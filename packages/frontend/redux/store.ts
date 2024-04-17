@@ -1,9 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import themeReducer from "./reducers/themeReducer";
+import storePersist from "./persistStore";
 import reducers from "./reducers";
+import { persistStore } from "redux-persist";
+
+const persistedReducer = storePersist(reducers);
 
 export const store = configureStore({
-  reducer: reducers,
+  reducer: persistedReducer,
 });
+
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
