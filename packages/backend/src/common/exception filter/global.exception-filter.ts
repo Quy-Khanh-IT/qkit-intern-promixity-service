@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { ConfigKey } from '../constraints/configKey.constraint';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -25,7 +26,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       statusCode: status,
       message,
       error:
-        this.config_service.get('NODE_ENV') !== 'prod'
+        this.config_service.get(ConfigKey.PROJECT_ENVIRONMENT) !== 'prod'
           ? {
               response: exception.response,
               stack: exception.stack,

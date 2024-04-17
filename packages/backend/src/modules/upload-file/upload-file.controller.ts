@@ -10,6 +10,7 @@ import {
 import { UploadFileService } from './upload-file.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 @Controller('images')
 export class UploadFileController {
@@ -35,7 +36,9 @@ export class UploadFileController {
       },
     }),
   )
-  async uploadFile(@UploadedFile() image: Express.Multer.File) {
+  async uploadFile(
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     const result = await this.uploadFileService.uploadImageToCloudinary(image);
 
     return result;
@@ -66,7 +69,7 @@ export class UploadFileController {
   )
   async uploadMultipleFiles(
     @UploadedFiles() images: Array<Express.Multer.File>,
-  ) {
+  ): Promise<Array<UploadApiResponse | UploadApiErrorResponse>> {
     const results = await Promise.all(
       images.map((image) =>
         this.uploadFileService.uploadImageToCloudinary(image),
