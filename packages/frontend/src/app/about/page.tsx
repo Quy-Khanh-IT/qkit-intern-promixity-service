@@ -3,6 +3,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { setTheme } from "../../../redux/reducers/themeReducer";
+import { setTest } from "../../../redux/reducers/testReducer";
 
 const AboutPage: React.FC = () => {
   const currentTheme = useSelector(
@@ -11,7 +12,7 @@ const AboutPage: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleChangeTheme = () => {
-    dispatch(setTheme(undefined));
+    dispatch(setTest(undefined));
   };
 
   return (

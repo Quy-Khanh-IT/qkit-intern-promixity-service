@@ -1,0 +1,34 @@
+.scroll-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+
+  display: none;
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  height: 50px;
+  width: 50px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  z-index: 9999;
+
+  i {
+    font-size: 20px;
+    position: fixed;
+    bottom: 34px;
+    right: 33px;
+  }
+
+  iframe {
+    height: 50px;
+    width: 50px;
+  }
+}
+
+.show {
+  display: block !important;
+}

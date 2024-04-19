@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.scss";
+import "../app/styles/globals.scss";
 import "bootstrap/dist/css/bootstrap.css";
 import StoreProvider from "@/components/StoreProvider";
+import ScrollToTopButton from "@/components/Scrolltotop";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={inter.className}>
+        <ScrollToTopButton />
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
