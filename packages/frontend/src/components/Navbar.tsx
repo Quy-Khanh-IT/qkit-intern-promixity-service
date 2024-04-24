@@ -57,12 +57,12 @@ export default function Navbar() {
           {!toggle ? (
             <i
               onClick={() => setToggle(!toggle)}
-              className="fa-solid fa-bars"
+              className="fa-solid fa-bars nav-icon"
             ></i>
           ) : (
             <i
               onClick={() => setToggle(!toggle)}
-              className="fa-solid fa-xmark"
+              className="fa-solid fa-xmark nav-icon"
             ></i>
           )}
 

@@ -3,9 +3,11 @@
   bottom: 30px;
   right: 30px;
   display: flex;
+  align-items: center;
+  justify-content: center;
 
   display: none;
-  background-color: transparent;
+  background-color: #151030;
   color: white;
   border: none;
   border-radius: 50px;
@@ -17,10 +19,7 @@
   z-index: 9999;
 
   i {
-    font-size: 20px;
-    position: fixed;
-    bottom: 34px;
-    right: 33px;
+    font-size: 24px;
   }
 
   iframe {
@@ -30,5 +29,5 @@
 }
 
 .show {
-  display: block !important;
+  display: flex !important;
 }

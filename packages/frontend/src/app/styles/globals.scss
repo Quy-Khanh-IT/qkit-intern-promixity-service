@@ -1,4 +1,29 @@
 main {
   background-color: #060817;
-  height: 200vh;
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgb(99, 99, 99);
+  opacity: 0.1 !important;
+}
+
+@keyframes animate {
+  0% {
+    background-position: 0;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+::-webkit-scrollbar-thumb {
+  background: #151030;
+  border-radius: 20px;
+  animation: animate 2s infinite linear;
 }

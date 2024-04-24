@@ -1,7 +1,10 @@
+"use client";
+
+import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
+import ServiceSlider from "@/components/ServiceSlider";
 import StarsCanvas from "@/components/canvas/Star";
-import Link from "next/link";
 
 export default function Home() {
   return (
@@ -11,6 +14,8 @@ export default function Home() {
         <Hero />
         <StarsCanvas />
       </div>
+      <ServiceSlider />
+      <Footer />
     </main>
   );
 }

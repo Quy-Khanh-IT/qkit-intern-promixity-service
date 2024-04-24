@@ -29,16 +29,12 @@ const ScrollToTopButton = () => {
   }, []);
 
   return (
-    <button
+    <div
       className={`scroll-to-top ${isVisible ? "show" : ""}`}
       onClick={scrollToTop}
     >
-      <img
-        src="./rocket.png"
-        alt="Scroll to Top"
-        style={{ width: "50px", height: "50px" }}
-      />
-    </button>
+      <i className="fa-solid fa-angle-up"></i>
+    </div>
   );
 };
 

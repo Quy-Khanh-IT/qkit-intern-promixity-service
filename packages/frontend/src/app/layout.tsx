@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "../app/styles/globals.scss";
 import "bootstrap/dist/css/bootstrap.css";
 import StoreProvider from "@/components/StoreProvider";
 import ScrollToTopButton from "@/components/Scrolltotop";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const popins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "700", "800", "900"],
+});
 
 export const metadata: Metadata = {
   title: "Promixity Service",
@@ -25,7 +30,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         ></script>
       </head>
-      <body className={inter.className}>
+      <body className={popins.className}>
         <ScrollToTopButton />
         <StoreProvider>{children}</StoreProvider>
       </body>

@@ -25,6 +25,11 @@ $hightlight_color: white;
     .navbar-menu {
       color: $hidden_color;
 
+      .nav-icon {
+        cursor: pointer;
+        position: relative;
+      }
+
       i {
         color: $hightlight_color;
         font-size: 24px;
