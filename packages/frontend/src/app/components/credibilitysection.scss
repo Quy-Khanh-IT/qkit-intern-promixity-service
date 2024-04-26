@@ -1,0 +1,87 @@
+.cred-section-container {
+  height: 100vh;
+  color: white;
+  padding-top: 100px;
+
+  .cred-section-header {
+    margin: 20px;
+    strong {
+      color: #ed1651 !important;
+    }
+  }
+
+  .list-card {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    .ts-card {
+      --card-color: #ff6b00;
+      --blur-color: rgba(255, 107, 0, 0.4);
+
+      &:hover {
+        background: var(--card-color);
+        box-shadow: 0px 3px 187.5px 7.5px var(--blur-color);
+        color: black;
+      }
+      margin: 20px;
+      border: 4px solid var(--card-color);
+      user-select: none;
+      width: 100%;
+      border-radius: 4px;
+
+      background: #080808;
+      box-shadow: var(--drop-100);
+      transition-property: color, background, box-shadow;
+      transition-timing-function: ease;
+      transition-duration: 600ms;
+      z-index: 1;
+      position: relative;
+      overflow: hidden;
+      max-width: 100%;
+      display: inline-block;
+
+      .ts-card-content {
+        z-index: 5;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        min-height: 30rem;
+        padding: 2rem 2.5rem;
+        display: flex;
+        position: relative;
+        .ts-card-description {
+          .title {
+            font-size: 60px;
+            font-weight: 900;
+          }
+        }
+
+        .ts-card-title {
+          font-weight: 900;
+          font-size: 20px;
+        }
+
+        .ts-card-detail {
+          display: flex;
+          align-items: center;
+          .detail-content {
+            font-size: 14px;
+          }
+          i {
+            margin-left: 8px;
+          }
+
+          &:hover {
+            font-weight: 700;
+          }
+        }
+
+        .ts-card-logo {
+          img {
+            height: 24px;
+          }
+        }
+      }
+    }
+  }
+}

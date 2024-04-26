@@ -1,0 +1,131 @@
+.aboutus-section-container {
+  border-top: #64ffda 1px solid;
+  height: 100vh;
+  padding-top: 112px;
+  color: white;
+
+  .aboutus-section-top {
+    display: flex;
+    .aboutus-content {
+      width: 50%;
+
+      .nav-tabs {
+        border: none;
+        margin-top: 56px;
+        list-style: none;
+        display: flex;
+        padding: 0;
+
+        .nav-item {
+          padding-right: 12px;
+          line-height: 1;
+          font-size: 18px;
+          font-weight: 500;
+
+          &:hover {
+            color: #ed1651;
+            text-decoration: underline;
+          }
+
+          &:not(:first-child) {
+            border-left: 1px grey solid;
+            padding-left: 12px;
+          }
+        }
+
+        .active {
+          font-weight: 600;
+          color: #ed1651;
+          text-decoration: underline;
+        }
+      }
+
+      .tab-content {
+        color: #cccccc;
+        margin-top: 4px;
+
+        .content {
+          font-size: 14px;
+        }
+        .tab-item {
+          .critia-list {
+            list-style: none;
+            margin-top: 8px;
+            padding: 0;
+
+            .critia-item {
+              font-size: 16px;
+              color: white;
+              display: flex;
+              align-items: center;
+
+              i {
+                color: #ed1651;
+                font-size: 18px;
+                margin-right: 12px;
+              }
+            }
+          }
+        }
+      }
+      .sub-title {
+        color: rgb(163, 163, 163);
+        font-weight: 700;
+      }
+
+      .title {
+        img {
+          height: 112px;
+          position: absolute;
+          bottom: -65px;
+          left: 10px;
+        }
+        h1 {
+          font-weight: 600;
+          margin: 0;
+          line-height: 1.6;
+          strong {
+            color: #64ffda;
+          }
+          position: relative;
+        }
+      }
+    }
+    .aboutus-thumb {
+      width: 50%;
+      padding: 0 80px;
+      position: relative;
+
+      .thumb-1 {
+        height: 50px;
+        border-radius: 8px;
+      }
+      .thumb-2 {
+        height: 260px;
+        position: absolute;
+        bottom: -100px;
+        right: -10px;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .aboutus-section-bottom {
+    margin-top: 130px;
+    .data-list {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      justify-content: space-between;
+
+      .data-item {
+        width: 100%;
+
+        background-color: red;
+        &:not(:first-child):not(:last-child) {
+          margin: 20px;
+        }
+      }
+    }
+  }
+}

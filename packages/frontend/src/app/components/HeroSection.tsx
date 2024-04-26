@@ -2,15 +2,30 @@
 import EarthCanvas from "./canvas/Earth";
 import { motion } from "framer-motion";
 import { slideIn } from "../../utils/motion";
-import ".//hero.scss";
+import ".//herosection.scss";
+import { Cursor, useTypewriter } from "react-simple-typewriter";
 
-export default function Hero() {
+export default function HeroSection() {
+  const [text] = useTypewriter({
+    words: ["Chính", "Bách", "Ngọc", "Tuấn", "Khánh", "QKIT Intern Team"],
+    typeSpeed: 120,
+  });
+
   return (
-    <div className="hero-wrap">
+    <div id="hero" className="hero-wrap ">
       <div className="hero-content">
         <div>
-          <h1>YOUR MAP</h1>
-          <h1>YOUR BUSINESS</h1>
+          <h1>PROXIMITY SERVICE</h1>
+          <div
+            className={
+              text === "QKIT Intern Team" ? "subtitle done" : "subtitle"
+            }
+          >
+            Created by: {text}
+            <span style={{ color: "white" }}>
+              <Cursor cursorStyle={text === "QKIT Intern Team" ? "🔥" : "|"} />
+            </span>
+          </div>
           <div
             style={{
               width: "100%",
@@ -20,7 +35,7 @@ export default function Hero() {
               margin: "16px 0 24px 24px",
             }}
           >
-            <button className="hero-btn">START NOW</button>
+            <button className="hero-btn">JOIN NOW</button>
           </div>
           <div style={{ maxWidth: "700px", marginTop: "8px" }}>
             <span>

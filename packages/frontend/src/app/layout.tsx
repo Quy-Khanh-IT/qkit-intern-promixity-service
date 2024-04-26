@@ -31,7 +31,7 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={popins.className}>
-        <ScrollToTopButton />
+        {/* <ScrollToTopButton /> */}
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>

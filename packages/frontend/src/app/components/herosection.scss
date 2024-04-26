@@ -17,6 +17,15 @@ $hightlight_color: white;
     color: $hightlight_color !important;
     flex-direction: column;
 
+    .subtitle {
+      color: #a19691;
+      font-weight: 500;
+    }
+
+    .done {
+      color: #fffab7 !important;
+    }
+
     @media (max-width: 1400px) {
       span {
         display: none !important;
@@ -144,6 +153,7 @@ $hightlight_color: white;
       width: 100% !important;
     }
     width: 50%;
+    float: right;
     .planet {
       flex-grow: 1;
       height: auto;
