@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "../app/styles/globals.scss";
+import "./globals.scss";
 import "bootstrap/dist/css/bootstrap.css";
-import StoreProvider from "@/components/StoreProvider";
-import ScrollToTopButton from "@/components/Scrolltotop";
+import StoreProvider from "@/app/components/StoreProvider";
+import ScrollToTopButton from "@/app/components/Scrolltotop";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 

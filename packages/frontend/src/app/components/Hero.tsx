@@ -1,8 +1,8 @@
 "use client";
-import EarthCanvas from "../components/canvas/Earth";
+import EarthCanvas from "./canvas/Earth";
 import { motion } from "framer-motion";
-import { slideIn } from "../utils/motion";
-import "../app/styles/components/hero.scss";
+import { slideIn } from "../../utils/motion";
+import ".//hero.scss";
 
 export default function Hero() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, ReactNode } from "react";
 import { Provider } from "react-redux";
-import { persistor, store } from "../../redux/store";
+import { persistor, store } from "../../../redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 
 interface StoreProviderProps {

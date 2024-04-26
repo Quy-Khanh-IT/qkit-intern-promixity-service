@@ -1,7 +1,7 @@
 "use client";
 
 import Slider from "react-slick";
-import ServiceSlick from "@/components/ServiceSlick";
+import ServiceSlick from "@/app/components/ServiceSlick";
 
 export default function TestPage() {
   let settings = {

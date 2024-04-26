@@ -27,7 +27,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/utils/motion.js",
-    "src/components/canvas/Star.js"
+    "src/app/components/canvas/Star.js"
   ],
   "exclude": ["node_modules"]
 }
