@@ -1,9 +1,8 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { configSwagger } from './cores/configs/swagger.config';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { configCloudinary } from './cores/configs/cloudinary.config';
+import { configCloudinary, configSwagger } from './cores/configs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
