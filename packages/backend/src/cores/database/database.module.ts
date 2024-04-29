@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConfigKey } from 'src/common/constraints/configKey.constraint';
+import { ConfigKey } from 'src/common/constants';
 
 @Module({
   imports: [
@@ -16,6 +16,7 @@ import { ConfigKey } from 'src/common/constraints/configKey.constraint';
         const host = configService.get(ConfigKey.MONGO_HOST);
         const port = configService.get(ConfigKey.MONGO_PORT);
         const urlConnection = `mongodb://${host}:${port}/${database}`;
+        console.log(urlConnection);
         return {
           uri: `${urlConnection}`,
           dbName: database,

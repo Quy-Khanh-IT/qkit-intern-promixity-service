@@ -1,7 +1,7 @@
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 
 export interface BaseRepositoryInterface<T> {
-  create(dto: T | any): Promise<T>;
+  create(dto: T | any): Promise<T>; //Unknown
 
   findOneById(id: string, projection?: string): Promise<T>;
 

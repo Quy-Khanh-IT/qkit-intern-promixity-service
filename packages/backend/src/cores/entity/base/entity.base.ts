@@ -3,9 +3,12 @@ import { Expose, Transform } from 'class-transformer';
 import { ObjectId } from 'mongoose';
 
 export class BaseEntity {
-  _id?: ObjectId | string;
+  _id?: ObjectId;
 
-  // @Expose()
-  // // @Transform((value) => value.obj?._id?.toString(), { toClassOnly: true })
-  // id?: string;
+  // Transform _id to id
+  id?: string;
+
+  createdAt?: Date;
+  updatedAt?: Date;
+  __v?: number;
 }

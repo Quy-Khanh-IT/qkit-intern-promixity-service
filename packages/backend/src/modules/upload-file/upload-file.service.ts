@@ -6,11 +6,7 @@ import {
   v2 as cloudinary,
 } from 'cloudinary';
 import * as sharp from 'sharp';
-import { ConfigKey } from 'src/common/constraints/configKey.constraint';
-
-const MAX_FILE_SIZE = 400 * 1024;
-const QUALITY_COMPRESSED_IMAGE = 50;
-const IMAGE_FORMAT = 'jpeg';
+import { ConfigKey, UploadFileConstraint } from 'src/common/constants';
 
 @Injectable()
 export class UploadFileService {
@@ -20,13 +16,13 @@ export class UploadFileService {
     file: Express.Multer.File,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     let fileBuffer = file.buffer;
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > UploadFileConstraint.MAX_FILE_SIZE) {
       fileBuffer = await this.compressImage(fileBuffer);
     }
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          format: IMAGE_FORMAT,
+          format: UploadFileConstraint.IMAGE_FORMAT,
           folder: this.configService.get<string>(
             ConfigKey.CLOUDINARY_IMAGE_FOLDER,
           ),
@@ -44,7 +40,7 @@ export class UploadFileService {
   async compressImage(fileBuffer: Buffer): Promise<Buffer> {
     const compressedImageBuffer = await sharp(fileBuffer)
       .jpeg({
-        quality: QUALITY_COMPRESSED_IMAGE,
+        quality: UploadFileConstraint.QUALITY_COMPRESSED_IMAGE,
         progressive: true,
       })
       .toBuffer();

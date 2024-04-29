@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { ConfigKey } from '../constraints/configKey.constraint';
+import { ConfigKey } from '../constants/config-key.constant';
+import { error } from 'console';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -21,7 +22,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const message =
       exception instanceof HttpException
         ? exception.message
-        : 'Internal server error';
+        : 'Server is busy, please try again later! (Internal Server Error)';
+    console.error(exception);
     response.status(status).json({
       statusCode: status,
       message,

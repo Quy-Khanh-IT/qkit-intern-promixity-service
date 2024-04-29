@@ -8,6 +8,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
 import { DatabaseModule } from './cores/database/database.module';
 import { UserModule } from './modules/user/user.module';
+import { OtpModule } from './modules/otp/otp.module';
+import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +22,8 @@ import { UserModule } from './modules/user/user.module';
     UploadFileModule,
     DatabaseModule,
     UserModule,
+    OtpModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

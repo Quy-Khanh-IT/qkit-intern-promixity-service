@@ -1,8 +1,23 @@
+import { string } from '@hapi/joi';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { model, Document, HydratedDocument } from 'mongoose';
+import { Address } from 'cluster';
+import {
+  model,
+  Document,
+  HydratedDocument,
+  Types,
+  VirtualType,
+} from 'mongoose';
+import { UserRole } from 'src/common/enums/user.enum';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type UserDocument = HydratedDocument<User>;
+
+export const AddressUser = {
+  city: String,
+  province: String,
+  country: String,
+};
 
 @Schema({
   timestamps: {
@@ -11,38 +26,36 @@ export type UserDocument = HydratedDocument<User>;
   },
 })
 export class User extends BaseEntity {
-  @Prop()
-  user_nickname: string;
+  @Prop({ required: true, unique: true, trim: true, maxlength: 100 })
+  email: string;
+
+  @Prop({ required: true, minlength: 8 })
+  password: string;
+
+  @Prop({ required: true, minlength: 2, maxlength: 50 })
+  firstName: string;
+
+  @Prop({ required: true, minlength: 2, maxlength: 50 })
+  lastName: string;
+
+  @Prop([String])
+  roles: string[];
 
   @Prop()
-  user_email: string;
+  image: string;
 
   @Prop()
-  user_password: string;
+  phoneNumber: string;
 
-  @Prop()
-  user_profilePhotoURL: string;
+  @Prop({
+    type: AddressUser,
+    _id: false,
+    required: true,
+  })
+  address: Object;
 
-  @Prop()
-  user_website: string;
-
-  @Prop()
-  user_bio: string;
-
-  @Prop()
-  user_favorite_posts: string[];
-
-  @Prop()
-  user_following_count: number;
-
-  @Prop()
-  user_follower_count: number;
-
-  @Prop()
-  user_gender: string;
-
-  @Prop()
-  role: string;
+  @Prop([Types.ObjectId])
+  businesses: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

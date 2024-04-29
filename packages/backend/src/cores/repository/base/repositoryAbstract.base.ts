@@ -2,6 +2,7 @@ import { Model, FilterQuery, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { BaseRepositoryInterface } from './repostioryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { transObjectIdToString } from 'src/common/utils';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -16,17 +17,24 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   }
 
   async findOneById(id: string): Promise<T> {
-    const item = (await this.model.findById(id).lean().exec()) as T;
-    return item;
+    const result = (await this.model.findById(id).lean().exec()) as T;
+    if (result) {
+      result.id = transObjectIdToString(result._id);
+    }
+    return result;
   }
 
-  async findOneByCondition(condition = {}): Promise<T> {
-    return (await this.model
+  async findOneByCondition(condition = {}): Promise<T | null> {
+    const result = (await this.model
       .findOne({
         ...condition,
       })
       .lean()
       .exec()) as T;
+    if (result) {
+      result.id = transObjectIdToString(result._id);
+    }
+    return result;
   }
 
   async findAll(
@@ -38,6 +46,11 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
       .lean()
       .exec()) as T[];
 
+    if (items.length) {
+      items.forEach(
+        (Element) => (Element.id = transObjectIdToString(Element._id)),
+      );
+    }
     return {
       count: items.length,
       items,
@@ -52,6 +65,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
         new: true,
       },
     );
+    if (result) {
+      result.id = transObjectIdToString(result._id);
+    }
     return result as T;
   }
 

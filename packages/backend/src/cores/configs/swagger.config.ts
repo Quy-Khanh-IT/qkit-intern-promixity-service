@@ -1,16 +1,16 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NextFunction, Request, Response } from 'express';
+import { SwaggerConstant } from 'src/common/constants/swagger.constant';
+
 export function configSwagger(app: INestApplication) {
-  const api_documentation_credentials = {
-    name: 'admin',
-    pass: 'admin',
-  };
+  const { api_documentation_credentials, description, name, version } =
+    SwaggerConstant;
 
   const config = new DocumentBuilder()
-    .setTitle('Proximity Service project')
-    .setDescription('## The Proximity Service API description')
-    .setVersion('1.0')
+    .setTitle(name)
+    .setDescription(description)
+    .setVersion(version)
     .addBearerAuth()
     .build();
 
