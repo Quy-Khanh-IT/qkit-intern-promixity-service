@@ -1,9 +1,7 @@
-// import { User as AppUser } from 'src/users/entities/users.entity';
+import { User as AppUser } from 'src/modules/user/entities/user.entity';
 
-// declare global {
-//   namespace Express {
-//     interface User extends AppUser {}
-//   }
-// }
-
-//Chưa config user entity
+declare global {
+  namespace Express {
+    interface User extends AppUser {}
+  }
+}

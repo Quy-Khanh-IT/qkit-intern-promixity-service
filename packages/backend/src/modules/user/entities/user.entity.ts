@@ -59,3 +59,4 @@ export class User extends BaseEntity {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+//path: packages/backend/src/modules/user/dto/create-user.dto.ts

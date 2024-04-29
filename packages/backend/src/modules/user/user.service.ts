@@ -12,17 +12,15 @@ export class UserService {
     return await this.userRepository.findAll({});
   }
 
-  async update() {
-    return this.userRepository.update('655ab2ba456d22a01c27972c', {
-      // user_nickname: 'NATNGoc nênnenenenene',
-    });
-  }
-
   async checkEmailExist(email: string): Promise<boolean> {
     const result = await this.userRepository.findOneByCondition({
       email: email,
     });
     return result ? true : false;
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOneByCondition({ email });
   }
 
   async delete() {

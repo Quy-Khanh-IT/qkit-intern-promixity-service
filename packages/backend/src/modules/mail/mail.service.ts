@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { User } from '../user/entities/user.entity';
 @Injectable()
 export class MailService {
   constructor(private readonly configService: ConfigService) {}

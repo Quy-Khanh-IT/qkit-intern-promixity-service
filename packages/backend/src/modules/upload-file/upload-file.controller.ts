@@ -9,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { UploadFileService } from './upload-file.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 @Controller('images')
+@ApiTags('Cloudianry')
 export class UploadFileController {
   constructor(private readonly uploadFileService: UploadFileService) {}
 
