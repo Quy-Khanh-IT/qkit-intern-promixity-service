@@ -1,7 +1,6 @@
 # Use a lighter version of Node as a base
 FROM node:20.11.1-alpine3.19 as base
 EXPOSE 8080
-EXPOSE 8081
 
 # Build 
 FROM node:20.11.1-alpine3.19 as build

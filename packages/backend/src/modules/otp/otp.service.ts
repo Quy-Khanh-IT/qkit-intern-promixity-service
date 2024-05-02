@@ -32,11 +32,7 @@ export class OtpService {
       otp: otpCode,
       expiredAt: expiredTime,
     });
-    this.mailService.sendEmail(
-      email,
-      'OTP Code',
-      `Your OTP code is ${otpCode}`,
-    );
+    this.mailService.sendOTPMail(email, 'OTP Code', otpCode);
     return result;
   }
 

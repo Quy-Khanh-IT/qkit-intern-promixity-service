@@ -20,7 +20,6 @@ export class SignUpDto {
   email: string;
 
   @IsString()
-  @MinLength(8)
   @ApiProperty({ example: 'Password123@' })
   @Matches(UserConstant.regrexPassword, {
     message:
