@@ -113,21 +113,18 @@ export default function AboutusSection() {
         </div>
 
         <div className="aboutus-thumb">
-          {/* <img
+          <img
             className="thumb-1"
-            src="./images/aboutus-thumb-6.png"
+            src="./images/earth-aboutus.svg"
             alt="thumb"
           ></img>
-          {/* <img
-            className="thumb-2"
-            src="./images/thumb-aboutus-3.jpg"
-            alt="thumb"
-          ></img> */}
         </div>
       </div>
       <div className="aboutus-section-bottom">
-        <ul className="data-list">
-          <li className="data-item">1</li>
+        <ul className="bento-wrapper">
+          <li className="data-item primary-item">
+            <h2>300k+ Users</h2>
+          </li>
           <li className="data-item">2</li>
           <li className="data-item">3</li>
           <li className="data-item">4</li>
