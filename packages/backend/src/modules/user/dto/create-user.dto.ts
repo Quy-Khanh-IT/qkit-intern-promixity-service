@@ -11,7 +11,7 @@ import {
   IsPhoneNumber,
 } from 'class-validator';
 import { UserConstant } from 'src/common/constants/user.constant';
-import { UserRole } from 'src/common/enums/user.enum';
+import { UserRole } from 'src/common/enums';
 
 export class CreateUserDto {
   @IsNotEmpty()

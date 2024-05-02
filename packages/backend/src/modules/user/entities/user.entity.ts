@@ -8,7 +8,7 @@ import {
   Types,
   VirtualType,
 } from 'mongoose';
-import { UserRole } from 'src/common/enums/user.enum';
+import { UserRole } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type UserDocument = HydratedDocument<User>;
