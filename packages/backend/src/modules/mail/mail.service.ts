@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
+import { MailConstant } from 'src/common/constants';
 @Injectable()
 export class MailService {
   constructor(private readonly configService: ConfigService) {}
@@ -41,15 +42,21 @@ export class MailService {
   }
 
   async sendOTPMail(email: string, subject: string, otpCode: string) {
-    const htmlTemplate = fs.readFileSync('src/common/views/OTP.html', 'utf8');
-    const emailContent = htmlTemplate.replace('{{otp}}', otpCode);
+    const htmlTemplate = fs.readFileSync(
+      MailConstant.MAIL_OTP_HTML_LINK,
+      'utf8',
+    );
+    const emailContent = htmlTemplate.replace(
+      MailConstant.OTP_CODE_VARIABLE,
+      otpCode,
+    );
 
     return this.sendEmail(email, subject, emailContent);
   }
 
   async sendWelcomeMail(email: string, subject: string) {
     const emailContent = fs.readFileSync(
-      'src/common/views/registration.html',
+      MailConstant.MAIL_WELCOME_HTML_LINK,
       'utf8',
     );
 

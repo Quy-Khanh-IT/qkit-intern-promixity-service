@@ -4,17 +4,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OTP</title>
+  <style>
+    /* Styles for small screens */
+    @media (max-width: 767px) {
+      .container {
+        width: 90%;
+        padding: 12px;
+      }
+
+      .logo img {
+        height: 30px;
+      }
+
+      .heading {
+        font-size: 24px;
+      }
+
+      .otp-banner img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .footer {
+        font-size: 12px;
+      }
+    }
+
+    /* Styles for medium screens */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .container {
+        width: 80%;
+      }
+
+      .logo img {
+        height: 40px;
+      }
+
+      .heading {
+        font-size: 32px;
+      }
+
+      .otp-banner img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .footer {
+        font-size: 14px;
+      }
+    }
+
+    /* Styles for large screens */
+    @media (min-width: 1024px) {
+      .container {
+        width: 60%;
+        max-width: 800px;
+        /* Giới hạn chiều rộng tối đa */
+      }
+
+      .logo img {
+        height: 45px;
+      }
+
+      .heading {
+        font-size: 38px;
+      }
+
+      .otp-banner img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .content {
+        padding: 40px 48px;
+      }
+
+      .footer {
+        font-size: 16px;
+      }
+    }
+
+    /* Căn giữa nội dung */
+    .container {
+      margin: 0 auto;
+    }
+  </style>
 </head>
 
 <body style="
       font-family: 'Poppins', sans-serif;
       background-color: #101010;
       color: #ffffff;
+      border-radius: 16px;
     ">
-  <div style=" display: table; width: 100%">
+  <div style="display: table; width: 100%">
     <div style="display: table-cell; vertical-align: middle">
-      <div style="margin: 0 auto; width: 50%; padding: 24px">
+      <div class="container" style="padding: 24px">
         <div style="width: 100%">
           <img src="https://raw.githubusercontent.com/ninehcobra/free-host-image/main/logo-qkit.png" alt="logo"
             style="height: 45px" />
@@ -38,9 +131,10 @@
                     letter-spacing: 8px;
                     font-weight: 700;
                     font-size: 24px;
+                    color: #ec0052;
                   ">
                 <!-- OTP để ở đây -->
-                {{otp}}
+                {{otp-code}}
               </div>
             </div>
           </div>
@@ -80,12 +174,9 @@
             </li>
           </ul>
         </div>
-
       </div>
     </div>
-  </div>
   </div>
 </body>
 
 </html>
-//Path: packages/backend/src/common/views/OTP.html
