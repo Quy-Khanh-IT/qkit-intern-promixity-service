@@ -7,16 +7,29 @@ import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { PassportModule } from '@nestjs/passport';
+import { JwtAccessTokenStrategy } from './stragegies/jwt-access-token.stragegy';
+import { JwtRefreshTokenStrategy } from './stragegies/jwt-refresh-token.stragegy';
+import { JwtResetPasswordStrategy } from './stragegies/jwt-reset-token.stragegy';
 
 @Module({
   imports: [
     OtpModule,
     MailModule,
     UserModule,
+    PassportModule,
     ConfigModule,
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, TokenService],
+  providers: [
+    AuthService,
+    TokenService,
+    TokenService,
+    JwtAccessTokenStrategy,
+    JwtRefreshTokenStrategy,
+    JwtResetPasswordStrategy,
+  ],
 })
 export class AuthModule {}

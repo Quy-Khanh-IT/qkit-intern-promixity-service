@@ -19,8 +19,20 @@ export class UserService {
     return result ? true : false;
   }
 
+  async updatePassword(id: string, password: string): Promise<User> {
+    const user = await this.userRepository.update(id, { password });
+    if (!user) {
+      throw new InternalServerErrorException('Update password failed');
+    }
+    return user;
+  }
+
   async findOneByEmail(email: string): Promise<User> {
     return await this.userRepository.findOneByCondition({ email });
+  }
+
+  async findOneById(id: string): Promise<User> {
+    return await this.userRepository.findOneById(id);
   }
 
   async delete() {

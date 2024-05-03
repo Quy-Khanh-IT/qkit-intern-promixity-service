@@ -29,6 +29,15 @@ export class TokenService {
     });
   }
 
+  async generateResetPasswordToken(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: `${this.configService.get<number>(ConfigKey.RESET_PASSWORD_SECRET_KEY)}`,
+      expiresIn: `${this.configService.get<string>(
+        ConfigKey.JWT_RESET_PASSWORD_TOKEN_EXPIRATION_TIME,
+      )}s`,
+    });
+  }
+
   public async genNewPairToken(
     tokenPayload: TokenPayload,
   ): Promise<[string, string] | null> {

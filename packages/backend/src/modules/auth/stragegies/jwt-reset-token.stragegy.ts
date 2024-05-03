@@ -1,27 +1,30 @@
 import {
-  HttpException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy, ExtractJwt } from 'passport-jwt';
+import { AuthService } from '../auth.service';
 import { ERRORS_DICTIONARY } from 'src/common/constants';
-import TokenPayload from 'src/modules/auth/key.payload';
-import { User } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import TokenPayload from '../key.payload';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Injectable()
-export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
+export class JwtResetPasswordStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-reset-password',
+) {
   constructor(
-    private readonly configServicde: ConfigService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromHeader('reset-token-header'),
       ignoreExpiration: false,
-      secretOrKey: configServicde.get<string>('SECRET_KEY'),
+      secretOrKey: configService.get<string>('RESET_PASSWORD_SECRET_KEY'), // replace with your secret key
     });
   }
 

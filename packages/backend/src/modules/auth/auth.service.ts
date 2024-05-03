@@ -1,24 +1,36 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { OtpService } from '../otp/otp.service';
 import { UserService } from '../user/user.service';
 import { SignUpDto } from './dto/sign-up.dto';
-import { ERRORS_DICTIONARY } from 'src/common/constants';
+import { ERRORS_DICTIONARY, ERROR_MESSAGES } from 'src/common/constants';
 import { User } from '../user/entities/user.entity';
-import { LoginDto, LoginResponeDto } from './dto/index';
+import {
+  LoginDto,
+  LoginResponeDto,
+  ResetPasswordDto,
+  requestResetPasswordDto,
+} from './dto/index';
 import { verifyHash } from 'src/common/utils';
 import { TokenService } from './token.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UserService,
+    private readonly userService: UserService,
     private readonly otpService: OtpService,
     private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
   ) {}
 
   public async signUp(registrationData: SignUpDto): Promise<User> {
-    const isExistingEmail = await this.usersService.checkEmailExist(
+    const isExistingEmail = await this.userService.checkEmailExist(
       registrationData.email,
     );
 
@@ -49,7 +61,7 @@ export class AuthService {
 
     const hashedPassword: string = await argon2.hash(registrationData.password);
 
-    return await this.usersService.create({
+    return await this.userService.create({
       firstName: registrationData.firstName,
       lastName: registrationData.lastName,
       email: registrationData.email,
@@ -66,7 +78,7 @@ export class AuthService {
   }
 
   public async login(loginData: LoginDto): Promise<LoginResponeDto> {
-    const user = await this.usersService.findOneByEmail(loginData.email);
+    const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new NotFoundException({
         message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
@@ -88,10 +100,65 @@ export class AuthService {
     }
     const pairToken = await this.tokenService.genNewPairToken({
       user_id: user._id.toString(),
+      action: 'login',
     });
     return {
       accessToken: pairToken[0],
       refreshToken: pairToken[1],
     };
+  }
+
+  public async resetPassword(
+    data: ResetPasswordDto,
+    email: string,
+  ): Promise<void> {
+    if (data.newPassword !== data.oldPassword) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.AUTH_PASSWORD_NOT_MATCH,
+          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_PASSWORD_NOT_MATCH],
+        },
+        403,
+      );
+    }
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.USER_NOT_FOUND,
+          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_FOUND],
+        },
+        404,
+      );
+    }
+    const hashedPassword = await argon2.hash(data.newPassword);
+    const result = await this.userService.updatePassword(
+      user.id,
+      hashedPassword,
+    );
+    if (!result) {
+      throw new InternalServerErrorException('Update password failed');
+    }
+  }
+
+  public async requestResetPassword(
+    data: requestResetPasswordDto,
+  ): Promise<string> {
+    const user = await this.userService.findOneByEmail(data.email);
+    if (!user) {
+      throw new NotFoundException({
+        message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
+        detail: 'User not found',
+      });
+    }
+
+    const tokenForResetPassword =
+      await this.tokenService.generateResetPasswordToken({
+        action: 'Reset password',
+        user_id: user._id.toString(),
+      });
+    const frontEndUrl = this.configService.get<string>('FRONT_END_URL');
+
+    return `${frontEndUrl}/reset-password?token=${tokenForResetPassword}`;
   }
 }

@@ -55,4 +55,20 @@ export class MailService {
 
     return this.sendEmail(email, subject, emailContent);
   }
+
+  async sendResetPasswordMail(
+    email: string,
+    subject: string,
+    resetLink: string,
+  ) {
+    // const htmlTemplate = fs.readFileSync(
+    //   'src/common/views/reset-password.html',
+    //   'utf8',
+    // );
+    const htmlTemplate =
+      "<h1>Reset Password</h1><p>Click the link below to reset your password</p><a href='{{resetLink}}'>Reset Password</a>";
+    const emailContent = htmlTemplate.replace('{{resetLink}}', resetLink);
+
+    return this.sendEmail(email, subject, emailContent);
+  }
 }
