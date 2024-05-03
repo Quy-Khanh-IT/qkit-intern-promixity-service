@@ -6,6 +6,8 @@ import StoreProvider from "@/app/components/StoreProvider";
 import ScrollToTopButton from "@/app/components/Scrolltotop";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const popins = Poppins({
   subsets: ["latin"],
@@ -33,6 +35,19 @@ export default function RootLayout({
       <body className={popins.className}>
         {/* <ScrollToTopButton /> */}
         <StoreProvider>{children}</StoreProvider>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
       </body>
     </html>
   );
