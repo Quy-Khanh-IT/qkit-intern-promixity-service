@@ -11,6 +11,8 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
+import { BusinessesModule } from './modules/businesses/businesses.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +28,7 @@ import { UserModule } from './modules/user/user.module';
     OtpModule,
     AuthModule,
     RequestModule,
+    BusinessesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -83,7 +83,7 @@ export class AuthService {
     });
   }
 
-  public async login(loginData: LoginDto): Promise<LoginResponeDto> {
+  public async login(loginData: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new EmailNotExistedException();

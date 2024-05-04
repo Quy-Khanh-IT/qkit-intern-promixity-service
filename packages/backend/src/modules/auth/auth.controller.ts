@@ -60,7 +60,7 @@ export class AuthController {
     status: 200,
     description: 'User successfully logged in.',
   })
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponeDto> {
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return await this.authService.login(loginDto);
   }
 
