@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsJWT, IsNotEmpty, IsString } from 'class-validator';
 
-export class LoginResponeDto {
+export class LoginResponseDto {
   @IsJWT()
   @ApiProperty({
     description: 'Access token',

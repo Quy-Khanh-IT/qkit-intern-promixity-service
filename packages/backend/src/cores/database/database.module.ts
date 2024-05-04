@@ -11,7 +11,7 @@ import { ConfigKey } from 'src/common/constants';
       useFactory: async (configService: ConfigService) => {
         // const username = configService.get('MONGO_USERNAME');
         // const password = configService.get('MONGO_PASSWORD');
-        //--- Above atrributes are only used in mongo atlas, local dont use account
+        //--- Above attributes are only used in mongo atlas, local don't use account
         const database = configService.get(ConfigKey.MONGO_NAME);
         const host = configService.get(ConfigKey.MONGO_HOST);
         const port = configService.get(ConfigKey.MONGO_PORT);

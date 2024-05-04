@@ -15,13 +15,13 @@ import { UserService } from 'src/modules/user/user.service';
 @Injectable()
 export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly configServicde: ConfigService,
+    private readonly configService: ConfigService,
     private readonly userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configServicde.get<string>('SECRET_KEY'),
+      secretOrKey: configService.get<string>('SECRET_KEY'),
     });
   }
 

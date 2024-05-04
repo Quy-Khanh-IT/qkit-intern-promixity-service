@@ -12,7 +12,7 @@ import { ERRORS_DICTIONARY, ERROR_MESSAGES } from 'src/common/constants';
 import { User } from '../user/entities/user.entity';
 import {
   LoginDto,
-  LoginResponeDto,
+  LoginResponseDto,
   ResetPasswordDto,
   requestResetPasswordDto,
 } from './dto/index';
@@ -77,7 +77,7 @@ export class AuthService {
     });
   }
 
-  public async login(loginData: LoginDto): Promise<LoginResponeDto> {
+  public async login(loginData: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new NotFoundException({
