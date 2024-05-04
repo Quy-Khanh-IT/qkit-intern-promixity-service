@@ -26,7 +26,7 @@ import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { Request } from 'express';
-import { JwtResetPasswordStrategy } from './stragegies/jwt-reset-token.stragegy';
+import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token';
 
 @Controller('auth')

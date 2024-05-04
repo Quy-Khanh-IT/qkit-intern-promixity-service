@@ -10,6 +10,7 @@ import { DatabaseModule } from './cores/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,7 +25,6 @@ import { AuthModule } from './modules/auth/auth.module';
     UserModule,
     OtpModule,
     AuthModule,
-    
   ],
   controllers: [AppController],
   providers: [

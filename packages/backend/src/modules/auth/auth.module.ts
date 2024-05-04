@@ -9,9 +9,9 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { PassportModule } from '@nestjs/passport';
-import { JwtAccessTokenStrategy } from './stragegies/jwt-access-token.stragegy';
-import { JwtRefreshTokenStrategy } from './stragegies/jwt-refresh-token.stragegy';
-import { JwtResetPasswordStrategy } from './stragegies/jwt-reset-token.stragegy';
+import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';
+import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
+import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 
 @Module({
   imports: [
