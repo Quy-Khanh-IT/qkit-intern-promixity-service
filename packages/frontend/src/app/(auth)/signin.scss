@@ -191,7 +191,7 @@ $header-height: 48px;
         .header {
           height: $header-height;
           width: 85%;
-          background-color: #0f0607;
+          background-color: #0d1018;
 
           border-top-left-radius: 16px;
           border-top-right-radius: 16px;
@@ -199,7 +199,7 @@ $header-height: 48px;
 
         .content {
           height: calc(100% - #{$header-height});
-          background-color: #0f0607;
+          background-color: #0d1018;
           padding: 24px 48px 24px 48px;
           border-radius: 0 32px 32px 32px;
           position: relative;
@@ -243,6 +243,7 @@ $header-height: 48px;
             margin-top: 32px;
             font-size: 16px;
             font-weight: 300;
+            color: #8892b0;
           }
           i {
             margin-top: 8px;

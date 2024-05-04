@@ -73,16 +73,25 @@ export default function SignIn() {
                   Forget Password
                 </div>
               </div>
-              <button onClick={SignIn} className="form-btn">
+              <button
+                style={{ color: "white" }}
+                onClick={SignIn}
+                className="form-btn"
+              >
                 Sign In
               </button>
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 {" "}
                 Do not have an account?{" "}
-                <strong
-                  style={{ color: "#ed1651 !important", cursor: "pointer" }}
-                >
-                  <Link style={{ textDecoration: "none" }} href="/signup">
+                <strong style={{ cursor: "pointer" }}>
+                  <Link
+                    style={{
+                      textDecoration: "none",
+                      color: "#ed1651",
+                      fontWeight: "300",
+                    }}
+                    href="/signup"
+                  >
                     Register here!
                   </Link>
                 </strong>
