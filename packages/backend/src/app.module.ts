@@ -10,7 +10,7 @@ import { DatabaseModule } from './cores/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { BusinessesModule } from './modules/businesses/businesses.module';
+import { BusinessModule } from './modules/business/business.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { BusinessesModule } from './modules/businesses/businesses.module';
     UserModule,
     OtpModule,
     AuthModule,
-    BusinessesModule,
+    BusinessModule,
   ],
   controllers: [AppController],
   providers: [

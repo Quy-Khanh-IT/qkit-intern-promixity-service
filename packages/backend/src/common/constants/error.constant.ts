@@ -30,6 +30,7 @@ export enum ERRORS_DICTIONARY {
 }
 
 export const ERROR_MESSAGES = {
+  // AUTH
   [ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED]: 'Email already exists.',
   [ERRORS_DICTIONARY.AUTH_WRONG_CREDENTIALS]: 'Incorrect username or password.',
   [ERRORS_DICTIONARY.AUTH_CONTENT_NOT_MATCH]: 'Content does not match.',
@@ -41,13 +42,27 @@ export const ERROR_MESSAGES = {
   //OTP
   [ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT]: 'OTP exceeded limit.',
 
+  // USER
   [ERRORS_DICTIONARY.USER_NOT_FOUND]: 'User not found.',
   [ERRORS_DICTIONARY.USER_ALREADY_EXIST]: 'User already exists.',
   [ERRORS_DICTIONARY.USER_DISABLED]: 'User is disabled.',
 
+  // BUSINESS
   [ERRORS_DICTIONARY.BUSINESS_NOT_FOUND]: 'Business not found.',
   [ERRORS_DICTIONARY.BUSINESS_ALREADY_EXIST]: 'Business already exists.',
   [ERRORS_DICTIONARY.BUSINESS_DISABLED]: 'Business is disabled.',
+
+  // CLASS VALIDATOR
+  [ERRORS_DICTIONARY.VALIDATION_ERROR]: 'Validation error.',
+  [ERRORS_DICTIONARY.INVALID_INPUT]: 'Invalid input.',
+};
+
+export const ERROR_CODES = {
+  // BUSINESS
+
+  // CLASS VALIDATOR
+  [ERRORS_DICTIONARY.VALIDATION_ERROR]: 400,
+  [ERRORS_DICTIONARY.INVALID_INPUT]: 400,
 };
 
 // Path: packages/backend/src/common/constants/upload.constant.ts

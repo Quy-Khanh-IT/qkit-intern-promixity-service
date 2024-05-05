@@ -1,6 +1,6 @@
 import { Model, FilterQuery, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { BaseRepositoryInterface } from './repostioryInterface.base';
+import { BaseRepositoryInterface } from './repositoryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { transObjectIdToString } from 'src/common/utils';
 
@@ -37,14 +37,11 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     return result;
   }
 
-
-/*
+  /*
 
 
 
 */
-
-
 
   async findAll(
     condition: FilterQuery<T>,
