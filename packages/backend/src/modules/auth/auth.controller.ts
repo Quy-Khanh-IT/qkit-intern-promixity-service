@@ -7,27 +7,20 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  ApiBody,
-  ApiHeader,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   SignUpDto,
   LoginDto,
   LoginResponseDto,
   ResetPasswordDto,
-  requestResetPasswordDto,
+  RequestResetPasswordDto,
 } from './dto/index';
 import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
-import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { Request } from 'express';
 import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
-import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token';
+import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -56,25 +49,6 @@ export class AuthController {
     );
   }
 
-  @Post('reset-password/request')
-  @HttpCode(200)
-  @ApiBody({
-    type: requestResetPasswordDto,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully reset.',
-  })
-  async requestResetPassword(@Body() data: requestResetPasswordDto) {
-    const resetPasswordLink = await this.authService.requestResetPassword(data);
-
-    this.mailService.sendResetPasswordMail(
-      data.email,
-      'Reset Password',
-      resetPasswordLink,
-    );
-  }
-
   @Post('login')
   @HttpCode(200)
   @ApiBody({
@@ -88,12 +62,11 @@ export class AuthController {
     return await this.authService.login(loginDto);
   }
 
-  @Post('reset-password/reset')
+  @Post('reset-password')
   @ApiHeader({
     name: 'reset-token-header',
     description: 'The reset password token',
   })
-  @UseGuards(JwtResetPasswordTokenGuard)
   @HttpCode(200)
   @ApiBody({
     type: ResetPasswordDto,
@@ -102,7 +75,27 @@ export class AuthController {
     status: 200,
     description: 'User successfully reset.',
   })
-  async resetPassword(@Req() req: Request, @Body() data: ResetPasswordDto) {
-    await this.authService.resetPassword(data, req.user.email);
+  @UseGuards(JwtResetPasswordTokenGuard)
+  async resetPassword(@Body() data: ResetPasswordDto, @Req() req: Request) {
+    const JWTtoken: string = req.headers['reset-token-header'].toString();
+    await this.authService.resetPassword(data, req.user, JWTtoken);
+  }
+
+  @Post('reset-password/request')
+  @HttpCode(200)
+  @ApiBody({
+    type: RequestResetPasswordDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mail with one-time link has been sent.',
+  })
+  async requestResetPassword(@Body() data: RequestResetPasswordDto) {
+    const resetLink = await this.authService.requestResetPassword(data);
+    this.mailService.sendResetPasswordMail(
+      data.email,
+      'Reset Password Link Proximity service',
+      resetLink,
+    );
   }
 }

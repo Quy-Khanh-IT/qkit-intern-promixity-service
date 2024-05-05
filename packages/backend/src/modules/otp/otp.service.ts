@@ -15,7 +15,7 @@ import { UserService } from '../user/user.service';
 export class OtpService {
   constructor(
     private readonly otpRepo: OtpRepository,
-    private readonly mailService: MailService,
+
     private readonly userService: UserService,
   ) {}
   private async create(email: string, TTLSecond: number): Promise<OTP> {
@@ -32,11 +32,11 @@ export class OtpService {
       otp: otpCode,
       expiredAt: expiredTime,
     });
-    this.mailService.sendOTPMail(email, 'OTP Code', otpCode);
+
     return result;
   }
 
-  async createForRegister(email: string): Promise<void> {
+  async createForRegister(email: string): Promise<OTP> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (isExistingEmail) {
       throw new HttpException(
@@ -58,7 +58,32 @@ export class OtpService {
         429,
       );
     }
-    await this.create(email, 4 * 60);
+    return await this.create(email, 4 * 60);
+  }
+
+  async createForResetpassword(email: string): Promise<OTP> {
+    const isExistingEmail = await this.userService.checkEmailExist(email);
+    if (!isExistingEmail) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
+          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED],
+        },
+        404,
+      );
+    }
+
+    const otpCodeCount = await this.otpRepo.findAll({ email });
+    if (otpCodeCount.count >= OTPConstant.OTP_MAX_REGISTRATION) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT,
+          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT],
+        },
+        429,
+      );
+    }
+    return await this.create(email, 4 * 60);
   }
 
   async findManyByEmail(
