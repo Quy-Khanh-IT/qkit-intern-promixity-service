@@ -37,14 +37,11 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     return result;
   }
 
-
-/*
+  /*
 
 
 
 */
-
-
 
   async findAll(
     condition: FilterQuery<T>,

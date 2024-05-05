@@ -5,4 +5,3 @@ export * from './swagger.constant';
 export * from './otp.constant';
 export * from './upload.constant';
 export * from './user.constant';
-export * from './mail.constant';
