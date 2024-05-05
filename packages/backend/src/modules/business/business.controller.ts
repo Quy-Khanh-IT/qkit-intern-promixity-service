@@ -40,4 +40,40 @@ export class BusinessController {
 
     return result;
   }
+
+  @Delete(':id/softDelete')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully delete business.',
+  })
+  async softDelete(@Param('id') id: string) {
+    const result: Boolean = await this.businessService.softDelete(id);
+
+    return result;
+  }
+
+  @Delete(':id/forceDelete')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully delete business and can not store.',
+  })
+  async forceDelete(@Param('id') id: string) {
+    const result: Boolean = await this.businessService.forceDelete(id);
+
+    return result;
+  }
+
+  @Patch(':id/restore')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully restore business.',
+  })
+  async restore(@Param('id') id: string) {
+    const result: Boolean = await this.businessService.restore(id);
+
+    return result;
+  }
 }

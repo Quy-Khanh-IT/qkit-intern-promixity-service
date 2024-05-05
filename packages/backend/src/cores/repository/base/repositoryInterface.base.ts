@@ -13,3 +13,11 @@ export interface BaseRepositoryInterface<T> {
 
   delete(id: string): Promise<boolean>;
 }
+
+export interface BaseSoftDeleteRepositoryInterface<T> {
+  softDelete(id: string): Promise<boolean>;
+
+  forceDelete(id: string): Promise<boolean>;
+
+  restore(id: string): Promise<boolean>;
+}

@@ -148,7 +148,7 @@ export class Business extends BaseEntity {
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
 
-BusinessSchema.plugin(MongooseDelete, {
-  deletedAt: true,
-  overrideMethods: 'all',
-});
+// BusinessSchema.plugin(MongooseDelete, {
+//   deletedAt: true,
+//   overrideMethods: 'all',
+// });
