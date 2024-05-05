@@ -2,8 +2,8 @@ import * as dayjs from 'dayjs';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { BaseRepositoryInterface } from './repositoryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { BaseRepositoryInterface } from './repostioryInterface.base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -81,6 +81,12 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     }
     return result;
   }
+
+  /*
+
+
+
+*/
 
   async findAll(
     condition: FilterQuery<T>,

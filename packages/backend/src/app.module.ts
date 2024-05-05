@@ -11,7 +11,7 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
-import { BusinessesModule } from './modules/businesses/businesses.module';
+import { BusinessModule } from './modules/business/business.module';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { BusinessesModule } from './modules/businesses/businesses.module';
     OtpModule,
     AuthModule,
     RequestModule,
-    BusinessesModule,
+    BusinessModule,
   ],
   controllers: [AppController],
   providers: [
