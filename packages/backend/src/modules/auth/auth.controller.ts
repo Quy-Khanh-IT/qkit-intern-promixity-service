@@ -22,7 +22,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
-import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token';
+import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 
 @Controller('auth')
 @ApiTags('Authentication')

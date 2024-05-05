@@ -13,6 +13,8 @@ import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
 import { BusinessModule } from './modules/business/business.module';
 
+import { join } from 'path';
+import { TokenModule } from './modules/token/token.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,12 +25,14 @@ import { BusinessModule } from './modules/business/business.module';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
+
     DatabaseModule,
     UserModule,
     OtpModule,
     AuthModule,
     RequestModule,
     BusinessModule,
+    TokenModule,
   ],
   controllers: [AppController],
   providers: [

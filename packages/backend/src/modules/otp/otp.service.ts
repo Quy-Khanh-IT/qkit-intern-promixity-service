@@ -71,7 +71,13 @@ export class OtpService {
 
     const otpCodeCount = await this.otpRepo.findAll({ email });
     if (otpCodeCount.count >= OTPConstant.OTP_MAX_REGISTRATION) {
-      throw new OTPExceedLimitException();
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT,
+          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT],
+        },
+        429,
+      );
     }
     return await this.create(email, 4 * 60);
   }
