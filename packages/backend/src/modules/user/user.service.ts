@@ -306,4 +306,28 @@ export class UserService {
     const user = await this.userRepository.create(createUserDto);
     return user;
   }
+
+  async addBusiness(userId: string, businessId: string): Promise<User> {
+    const update = {
+      $addToSet: { businesses: businessId },
+    } as Partial<User>;
+
+    const user = await this.userRepository.update(userId, update);
+    if (!user) {
+      throw new InternalServerErrorException('Update business failed');
+    }
+    return user;
+  }
+
+  async removeBusiness(userId: string, businessId: string): Promise<User> {
+    const update = {
+      $pull: { businesses: businessId },
+    } as Partial<User>;
+
+    const user = await this.userRepository.update(userId, update);
+    if (!user) {
+      throw new InternalServerErrorException('Remove business failed');
+    }
+    return user;
+  }
 }

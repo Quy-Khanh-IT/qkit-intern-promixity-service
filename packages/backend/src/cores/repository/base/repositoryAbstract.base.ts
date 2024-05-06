@@ -127,6 +127,7 @@ export abstract class SoftDeleteBaseRepositoryAbstract<
   protected constructor(private readonly model: SoftDeleteModel<T>) {
     this.model = model;
   }
+
   async softDelete(id: string): Promise<boolean> {
     const delete_item = (await this.model.findById(id).lean().exec()) as T;
 

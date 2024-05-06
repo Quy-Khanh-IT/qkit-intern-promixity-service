@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import * as MongooseDelete from 'mongoose-delete';
-import { HydratedDocument, Schema as OriginalSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 
 export type BusinessDocument =
@@ -143,7 +143,7 @@ export class Business extends BaseEntity {
   deleted: boolean;
 
   @Prop({ default: null })
-  deletedAt: OriginalSchema.Types.Date;
+  deletedAt: MongooseSchema.Types.Date;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
