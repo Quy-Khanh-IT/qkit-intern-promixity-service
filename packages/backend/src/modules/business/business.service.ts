@@ -11,15 +11,40 @@ import {
   ERRORS_DICTIONARY,
   ERROR_CODES,
 } from 'src/common/constants/error.constant';
+import { User } from '../user/entities/user.entity';
+import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { InjectConnection } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
+import { UserService } from '../user/user.service';
+import { transObjectIdToString } from 'src/common/utils';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly businessRepository: BusinessRepository,
     private readonly businessSoftDeleteRepository: BusinessSoftDeleteRepository,
+    private readonly userService: UserService,
+    @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
-  async create(createBusinessDto: CreateBusinessDto): Promise<Business> {
+  async getById(id: string): Promise<Business> {
+    const business = await this.businessRepository.findOneById(id);
+
+    return business;
+  }
+
+  async getAllByCurrentUser(user: User): Promise<FindAllResponse<Business>> {
+    const businesses = await this.businessRepository.findAll({
+      _id: { $in: user.businesses },
+    });
+
+    return businesses;
+  }
+
+  async create(
+    createBusinessDto: CreateBusinessDto,
+    userId: string,
+  ): Promise<Business> {
     const { dayOfWeek } = createBusinessDto;
     // Validate open time and close time
     for (const day of dayOfWeek) {
@@ -77,6 +102,7 @@ export class BusinessService {
         );
       }
     }
+
     // Format HH or MM from 0 to 00, 1 to 01, 2 to 02,...
     dayOfWeek.forEach((day) => {
       day.openTime = day.openTime
@@ -88,8 +114,27 @@ export class BusinessService {
         .map((time) => (time.length === 1 ? `0${time}` : time))
         .join(':');
     });
-    const business = await this.businessRepository.create(createBusinessDto);
-    return business;
+
+    const transactionSession = await this.connection.startSession();
+
+    try {
+      transactionSession.startTransaction();
+
+      const business = await this.businessRepository.create(createBusinessDto);
+
+      const businessId = transObjectIdToString(business._id);
+
+      await this.userService.addBusiness(userId, businessId);
+
+      await transactionSession.commitTransaction();
+
+      return business;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      throw err;
+    } finally {
+      transactionSession.endSession();
+    }
   }
 
   async softDelete(id: string): Promise<boolean> {
@@ -98,10 +143,27 @@ export class BusinessService {
     return business;
   }
 
-  async forceDelete(id: string): Promise<boolean> {
-    const business = await this.businessSoftDeleteRepository.forceDelete(id);
+  async forceDelete(userId: string, businessId: string): Promise<boolean> {
+    const transactionSession = await this.connection.startSession();
 
-    return business;
+    try {
+      transactionSession.startTransaction();
+
+      const business =
+        await this.businessSoftDeleteRepository.forceDelete(businessId);
+
+      await this.userService.removeBusiness(userId, businessId);
+
+      await transactionSession.commitTransaction();
+
+      return business;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+
+      throw err;
+    } finally {
+      transactionSession.endSession();
+    }
   }
 
   async restore(id: string): Promise<boolean> {

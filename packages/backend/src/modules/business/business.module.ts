@@ -7,7 +7,8 @@ import {
   BusinessRepository,
   BusinessSoftDeleteRepository,
 } from './repository/business.repository';
-import { valid } from '@hapi/joi';
+import { UserService } from '../user/user.service';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { valid } from '@hapi/joi';
         },
       },
     ]),
+    UserModule,
   ],
   controllers: [BusinessController],
   providers: [
