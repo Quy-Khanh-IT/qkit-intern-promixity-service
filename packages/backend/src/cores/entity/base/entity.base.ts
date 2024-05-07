@@ -6,7 +6,12 @@ export class BaseEntity {
   // Transform _id to id
   id?: string;
 
+  @Prop({ default: null })
+  deleted_at?: Date;
+
   createdAt?: Date;
+
   updatedAt?: Date;
+
   __v?: number;
 }

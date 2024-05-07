@@ -11,7 +11,9 @@ export interface BaseRepositoryInterface<T> {
 
   update(id: string, dto: Partial<T>): Promise<T>;
 
-  delete(id: string): Promise<boolean>;
+  hardDelete(id: string): Promise<boolean>;
+
+  softDelete(id: string): Promise<boolean>;
 }
 
 export interface BaseSoftDeleteRepositoryInterface<T> {
