@@ -12,6 +12,14 @@ export class UserService {
     return await this.userRepository.findAll({});
   }
 
+  async softDeleteById(id: string): Promise<boolean> {
+    return await this.userRepository.softDelete(id);
+  }
+
+  async hardDeleteById(id: string): Promise<boolean> {
+    return await this.userRepository.hardDelete(id);
+  }
+
   async checkEmailExist(email: string): Promise<boolean> {
     const result = await this.userRepository.findOneByCondition({
       email: email,
@@ -36,7 +44,7 @@ export class UserService {
   }
 
   async delete() {
-    return this.userRepository.delete('655ab2ba456d22a01c27972c');
+    return this.userRepository.hardDelete('655ab2ba456d22a01c27972c');
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

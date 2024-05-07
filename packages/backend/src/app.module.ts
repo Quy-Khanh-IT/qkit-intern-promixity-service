@@ -10,7 +10,8 @@ import { DatabaseModule } from './cores/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
-
+import { join } from 'path';
+import { TokenModule } from './modules/token/token.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +22,7 @@ import { AuthModule } from './modules/auth/auth.module';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
+
     DatabaseModule,
     UserModule,
     OtpModule,

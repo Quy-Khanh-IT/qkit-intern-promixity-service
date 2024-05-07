@@ -43,7 +43,7 @@ export class SignUpDto {
   @IsString()
   @IsOptional()
   @ApiProperty({
-    example: 'https://example.com/image.jpg',
+    example: '0389185482',
   })
   @IsPhoneNumber('VN')
   phoneNumber: string;
