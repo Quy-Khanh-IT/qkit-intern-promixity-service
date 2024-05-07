@@ -11,6 +11,11 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   protected constructor(private readonly model: Model<T>) {
     this.model = model;
   }
+  async softDelete(id: string): Promise<boolean> {
+    return !!(await this.model
+      .findByIdAndUpdate<T>(id, { deleted_at: dayjs() })
+      .exec());
+  }
 
   async restore(id: string): Promise<T> {
     const result = await this.model.findOneAndUpdate(
@@ -81,12 +86,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     }
     return result;
   }
-
-  /*
-
-
-
-*/
 
   async findAll(
     condition: FilterQuery<T>,
