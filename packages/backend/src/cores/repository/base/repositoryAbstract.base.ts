@@ -134,6 +134,7 @@ export abstract class SoftDeleteBaseRepositoryAbstract<
     if (!delete_item) {
       return false;
     }
+    //test
     return !!(await this.model.delete({ _id: id }));
   }
 
