@@ -76,11 +76,9 @@ export class BusinessController {
     createBusinessDto: CreateBusinessDto,
     @Req() req: Request,
   ) {
-    const userId = transObjectIdToString(req.user._id);
-
     const result: Business = await this.businessService.create(
       createBusinessDto,
-      userId,
+      req.user.id,
     );
 
     return result;
