@@ -11,7 +11,4 @@ export class UserController {
     const result: User = await this.userService.create(createUserDto);
     return result;
   }
-
-
-  
 }
