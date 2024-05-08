@@ -17,5 +17,8 @@ export enum ConfigKey {
   GOOGLE_USERNAME = 'GOOGLE_USERNAME',
   MAIL_HOST = 'MAIL_HOST',
   MAIL_PORT = 'MAIL_PORT',
+  FRONT_END_URL = 'FRONT_END_URL',
+  NODE_ENV = 'NODE_ENV',
+  PORT = 'PORT',
 }
 // Path: packages/backend/src/common/constants/error.constant.ts

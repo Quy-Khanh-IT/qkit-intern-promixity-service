@@ -12,6 +12,9 @@ import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BusinessModule } from './modules/business/business.module';
 
+import { join } from 'path';
+import { TokenModule } from './modules/token/token.module';
+import { AxiosModule } from './modules/axios/axios.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,11 +25,13 @@ import { BusinessModule } from './modules/business/business.module';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
+
     DatabaseModule,
     UserModule,
     OtpModule,
     AuthModule,
     BusinessModule,
+    AxiosModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,11 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import * as MongooseDelete from 'mongoose-delete';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
-
-export type BusinessDocument =
-  HydratedDocument<MongooseDelete.SoftDeleteDocument>;
+import { number } from '@hapi/joi';
 
 @Schema({
   _id: false,
@@ -21,11 +18,8 @@ export class DayOpenCloseTime {
   closeTime: string;
 }
 
-export class Star {
-  @Prop({ enum: StarEnum })
-  star: string;
-
-  @Prop({})
+export interface Star {
+  star: StarEnum;
   count: number;
 }
 
@@ -55,7 +49,7 @@ export class CloundinaryImage {
 const DayOpenCloseTimeSchema = SchemaFactory.createForClass(DayOpenCloseTime);
 const CloundinaryImageSchema = SchemaFactory.createForClass(CloundinaryImage);
 
-const defaultStars = [
+const defaultStars: Star[] = [
   {
     star: StarEnum.ONE,
     count: 0,
@@ -76,12 +70,12 @@ const defaultStars = [
     star: StarEnum.FIVE,
     count: 0,
   },
-] as Array<Star>;
+];
 
 @Schema({
   timestamps: {
-    createdAt: true,
-    updatedAt: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   },
 })
 export class Business extends BaseEntity {
@@ -112,20 +106,20 @@ export class Business extends BaseEntity {
   @Prop({ default: 0 })
   totalReview: number;
 
-  @Prop({ default: defaultStars })
+  @Prop({ type: [Object], default: defaultStars })
   stars: Star[];
-
-  @Prop({ required: true, trim: true })
-  country: string;
-
-  @Prop({ required: true, trim: true })
-  province: string;
-
-  @Prop({ required: true, trim: true })
-  city: string;
 
   @Prop({ trim: true })
   addressLine: string;
+
+  @Prop({ required: true })
+  province: string;
+
+  @Prop({ required: true })
+  district: string;
+
+  @Prop({ required: true })
+  country: string;
 
   @Prop([DayOpenCloseTimeSchema])
   dayOfWeek: DayOpenCloseTime[];
@@ -139,16 +133,9 @@ export class Business extends BaseEntity {
   @Prop({ enum: BusinessStatusEnum, default: BusinessStatusEnum.PENDING })
   status: string;
 
-  @Prop({ default: false })
-  deleted: boolean;
-
   @Prop({ default: null })
-  deletedAt: MongooseSchema.Types.Date;
+  deleted_at: MongooseSchema.Types.Date;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
-
-// BusinessSchema.plugin(MongooseDelete, {
-//   deletedAt: true,
-//   overrideMethods: 'all',
-// });
+export type BusinessDocument = HydratedDocument<Business>;

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { TokenService } from './token.service';
+import { JWTTokenService } from './token.service';
 import { OtpModule } from '../otp/otp.module';
 import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
@@ -11,6 +11,8 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { PassportModule } from '@nestjs/passport';
 import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
+import { TokenModule } from '../token/token.module';
+import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 
 @Module({
@@ -21,12 +23,13 @@ import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy'
     PassportModule,
     ConfigModule,
     JwtModule.register({}),
+    TokenModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    TokenService,
-    TokenService,
+    JWTTokenService,
+    JWTTokenService,
     JwtAccessTokenStrategy,
     JwtRefreshTokenStrategy,
     JwtResetPasswordStrategy,

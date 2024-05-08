@@ -42,21 +42,21 @@ export class CreateBusinessDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'Vietnam' })
+  @ApiProperty({ example: 'Việt Nam' })
   country: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'Ho Chi Minh' })
+  @ApiProperty({ example: 'Hồ Chí Minh' })
   province: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'Thu Duc' })
-  city: string;
+  @ApiProperty({ example: 'Quận 1' })
+  district: string;
 
   @IsOptional()
-  @ApiProperty({ example: '68A, Paster' })
+  @ApiProperty({ example: '7060 Lý' })
   addressLine: string;
 
   @IsNotEmpty()

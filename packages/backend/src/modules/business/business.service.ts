@@ -2,10 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
-import {
-  BusinessRepository,
-  BusinessSoftDeleteRepository,
-} from './repository/business.repository';
+import { BusinessRepository } from './repository/business.repository';
 import { BusinessConstant } from '../../common/constants/business.constant';
 import {
   ERRORS_DICTIONARY,
@@ -17,13 +14,16 @@ import { InjectConnection } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { UserService } from '../user/user.service';
 import { transObjectIdToString } from 'src/common/utils';
+import { HttpService } from '@nestjs/axios';
+import { AxiosService } from '../axios/axios.service';
+import { buildQueryParams, isSimilar } from 'src/common/utils';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly businessRepository: BusinessRepository,
-    private readonly businessSoftDeleteRepository: BusinessSoftDeleteRepository,
     private readonly userService: UserService,
+    private readonly axiosService: AxiosService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
@@ -45,8 +45,8 @@ export class BusinessService {
     createBusinessDto: CreateBusinessDto,
     userId: string,
   ): Promise<Business> {
-    const { dayOfWeek } = createBusinessDto;
     // Validate open time and close time
+    const { dayOfWeek } = createBusinessDto;
     for (const day of dayOfWeek) {
       if (
         !RegExp(BusinessConstant.regexOpenCloseTime).test(day.openTime) ||
@@ -103,7 +103,7 @@ export class BusinessService {
       }
     }
 
-    // Format HH or MM from 0 to 00, 1 to 01, 2 to 02,...
+    // Format if not true form of HH or MM from 0 to 00, 1 to 01, 2 to 02,...
     dayOfWeek.forEach((day) => {
       day.openTime = day.openTime
         .split(':')
@@ -115,6 +115,38 @@ export class BusinessService {
         .join(':');
     });
 
+    // validate addresses in Vietnam
+    const osmApi = 'https://nominatim.openstreetmap.org/search.php';
+
+    const { country, province, district, addressLine } = createBusinessDto;
+
+    const addresses = {
+      street: addressLine,
+      county: district,
+      province,
+      country: country,
+    };
+
+    const queryStr = buildQueryParams(addresses);
+
+    const data = await this.axiosService.get(osmApi + queryStr);
+
+    const roads = data.map((item) => item.address.road);
+
+    const components = addressLine.split(' ');
+
+    const road = components.slice(1).join(' ');
+
+    if (!isSimilar(road, roads)) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid road address',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
     const transactionSession = await this.connection.startSession();
 
     try {
@@ -122,9 +154,7 @@ export class BusinessService {
 
       const business = await this.businessRepository.create(createBusinessDto);
 
-      const businessId = transObjectIdToString(business._id);
-
-      await this.userService.addBusiness(userId, businessId);
+      await this.userService.addBusiness(userId, business.id);
 
       await transactionSession.commitTransaction();
 
@@ -138,7 +168,7 @@ export class BusinessService {
   }
 
   async softDelete(id: string): Promise<boolean> {
-    const business = await this.businessSoftDeleteRepository.softDelete(id);
+    const business = await this.businessRepository.softDelete(id);
 
     return business;
   }
@@ -149,8 +179,7 @@ export class BusinessService {
     try {
       transactionSession.startTransaction();
 
-      const business =
-        await this.businessSoftDeleteRepository.forceDelete(businessId);
+      const business = await this.businessRepository.hardDelete(businessId);
 
       await this.userService.removeBusiness(userId, businessId);
 
@@ -167,8 +196,8 @@ export class BusinessService {
   }
 
   async restore(id: string): Promise<boolean> {
-    const business = await this.businessSoftDeleteRepository.restore(id);
+    // const business = await this.businessRepository.restore(id);
 
-    return business;
+    return false;
   }
 }

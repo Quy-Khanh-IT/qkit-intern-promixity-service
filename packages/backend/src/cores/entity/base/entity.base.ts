@@ -1,3 +1,4 @@
+import { Prop } from '@nestjs/mongoose';
 import { ObjectId } from 'mongoose';
 
 export class BaseEntity {
@@ -6,7 +7,12 @@ export class BaseEntity {
   // Transform _id to id
   id?: string;
 
+  @Prop({ default: null })
+  deletedAt?: Date;
+
   createdAt?: Date;
+
   updatedAt?: Date;
+
   __v?: number;
 }

@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigKey } from 'src/common/constants';
 
 @Injectable()
-export class TokenService {
+export class JWTTokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
