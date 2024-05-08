@@ -9,9 +9,16 @@ export interface BaseRepositoryInterface<T> {
 
   findAll(condition: object, options?: object): Promise<FindAllResponse<T>>;
 
+  findAllWithDeleted(
+    condition: object,
+    options?: object,
+  ): Promise<FindAllResponse<T>>;
+
   update(id: string, dto: Partial<T>): Promise<T>;
 
   hardDelete(id: string): Promise<boolean>;
+
+  restore(id: string): Promise<T>;
 
   softDelete(id: string): Promise<boolean>;
 }
