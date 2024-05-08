@@ -11,6 +11,44 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   protected constructor(private readonly model: Model<T>) {
     this.model = model;
   }
+
+  async restore(id: string): Promise<T> {
+    const result = await this.model.findOneAndUpdate(
+      {
+        _id: transStringToObjectId(id),
+        deleted_at: { $ne: null },
+      } as FilterQuery<T>,
+      { deleted_at: null },
+      { new: true },
+    );
+
+    return result;
+  }
+
+  async findAllWithDeleted(
+    condition: FilterQuery<T>,
+    options?: QueryOptions<T>,
+  ): Promise<FindAllResponse<T>> {
+    const items = (await this.model
+      .find(
+        { ...condition, deleted_at: { $ne: null } },
+        options?.projection,
+        options,
+      )
+      .lean()
+      .exec()) as T[];
+
+    if (items.length) {
+      items.forEach(
+        (Element) => (Element.id = transObjectIdToString(Element._id)),
+      );
+    }
+    return {
+      count: items.length,
+      items,
+    };
+  }
+
   async softDelete(id: string): Promise<boolean> {
     return !!(await this.model
       .findByIdAndUpdate<T>(id, { deleted_at: dayjs() })
