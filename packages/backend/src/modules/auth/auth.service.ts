@@ -43,7 +43,6 @@ export class AuthService {
     const isExistingEmail = await this.userService.checkEmailExist(
       registrationData.email,
     );
-
     if (isExistingEmail) {
       throw new HttpException(
         {

@@ -5,6 +5,8 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type TokenDocument = HydratedDocument<Token>;
 
+
+
 @Schema({
   timestamps: {
     createdAt: 'created_at',

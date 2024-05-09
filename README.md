@@ -1,1 +1,0 @@
-# qkit-intern-promixity-service

@@ -23,7 +23,7 @@ export class SignUpDto {
   @ApiProperty({ example: 'Password123@' })
   @Matches(UserConstant.regrexPassword, {
     message:
-      'Password must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
+      'password must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })
   @IsNotEmpty()
   password: string;

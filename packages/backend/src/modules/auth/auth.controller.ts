@@ -47,6 +47,8 @@ export class AuthController {
       'Welcome to our Proximity Service',
     );
   }
+  
+  
 
   @Post('login')
   @HttpCode(200)
