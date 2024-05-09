@@ -36,7 +36,7 @@ export const buildQueryParams = (options: object) => {
   return queryString;
 };
 
-export const isSimilar = (inputString, targetStrings) => {
+export const validateRoad = (inputString, targetStrings) => {
   const normalizedInput = inputString.toLowerCase();
 
   const normalizedTargets = targetStrings.map((str) => str.toLowerCase());

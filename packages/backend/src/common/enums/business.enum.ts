@@ -13,3 +13,8 @@ export enum BusinessStatusEnum {
   APPROVED = 'approved',
   REJECTED = 'rejected',
 }
+
+export enum DeleteActionEnum {
+  SOFT = 'soft',
+  HARD = 'hard',
+}

@@ -19,6 +19,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
   async create(dto: T | any): Promise<T> {
     const created_data = await this.model.create(dto);
+
+    created_data.id = transObjectIdToString(created_data._id);
+
     return created_data.toObject() as T;
   }
 

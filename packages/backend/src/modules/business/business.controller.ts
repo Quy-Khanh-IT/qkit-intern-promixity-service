@@ -10,6 +10,7 @@ import {
   HttpCode,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
@@ -21,6 +22,7 @@ import {
   ApiHeader,
   ApiResponse,
   ApiTags,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { ParseFloat } from '../../cores/decorators/parseFloat.decorator';
 import { Request } from 'express';
@@ -28,6 +30,8 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { transObjectIdToString } from 'src/common/utils';
+import { DeleteActionEnum } from 'src/common/enums';
+import { DeleteActionsDto } from './dto/delete-actions.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
@@ -84,32 +88,55 @@ export class BusinessController {
     return result;
   }
 
-  @Delete(':id/softDelete')
+  @Delete(':id/soft')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({
     status: 200,
     description: 'User successfully delete business.',
   })
-  async softDelete(@Param('id') id: string) {
-    const result: Boolean = await this.businessService.softDelete(id);
+  async softDelete(@Param('id') id: string) {}
 
-    return result;
-  }
-
-  @Delete(':id/forceDelete')
+  @Delete(':id/hard')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({
     status: 200,
     description: 'User successfully delete business and can not store.',
   })
-  async forceDelete(@Param('id') id: string, @Req() req: Request) {
+  async forceDelete(@Param('id') id: string, @Req() req: Request) {}
+
+  @Delete(':id/request')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully deleted business.',
+  })
+  async testDelete(
+    @Param('id') id: string,
+    @Query('type') type: string,
+    @Req() req: Request,
+  ) {
     const userId = transObjectIdToString(req.user._id);
 
-    const result: Boolean = await this.businessService.forceDelete(userId, id);
+    if (type === DeleteActionEnum.SOFT) {
+      const result: Boolean = await this.businessService.softDelete(id);
 
-    return result;
+      return result;
+    }
+
+    if (type === DeleteActionEnum.HARD) {
+      const result: Boolean = await this.businessService.forceDelete(
+        userId,
+        id,
+      );
+
+      return result;
+    }
+
+    return false;
   }
 
   @Patch(':id/restore')

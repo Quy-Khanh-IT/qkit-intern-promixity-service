@@ -16,7 +16,8 @@ import { UserService } from '../user/user.service';
 import { transObjectIdToString } from 'src/common/utils';
 import { HttpService } from '@nestjs/axios';
 import { AxiosService } from '../axios/axios.service';
-import { buildQueryParams, isSimilar } from 'src/common/utils';
+import { buildQueryParams, validateRoad } from 'src/common/utils';
+import { BusinessStatusEnum } from 'src/common/enums';
 
 @Injectable()
 export class BusinessService {
@@ -137,7 +138,7 @@ export class BusinessService {
 
     const road = components.slice(1).join(' ');
 
-    if (!isSimilar(road, roads)) {
+    if (!validateRoad(road, roads)) {
       throw new HttpException(
         {
           message: ERRORS_DICTIONARY.INVALID_INPUT,
@@ -154,7 +155,9 @@ export class BusinessService {
 
       const business = await this.businessRepository.create(createBusinessDto);
 
-      await this.userService.addBusiness(userId, business.id);
+      const businessId = transObjectIdToString(business._id);
+
+      await this.userService.addBusiness(userId, businessId);
 
       await transactionSession.commitTransaction();
 
@@ -168,9 +171,21 @@ export class BusinessService {
   }
 
   async softDelete(id: string): Promise<boolean> {
-    const business = await this.businessRepository.softDelete(id);
+    const business = await this.businessRepository.findOneById(id);
 
-    return business;
+    if (business.status === BusinessStatusEnum.PENDING) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Cannot delete "pending" business',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    const isDeleted = await this.businessRepository.softDelete(id);
+
+    return isDeleted;
   }
 
   async forceDelete(userId: string, businessId: string): Promise<boolean> {
@@ -179,13 +194,26 @@ export class BusinessService {
     try {
       transactionSession.startTransaction();
 
-      const business = await this.businessRepository.hardDelete(businessId);
+      const business = await this.businessRepository.findOneById(businessId);
+
+      if (business.deletedAt === null) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
+            detail: 'Cannot delete "pending" business',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
+        );
+      }
+
+      const deleteBusiness =
+        await this.businessRepository.hardDelete(businessId);
 
       await this.userService.removeBusiness(userId, businessId);
 
       await transactionSession.commitTransaction();
 
-      return business;
+      return deleteBusiness;
     } catch (err) {
       await transactionSession.abortTransaction();
 
