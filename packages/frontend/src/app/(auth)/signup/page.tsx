@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-// import * as bootstrap from "bootstrap/dist/css/bootstrap.css";
+import axios from "../../../utils/axios";
+import Link from "next/link";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,14 @@ export default function SignUp() {
     // const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     //   return new bootstrap.Tooltip(tooltipTriggerEl);
     // });
+  };
+
+  const getCode = async () => {
+    let response = await axios.post("/otps/registration", {
+      email: "congchinh2903@gmail.com",
+    });
+
+    console.log(response.data);
   };
 
   const fetchProvinces = async () => {
@@ -39,7 +48,7 @@ export default function SignUp() {
       `https://vnprovinces.pythonanywhere.com//api/provinces/${selectedCity}`
     );
     const listCity = await response.json();
-    setProvinces(listCity.neighbours);
+    setProvinces(listCity.districts);
   };
 
   useEffect(() => {
@@ -66,7 +75,7 @@ export default function SignUp() {
               <div className="container">
                 <div className="row">
                   <div className="col-6">
-                    <form onSubmit={() => {}}>
+                    <div className="form">
                       <div className="mb-3">
                         <label className="form-label">Email address</label>
                         <input
@@ -79,20 +88,21 @@ export default function SignUp() {
                       </div>
                       <div className="mb-3">
                         <label className="form-label">OTP</label>
-                        <div className="otp-wrapper">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Input OTP code with 6 digits"
-                          />
-                          <button
-                            onClick={() => alert("get code")}
-                            className="otp-btn"
-                          >
-                            Get code
+
+                        <div className="form-control">
+                          <input placeholder="Input OTP code with 6 digits"></input>
+                          <button>
+                            <div onClick={() => getCode()}>Get Code</div>
                           </button>
                         </div>
+                        {/* <button
+                          onClick={() => alert("get code")}
+                          className="otp-btn"
+                        >
+                          Get code
+                        </button> */}
                       </div>
+
                       <div className="mb-3">
                         <label className="form-label">Password</label>
                         <input
@@ -113,10 +123,10 @@ export default function SignUp() {
                           placeholder="********"
                         />
                       </div>
-                    </form>
+                    </div>
                   </div>
                   <div className="col-6">
-                    <form>
+                    <div className="form">
                       <div className="mb-3">
                         <label className="form-label">First name</label>
                         <input
@@ -143,9 +153,9 @@ export default function SignUp() {
                       </div>
                       <div className="mb-3 container">
                         <div className="row">
-                          <div className="col-6">
+                          <div className="col-sm-12 col-md-6">
                             <div className="mb-3">
-                              <label className="form-label">City</label>
+                              <label className="form-label">Province</label>
                               <select
                                 value={selectedCity}
                                 onChange={(e) =>
@@ -164,9 +174,9 @@ export default function SignUp() {
                               </select>
                             </div>
                           </div>
-                          <div className="col-6">
+                          <div className="col-sm-12 col-md-6">
                             <div className="mb-3">
-                              <label className="form-label">Province</label>
+                              <label className="form-label">District</label>
                               <select
                                 value={selectedProvince}
                                 onChange={(e) =>
@@ -190,14 +200,14 @@ export default function SignUp() {
                           </div>
                         </div>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             <div
               className="d-flex  align-items-center justify-content-center"
-              style={{ padding: "0 72x" }}
+              style={{ padding: "0 72x", flexDirection: "column" }}
             >
               <button
                 style={{ width: "200px" }}
@@ -206,6 +216,22 @@ export default function SignUp() {
               >
                 Sign Up
               </button>
+              <div style={{ textAlign: "center", marginTop: "10px" }}>
+                {" "}
+                Already have an account?{" "}
+                <strong style={{ cursor: "pointer" }}>
+                  <Link
+                    style={{
+                      textDecoration: "none",
+                      color: "#ed1651",
+                      fontWeight: "300",
+                    }}
+                    href="/signin"
+                  >
+                    Login here
+                  </Link>
+                </strong>
+              </div>
             </div>
           </div>
         </div>

@@ -81,6 +81,10 @@ $header-height: 48px;
         }
         .f-form {
           padding: 20px 72px 0 72px !important;
+
+          @media (max-width: 768px) {
+            padding: 34px 0 0 0 !important;
+          }
         }
         .form-wrapper {
           padding: 68px 72px 0 72px;
@@ -89,7 +93,7 @@ $header-height: 48px;
             padding: 68px 0 0 0;
           }
 
-          form {
+          .form {
             margin-top: 48px;
             .form-label {
               margin-bottom: 20px;
@@ -112,6 +116,8 @@ $header-height: 48px;
               }
             }
             .form-control {
+              display: flex;
+              justify-content: space-between;
               color: white;
               margin-bottom: 20px;
               border-radius: 20px;
@@ -131,6 +137,34 @@ $header-height: 48px;
 
               option {
                 color: black;
+              }
+
+              input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                line-height: 1.9;
+                width: 100%;
+                color: white;
+                &::placeholder {
+                  font-weight: 400;
+                  color: grey;
+                }
+              }
+
+              button {
+                width: 120px;
+                line-height: 1.8;
+                font-size: 14px;
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: white;
+                border-left: 1px solid white;
+
+                &:hover {
+                  color: #ed1651;
+                }
               }
             }
           }
