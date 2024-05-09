@@ -17,6 +17,7 @@ import { transObjectIdToString } from 'src/common/utils';
 import { AxiosService } from '../axios/axios.service';
 import { buildQueryParams, validateRoad } from 'src/common/utils';
 import { BusinessStatusEnum } from 'src/common/enums';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BusinessService {
@@ -25,6 +26,7 @@ export class BusinessService {
     private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
     private readonly axiosService: AxiosService,
+    private readonly configService: ConfigService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
@@ -118,22 +120,92 @@ export class BusinessService {
     });
 
     // validate addresses in Vietnam
-    const osmApi = 'https://nominatim.openstreetmap.org/search.php';
+    const osmApiSearch = this.configService.get<string>(
+      'THIRD_PARTY_API_OSM_SEARCH_URL',
+    );
+    const osmApiReverse = this.configService.get<string>(
+      'THIRD_PARTY_API_OSM_REVERSE_URL',
+    );
 
-    const { country, province, district, addressLine } = createBusinessDto;
+    const { country, province, district, addressLine, latitude, longitude } =
+      createBusinessDto;
 
-    const addresses = {
-      street: addressLine,
-      county: district,
-      province,
-      country: country,
+    const queryParam = {
+      format: 'jsonv2',
+      addressdetails: 1,
+      'accept-language': 'vi',
     };
 
-    const queryStr = buildQueryParams(addresses);
+    const queryGeoParam = Object.assign(
+      {
+        lat: latitude,
+        lon: longitude,
+      },
+      queryParam,
+    );
 
-    const data = await this.axiosService.get(osmApi + queryStr);
+    const queryAddressParam = Object.assign(
+      {
+        country,
+        city: district,
+        state: province,
+        street: addressLine,
+      },
+      queryParam,
+    );
 
-    const roads = data.map((item) => item.address.road);
+    const queryAddressStr = buildQueryParams(queryAddressParam);
+    const queryGeoStr = buildQueryParams(queryGeoParam);
+
+    const searchUrl = osmApiSearch + queryAddressStr;
+    const reverseUrl = osmApiReverse + queryGeoStr;
+
+    const searchData = await this.axiosService.get(searchUrl);
+
+    if (searchData.length === 0) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid address line',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    const reverseData = await this.axiosService.get(reverseUrl);
+
+    let validAddress = false;
+
+    for (const item of searchData) {
+      if (
+        item?.address?.country === reverseData?.address?.country &&
+        item?.address?.state === reverseData?.address?.state &&
+        item?.address?.city === reverseData?.address?.city &&
+        item?.address?.suburb === reverseData?.address?.suburb &&
+        item?.address?.road === reverseData?.address?.road
+      ) {
+        validAddress = true;
+        break;
+      }
+    }
+
+    if (!validAddress) {
+      console.log('Invalid address line');
+
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid address line',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    console.log('Valid address line');
+
+    return;
+
+    const roads = [].map((item) => item.address.road);
 
     const components = addressLine.split(' ');
 
