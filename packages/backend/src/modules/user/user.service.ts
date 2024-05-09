@@ -335,4 +335,10 @@ export class UserService {
     }
     return user;
   }
+
+  async getAllBusiness(user: User): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByCurrentUser(user);
+
+    return businesses;
+  }
 }

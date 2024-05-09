@@ -9,6 +9,8 @@ import {
 } from './repository/business.repository';
 import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
+import { AxiosModule } from '../axios/axios.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -25,7 +27,8 @@ import { UserModule } from '../user/user.module';
         },
       },
     ]),
-    UserModule,
+    forwardRef(() => UserModule),
+    AxiosModule,
   ],
   controllers: [BusinessController],
   providers: [
