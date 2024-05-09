@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/utils/motion.js",
-    "src/app/components/canvas/Star.js"
+    "src/app/components/canvas/Star.js",
+    "**/*.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next", ".vercel", "out"]
 }

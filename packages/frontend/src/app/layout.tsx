@@ -1,13 +1,13 @@
+import StoreProvider from "@/app/components/StoreProvider";
+import "bootstrap/dist/css/bootstrap.css";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import "./globals.scss";
-import "bootstrap/dist/css/bootstrap.css";
-import StoreProvider from "@/app/components/StoreProvider";
-import ScrollToTopButton from "@/app/components/Scrolltotop";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
+import "./globals.scss";
+import { useState } from "react";
 
 const popins = Poppins({
   subsets: ["latin"],
@@ -24,13 +24,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <head>
-        <script
-          src="https://kit.fontawesome.com/03244eb91d.js"
-          crossOrigin="anonymous"
-        ></script>
+        <link
+          rel="stylesheet"
+          href="https://site-assets.fontawesome.com/releases/v6.1.2/css/all.css?fbclid=IwAR2undhfna4tMQt0yyPEeuUmtLt5QD9hl2TxmpC3H3oo--fAJX6skSyYftg%22%3E"
+        />
       </head>
       <body className={popins.className}>
         {/* <ScrollToTopButton /> */}
@@ -48,6 +49,12 @@ export default function RootLayout({
           theme="light"
           transition={Bounce}
         />
+
+        <script
+          defer
+          src="https://kit.fontawesome.com/03244eb91d.js"
+          crossOrigin="anonymous"
+        ></script>
       </body>
     </html>
   );
