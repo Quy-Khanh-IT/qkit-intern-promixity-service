@@ -24,13 +24,20 @@ import { MailService } from '../mail/mail.service';
 import { RequestService } from '../request/request.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { RequesUpdateEmail } from './dto/request-update-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { Business } from '../business/entities/business.entity';
+import { BusinessService } from '../business/business.service';
 
 @Injectable()
 export class UserService {
@@ -41,6 +48,8 @@ export class UserService {
     private readonly requestService: RequestService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    // @Inject(forwardRef(() => BusinessService))
+    private readonly BusinessService: BusinessService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
@@ -337,8 +346,8 @@ export class UserService {
     return user;
   }
 
-  async getAllByUser(user: User): Promise<FindAllResponse<Business> | []> {
-    const businesses = await this.BusinessService.getAllByUser(user);
+  async getAllBusiness(user: User): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByCurrentUser(user);
 
     return businesses;
   }

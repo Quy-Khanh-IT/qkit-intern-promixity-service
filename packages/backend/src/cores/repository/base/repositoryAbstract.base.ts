@@ -111,7 +111,8 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     if (result) {
       result.id = transObjectIdToString(result._id);
     }
-    return result.deleted_at ? null : result;
+
+    return result.deletedAt ? null : result;
   }
 
   async findOneByCondition(condition = {}): Promise<T | null> {

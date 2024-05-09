@@ -30,6 +30,8 @@ import { ValidateAddress } from './dto/validate-address.dto';
 @Injectable()
 export class BusinessService {
   constructor(
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,

@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
 import {
   ApiBearerAuth,
@@ -93,55 +92,7 @@ export class BusinessController {
     return result;
   }
 
-  @Delete(':id/soft')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiBody({ type: UpdateBusinessDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
-  async updateInformation(
-    @Param('id') id: string,
-    @Body()
-    @ParseFloat(['longitude', 'latitude'])
-    updateBusinessDto: UpdateBusinessDto,
-    @Req() req: Request,
-  ) {
-    const result: Boolean = await this.businessService.updateInformation(
-      id,
-      req.user.businesses,
-      updateBusinessDto,
-    );
-
-    return result;
-  }
-
-  @Patch('addresses/:id')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiBody({ type: UpdateAddressDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
-  async updateAddresses(
-    @Param('id') id: string,
-    @Body()
-    @ParseFloat(['longitude', 'latitude'])
-    updateAddressDto: UpdateAddressDto,
-    @Req() req: Request,
-  ) {
-    const result: Business = await this.businessService.updateAddresses(
-      id,
-      req.user.businesses,
-      updateAddressDto,
-    );
-  }
-
-  async forceDelete(@Param('id') id: string, @Req() req: Request) {}
-
-  @Delete(':id/request')
+  @Delete(':id')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
@@ -149,7 +100,7 @@ export class BusinessController {
     status: 200,
     description: 'User successfully deleted business.',
   })
-  async testDelete(
+  async delete(
     @Param('id') id: string,
     @Query('type') type: string,
     @Req() req: Request,
