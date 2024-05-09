@@ -35,6 +35,7 @@ import {
   StatusActionsEnum,
 } from 'src/common/enums';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { DeleteActionsDto } from './dto/delete-actions.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
@@ -92,7 +93,7 @@ export class BusinessController {
     return result;
   }
 
-  @Patch(':id')
+  @Delete(':id/soft')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiBody({ type: UpdateBusinessDto })
@@ -136,8 +137,41 @@ export class BusinessController {
       req.user.businesses,
       updateAddressDto,
     );
+  }
 
-    return result;
+  async forceDelete(@Param('id') id: string, @Req() req: Request) {}
+
+  @Delete(':id/request')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully deleted business.',
+  })
+  async testDelete(
+    @Param('id') id: string,
+    @Query('type') type: string,
+    @Req() req: Request,
+  ) {
+    const userId = transObjectIdToString(req.user._id);
+
+    if (type === DeleteActionEnum.SOFT) {
+      const result: Boolean = await this.businessService.softDelete(id);
+
+      return result;
+    }
+
+    if (type === DeleteActionEnum.HARD) {
+      const result: Boolean = await this.businessService.forceDelete(
+        userId,
+        id,
+      );
+
+      return result;
+    }
+
+    return false;
   }
 
   @Patch('images/:id')

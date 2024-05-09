@@ -233,7 +233,19 @@ export class BusinessService {
 
     const business = await this.businessRepository.findOneById(businessId);
 
-    return business;
+    if (business.status === BusinessStatusEnum.PENDING) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Cannot delete "pending" business',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    const isDeleted = await this.businessRepository.softDelete(id);
+
+    return isDeleted;
   }
 
   async updateImages(
@@ -331,6 +343,18 @@ export class BusinessService {
 
     try {
       transactionSession.startTransaction();
+
+      const business = await this.businessRepository.findOneById(businessId);
+
+      if (business.deletedAt === null) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
+            detail: 'Cannot delete "pending" business',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
+        );
+      }
 
       const deleteBusiness =
         await this.businessRepository.hardDelete(businessId);
