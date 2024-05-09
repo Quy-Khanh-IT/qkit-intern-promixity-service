@@ -53,11 +53,16 @@ export class UserService {
   }
 
   async addBusiness(userId: string, businessId: string): Promise<User> {
+    console.log('businessId', businessId);
+
     const update = {
       $addToSet: { businesses: businessId },
     } as Partial<User>;
 
     const user = await this.userRepository.update(userId, update);
+
+    console.log('user', user);
+
     if (!user) {
       throw new InternalServerErrorException('Update business failed');
     }
