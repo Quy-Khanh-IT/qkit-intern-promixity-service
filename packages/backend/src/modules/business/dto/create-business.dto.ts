@@ -42,7 +42,7 @@ export class CreateBusinessDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'Vietnam' })
+  @ApiProperty({ example: 'Việt Nam', default: 'Việt Nam' })
   country: string;
 
   @IsString()
@@ -56,20 +56,20 @@ export class CreateBusinessDto {
   city: string;
 
   @IsOptional()
-  @ApiProperty({ example: '68A, Paster' })
+  @ApiProperty({ example: 'đường Lý Tự Trọng' })
   addressLine: string;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(-180)
   @Max(180)
-  @ApiProperty({ example: '106.7824431' })
+  @ApiProperty({ example: '106.698387' })
   longitude: string;
 
   @IsNotEmpty()
   @IsNumber()
   @Min(-90)
   @Max(90)
-  @ApiProperty({ example: '10.8826391' })
+  @ApiProperty({ example: '10.775114' })
   latitude: string;
 }

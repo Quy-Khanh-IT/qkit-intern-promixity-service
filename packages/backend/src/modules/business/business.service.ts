@@ -18,13 +18,14 @@ import * as mongoose from 'mongoose';
 import { UserService } from '../user/user.service';
 import { transObjectIdToString } from 'src/common/utils';
 import { BusinessStatusEnum } from 'src/common/enums';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly businessRepository: BusinessRepository,
-    private readonly businessSoftDeleteRepository: BusinessSoftDeleteRepository,
-    private readonly userService: UserService,
+    private readonly axiosService: AxiosService,
+    private readonly configService: ConfigService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
@@ -116,6 +117,108 @@ export class BusinessService {
         .map((time) => (time.length === 1 ? `0${time}` : time))
         .join(':');
     });
+
+    // validate addresses in Vietnam
+    const osmApiSearch = this.configService.get<string>(
+      'THIRD_PARTY_API_OSM_SEARCH_URL',
+    );
+    const osmApiReverse = this.configService.get<string>(
+      'THIRD_PARTY_API_OSM_REVERSE_URL',
+    );
+
+    const { country, province, district, addressLine, latitude, longitude } =
+      createBusinessDto;
+
+    const queryParam = {
+      format: 'jsonv2',
+      addressdetails: 1,
+      'accept-language': 'vi',
+    };
+
+    const queryGeoParam = Object.assign(
+      {
+        lat: latitude,
+        lon: longitude,
+      },
+      queryParam,
+    );
+
+    const queryAddressParam = Object.assign(
+      {
+        country,
+        city: district,
+        state: province,
+        street: addressLine,
+      },
+      queryParam,
+    );
+
+    const queryAddressStr = buildQueryParams(queryAddressParam);
+    const queryGeoStr = buildQueryParams(queryGeoParam);
+
+    const searchUrl = osmApiSearch + queryAddressStr;
+    const reverseUrl = osmApiReverse + queryGeoStr;
+
+    const searchData = await this.axiosService.get(searchUrl);
+
+    if (searchData.length === 0) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid address line',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    const reverseData = await this.axiosService.get(reverseUrl);
+
+    let validAddress = false;
+
+    for (const item of searchData) {
+      if (
+        item?.address?.country === reverseData?.address?.country &&
+        item?.address?.state === reverseData?.address?.state &&
+        item?.address?.city === reverseData?.address?.city &&
+        item?.address?.suburb === reverseData?.address?.suburb &&
+        item?.address?.road === reverseData?.address?.road
+      ) {
+        validAddress = true;
+        break;
+      }
+    }
+
+    if (!validAddress) {
+      console.log('Invalid address line');
+
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid address line',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    console.log('Valid address line');
+
+    return;
+
+    const roads = [].map((item) => item.address.road);
+
+    const components = addressLine.split(' ');
+
+    const road = components.slice(1).join(' ');
+
+    if (!validateRoad(road, roads)) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Invalid road address',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
 
     const transactionSession = await this.connection.startSession();
 
