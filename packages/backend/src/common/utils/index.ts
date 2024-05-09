@@ -29,8 +29,7 @@ export const buildQueryParams = (options: object) => {
       queryString += `${encodedKey}=${encodedValue}&`;
     }
   }
-  // Append additional parameters
-  queryString += 'format=jsonv2&addressdetails=1';
+
   // Remove the trailing '&' if present
   queryString = queryString.replace(/&$/, '');
   return queryString;
