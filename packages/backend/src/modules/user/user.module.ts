@@ -4,6 +4,8 @@ import { UserController } from './user.controller';
 import { User, UserSchema } from './entities/user.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserRepository } from './repository/user.repository';
+import { BusinessModule } from '../business/business.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -13,6 +15,7 @@ import { UserRepository } from './repository/user.repository';
         schema: UserSchema,
       },
     ]),
+    forwardRef(() => BusinessModule),
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository],

@@ -68,6 +68,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     if (result) {
       result.id = transObjectIdToString(result._id);
     }
+
     return result.deletedAt ? null : result;
   }
 

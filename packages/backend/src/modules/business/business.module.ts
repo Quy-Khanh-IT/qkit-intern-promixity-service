@@ -6,6 +6,7 @@ import { Business, BusinessSchema } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
 import { UserModule } from '../user/user.module';
 import { AxiosModule } from '../axios/axios.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { AxiosModule } from '../axios/axios.module';
         schema: BusinessSchema,
       },
     ]),
-    UserModule,
+    forwardRef(() => UserModule),
     AxiosModule,
   ],
   controllers: [BusinessController],

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
@@ -14,7 +14,6 @@ import { InjectConnection } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { UserService } from '../user/user.service';
 import { transObjectIdToString } from 'src/common/utils';
-import { HttpService } from '@nestjs/axios';
 import { AxiosService } from '../axios/axios.service';
 import { buildQueryParams, validateRoad } from 'src/common/utils';
 import { BusinessStatusEnum } from 'src/common/enums';
@@ -22,8 +21,9 @@ import { BusinessStatusEnum } from 'src/common/enums';
 @Injectable()
 export class BusinessService {
   constructor(
-    private readonly businessRepository: BusinessRepository,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    private readonly businessRepository: BusinessRepository,
     private readonly axiosService: AxiosService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
@@ -66,6 +66,7 @@ export class BusinessService {
       const startMM = parseInt(day.openTime.split(':')[1]);
       const endHH = parseInt(day.closeTime.split(':')[0]);
       const endMM = parseInt(day.closeTime.split(':')[1]);
+
       if (startHH < 0 || startHH > 23 || endHH < 0 || endHH > 23) {
         throw new HttpException(
           {
@@ -224,7 +225,7 @@ export class BusinessService {
   }
 
   async restore(id: string): Promise<boolean> {
-    // const business = await this.businessRepository.restore(id);
+    const business = await this.businessRepository.restore(id);
 
     return false;
   }
