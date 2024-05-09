@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  HttpStatus,
   HttpCode,
   Req,
   UseGuards,
@@ -14,12 +13,10 @@ import {
 } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
 import {
   ApiBearerAuth,
   ApiBody,
-  ApiHeader,
   ApiResponse,
   ApiTags,
   ApiQuery,
@@ -27,30 +24,14 @@ import {
 import { ParseFloat } from '../../cores/decorators/parseFloat.decorator';
 import { Request } from 'express';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
-import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
 import { transObjectIdToString } from 'src/common/utils';
 import { DeleteActionEnum } from 'src/common/enums';
-import { DeleteActionsDto } from './dto/delete-actions.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
 @ApiBearerAuth()
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
-
-  @Get('/getAllByCurrentUser')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getAllByCurrentUser(@Req() req: Request) {
-    const result = await this.businessService.getAllByCurrentUser(req.user);
-
-    return result;
-  }
 
   @Get(':id')
   @HttpCode(200)
@@ -88,25 +69,7 @@ export class BusinessController {
     return result;
   }
 
-  @Delete(':id/soft')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully delete business.',
-  })
-  async softDelete(@Param('id') id: string) {}
-
-  @Delete(':id/hard')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully delete business and can not store.',
-  })
-  async forceDelete(@Param('id') id: string, @Req() req: Request) {}
-
-  @Delete(':id/request')
+  @Delete(':id')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
@@ -114,7 +77,7 @@ export class BusinessController {
     status: 200,
     description: 'User successfully deleted business.',
   })
-  async testDelete(
+  async delete(
     @Param('id') id: string,
     @Query('type') type: string,
     @Req() req: Request,

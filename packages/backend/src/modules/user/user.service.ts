@@ -1,12 +1,23 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { Business } from '../business/entities/business.entity';
+import { BusinessService } from '../business/business.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    // @Inject(forwardRef(() => BusinessService))
+    private readonly BusinessService: BusinessService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
@@ -79,5 +90,11 @@ export class UserService {
       throw new InternalServerErrorException('Remove business failed');
     }
     return user;
+  }
+
+  async getAllBusiness(user: User): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByCurrentUser(user);
+
+    return businesses;
   }
 }

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
@@ -66,6 +66,7 @@ export class BusinessService {
       const startMM = parseInt(day.openTime.split(':')[1]);
       const endHH = parseInt(day.closeTime.split(':')[0]);
       const endMM = parseInt(day.closeTime.split(':')[1]);
+
       if (startHH < 0 || startHH > 23 || endHH < 0 || endHH > 23) {
         throw new HttpException(
           {
