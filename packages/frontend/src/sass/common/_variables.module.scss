@@ -1,5 +1,5 @@
 $main-color: #ee1752;
-$sub-color: #d4335e;
+$sub-color: #ee6f92b3;
 $sub-color-2: #f4c2cf7a;
 // ---------
 $text-gray: #979393;
@@ -23,6 +23,7 @@ $warning-hover: #eaefa2;
 :export {
   mainColor: $main-color;
   grayBg: $gray-bg;
+  subColor: $sub-color;
   subColor2: $sub-color-2;
   dark: $dark;
   light: $light;

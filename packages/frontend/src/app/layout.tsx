@@ -11,7 +11,7 @@ import 'slick-carousel/slick/slick.css'
 import './globals.scss'
 import variables from '@/sass/common/_variables.module.scss'
 
-const { mainColor, light, dark } = variables
+const { mainColor, light, dark, subColor, subColor2 } = variables
 
 const popins = Poppins({
   subsets: ['latin'],
@@ -55,6 +55,9 @@ export default function RootLayout({
                 Menu: {
                   itemSelectedBg: mainColor,
                   itemSelectedColor: light
+                },
+                Table: {
+                  headerBg: subColor
                 }
               }
             }}

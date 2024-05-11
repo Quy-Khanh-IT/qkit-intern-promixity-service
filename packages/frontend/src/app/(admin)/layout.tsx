@@ -34,7 +34,7 @@ const containerVariants = {
     transition: {
       // type: 'spring',
       damping: 15,
-      duration: 0.5,
+      duration: 0.3,
       ease: 'easeInOut'
     }
   }
@@ -45,14 +45,14 @@ const contentVariants = {
     transition: {
       type: 'spring',
       damping: 15,
-      duration: 0.5
+      duration: 0.7
     }
   },
   open: {
     transition: {
       type: 'spring',
       damping: 15,
-      duration: 0.5
+      duration: 0.7
     }
   }
 }
@@ -179,10 +179,7 @@ export default function RootLayout({
                 backgroundColor: subColor2
               }}
             >
-              <div style={{ background: colorBgContainer, height: 100, borderRadius: 8, color: 'red', padding: 8 }}>
-                Content
-                {children}
-              </div>
+              <div style={{ background: colorBgContainer, borderRadius: 8, padding: 20 }}>{children}</div>
             </Content>
           </motion.div>
         </Row>
