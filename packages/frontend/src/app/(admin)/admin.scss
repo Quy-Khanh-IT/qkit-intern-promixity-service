@@ -1,0 +1,26 @@
+@import "@/sass/common/common.scss";
+
+.ant-layout-sider {
+  // width: calc(100% / 6) !important;
+  max-width: unset !important;
+}
+
+.--admin-layout {
+  .--admin-header {
+    .logo-section {
+      border-right: 0.5px solid $gray-border;
+    }
+    border-bottom: 0.5px solid $gray-border;
+  }
+
+  .ant-layout-sider-children {
+    height: 100%;
+
+    .ant-menu {
+      padding: 12px;
+      .ant-menu-item {
+        padding: 12px;
+      }
+    }
+  }
+}

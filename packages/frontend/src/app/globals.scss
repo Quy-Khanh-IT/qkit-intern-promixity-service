@@ -1,3 +1,7 @@
+// @import "~antd/dist/antd.less";
+
+// @primary-color: #007bff;
+
 main {
   background-color: #060817;
   overflow-x: hidden !important;
@@ -26,4 +30,9 @@ main {
   background: #151030;
   border-radius: 20px;
   animation: animate 2s infinite linear;
+}
+
+.col-0 {
+  flex: 0 0 auto;
+  width: 0%;
 }

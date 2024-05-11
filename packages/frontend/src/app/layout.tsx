@@ -1,4 +1,6 @@
 import StoreProvider from '@/app/components/StoreProvider'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { ConfigProvider } from 'antd'
 import 'bootstrap/dist/css/bootstrap.css'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
@@ -7,8 +9,9 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'slick-carousel/slick/slick-theme.css'
 import 'slick-carousel/slick/slick.css'
 import './globals.scss'
-import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { useState } from 'react'
+import variables from '@/sass/common/_variables.module.scss'
+
+const { mainColor, light, dark } = variables
 
 const popins = Poppins({
   subsets: ['latin'],
@@ -25,6 +28,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // console.log(variables.primary)
   return (
     <html lang='en'>
       <head>
@@ -33,10 +37,30 @@ export default function RootLayout({
           href='https://site-assets.fontawesome.com/releases/v6.1.2/css/all.css?fbclid=IwAR2undhfna4tMQt0yyPEeuUmtLt5QD9hl2TxmpC3H3oo--fAJX6skSyYftg%22%3E'
         />
       </head>
-      <body className={popins.className}>
+      <body className={`${popins.className} vh-100`}>
         {/* <ScrollToTopButton /> */}
         <AntdRegistry>
-          <StoreProvider>{children}</StoreProvider>
+          <ConfigProvider
+            theme={{
+              token: {
+                // Seed Token
+                colorPrimary: mainColor,
+                colorText: dark,
+                fontSize: 14,
+
+                // Alias Token
+                colorBgContainer: light
+              },
+              components: {
+                Menu: {
+                  itemSelectedBg: mainColor,
+                  itemSelectedColor: light
+                }
+              }
+            }}
+          >
+            <StoreProvider>{children}</StoreProvider>
+          </ConfigProvider>
         </AntdRegistry>
 
         <ToastContainer
