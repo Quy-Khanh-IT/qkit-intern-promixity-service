@@ -17,7 +17,6 @@ export default function HeroSection() {
       <div className='hero-content'>
         <div>
           <h1>PROXIMITY SERVICE</h1>
-          <Button type='primary'>Primary Button</Button>
           <div className={text === 'QKIT Intern Team' ? 'subtitle done' : 'subtitle'}>
             Created by: {text}
             <span style={{ color: 'white' }}>

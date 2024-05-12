@@ -1,5 +1,5 @@
 $main-color: #ee1752;
-$sub-color: #ee6f92b3;
+$sub-color: #f1235cb3;
 $sub-color-2: #f4c2cf7a;
 // ---------
 $text-gray: #979393;
@@ -27,4 +27,5 @@ $warning-hover: #eaefa2;
   subColor2: $sub-color-2;
   dark: $dark;
   light: $light;
+  errorColor: $error;
 }
