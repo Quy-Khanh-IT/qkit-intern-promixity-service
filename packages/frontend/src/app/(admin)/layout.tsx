@@ -7,7 +7,7 @@ import {
   UserOutlined,
   VideoCameraOutlined
 } from '@ant-design/icons'
-import { Button, Col, Image, Menu, Row, theme } from 'antd'
+import { Button, Col, Flex, Image, Menu, Row, theme } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import React, { useEffect, useState } from 'react'
@@ -96,8 +96,7 @@ export default function RootLayout({
           }}
           className='--admin-header'
         >
-          <Col
-            span={4}
+          <Flex
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -105,7 +104,7 @@ export default function RootLayout({
               paddingLeft: 12,
               paddingRight: 12
             }}
-            className='logo-section h-100'
+            className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
           >
             <Image src='/logo_light.png' width={120} preview={false} />
             <Button
@@ -123,23 +122,23 @@ export default function RootLayout({
                 height: 40
               }}
             />
-          </Col>
+          </Flex>
         </Header>
       </Col>
       <Col span={24} style={{ paddingTop: headerHeight }}>
-        <Row>
+        <Row style={{ position: 'fixed', left: 0, right: 0, top: headerHeight, zIndex: 99 }}>
           {/* span={collapsed ? 0 : 4} */}
           <motion.div
             variants={containerVariants}
             animate={containerControls}
-            className={`${collapsed ? 'col-0' : 'col-2'}`}
+            className={`sidebar-col ${collapsed ? 'col-0' : 'col-6 col-sm-4 col-md-3 col-lg-2'}`}
           >
             <Sider
               trigger={null}
               collapsible
               // collapsed={collapsed}
               // style={{ position: 'fixed', width: '100%', background: colorBgContainer }}
-              className='vh-100 w-100'
+              className='vh-100 w-100 --sider-admin'
               style={{ background: colorBgContainer }}
             >
               <Menu
@@ -170,7 +169,7 @@ export default function RootLayout({
           <motion.div
             variants={contentVariants}
             animate={contentControls}
-            className={`${collapsed ? 'col-12' : 'col-10'}`}
+            className={`col-12 ${collapsed ? 'col-12' : 'col-12 col-sm-12 col-md-9 col-lg-10 content-col '}`}
           >
             <Content
               style={{
@@ -178,6 +177,7 @@ export default function RootLayout({
                 minHeight: `calc(100vh - ${headerHeight}px)`,
                 backgroundColor: subColor2
               }}
+              className='h-100'
             >
               <div style={{ background: colorBgContainer, borderRadius: 8, padding: 20 }}>{children}</div>
             </Content>

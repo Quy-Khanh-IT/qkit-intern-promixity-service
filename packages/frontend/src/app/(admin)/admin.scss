@@ -3,6 +3,7 @@
 .ant-layout-sider {
   // width: calc(100% / 6) !important;
   max-width: unset !important;
+  min-width: unset !important;
 }
 
 .--admin-layout {
@@ -22,5 +23,20 @@
         padding: 12px;
       }
     }
+  }
+
+  .sidebar-col {
+    @include xs {
+      position: fixed;
+      z-index: 99;
+    }
+
+    @include md {
+      position: unset;
+      z-index: unset;
+    }
+  }
+
+  .content-col {
   }
 }

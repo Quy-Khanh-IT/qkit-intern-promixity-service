@@ -116,12 +116,48 @@ const ManageUser = () => {
       email: 'Jim Red',
       phone: 32,
       role: 'London No. 2 Lake Park'
-    }
+    },
+    {
+      key: '5',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    },
+    {
+      key: '6',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    },
+    {
+      key: '7',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    },
+    {
+      key: '8',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    },
+    {
+      key: '9',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    },
+    {
+      key: '10',
+      email: 'Jim Red',
+      phone: 32,
+      role: 'London No. 2 Lake Park'
+    } 
   ]
 
   return (
     <div>
-      <Table columns={listColumns} pagination={false} dataSource={data} />
+      <Table columns={listColumns} pagination={false} dataSource={data}  style={{ overflowY: 'scroll', maxHeight: '400px' }}/>
     </div>
   )
 }

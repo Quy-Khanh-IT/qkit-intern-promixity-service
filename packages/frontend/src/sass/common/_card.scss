@@ -1,27 +1,27 @@
 @import "./variables.module";
 @import "./breakpoints";
 
-.--card-wrapper {
-  background-color: white;
-  border-radius: 5px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
-    rgb(209, 213, 219) 0px 0px 0px 1px inset;
-  padding: 10px;
+// .--card-wrapper {
+//   background-color: white;
+//   border-radius: 5px;
+//   box-shadow:
+//     rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
+//     rgb(209, 213, 219) 0px 0px 0px 1px inset;
+//   padding: 10px;
 
-  @include sm {
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
-}
+//   @include sm {
+//     padding-left: 15px;
+//     padding-right: 15px;
+//     padding-top: 20px;
+//     padding-bottom: 20px;
+//   }
+// }
 
-.--card-wrapper-xs {
-  background-color: white;
-  border-radius: 5px;
-  box-shadow:
-    #74c1df 0px 0px 0px 1px,
-    rgb(209, 213, 219) 0px 0px 0px 1px inset;
-  padding: 10px;
-}
+// .--card-wrapper-xs {
+//   background-color: white;
+//   border-radius: 5px;
+//   box-shadow:
+//     #74c1df 0px 0px 0px 1px,
+//     rgb(209, 213, 219) 0px 0px 0px 1px inset;
+//   padding: 10px;
+// }
