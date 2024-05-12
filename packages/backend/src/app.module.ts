@@ -11,11 +11,13 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
-import { AddressModule } from './modules/address/address.module';
+
 import { SeedService } from './seeds/seed.service';
 import { DistrictRepository } from './modules/address/repository/district.repository';
 import { DistrictModule } from './modules/address/district.module';
 import { ProvinceModule } from './modules/address/province.module';
+import { join } from 'path';
+import { AddressModule } from './modules/address/address.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,10 +32,15 @@ import { ProvinceModule } from './modules/address/province.module';
     UserModule,
     OtpModule,
     AuthModule,
+<<<<<<< HEAD
     RequestModule,
     AddressModule,
     DistrictModule,
     ProvinceModule,
+=======
+    TokenModule,
+    AddressModule,
+>>>>>>> cf4812b (feat: Add CRUD Apis of Province, District, Ward and Address Apis)
   ],
   controllers: [AppController],
   providers: [

@@ -40,7 +40,6 @@ export class AddressController {
   async getAllDistrictsByProvinceCode(
     @Param('provinceCode') provinceCode: string,
   ): Promise<{ count: number; items: District[] }> {
-   
     return this.addressService.getAllDistrictByProvinceCode(provinceCode);
   }
 
