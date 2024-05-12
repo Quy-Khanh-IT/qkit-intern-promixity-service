@@ -12,6 +12,7 @@ import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { join } from 'path';
 import { TokenModule } from './modules/token/token.module';
+import { AddressModule } from './modules/address/address.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,7 @@ import { TokenModule } from './modules/token/token.module';
     OtpModule,
     AuthModule,
     TokenModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [
