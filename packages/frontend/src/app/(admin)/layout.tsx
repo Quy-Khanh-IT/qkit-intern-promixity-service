@@ -1,5 +1,6 @@
 'use client'
 import '@/sass/common/_common.scss'
+import variables from '@/sass/common/_variables.module.scss'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -10,11 +11,9 @@ import {
 import { Button, Col, Flex, Image, Menu, Row, theme } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
+import { motion, useAnimationControls } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import './admin.scss'
-import variables from '@/sass/common/_variables.module.scss'
-import { motion, useAnimationControls } from 'framer-motion'
-import { calc } from 'antd/es/theme/internal'
 
 const { subColor2 } = variables
 const headerHeight = 80
@@ -71,13 +70,17 @@ export default function RootLayout({
   } = theme.useToken()
 
   useEffect(() => {
-    if (collapsed) {
-      containerControls.start('close')
-      contentControls.start('open')
-    } else {
-      containerControls.start('open')
-      contentControls.start('close')
+    const animate = async () => {
+      if (collapsed) {
+        await containerControls.start('close')
+        await contentControls.start('open')
+      } else {
+        await containerControls.start('open')
+        await contentControls.start('close')
+      }
     }
+
+    animate()
   }, [collapsed])
 
   return (
@@ -106,7 +109,7 @@ export default function RootLayout({
             }}
             className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
           >
-            <Image src='/logo_light.png' width={120} preview={false} />
+            <Image src='/logo_light.png' width={120} preview={false} alt='error' />
             <Button
               type='text'
               icon={

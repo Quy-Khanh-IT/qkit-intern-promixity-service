@@ -12,4 +12,6 @@ coverage
 **/out/*
 next-env.d.ts
 **/.vscode/*
+*.js
+*.jsx
 # next.config.js

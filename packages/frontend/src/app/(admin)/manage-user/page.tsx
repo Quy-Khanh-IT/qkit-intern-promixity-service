@@ -152,12 +152,17 @@ const ManageUser = () => {
       email: 'Jim Red',
       phone: 32,
       role: 'London No. 2 Lake Park'
-    } 
+    }
   ]
 
   return (
     <div>
-      <Table columns={listColumns} pagination={false} dataSource={data}  style={{ overflowY: 'scroll', maxHeight: '400px' }}/>
+      <Table
+        columns={listColumns}
+        pagination={false}
+        dataSource={data}
+        style={{ overflowY: 'scroll', maxHeight: '400px' }}
+      />
     </div>
   )
 }
