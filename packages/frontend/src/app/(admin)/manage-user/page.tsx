@@ -2,6 +2,7 @@
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import { Dropdown, MenuProps, Table, TableProps } from 'antd'
 import { useState } from 'react'
+import './manage-user.scss'
 
 export interface IManageUserProps {}
 
@@ -77,7 +78,7 @@ const ManageUser = () => {
       title: 'Quyền hạn',
       dataIndex: 'role',
       key: 'role',
-      width: '15%'
+      width: '25%'
     }
   ]
 
@@ -162,7 +163,7 @@ const ManageUser = () => {
         pagination={false}
         dataSource={data}
         style={{ overflowY: 'scroll', maxHeight: '400px' }}
-        className='scroll-bar-2'
+        className='scroll-bar-2 --manage-table'
       />
     </div>
   )

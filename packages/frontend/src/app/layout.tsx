@@ -31,11 +31,6 @@ export default function RootLayout({
           rel='stylesheet'
           integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC'
         />
-        <script
-          defer
-          src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'
-          integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM'
-        ></script>
       </head>
       <body className={'vh-100'}>
         {/* <ScrollToTopButton /> */}
@@ -62,6 +57,11 @@ export default function RootLayout({
         />
 
         <script defer src='https://kit.fontawesome.com/03244eb91d.js' crossOrigin='anonymous'></script>
+        <script
+          defer
+          src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'
+          integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM'
+        ></script>
       </body>
     </html>
   )

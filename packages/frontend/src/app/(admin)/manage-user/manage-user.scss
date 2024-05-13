@@ -1,0 +1,19 @@
+.--manage-table {
+  // overflow-x: scroll;
+  // max-width: 200px;
+
+  .ant-spin-nested-loading {
+    margin-right: 1px;
+    .ant-table-thead {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 2;
+    }
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+}

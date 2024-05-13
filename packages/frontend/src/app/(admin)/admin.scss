@@ -1,17 +1,11 @@
 @import "@/sass/common/common.scss";
 
-.ant-layout-sider {
-  // width: calc(100% / 6) !important;
-  max-width: unset !important;
-  min-width: unset !important;
-}
-
 .--admin-layout {
   .--admin-header {
+    padding: 0;
     .logo-section {
       border-right: 0.5px solid $gray-border;
     }
-    border-bottom: 0.5px solid $gray-border;
   }
 
   .ant-layout-sider-children {
@@ -26,14 +20,30 @@
   }
 
   .sidebar-col {
+    height: 100%;
+    border-top: 0.5px solid $gray-border;
+
     @include xs {
       position: fixed;
       z-index: 99;
+      width: 50%;
     }
 
     @include md {
       position: unset;
       z-index: unset;
+    }
+
+    .ant-layout-sider {
+      // width: calc(100% / 6) !important;
+      max-width: unset !important;
+      min-width: unset !important;
+      width: unset !important;
+      height: 100% !important;
+
+      .ant-menu {
+        height: 100%;
+      }
     }
   }
 
