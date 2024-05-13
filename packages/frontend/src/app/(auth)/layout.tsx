@@ -1,5 +1,5 @@
 import Footer from "../components/Footer";
-import "./signin.scss";
+import "./auth.scss";
 export default function AuthFunction({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

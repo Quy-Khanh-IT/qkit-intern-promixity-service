@@ -1,4 +1,4 @@
-import ".//serviceslick.scss";
+import "./service-slick.scss";
 
 export default function ServiceSlick(service: any) {
   return (

@@ -1,0 +1,19 @@
+.main-container {
+  position: "relative";
+  z-index: 0;
+  width: 100vw;
+  background-color: #060817;
+
+  img {
+  }
+
+  .not-found-wrapper {
+    color: white;
+    .not-found-content {
+      margin-right: 70px;
+      span {
+        font-weight: 200;
+      }
+    }
+  }
+}

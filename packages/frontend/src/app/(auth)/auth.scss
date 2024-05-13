@@ -81,6 +81,10 @@ $header-height: 48px;
         }
         .f-form {
           padding: 20px 72px 0 72px !important;
+
+          @media (max-width: 768px) {
+            padding: 34px 0 0 0 !important;
+          }
         }
         .form-wrapper {
           padding: 68px 72px 0 72px;
@@ -89,10 +93,9 @@ $header-height: 48px;
             padding: 68px 0 0 0;
           }
 
-          form {
+          .form {
             margin-top: 48px;
             .form-label {
-              margin-bottom: 20px;
             }
             .otp-wrapper {
               display: flex;
@@ -112,17 +115,19 @@ $header-height: 48px;
               }
             }
             .form-control {
-              color: white;
+              display: flex;
+              justify-content: space-between;
+              color: black;
               margin-bottom: 20px;
               border-radius: 20px;
               border: none;
               line-height: 2.2;
               padding-left: 28px;
               border: 3px solid black;
-              background-image: radial-gradient(#010101, #1f1b1c);
+              background-image: #e8f0fe;
               &::placeholder {
                 font-weight: 400;
-                color: grey;
+                color: rgb(104, 103, 103);
               }
 
               &:focus {
@@ -131,6 +136,35 @@ $header-height: 48px;
 
               option {
                 color: black;
+              }
+
+              input {
+                background-color: transparent;
+                border: none;
+                outline: none;
+                line-height: 1.9;
+                width: 100%;
+                color: white;
+                &::placeholder {
+                  font-weight: 400;
+                  color: grey;
+                }
+              }
+
+              button {
+                width: 120px;
+                line-height: 1.8;
+                font-size: 14px;
+                font-weight: 600;
+                background-color: transparent;
+                border: none;
+                outline: none;
+                color: black;
+                border-left: 1px solid black;
+
+                &:hover {
+                  color: #ed1651;
+                }
               }
             }
           }
@@ -160,20 +194,19 @@ $header-height: 48px;
           form {
             margin-top: 48px;
             .form-label {
-              margin-bottom: 20px;
             }
             input {
-              color: white;
+              color: black;
               margin-bottom: 20px;
               border-radius: 20px;
               border: none;
               line-height: 2.2;
               padding-left: 28px;
               border: 3px solid black;
-              background-image: radial-gradient(#010101, #1f1b1c);
+              background-image: #e8f0fe;
               &::placeholder {
                 font-weight: 400;
-                color: grey;
+                color: rgb(104, 103, 103);
               }
 
               &:focus {
@@ -258,4 +291,11 @@ $header-height: 48px;
       }
     }
   }
+}
+
+.error-input {
+  color: red;
+  line-height: 1.2;
+  font-size: 12px;
+  margin-left: 8px;
 }

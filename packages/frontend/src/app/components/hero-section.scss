@@ -56,6 +56,7 @@ $hightlight_color: white;
       border: calc(0.08 * 4rem) solid transparent !important;
       position: relative;
       color: #f3f3f3;
+      z-index: 9;
 
       font-size: var(--m);
       border-radius: calc(0.7 * var(--m));

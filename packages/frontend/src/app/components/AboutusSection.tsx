@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./aboutussection.scss";
+import "./about-us-section.scss";
 
 export default function AboutusSection() {
   const [tabs, setTabs] = useState<number>(0);
