@@ -1,5 +1,5 @@
 "use client";
-import "./credibilitysection.scss";
+import "./creadibility-section.scss";
 import { useRef } from "react";
 
 export default function AboutUsSection() {

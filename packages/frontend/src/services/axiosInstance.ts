@@ -2,7 +2,10 @@ import axios from "axios";
 
 // Set config defaults when creating the instance
 const instance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: process.env.BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  }
 });
 
 instance.defaults.withCredentials = true;

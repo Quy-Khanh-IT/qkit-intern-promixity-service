@@ -1,5 +1,5 @@
 "use client";
-import "./navprocessbar.scss";
+import "./nav-process-bar.scss";
 export default function NavProcessbar() {
   const navClick = (name: string) => {
     const element = document.getElementById(name);

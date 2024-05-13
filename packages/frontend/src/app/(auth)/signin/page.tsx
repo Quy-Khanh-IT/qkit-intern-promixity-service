@@ -1,4 +1,5 @@
 "use client";
+import { useLoginUserMutation } from "@/services/auth.service";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -8,21 +9,46 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const enableTooltip = () => {
-    // const tooltipTriggerList = [].slice.call(
-    //   document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    // );
-    // const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    //   return new bootstrap.Tooltip(tooltipTriggerEl);
-    // });
+  const [inputError, setInputError] = useState({
+    email: "",
+    password: "",
+  });
+  const [loginUser, { data: loginData, isSuccess, isError, isLoading, error }] =
+    useLoginUserMutation();
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("Login successful", loginData);
+    }
+    if (isError) {
+      console.log("Login error", error);
+    }
+  }, [isSuccess, isError]);
+
+  const SignIn = async () => {
+    if (!password && !email) {
+      setInputError({
+        email: !email ? "Please input email" : "",
+        password: !password ? "Please input email" : "",
+      });
+    } else {
+      await loginUser({
+        email,
+        password,
+      });
+    }
   };
 
-  useEffect(() => {
-    enableTooltip();
-  }, []);
-
-  const SignIn = () => {
-    toast(`${email} ${password}`);
+  const onChangeData = (value: string, type: string) => {
+    if (type == "email") {
+      setEmail(value);
+    }
+    if (type == "password") {
+      setPassword(value);
+    }
+    setInputError({
+      email: "",
+      password: "",
+    });
   };
   return (
     <div className="auth-container">
@@ -38,9 +64,12 @@ export default function SignIn() {
               <form>
                 <div className="mb-3">
                   <label className="form-label">Email address</label>
+                  <div>
+                    <span className="error-input">{inputError.email}</span>
+                  </div>
                   <input
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => onChangeData(e.target.value, "email")}
                     type="email"
                     className="form-control"
                     placeholder="name@example.com"
@@ -48,9 +77,12 @@ export default function SignIn() {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
+                  <div>
+                    <span className="error-input">{inputError.password}</span>
+                  </div>
                   <input
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => onChangeData(e.target.value, "password")}
                     type="password"
                     className="form-control"
                     placeholder="********"

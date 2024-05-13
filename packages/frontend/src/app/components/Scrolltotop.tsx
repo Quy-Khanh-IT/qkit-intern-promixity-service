@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import ".//scrolltotop.scss";
+import "./scroll-to-top.scss";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);

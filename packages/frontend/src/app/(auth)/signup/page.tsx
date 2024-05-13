@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import axios from "../../../utils/axios";
+import axios from "../../../services/axiosInstance";
 import Link from "next/link";
+import { useRegistrationOTPMutation } from "@/services/otp.service";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -13,21 +14,22 @@ export default function SignUp() {
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
 
-  const enableTooltip = () => {
-    // const tooltipTriggerList = [].slice.call(
-    //   document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    // );
-    // const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    //   return new bootstrap.Tooltip(tooltipTriggerEl);
-    // });
-  };
-
+  const [
+    registrationOTP,
+    { data: otpData, isSuccess, isError, isLoading, error },
+  ] = useRegistrationOTPMutation();
   const getCode = async () => {
-    let response = await axios.post("/otps/registration", {
-      email: "congchinh2903@gmail.com",
-    });
+    if (!email) {
+      toast.error("Please input email");
+    } else {
+      await registrationOTP({
+        email,
+      });
 
-    console.log(response.data);
+      if (isSuccess) {
+        toast.success("Email sent successfully");
+      }
+    }
   };
 
   const fetchProvinces = async () => {
@@ -39,7 +41,6 @@ export default function SignUp() {
   };
 
   useEffect(() => {
-    enableTooltip();
     fetchProvinces();
   }, []);
 

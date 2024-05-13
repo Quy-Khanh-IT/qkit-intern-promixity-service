@@ -2,14 +2,17 @@
 import EarthCanvas from "./canvas/Earth";
 import { motion } from "framer-motion";
 import { slideIn } from "../../utils/motion";
-import ".//herosection.scss";
+import "./hero-section.scss";
 import { Cursor, useTypewriter } from "react-simple-typewriter";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
   const [text] = useTypewriter({
     words: ["Chính", "Bách", "Ngọc", "Tuấn", "Khánh", "QKIT Intern Team"],
     typeSpeed: 120,
   });
+
+  const router=useRouter();
 
   return (
     <div id="hero" className="hero-wrap ">
@@ -35,7 +38,7 @@ export default function HeroSection() {
               margin: "16px 0 24px 24px",
             }}
           >
-            <button className="hero-btn">JOIN NOW</button>
+            <button onClick={()=>router.push("/signin")} className="hero-btn">JOIN NOW</button>
           </div>
           <div style={{ maxWidth: "700px", marginTop: "8px" }}>
             <span>

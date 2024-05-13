@@ -6,7 +6,7 @@ import Navbar from "@/app/components/Navbar";
 import ServiceSlider from "@/app/components/ServiceSlider";
 import StarsCanvas from "./components/canvas/Star";
 import CredibilitySection from "./components/CredibilitySection";
-import { useRef } from "react";
+
 import NavProcessbar from "./components/NavProcessbar";
 import AboutusSection from "./components/AboutusSection";
 

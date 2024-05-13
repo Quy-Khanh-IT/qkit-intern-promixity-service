@@ -1,14 +1,25 @@
 import { configureStore } from "@reduxjs/toolkit";
-import storePersist from "./persistStore";
-import reducers from "./reducers";
-import { persistStore } from "redux-persist";
 
-const persistedReducer = storePersist(reducers);
+import reducers from "./reducers";
+
+import { setupListeners } from "@reduxjs/toolkit/query";
+import { authApi } from "@/services/auth.service";
+import { otpApi } from "@/services/otp.service";
+
+// const persistedReducer = storePersist(reducers);
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: {
+    [authApi.reducerPath]: authApi.reducer,
+    [otpApi.reducerPath]: otpApi.reducer,
+  },
+
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(authApi.middleware, otpApi.middleware),
 });
 
-export const persistor = persistStore(store);
+setupListeners(store.dispatch);
+
+// export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof reducers>;
