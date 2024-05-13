@@ -162,6 +162,7 @@ const ManageUser = () => {
         pagination={false}
         dataSource={data}
         style={{ overflowY: 'scroll', maxHeight: '400px' }}
+        className='scroll-bar-2'
       />
     </div>
   )

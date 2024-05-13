@@ -1,6 +1,11 @@
-// @import "~antd/dist/antd.less";
+@import "@/sass/utils/animate.scss";
+@import "@/sass/utils/scroll-bar.scss";
 
-// @primary-color: #007bff;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 main {
   background-color: #060817;
@@ -8,28 +13,8 @@ main {
   width: 100%;
 }
 
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: rgb(99, 99, 99);
-  opacity: 0.1 !important;
-}
-
-@keyframes animate {
-  0% {
-    background-position: 0;
-  }
-  100% {
-    background-position: 200%;
-  }
-}
-
-::-webkit-scrollbar-thumb {
-  background: #151030;
-  border-radius: 20px;
-  animation: animate 2s infinite linear;
+body {
+  margin: 0;
 }
 
 .col-0 {

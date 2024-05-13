@@ -55,22 +55,22 @@
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-floating-promises": "off",
     "react-hooks/exhaustive-deps": "warn",
-    "react-hooks/rules-of-hooks": "warn"
+    "react-hooks/rules-of-hooks": "warn",
 
     // "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
-    // "prettier/prettier": [
-    //   "warn",
-    //   {
-    //     "arrowParens": "always",
-    //     "semi": false,
-    //     "trailingComma": "none",
-    //     "tabWidth": 2,
-    //     "endOfLine": "auto",
-    //     "useTabs": false,
-    //     "singleQuote": true,
-    //     "printWidth": 120,
-    //     "jsxSingleQuote": true
-    //   }
-    // ]
+    "prettier/prettier": [
+      "warn",
+      {
+        "arrowParens": "always",
+        "semi": false,
+        "trailingComma": "none",
+        "tabWidth": 2,
+        "endOfLine": "auto",
+        "useTabs": false,
+        "singleQuote": true,
+        "printWidth": 120,
+        "jsxSingleQuote": true
+      }
+    ]
   }
 }

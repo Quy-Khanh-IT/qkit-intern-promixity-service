@@ -1,10 +1,10 @@
-import { combineReducers } from "@reduxjs/toolkit";
-import themeReducer from "./themeReducer";
-import testReducer from "./testReducer";
+import { combineReducers } from '@reduxjs/toolkit'
+import themeReducer from './themeReducer'
+import testReducer from './testReducer'
 
 const reducers = combineReducers({
   theme: themeReducer,
-  test: testReducer,
-});
+  test: testReducer
+})
 
-export default reducers;
+export default reducers

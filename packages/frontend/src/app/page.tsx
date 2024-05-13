@@ -13,7 +13,7 @@ export default function Home() {
     <main>
       <NavProcessbar />
       <Navbar />
-      <div style={{ position: 'relative', zIndex: 0 }}>
+      <div style={{ position: 'relative', zIndex: 0 }} className='scroll-bar-1'>
         <HeroSection />
         <CredibilitySection />
         <StarsCanvas />
