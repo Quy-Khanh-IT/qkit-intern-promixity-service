@@ -69,21 +69,8 @@ $hightlight_color: white;
       justify-content: center;
       cursor: pointer;
       background: linear-gradient(#121213, #121213),
-        linear-gradient(
-          #121213 50%,
-          rgba(18, 18, 19, 0.6) 80%,
-          rgba(18, 18, 19, 0)
-        ),
-        linear-gradient(
-          90deg,
-          #ff6d1b,
-          #ffee55,
-          #5bff89,
-          #4d8aff,
-          #6b5fff,
-          #ff64f9,
-          #ff6565
-        );
+        linear-gradient(#121213 50%, rgba(18, 18, 19, 0.6) 80%, rgba(18, 18, 19, 0)),
+        linear-gradient(90deg, #ff6d1b, #ffee55, #5bff89, #4d8aff, #6b5fff, #ff64f9, #ff6565);
       background-origin: border-box;
       background-clip: padding-box, border-box, border-box;
       background-size: 200%;
@@ -91,16 +78,7 @@ $hightlight_color: white;
 
       &::before {
         content: "";
-        background: linear-gradient(
-          90deg,
-          #ff6d1b,
-          #ffee55,
-          #5bff89,
-          #4d8aff,
-          #6b5fff,
-          #ff64f9,
-          #ff6565
-        );
+        background: linear-gradient(90deg, #ff6d1b, #ffee55, #5bff89, #4d8aff, #6b5fff, #ff64f9, #ff6565);
         height: 30%;
         width: 60%;
         position: absolute;

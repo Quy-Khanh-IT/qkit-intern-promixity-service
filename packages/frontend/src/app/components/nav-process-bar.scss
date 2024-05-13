@@ -96,7 +96,8 @@
           top: 50%;
           left: 50%;
 
-          transition: transform 500ms ease-in-out,
+          transition:
+            transform 500ms ease-in-out,
             -webkit-transform 500ms ease-in-out;
           border-radius: 50%;
         }
