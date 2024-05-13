@@ -1,8 +1,7 @@
 'use client'
 import { useLoginUserMutation } from '@/services/auth.service'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { toast } from 'react-toastify'
+import { useEffect, useState } from 'react'
 // import * as bootstrap from "bootstrap/dist/css/bootstrap.css";
 
 export default function SignIn() {
