@@ -1,5 +1,5 @@
 'use client'
-import Navbar from '@/app/components/Navbar'
+import Navbar from '@/app/components/NavBar'
 import StarsCanvas from './components/canvas/Star'
 import './not-found.scss'
 export default function NotFound() {

@@ -3,21 +3,21 @@ import Footer from '@/app/components/Footer'
 import HeroSection from '@/app/components/HeroSection'
 import Navbar from '@/app/components/NavBar'
 import ServiceSlider from '@/app/components/ServiceSlider'
-import AboutusSection from './components/AboutUsSection'
 import StarsCanvas from './components/canvas/Star'
 import CredibilitySection from './components/CredibilitySection'
-import NavProcessbar from './components/NavProcessBar'
+import NavProcessBar from './components/NavProcessbar'
+import AboutUsSection from './components/AboutusSection'
 
 export default function Home() {
   return (
     <main>
-      <NavProcessbar />
+      <NavProcessBar />
       <Navbar />
       <div style={{ position: 'relative', zIndex: 0 }} className='scroll-bar-1'>
         <HeroSection />
         <CredibilitySection />
         <StarsCanvas />
-        <AboutusSection />
+        <AboutUsSection />
       </div>
       <ServiceSlider />
 

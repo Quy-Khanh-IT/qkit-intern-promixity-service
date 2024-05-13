@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './about-us-section.scss'
 
-export default function AboutusSection() {
+export default function AboutUsSection() {
   const [tabs, setTabs] = useState<number>(0)
 
   const handleTabs = (index: number) => {
