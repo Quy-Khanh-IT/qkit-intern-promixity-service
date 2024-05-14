@@ -9,11 +9,12 @@ $primary-light: rgb(224, 239, 255);
 $dark: #000000; //
 $gray: #6b778c;
 $gray-bg: #ededed;
-$gray-hover: #e7ebef74;
+$gray-hover: #c6cbd074;
+$gray-row-hover: #ececec74;
 $gray-border: #c6cace; //
 $input-disable: #b9bdbf17;
 $light: #ffffff; //
-$error: #c11b17; //
+$error: #ea1d18; //
 $error-hover: #ff9997;
 $success: #48c14e; //
 $success-hover: #b9f6ca;
@@ -25,6 +26,7 @@ $warning-hover: #eaefa2;
   grayBg: $gray-bg;
   subColor: $sub-color;
   subColor2: $sub-color-2;
+  grayRowHover: $gray-row-hover;
   dark: $dark;
   light: $light;
   errorColor: $error;

@@ -2,7 +2,7 @@
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
 import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Col, Flex, Image, Menu, Row, theme, Grid, MenuProps, Space, Tooltip, Avatar } from 'antd'
+import { Button, Col, Flex, Image, Menu, Row, theme, Grid, MenuProps, Space, Tooltip, Avatar, Badge } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import { motion, useAnimationControls } from 'framer-motion'
@@ -125,7 +125,13 @@ export default function RootLayout({
               // className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
               className='h-100'
             >
-              <Image src='/logo_light.png' width={120} preview={false} alt='error' style={{ paddingLeft: 16 }} />
+              <Image
+                src='/logo_light.png'
+                className='header-logo'
+                preview={false}
+                alt='error'
+                style={{ paddingLeft: 24 }}
+              />
               <Button
                 type='text'
                 icon={
@@ -148,8 +154,10 @@ export default function RootLayout({
 
         <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
           <Space className='me-4' size='middle'>
-            <Tooltip title='Notifications' className='action-button'>
-              <BellOutlined style={{ fontSize: 24 }} />
+            <Tooltip title='Notifications'>
+              <Badge count={5} offset={[-5, 4]}>
+                <BellOutlined style={{ fontSize: 24 }} className='action-button' />
+              </Badge>
             </Tooltip>
             <Avatar icon={<UserOutlined />} className='cursor' />
           </Space>

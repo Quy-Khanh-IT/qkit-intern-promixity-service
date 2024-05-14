@@ -1,6 +1,12 @@
+@import "@/sass/common/common.scss";
+
 .--manage-table {
   overflow-y: auto;
   overflow-x: auto;
+  border-left: 1px solid $gray-border;
+  border-right: 1px solid $gray-border;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   // max-width: 200px;
 
   .ant-spin-nested-loading {
@@ -16,11 +22,13 @@
   // @include x
   th {
     white-space: nowrap;
-
-    
   }
 
-  tr > th:last-child{
+  tr > th:last-child {
     text-align: center !important;
+  }
+
+  tr:nth-child(odd) {
+    background-color: $gray-row-hover;
   }
 }

@@ -1,7 +1,7 @@
-@import '../common/common';
+@import "../common/common";
 
 .action-button {
-  padding: 6px;
+  padding: 4px;
   border-radius: 50%;
   transition: all ease-in 0.3s;
   cursor: pointer;
@@ -11,6 +11,6 @@
   }
 }
 
-.cursor{
+.cursor {
   cursor: pointer;
 }

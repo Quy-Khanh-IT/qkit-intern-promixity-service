@@ -1,10 +1,10 @@
 'use client'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import { Button, Dropdown, Flex, MenuProps, Table, TableProps, Tag, Typography } from 'antd'
+import { Button, Dropdown, Flex, MenuProps, Table, TableProps, Tag, Typography, Pagination, Row } from 'antd'
 import { useState } from 'react'
 import './manage-user.scss'
 import userData from './user-data.json'
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons'
 
 export interface IManageUserProps {}
 
@@ -118,21 +118,42 @@ const ManageUser = () => {
 
   return (
     <>
-      <Flex justify='space-between' style={{    marginBottom: 16,
-    height: 40}}>
-        <Typography.Title className='mb-0' level={3}>User</Typography.Title>
-        <Button type='primary' icon={<PlusOutlined />} className='h-100' style={{
-    fontWeight: 700,
-    padding: '0 20px'}}>Add User</Button>
+      <Flex justify='space-between' style={{ marginBottom: 16, height: 40 }}>
+        <Typography.Title className='mb-0' level={3}>
+          User
+        </Typography.Title>
+        <Button
+          type='primary'
+          icon={<PlusOutlined />}
+          className='h-100'
+          style={{
+            fontWeight: 700,
+            padding: '0 20px'
+          }}
+        >
+          Add User
+        </Button>
       </Flex>
       <Table
         columns={listColumns}
         pagination={false}
         dataSource={data}
-        // 80 header, 48 external padding, 40 internal padding, 56 header content
-        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 56px)' }}
+        // 80 header, 48 external padding, 40 internal padding, 56 header content, 60px for pagination
+        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 56px - 50px)' }}
         className='scroll-bar-2 --manage-table'
       />
+      <Row justify='end' align='bottom' style={{ height: 50 }}>
+        <Pagination
+          showSizeChanger={false}
+          // current={2}
+          defaultCurrent={1}
+          pageSize={10}
+          total={50}
+          // onChange={(page, pageSize) => {
+          //   pagination?.onChange(page, pageSize)
+          // }}
+        />
+      </Row>
     </>
   )
 }

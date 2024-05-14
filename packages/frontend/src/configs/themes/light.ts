@@ -1,7 +1,7 @@
 import variables from '@/sass/common/_variables.module.scss'
 import { ThemeConfig } from 'antd'
 import { Nunito, Poppins, Roboto } from 'next/font/google'
-const { mainColor, light, dark, subColor, subColor2, errorColor } = variables
+const { mainColor, light, dark, subColor, subColor2, grayRowHover, errorColor } = variables
 
 const nunitoFont = Nunito({
   subsets: ['latin'],
@@ -26,7 +26,8 @@ export const themConfig: ThemeConfig = {
       itemSelectedColor: light
     },
     Table: {
-      headerBg: subColor
+      headerBg: subColor,
+      rowHoverBg: grayRowHover
     }
   }
   // components: {

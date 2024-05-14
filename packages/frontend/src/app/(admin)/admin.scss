@@ -4,6 +4,16 @@
   .--admin-header {
     border-right: 0.5px solid $gray-border;
     padding: 0;
+
+    .header-logo {
+      @include xs {
+        width: 120px;
+      }
+
+      @include lg {
+        width: 140px;
+      }
+    }
   }
 
   .ant-layout-sider-children {

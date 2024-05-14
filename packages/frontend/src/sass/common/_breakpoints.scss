@@ -24,6 +24,12 @@
   }
 }
 
+@mixin lg {
+  @media screen and (min-width: 992px) {
+    @content;
+  }
+}
+
 // Nest Hub Max (1280x800)
 @mixin xl {
   @media screen and (min-width: 1200px) {
