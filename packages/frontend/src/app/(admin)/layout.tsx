@@ -1,14 +1,8 @@
 'use client'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined
-} from '@ant-design/icons'
-import { Button, Col, Flex, Image, Menu, Row, theme, Grid } from 'antd'
+import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Col, Flex, Image, Menu, Row, theme, Grid, MenuProps, Space, Tooltip, Avatar } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
 import { motion, useAnimationControls } from 'framer-motion'
@@ -98,12 +92,17 @@ export default function RootLayout({
     animate()
   }, [collapsed])
 
+  const onMenuClick: MenuProps['onClick'] = (e) => {
+    console.log('click ', e)
+  }
+
   return (
     <Row className='--admin-layout'>
       <Col
         span={24}
         style={{
           minHeight: 'unset',
+          display: 'flex',
           padding: 0,
           background: colorBgContainer,
           position: 'fixed',
@@ -114,8 +113,8 @@ export default function RootLayout({
           height: headerHeight
         }}
       >
-        <Col xs={12} md={6} lg={5} xl={4} className='h-100'>
-          <Header style={{ backgroundColor: colorBgContainer }} className='--admin-header'>
+        <Col xs={12} md={6} lg={5} xl={4} className='h-100 --admin-header'>
+          <Header style={{ backgroundColor: colorBgContainer, padding: 0 }} className='h-100'>
             <Flex
               style={{
                 display: 'flex',
@@ -123,7 +122,8 @@ export default function RootLayout({
                 justifyContent: 'space-between'
                 // height: headerHeight
               }}
-              className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
+              // className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
+              className='h-100'
             >
               <Image src='/logo_light.png' width={120} preview={false} alt='error' style={{ paddingLeft: 16 }} />
               <Button
@@ -144,6 +144,15 @@ export default function RootLayout({
               />
             </Flex>
           </Header>
+        </Col>
+
+        <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
+          <Space className='me-4' size='middle'>
+            <Tooltip title='Notifications' className='action-button'>
+              <BellOutlined style={{ fontSize: 24 }} />
+            </Tooltip>
+            <Avatar icon={<UserOutlined />} className='cursor' />
+          </Space>
         </Col>
       </Col>
       <Col span={24} style={{ paddingTop: headerHeight }}>
@@ -172,6 +181,7 @@ export default function RootLayout({
             >
               <Menu
                 theme='light'
+                onClick={onMenuClick}
                 mode='inline'
                 defaultSelectedKeys={['1']}
                 className='h-100'
@@ -179,23 +189,33 @@ export default function RootLayout({
                   {
                     key: '1',
                     icon: <UserOutlined />,
-                    label: 'nav 1'
+                    label: 'Manage user'
                   },
                   {
                     key: '2',
-                    icon: <VideoCameraOutlined />,
-                    label: 'nav 2'
-                  },
-                  {
-                    key: '3',
-                    icon: <UploadOutlined />,
-                    label: 'nav 3'
+                    icon: (
+                      <Flex style={{ width: 14, height: 16 }} justify='center'>
+                        <i className='fa-light fa-building'></i>
+                      </Flex>
+                    ),
+                    label: 'Manage business'
                   }
+                  // {
+                  //   key: '3',
+                  //   icon: <UploadOutlined />,
+                  //   label: 'nav 3'
+                  // }
                 ]}
               />
             </Sider>
           </Col>
-          <Col flex='auto' className='content-col'>
+          <Col
+            xs={collapsed ? 24 : 24}
+            md={collapsed ? 24 : 18}
+            lg={collapsed ? 24 : 19}
+            xl={collapsed ? 24 : 20}
+            className='content-col'
+          >
             <Content
               style={{
                 padding: 24,
@@ -205,7 +225,17 @@ export default function RootLayout({
               }}
               // className='h-100'
             >
-              <div style={{ background: colorBgContainer, borderRadius: 8, padding: 20 }}>{children}</div>
+              <div
+                style={{
+                  background: colorBgContainer,
+                  borderRadius: 8,
+                  padding: 20,
+                  // padding 24px vs 80px for header
+                  height: 'calc(100vh - 80px - 48px)'
+                }}
+              >
+                {children}
+              </div>
             </Content>
           </Col>
           {/* <motion.div

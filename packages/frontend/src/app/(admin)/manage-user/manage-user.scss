@@ -1,5 +1,6 @@
 .--manage-table {
-  // overflow-x: scroll;
+  overflow-y: auto;
+  overflow-x: auto;
   // max-width: 200px;
 
   .ant-spin-nested-loading {
@@ -12,8 +13,14 @@
     }
   }
 
-  th,
-  td {
+  // @include x
+  th {
     white-space: nowrap;
+
+    
+  }
+
+  tr > th:last-child{
+    text-align: center !important;
   }
 }

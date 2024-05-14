@@ -2,10 +2,8 @@
 
 .--admin-layout {
   .--admin-header {
+    border-right: 0.5px solid $gray-border;
     padding: 0;
-    .logo-section {
-      border-right: 0.5px solid $gray-border;
-    }
   }
 
   .ant-layout-sider-children {
@@ -32,6 +30,7 @@
     @include md {
       position: unset;
       z-index: unset;
+      width: unset;
     }
 
     .ant-layout-sider {
@@ -43,6 +42,10 @@
 
       .ant-menu {
         height: 100%;
+
+        .ant-menu-item {
+          height: 45px;
+        }
       }
     }
   }

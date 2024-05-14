@@ -1,8 +1,10 @@
 'use client'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import { Dropdown, MenuProps, Table, TableProps } from 'antd'
+import { Button, Dropdown, Flex, MenuProps, Table, TableProps, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import './manage-user.scss'
+import userData from './user-data.json'
+import { PlusOutlined } from '@ant-design/icons';
 
 export interface IManageUserProps {}
 
@@ -10,17 +12,18 @@ type ColumnsType<T extends object> = TableProps<T>['columns']
 
 interface DataType {
   key: string
-  email: string
-  phone: number
-  role: string
+  firstName: string
+  lastName: string
+  address: string
+  roles: string[]
 }
 
 const ManageUser = () => {
   const [userOption, setUserOption] = useState()
 
-  const listColumns: ColumnsType<any> = [
+  const listColumns: ColumnsType<DataType> = [
     {
-      width: '8%',
+      width: 75,
       align: 'center',
       render: () => {
         const items: MenuProps['items'] = [
@@ -64,21 +67,39 @@ const ManageUser = () => {
       }
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email'
+      title: 'First name',
+      dataIndex: 'firstName',
+      key: 'firstName',
+      width: 200
     },
     {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
-      width: '25%'
+      title: 'Last name',
+      dataIndex: 'lastName',
+      key: 'lastName',
+      width: 200
     },
     {
-      title: 'Quyền hạn',
-      dataIndex: 'role',
-      key: 'role',
-      width: '25%'
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address'
+    },
+    {
+      title: 'Roles',
+      dataIndex: 'roles',
+      key: 'roles',
+      width: 250,
+      render: (roles: string[]) => (
+        <Flex justify='center' wrap>
+          {roles?.map((role, _index) => {
+            const color = role == 'ADMIN' ? 'green' : 'geekblue'
+            return (
+              <Tag color={color} key={role} style={{ margin: '4px 0px 0px 4px' }}>
+                {role}
+              </Tag>
+            )
+          })}
+        </Flex>
+      )
     }
   ]
 
@@ -93,79 +114,26 @@ const ManageUser = () => {
     }
   ]
 
-  const data: DataType[] = [
-    {
-      key: '1',
-      email: 'John Brown',
-      phone: 32,
-      role: 'New York No. 1 Lake Park'
-    },
-    {
-      key: '2',
-      email: 'Joe Black',
-      phone: 42,
-      role: 'London No. 1 Lake Park'
-    },
-    {
-      key: '3',
-      email: 'Jim Green',
-      phone: 32,
-      role: 'Sydney No. 1 Lake Park'
-    },
-    {
-      key: '4',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '5',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '6',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '7',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '8',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '9',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    },
-    {
-      key: '10',
-      email: 'Jim Red',
-      phone: 32,
-      role: 'London No. 2 Lake Park'
-    }
-  ]
+  const data: DataType[] = userData
 
   return (
-    <div>
+    <>
+      <Flex justify='space-between' style={{    marginBottom: 16,
+    height: 40}}>
+        <Typography.Title className='mb-0' level={3}>User</Typography.Title>
+        <Button type='primary' icon={<PlusOutlined />} className='h-100' style={{
+    fontWeight: 700,
+    padding: '0 20px'}}>Add User</Button>
+      </Flex>
       <Table
         columns={listColumns}
         pagination={false}
         dataSource={data}
-        style={{ overflowY: 'scroll', maxHeight: '400px' }}
+        // 80 header, 48 external padding, 40 internal padding, 56 header content
+        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 56px)' }}
         className='scroll-bar-2 --manage-table'
       />
-    </div>
+    </>
   )
 }
 

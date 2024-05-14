@@ -1,11 +1,11 @@
 import variables from '@/sass/common/_variables.module.scss'
 import { ThemeConfig } from 'antd'
-import { Poppins, Roboto } from 'next/font/google'
+import { Nunito, Poppins, Roboto } from 'next/font/google'
 const { mainColor, light, dark, subColor, subColor2, errorColor } = variables
 
-const poppinsFont = Poppins({
+const nunitoFont = Nunito({
   subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900']
+  weight: ['300', '400', '500', '700', '900']
 })
 
 export const themConfig: ThemeConfig = {
@@ -15,7 +15,7 @@ export const themConfig: ThemeConfig = {
     colorText: dark,
     colorError: errorColor,
     fontSize: 14,
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: 'Nunito, sans-serif',
 
     // Alias Token
     colorBgContainer: light
