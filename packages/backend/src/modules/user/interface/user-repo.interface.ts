@@ -1,1 +1,3 @@
-
+interface UserRepositoryInterface {
+  findSpecificUser();
+}

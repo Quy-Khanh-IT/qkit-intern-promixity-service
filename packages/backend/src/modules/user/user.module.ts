@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { User, UserSchema } from './entities/user.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserRepository } from './repository/user.repository';
+import { JwtAccessTokenStrategy } from '../auth/stragegies/jwt-access-token.stragegy';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UserRepository } from './repository/user.repository';
         schema: UserSchema,
       },
     ]),
+    JwtAccessTokenStrategy,
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository],

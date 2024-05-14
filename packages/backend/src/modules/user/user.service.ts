@@ -3,6 +3,9 @@ import { UserRepository } from './repository/user.repository';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { ResetPasswordDto } from '../auth/dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { verifyHash } from 'src/common/utils';
 
 @Injectable()
 export class UserService {
@@ -33,6 +36,22 @@ export class UserService {
       throw new InternalServerErrorException('Update password failed');
     }
     return user;
+  }
+
+  async changePassword(data: ChangePasswordDto, user: User): Promise<boolean> {
+    const { confirmPassword, newPassword, oldPassword } = data;
+    if (newPassword !== confirmPassword) {
+      throw new InternalServerErrorException('Password not match');
+    }
+    const isMatch = await verifyHash(user.password, oldPassword);
+    if (!isMatch) {
+      throw new InternalServerErrorException('Old password is incorrect');
+    }
+    const result = await this.updatePassword(user.id, newPassword);
+    if (!result) {
+      throw new InternalServerErrorException('Change password failed');
+    }
+    return true;
   }
 
   async findOneByEmail(email: string): Promise<User> {
