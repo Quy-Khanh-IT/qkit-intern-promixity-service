@@ -5,10 +5,20 @@ import {
   Param,
   Patch,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
+import { UploadFileConstraint } from 'src/common/constants';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NoContentResponseDto } from './dto/change-password.response.dto';
@@ -66,5 +76,31 @@ export class UserController {
     @Param('userId') id: string,
   ): Promise<UpdateGeneralInfoResponseDto> {
     return await this.userService.updateGeneralInfo(data, req.user, id);
+  }
+
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Patch(':userId/avatar')
+  @HttpCode(201)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image', UploadFileConstraint.MULTER_OPTION))
+  async updateImage(
+    @UploadedFile() image: Express.Multer.File,
+    @Req() req: Request,
+    @Param('userId') id: string,
+  ): Promise<NoContentResponseDto> {
+    return {
+      isSuccess: await this.userService.updateImage(req.user, id, image),
+    };
   }
 }

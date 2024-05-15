@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   UploadApiErrorResponse,
@@ -16,13 +16,13 @@ export class UploadFileService {
     file: Express.Multer.File,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     let fileBuffer = file.buffer;
-    if (file.size > UploadFileConstraint.MAX_FILE_SIZE) {
+    if (file.size > UploadFileConstraint.LIMIT_FILE_SIZE) {
       fileBuffer = await this.compressImage(fileBuffer);
     }
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          format: UploadFileConstraint.IMAGE_FORMAT,
+          format: UploadFileConstraint.IMAGE_STANDARD_FORMAT,
           folder: this.configService.get<string>(
             ConfigKey.CLOUDINARY_IMAGE_FOLDER,
           ),

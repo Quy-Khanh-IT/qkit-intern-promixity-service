@@ -10,6 +10,7 @@ import {
 } from 'src/common/exceptions/user.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { hashString, verifyHash } from 'src/common/utils';
+import { UploadFileService } from '../upload-file/upload-file.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
@@ -19,7 +20,10 @@ import { UserRepository } from './repository/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly uploadFileService: UploadFileService,
+  ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
@@ -110,11 +114,34 @@ export class UserService {
     };
   }
 
+  /*
+  Not yet handling deleting the old image of user
+  */
   async updateImage(
     userFromToken: User,
     userRequestId: string,
-    image: Express.Multer.File,
-  ) {}
+    imageFile: Express.Multer.File,
+  ): Promise<boolean> {
+    if (!this.verifyUserFromToken(userRequestId, userFromToken.id)) {
+      throw new InvalidTokenException();
+    }
+    const path = (
+      await this.uploadFileService.uploadImageToCloudinary(imageFile)
+    ).secure_url;
+
+    if (!path) {
+      throw new InternalServerErrorException();
+    }
+
+    const result = await this.userRepository.update(userFromToken.id, {
+      image: path,
+    });
+
+    if (!result) {
+      throw new InternalServerErrorException();
+    }
+    return true;
+  }
 
   createAddressObjectForUpdate(data: UpdateGeneralInfoDto): {
     city: string;

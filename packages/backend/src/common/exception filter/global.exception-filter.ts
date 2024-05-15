@@ -23,7 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.message
         : 'Server is busy, please try again later! (Internal Server Error)';
 
-    if (message === 'Bad Request Exception') {
+    if (status == 400) {
       if (exception.response.message instanceof Array) {
         console.log('Validation Exception');
         exception.response = exception.response.message.reduce((acc, curr) => {

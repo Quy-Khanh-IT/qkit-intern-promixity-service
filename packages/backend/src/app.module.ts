@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GlobalExceptionFilter } from './common/exceptions/global.exception';
+import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
 import { DatabaseModule } from './cores/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OtpModule } from './modules/otp/otp.module';
