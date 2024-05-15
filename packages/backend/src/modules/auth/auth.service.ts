@@ -1,32 +1,40 @@
 import {
+  HttpException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
-  HttpException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
-import { OtpService } from '../otp/otp.service';
-import { UserService } from '../user/user.service';
-import { SignUpDto } from './dto/sign-up.dto';
+import * as Dayjs from 'dayjs';
 import {
   ConfigKey,
   ERRORS_DICTIONARY,
   ERROR_MESSAGES,
 } from 'src/common/constants';
+import { AuthConstant } from 'src/common/constants/auth.constant';
+import {
+  EmailExistedException,
+  EmailNotExistedException,
+  OTPNotMatchException,
+  TokenExpiredException,
+  TokenResetExceededLimitException,
+  UserNotFoundException,
+  WrongCredentialsException,
+} from 'src/common/exceptions';
+import { verifyHash } from 'src/common/utils';
+import { MailService } from '../mail/mail.service';
+import { OtpService } from '../otp/otp.service';
+import { TokenService } from '../token/token.service';
 import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 import {
   LoginDto,
   LoginResponeDto,
-  ResetPasswordDto,
   RequestResetPasswordDto,
+  ResetPasswordDto,
 } from './dto/index';
-import { verifyHash } from 'src/common/utils';
+import { SignUpDto } from './dto/sign-up.dto';
 import { JWTTokenService } from './token.service';
-import { ConfigService } from '@nestjs/config';
-import { MailService } from '../mail/mail.service';
-import { OTP } from '../otp/entities/otp.entity';
-import { TokenService } from '../token/token.service';
-import * as Dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -44,13 +52,7 @@ export class AuthService {
       registrationData.email,
     );
     if (isExistingEmail) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED,
-          detail: 'Email already exists',
-        },
-        409,
-      );
+      throw new EmailExistedException();
     }
 
     const otps = await this.otpService.findManyByEmail(
@@ -59,13 +61,7 @@ export class AuthService {
     );
 
     if (!otps.count || otps.items[0].otp !== registrationData.otp) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.OTP_NOT_MATCH,
-          detail: 'Invalid OTP',
-        },
-        400,
-      );
+      throw new OTPNotMatchException();
     }
 
     const hashedPassword: string = await argon2.hash(registrationData.password);
@@ -89,23 +85,14 @@ export class AuthService {
   public async login(loginData: LoginDto): Promise<LoginResponeDto> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
-      throw new NotFoundException({
-        message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
-        detail: 'User not found',
-      });
+      throw new EmailNotExistedException();
     }
     const isMatchingPassword = await verifyHash(
       user.password,
       loginData.password,
     );
     if (!isMatchingPassword) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_WRONG_CREDENTIALS,
-          detail: 'Incorrect username or password',
-        },
-        401,
-      );
+      throw new WrongCredentialsException();
     }
     const pairToken = await this.JWTTokenService.genNewPairToken({
       user_id: user._id.toString(),
@@ -122,28 +109,15 @@ export class AuthService {
   ): Promise<string> {
     const user = await this.userService.findOneByEmail(data.email);
     if (!user) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.USER_NOT_FOUND,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_FOUND],
-        },
-        404,
-      );
+      throw new UserNotFoundException();
     }
 
     const tokens = await this.tokenService.findManyByUserId(
       user._id.toString(),
     );
 
-    if (tokens.count >= 5) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_TOKEN_RESET_EXEEDED_LIMIT,
-          detail:
-            ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_TOKEN_RESET_EXEEDED_LIMIT],
-        },
-        429,
-      );
+    if (tokens.count >= AuthConstant.TOKEN_RESET_LIMIT_TIME) {
+      throw new TokenResetExceededLimitException();
     }
 
     const newJWTToken = await this.JWTTokenService.generateResetPasswordToken({
@@ -192,13 +166,7 @@ export class AuthService {
       tokens.items[0].used === true ||
       tokens.items[0].token !== token
     ) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_TOKEN_EXPIRED,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_TOKEN_EXPIRED],
-        },
-        400,
-      );
+      throw new TokenExpiredException();
     }
 
     const hashedPassword = await argon2.hash(data.newPassword);

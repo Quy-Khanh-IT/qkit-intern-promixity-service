@@ -20,3 +20,33 @@ export class ConfirmPassNotMatchException extends BaseException {
     );
   }
 }
+
+export class UserNotFoundException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_NOT_FOUND,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_FOUND],
+      404,
+    );
+  }
+}
+
+export class UserAlreadyExistException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_ALREADY_EXIST,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_ALREADY_EXIST],
+      400,
+    );
+  }
+}
+
+export class UserDisabledException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_DISABLED,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_DISABLED],
+      403,
+    );
+  }
+}

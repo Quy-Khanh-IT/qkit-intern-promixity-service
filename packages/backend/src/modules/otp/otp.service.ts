@@ -1,16 +1,16 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { OtpRepository } from './repository/otp.repository';
-import * as OTPGenerator from 'otp-generator';
-import {
-  OTPConstant,
-  ERRORS_DICTIONARY,
-  ERROR_MESSAGES,
-} from 'src/common/constants';
+import { Injectable } from '@nestjs/common';
 import * as Dayjs from 'dayjs';
-import { OTP } from './entities/otp.entity';
+import * as OTPGenerator from 'otp-generator';
+import { OTPConstant } from 'src/common/constants';
+import {
+  EmailExistedException,
+  EmailNotExistedException,
+} from 'src/common/exceptions';
+import { OTPExceedLimitException } from 'src/common/exceptions/otp.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
+import { OTP } from './entities/otp.entity';
+import { OtpRepository } from './repository/otp.repository';
 @Injectable()
 export class OtpService {
   constructor(
@@ -39,24 +39,12 @@ export class OtpService {
   async createForRegister(email: string): Promise<OTP> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (isExistingEmail) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED],
-        },
-        409,
-      );
+      throw new EmailExistedException();
     }
 
     const otpCodeCount = await this.otpRepo.findAll({ email });
     if (otpCodeCount.count >= OTPConstant.OTP_MAX_REGISTRATION) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT],
-        },
-        429,
-      );
+      throw new OTPExceedLimitException();
     }
     return await this.create(email, 4 * 60);
   }
@@ -64,24 +52,12 @@ export class OtpService {
   async createForResetpassword(email: string): Promise<OTP> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (!isExistingEmail) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED],
-        },
-        404,
-      );
+      throw new EmailNotExistedException();
     }
 
     const otpCodeCount = await this.otpRepo.findAll({ email });
     if (otpCodeCount.count >= OTPConstant.OTP_MAX_REGISTRATION) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT,
-          detail: ERROR_MESSAGES[ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT],
-        },
-        429,
-      );
+      throw new OTPExceedLimitException();
     }
     return await this.create(email, 4 * 60);
   }
