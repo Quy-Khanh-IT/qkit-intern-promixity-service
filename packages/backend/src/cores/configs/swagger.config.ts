@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { SwaggerConstant } from 'src/common/constants/swagger.constant';
 
 export function configSwagger(app: INestApplication) {
-  const { api_documentation_credentials, description, name, version } =
+  const { description, name, version, api_documentation_credentials } =
     SwaggerConstant;
 
   const config = new DocumentBuilder()
@@ -57,9 +57,5 @@ export function configSwagger(app: INestApplication) {
     },
   );
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+  SwaggerModule.setup('api-docs', app, document);
 }

@@ -1,44 +1,42 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  UseGuards,
   HttpCode,
+  Patch,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
-import { ResetPasswordDto } from '../auth/dto';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { ChangePasswordResponseDto } from './dto/change-password.response.dto';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ChangePasswordResponseDto } from './dto/change-password.response.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
+import { UserService } from './user.service';
 
 @Controller('users')
+@ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     const result: User = await this.userService.create(createUserDto);
     return result;
   }
 
+  @UseGuards(JwtAccessTokenGuard)
   @Patch('password')
   @HttpCode(201)
   @ApiBody({
-    type: ResetPasswordDto,
+    type: ChangePasswordDto,
   })
   @ApiResponse({
     status: 200,
     type: ChangePasswordResponseDto,
     description: 'User successfully reset password.',
   })
-  @UseGuards(JwtResetPasswordTokenGuard)
+  @ApiBearerAuth()
   async resetPassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @Req() req: Request,

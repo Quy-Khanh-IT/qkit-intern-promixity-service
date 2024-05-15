@@ -1,17 +1,16 @@
+import * as Joi from '@hapi/joi';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from '@hapi/joi';
-import { UploadFileModule } from './modules/upload-file/upload-file.module';
-import { APP_FILTER } from '@nestjs/core';
-import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
+import { GlobalExceptionFilter } from './common/exceptions/global.exception';
 import { DatabaseModule } from './cores/database/database.module';
-import { UserModule } from './modules/user/user.module';
-import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { join } from 'path';
+import { OtpModule } from './modules/otp/otp.module';
 import { TokenModule } from './modules/token/token.module';
+import { UploadFileModule } from './modules/upload-file/upload-file.module';
+import { UserModule } from './modules/user/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({

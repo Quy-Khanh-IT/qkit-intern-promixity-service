@@ -1,11 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UserRepository } from './repository/user.repository';
-import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  ConfirmPassNotMatchException,
+  NewPassNotMatchOldException,
+} from 'src/common/exceptions/user.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { ResetPasswordDto } from '../auth/dto';
+import { hashString, verifyHash } from 'src/common/utils';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { verifyHash } from 'src/common/utils';
+import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
+import { UserRepository } from './repository/user.repository';
 
 @Injectable()
 export class UserService {
@@ -32,25 +35,25 @@ export class UserService {
 
   async updatePassword(id: string, password: string): Promise<User> {
     const user = await this.userRepository.update(id, { password });
-    if (!user) {
-      throw new InternalServerErrorException('Update password failed');
-    }
     return user;
   }
 
   async changePassword(data: ChangePasswordDto, user: User): Promise<boolean> {
     const { confirmPassword, newPassword, oldPassword } = data;
     if (newPassword !== confirmPassword) {
-      throw new InternalServerErrorException('Password not match');
+      throw new ConfirmPassNotMatchException();
     }
-    const isMatch = await verifyHash(user.password, oldPassword);
-    if (!isMatch) {
-      throw new InternalServerErrorException('Old password is incorrect');
+    const isMatchingPass = await verifyHash(user.password, oldPassword);
+    if (!isMatchingPass) {
+      throw new NewPassNotMatchOldException();
     }
-    const result = await this.updatePassword(user.id, newPassword);
+
+    const newHashedPass = await hashString(newPassword);
+    const result = await this.updatePassword(user.id, newHashedPass);
     if (!result) {
-      throw new InternalServerErrorException('Change password failed');
+      throw new InternalServerErrorException('Not success reset password');
     }
+
     return true;
   }
 

@@ -1,8 +1,8 @@
 import {
-  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  HttpException,
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { OtpService } from '../otp/otp.service';
