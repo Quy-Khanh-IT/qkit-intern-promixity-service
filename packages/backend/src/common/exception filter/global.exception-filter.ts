@@ -3,12 +3,10 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { ConfigKey } from '../constants/config-key.constant';
-import { error } from 'console';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -25,16 +23,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.message
         : 'Server is busy, please try again later! (Internal Server Error)';
 
-    if (
-      exception.response.message instanceof Array &&
-      message === 'Bad Request Exception'
-    ) {
-      console.log('Validation Exception');
-      exception.response = exception.response.message.reduce((acc, curr) => {
-        const [field, ...errorMessages] = curr.split(' ');
-        acc[field] = (acc[field] || []).concat(errorMessages.join(' '));
-        return acc;
-      }, {});
+    if (message === 'Bad Request Exception') {
+      if (exception.response.message instanceof Array) {
+        console.log('Validation Exception');
+        exception.response = exception.response.message.reduce((acc, curr) => {
+          const [field, ...errorMessages] = curr.split(' ');
+          acc[field] = (acc[field] || []).concat(errorMessages.join(' '));
+          return acc;
+        }, {});
+      } else {
+        const key = exception.response.message.split(' ')[0];
+        exception.response = {
+          [key]: exception.response.message.split(' ').slice(1).join(' '),
+        };
+      }
     }
     response.status(status).json({
       statusCode: status,

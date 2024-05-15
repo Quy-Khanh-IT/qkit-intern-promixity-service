@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   HttpCode,
+  Param,
   Patch,
   Req,
   UseGuards,
@@ -12,11 +13,14 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ChangePasswordResponseDto } from './dto/change-password.response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
+import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Controller('users')
 @ApiTags('User')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -26,7 +30,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAccessTokenGuard)
-  @Patch('password')
+  @Patch(':userId/password')
   @HttpCode(201)
   @ApiBody({
     type: ChangePasswordDto,
@@ -36,17 +40,31 @@ export class UserController {
     type: ChangePasswordResponseDto,
     description: 'User successfully reset password.',
   })
-  @ApiBearerAuth()
   async resetPassword(
-    @Body() changePasswordDto: ChangePasswordDto,
+    @Body() data: ChangePasswordDto,
     @Req() req: Request,
+    @Param('userId') id: string,
   ): Promise<ChangePasswordResponseDto> {
-    const result = await this.userService.changePassword(
-      changePasswordDto,
-      req.user,
-    );
+    const result = await this.userService.changePassword(data, req.user, id);
     return {
       isSuccess: result,
     };
+  }
+
+  @UseGuards(JwtAccessTokenGuard)
+  @Patch(':userId/profile')
+  @HttpCode(201)
+  @ApiBody({
+    type: UpdateGeneralInfoDto,
+  })
+  @ApiResponse({
+    type: User,
+  })
+  async updateGeneralInfo(
+    @Body() data: UpdateGeneralInfoDto,
+    @Req() req: Request,
+    @Param('userId') id: string,
+  ): Promise<UpdateGeneralInfoResponseDto> {
+    return await this.userService.updateGeneralInfo(data, req.user, id);
   }
 }

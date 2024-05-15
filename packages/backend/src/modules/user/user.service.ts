@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { InvalidTokenException } from 'src/common/exceptions';
 import {
   ConfirmPassNotMatchException,
   NewPassNotMatchOldException,
@@ -7,6 +12,8 @@ import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { hashString, verifyHash } from 'src/common/utils';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
+import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 
@@ -38,18 +45,32 @@ export class UserService {
     return user;
   }
 
-  async changePassword(data: ChangePasswordDto, user: User): Promise<boolean> {
+  verifyUserFromToken(userRequestId: string, userTokenId: string): boolean {
+    return userRequestId === userTokenId;
+  }
+
+  async changePassword(
+    data: ChangePasswordDto,
+    userFromToken: User,
+    userIdRequest: string,
+  ): Promise<boolean> {
+    if (!this.verifyUserFromToken(userIdRequest, userFromToken.id)) {
+      throw new InternalServerErrorException('Not allow to change password');
+    }
     const { confirmPassword, newPassword, oldPassword } = data;
     if (newPassword !== confirmPassword) {
       throw new ConfirmPassNotMatchException();
     }
-    const isMatchingPass = await verifyHash(user.password, oldPassword);
+    const isMatchingPass = await verifyHash(
+      userFromToken.password,
+      oldPassword,
+    );
     if (!isMatchingPass) {
       throw new NewPassNotMatchOldException();
     }
 
     const newHashedPass = await hashString(newPassword);
-    const result = await this.updatePassword(user.id, newHashedPass);
+    const result = await this.updatePassword(userFromToken.id, newHashedPass);
     if (!result) {
       throw new InternalServerErrorException('Not success reset password');
     }
@@ -57,7 +78,56 @@ export class UserService {
     return true;
   }
 
-  async findOneByEmail(email: string): Promise<User> {
+  async updateGeneralInfo(
+    updateGeneralInfo: UpdateGeneralInfoDto,
+    userFromToken: User,
+    userIdRequest: string,
+  ): Promise<UpdateGeneralInfoResponseDto> {
+    if (!this.verifyUserFromToken(userIdRequest, userFromToken.id)) {
+      throw new InvalidTokenException();
+    }
+    const address = this.createAddressObjectForUpdate(updateGeneralInfo);
+    // Not yet validate address because API of it is also lack of
+    const result = await this.userRepository.update(userIdRequest, {
+      ...updateGeneralInfo,
+      address: {
+        ...address,
+      },
+    });
+
+    if (!result) {
+      throw new InternalServerErrorException('Update general info failed');
+    }
+
+    return {
+      id: result.id,
+      email: result.email,
+      firstName: result.firstName,
+      lastName: result.lastName,
+      image: result.image,
+      phoneNumber: result.phoneNumber,
+      address: result.address,
+    };
+  }
+
+  createAddressObjectForUpdate(data: UpdateGeneralInfoDto): {
+    city: string;
+    province: string;
+    country: string;
+  } {
+    if (!data.city || !data.province || !data.country) {
+      throw new BadRequestException(
+        'Address must have all 3 fields(city, province, country) or leave it all blank',
+      );
+    }
+    return {
+      city: data.city,
+      province: data.province,
+      country: data.country,
+    };
+  }
+
+  async findOneByEmail(email: string): Promise<User | null> {
     return await this.userRepository.findOneByCondition({ email });
   }
 
