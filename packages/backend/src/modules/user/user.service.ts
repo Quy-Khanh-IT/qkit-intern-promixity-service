@@ -110,6 +110,12 @@ export class UserService {
     };
   }
 
+  async updateImage(
+    userFromToken: User,
+    userRequestId: string,
+    image: Express.Multer.File,
+  ) {}
+
   createAddressObjectForUpdate(data: UpdateGeneralInfoDto): {
     city: string;
     province: string;

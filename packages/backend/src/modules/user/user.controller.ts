@@ -11,7 +11,7 @@ import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { ChangePasswordResponseDto } from './dto/change-password.response.dto';
+import { NoContentResponseDto } from './dto/change-password.response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
@@ -37,14 +37,14 @@ export class UserController {
   })
   @ApiResponse({
     status: 200,
-    type: ChangePasswordResponseDto,
+    type: NoContentResponseDto,
     description: 'User successfully reset password.',
   })
   async resetPassword(
     @Body() data: ChangePasswordDto,
     @Req() req: Request,
     @Param('userId') id: string,
-  ): Promise<ChangePasswordResponseDto> {
+  ): Promise<NoContentResponseDto> {
     const result = await this.userService.changePassword(data, req.user, id);
     return {
       isSuccess: result,
