@@ -8,6 +8,9 @@ import Sider from 'antd/es/layout/Sider'
 import { motion, useAnimationControls } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import './admin.scss'
+import { useRouter } from 'next/navigation'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { ROUTE } from '@/constants/route'
 
 const { useBreakpoint } = Grid
 
@@ -57,10 +60,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const containerControls = useAnimationControls()
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
+
+  const [routeValue, setRouteValue, removeRouteValue] = useLocalStorage('routeValue', ROUTE.MANAGE_USER)
+  const [selectedMenuKey, setSelectedMenuKey] = useState<string>('1')
+
+  useEffect(() => {
+    if (routeValue) {
+      if (routeValue == ROUTE.MANAGE_USER) {
+        setSelectedMenuKey('1')
+      } else if (routeValue == ROUTE.MANAGE_BUSINESS) {
+        setSelectedMenuKey('2')
+      } else {
+        setSelectedMenuKey('1')
+      }
+    }
+  }, [routeValue])
 
   const {
     token: { colorBgContainer }
@@ -93,7 +112,14 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e)
+    if (e.key === '1') {
+      router.push(ROUTE.MANAGE_USER)
+      setRouteValue(ROUTE.MANAGE_USER)
+    } else if (e.key === '2') {
+      router.push(ROUTE.MANAGE_BUSINESS)
+      setRouteValue(ROUTE.MANAGE_BUSINESS)
+    }
+    setSelectedMenuKey(e.key)
   }
 
   return (
@@ -120,9 +146,7 @@ export default function RootLayout({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
-                // height: headerHeight
               }}
-              // className='logo-section h-100 col-6 col-sm-4 col-md-3 col-lg-2'
               className='h-100'
             >
               <Image
@@ -153,13 +177,13 @@ export default function RootLayout({
         </Col>
 
         <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
-          <Space className='me-4' size='middle'>
+          <Space className='me-4' size='large'>
             <Tooltip title='Notifications'>
-              <Badge count={5} offset={[-5, 4]}>
+              <Badge count={5} offset={[-6, 6]}>
                 <BellOutlined style={{ fontSize: 24 }} className='action-button' />
               </Badge>
             </Tooltip>
-            <Avatar icon={<UserOutlined />} className='cursor' />
+            <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
           </Space>
         </Col>
       </Col>
@@ -191,7 +215,8 @@ export default function RootLayout({
                 theme='light'
                 onClick={onMenuClick}
                 mode='inline'
-                defaultSelectedKeys={['1']}
+                defaultSelectedKeys={[selectedMenuKey]}
+                selectedKeys={[selectedMenuKey]}
                 className='h-100'
                 items={[
                   {

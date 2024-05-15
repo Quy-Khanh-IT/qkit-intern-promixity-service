@@ -7,7 +7,6 @@
   border-right: 1px solid $gray-border;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  // max-width: 200px;
 
   .ant-spin-nested-loading {
     margin-right: 1px;
@@ -19,7 +18,6 @@
     }
   }
 
-  // @include x
   th {
     white-space: nowrap;
   }
@@ -30,5 +28,26 @@
 
   tr:nth-child(odd) {
     background-color: $gray-row-hover;
+  }
+}
+
+.table-pagination {
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 36px !important;
+    height: 36px !important;
+
+    button {
+      padding: 3px !important;
+    }
+  }
+
+  .ant-pagination-item {
+    min-width: 36px !important;
+    height: 36px !important;
+
+    a {
+      padding: 3px 6px !important;
+    }
   }
 }

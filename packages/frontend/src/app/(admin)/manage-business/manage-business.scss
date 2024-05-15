@@ -1,0 +1,5 @@
+.--manage-business-table {
+  tr > .ant-table-cell:nth-last-child(-n + 3) {
+    text-align: center !important;
+  }
+}

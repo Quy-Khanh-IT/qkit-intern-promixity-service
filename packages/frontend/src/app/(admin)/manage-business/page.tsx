@@ -1,37 +1,21 @@
 'use client'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import {
-  Button,
-  Dropdown,
-  Flex,
-  MenuProps,
-  Table,
-  TableProps,
-  Tag,
-  Typography,
-  Pagination,
-  Row,
-  Col,
-  Space
-} from 'antd'
-import { useRef, useState } from 'react'
-import userData from './user-data.json'
+import { Button, Dropdown, Flex, MenuProps, Table, TableProps, Tag, Typography, Pagination, Row } from 'antd'
+import { useState } from 'react'
+import businessData from './business-data.json'
 import { PlusOutlined } from '@ant-design/icons'
 import TableComponent from '@/app/components/admin/Table/Table'
-import { IUserInformation } from '@/types/user'
-import ViewRowDetailsModal, { ViewRowDetailsModalMethods } from '@/app/components/admin/ViewRowDetails/ViewRowDetails'
-
-const { Text } = Typography
+import './manage-business.scss'
+import { IBusiness } from '@/types/business'
 
 export interface IManageUserProps {}
 
 type ColumnsType<T extends object> = TableProps<T>['columns']
 
-const ManageUser = () => {
+const ManageBusiness = () => {
   const [userOption, setUserOption] = useState()
-  const refUserModal = useRef<ViewRowDetailsModalMethods | null>(null)
 
-  const listColumns: ColumnsType<IUserInformation> = [
+  const listColumns: ColumnsType<IBusiness> = [
     {
       width: 75,
       align: 'center',
@@ -77,16 +61,19 @@ const ManageUser = () => {
       }
     },
     {
-      title: 'First name',
-      dataIndex: 'firstName',
-      key: 'firstName',
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
       width: 200
     },
     {
-      title: 'Last name',
-      dataIndex: 'lastName',
-      key: 'lastName',
-      width: 200
+      title: 'Category',
+      dataIndex: 'category',
+      key: 'category',
+      width: 200,
+      render: (category: string[]) => {
+        return category.join(', ')
+      }
     },
     {
       title: 'Address',
@@ -94,22 +81,36 @@ const ManageUser = () => {
       key: 'address'
     },
     {
-      title: 'Roles',
-      dataIndex: 'roles',
-      key: 'roles',
-      width: 250,
-      render: (roles: string[]) => (
-        <Flex justify='center' wrap>
-          {roles?.map((role, _index) => {
-            const color = role == 'ADMIN' ? 'green' : 'geekblue'
-            return (
-              <Tag color={color} key={role} style={{ margin: '4px 0px 0px 4px' }}>
-                {role}
-              </Tag>
-            )
-          })}
+      title: 'Total Reviews',
+      dataIndex: 'totalReviews',
+      key: 'totalReviews',
+      width: 30
+    },
+    {
+      title: 'Average Rating',
+      dataIndex: 'overallRating',
+      key: 'overallRating',
+      width: 30,
+      render: (avgRating: number) => (
+        <Flex justify='center' align='center'>
+          <Typography.Text>{avgRating}</Typography.Text>
+          <i className='fa-solid fa-star ms-2' style={{ color: '#FFD43B' }}></i>
         </Flex>
       )
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 250,
+      render: (status: string) => {
+        const color = status == 'ADMIN' ? 'green' : 'geekblue'
+        return (
+          <Tag color={color} key={status} style={{ margin: '4px 0px 0px 4px' }}>
+            {status}
+          </Tag>
+        )
+      }
     }
   ]
 
@@ -124,13 +125,13 @@ const ManageUser = () => {
     }
   ]
 
-  const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
+  const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
 
   return (
     <>
       <Flex justify='space-between' style={{ marginBottom: 16, height: 40 }}>
         <Typography.Title className='mb-0' level={3}>
-          User
+          Business
         </Typography.Title>
         <Button
           type='primary'
@@ -141,40 +142,17 @@ const ManageUser = () => {
             padding: '0 20px'
           }}
         >
-          Add User
+          Add Business
         </Button>
       </Flex>
       <TableComponent
         isFetching={false}
         columns={listColumns}
-        dataSource={usersWithKeys}
-        className='--manage-user-table'
+        dataSource={businessWithKeys}
+        className='--manage-business-table'
       />
-      <ViewRowDetailsModal title={''} data={null}>
-        <Row>
-          <Col span={8}>
-            <Space direction='vertical'>
-              <Text>Họ:</Text>
-              <Text>Tên:</Text>
-              <Text>Email:</Text>
-              <Text>Số điện thoại:</Text>
-              <Text>Địa chỉ:</Text>
-            </Space>
-          </Col>
-
-          <Col span={16}>
-            <Space direction='vertical'>
-              {/* <Text> {userOne.}</Text>
-                <Text> {userOne.}</Text>
-                <Text> {userOne?.email}</Text>
-                <Text> {userOne?.phone}</Text>
-                <Text> {userOne?.address}</Text> */}
-            </Space>
-          </Col>
-        </Row>
-      </ViewRowDetailsModal>
     </>
   )
 }
 
-export default ManageUser
+export default ManageBusiness
