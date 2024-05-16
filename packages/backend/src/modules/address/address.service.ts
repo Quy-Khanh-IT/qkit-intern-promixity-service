@@ -27,8 +27,6 @@ export class AddressService {
       province_code,
     });
 
-    // Kiểm tra nếu items không phải là một mảng
-
     return findAllResponse;
   }
 
@@ -38,8 +36,6 @@ export class AddressService {
     const findAllResponse = await this.wardRepository.findAll({
       district_code,
     });
-
-    // Kiểm tra nếu items không phải là một mảng
 
     return findAllResponse;
   }
