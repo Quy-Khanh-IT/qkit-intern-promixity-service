@@ -7,10 +7,15 @@ import { AppService } from './app.service';
 import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
 import { DatabaseModule } from './cores/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+<<<<<<< HEAD
 import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
+=======
+import { join } from 'path';
+import { TokenModule } from './modules/token/token.module';
+>>>>>>> 0195187c11549fb5bd5b92190825ede1ed317176
 import { AddressModule } from './modules/address/address.module';
 import { SeedService } from './seeds/seed.service';
 import { DistrictRepository } from './modules/address/repository/district.repository';
