@@ -6,7 +6,8 @@
     "address": "Nhà hát Thành Phố Hồ Chí Minh",
     "roles": [
       "ADMIN",
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {

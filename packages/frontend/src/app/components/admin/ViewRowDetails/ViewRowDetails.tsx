@@ -5,7 +5,6 @@ import { Button, Modal, Carousel, Image, Descriptions, DescriptionsProps } from 
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import './view-row-details.scss'
 import { PLACEHOLDER } from '@/types/common'
-import ViewUserDescription from '@/app/(admin)/manage-user/user-details.pipe'
 
 const { grayBg } = variables
 
@@ -16,7 +15,7 @@ export interface ViewRowDetailsModalMethods {
 
 export interface ViewRowDetailsProps {
   title: string
-  data: any
+  data: DescriptionsProps['items']
 }
 
 const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods, ViewRowDetailsProps> = (
@@ -24,7 +23,6 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods
   ref
 ) => {
   const [open, setOpen] = useState(false)
-  const pipedData: DescriptionsProps['items'] = ViewUserDescription(data as IUserInformation)
 
   useImperativeHandle(ref, () => ({
     showModal: () => setOpen(true),
@@ -60,7 +58,7 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods
         ]}
       >
         <div className='content-box'>
-          <Descriptions bordered items={pipedData} size='small' layout="vertical"/>
+          <Descriptions bordered items={data} size='small' layout="vertical" />
         </div>
       </Modal>
     </>

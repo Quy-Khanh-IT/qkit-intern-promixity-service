@@ -3,12 +3,10 @@ import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal, { ViewRowDetailsModalMethods } from '@/app/components/admin/ViewRowDetails/ViewRowDetails'
 import { IUserInformation } from '@/types/user'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import { Col, Dropdown, Flex, InputNumber, MenuProps, Row, TableProps, Tag, Typography, theme } from 'antd'
+import { DescriptionsProps, Dropdown, Flex, MenuProps, TableProps, Tag } from 'antd'
 import { useRef, useState } from 'react'
-import userData from './user-data.json'
 import './manage-user.scss'
-
-
+import userData from './user-data.json'
 
 export interface IManageUserProps {}
 
@@ -34,6 +32,13 @@ const ManageUser = () => {
     {
       width: 75,
       align: 'center',
+      onCell: (user: IUserInformation) => {
+        return {
+          onClick: () => {
+            setUserOne(userData[0])
+          }
+        }
+      },
       render: () => {
         const items: MenuProps['items'] = [
           {
@@ -106,7 +111,7 @@ const ManageUser = () => {
           {roles?.map((role, _index) => {
             const color = role == 'ADMIN' ? 'green' : 'geekblue'
             return (
-              <Tag color={color} key={role} style={{ margin: '4px 0px 0px 4px' }}>
+              <Tag color={color} key={role} style={{ margin: '6px 0px 0px 6px' }}>
                 {role}
               </Tag>
             )
@@ -115,6 +120,40 @@ const ManageUser = () => {
       )
     }
   ]
+
+  const detailedItems: DescriptionsProps['items'] = [
+    {
+      label: 'First name',
+      span: 2,
+      children: userOne?.firstName,
+    },
+    {
+      label: 'Last name',
+      span: 2,
+      children: userOne?.lastName,
+    },
+    {
+      label: 'Address',
+      span: 4,
+      children: userOne?.address,
+    },
+    {
+      label: 'Roles',
+      span: 4,
+      children: (
+        <Flex wrap>
+          {userOne?.roles?.map((role, _index) => {
+            const color = role == 'ADMIN' ? 'green' : 'geekblue'
+            return (
+              <Tag color={color} key={role} style={{ display: 'flex', alignItems: 'center' }}>
+                {role}
+              </Tag>
+            )
+          })}
+        </Flex>
+      ),
+    }
+  ];
 
   const options = [
     {
@@ -137,7 +176,7 @@ const ManageUser = () => {
         dataSource={usersWithKeys}
         className='--manage-user-table'
       />
-      <ViewRowDetailsModal title={'User details'} data={userData[0]} ref={refViewDetailsModal} />
+      <ViewRowDetailsModal title={'User details'} data={detailedItems} ref={refViewDetailsModal} />
     </>
   )
 }
