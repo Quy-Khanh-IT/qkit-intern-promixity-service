@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { OtpService } from './otp.service';
-import { OtpController } from './otp.controller';
-import { OTP, OTPSchema } from './entities/otp.entity';
-import { OtpRepository } from './repository/otp.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
+import { OTP, OTPSchema } from './entities/otp.entity';
+import { OtpController } from './otp.controller';
+import { OtpService } from './otp.service';
+import { OtpRepository } from './repository/otp.repository';
 
 @Module({
   imports: [

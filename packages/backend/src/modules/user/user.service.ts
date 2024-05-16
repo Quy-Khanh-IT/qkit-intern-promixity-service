@@ -13,6 +13,7 @@ import { hashString, verifyHash } from 'src/common/utils';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateEmailDto } from './dto/update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
@@ -113,6 +114,8 @@ export class UserService {
       address: result.address,
     };
   }
+
+  async updateEmail(data: UpdateEmailDto, user: User) {}
 
   /*
   Not yet handling deleting the old image of user

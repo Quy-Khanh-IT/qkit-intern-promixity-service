@@ -8,7 +8,7 @@ import { GlobalExceptionFilter } from './common/exception filter/global.exceptio
 import { DatabaseModule } from './cores/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OtpModule } from './modules/otp/otp.module';
-import { TokenModule } from './modules/token/token.module';
+import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
 @Module({
@@ -21,12 +21,11 @@ import { UserModule } from './modules/user/user.module';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
-
     DatabaseModule,
     UserModule,
     OtpModule,
     AuthModule,
-    TokenModule,
+    RequestModule,
   ],
   controllers: [AppController],
   providers: [
