@@ -28,7 +28,6 @@ import { JWTTokenService } from './token.service';
   providers: [
     AuthService,
     JWTTokenService,
-    JWTTokenService,
     JwtAccessTokenStrategy,
     JwtRefreshTokenStrategy,
     JwtResetPasswordStrategy,

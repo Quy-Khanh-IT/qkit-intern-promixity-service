@@ -1,8 +1,6 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
-import * as fs from 'fs';
-import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class MailService {
   constructor(
@@ -37,6 +35,17 @@ export class MailService {
     this.mailerService.sendMail({
       to: email,
       subject: 'Reset your password in Proximity Service',
+      template: './reset-password',
+      context: {
+        resetLink: resetLink,
+      },
+    });
+  }
+
+  async sendResetEmailMail(email: string, subject: string, resetLink: string) {
+    this.mailerService.sendMail({
+      to: email,
+      subject: subject,
       template: './reset-password',
       context: {
         resetLink: resetLink,

@@ -3,16 +3,29 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InvalidTokenException } from 'src/common/exceptions';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import * as Dayjs from 'dayjs';
+import { ConfigKey, UserConstant } from 'src/common/constants';
+import { TypeRequests } from 'src/common/enums';
+import {
+  InvalidTokenException,
+  WrongCredentialsException,
+} from 'src/common/exceptions';
 import {
   ConfirmPassNotMatchException,
   NewPassNotMatchOldException,
+  UserAlreadyExistException,
 } from 'src/common/exceptions/user.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { hashString, verifyHash } from 'src/common/utils';
+import TokenPayload from '../auth/key.payload';
+import { MailService } from '../mail/mail.service';
+import { RequestService } from '../request/request.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RequesUpdateEmail } from './dto/request-update-email.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
@@ -24,6 +37,10 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly uploadFileService: UploadFileService,
+    private readonly mailService: MailService,
+    private readonly requestService: RequestService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
@@ -113,6 +130,116 @@ export class UserService {
       phoneNumber: result.phoneNumber,
       address: result.address,
     };
+  }
+
+  async requestResetEmail(
+    data: RequesUpdateEmail,
+    userFromToken: User,
+    userIdRequest: string,
+  ): Promise<boolean> {
+    if (!this.verifyUserFromToken(userIdRequest, userFromToken.id)) {
+      throw new InvalidTokenException();
+    }
+    const isPasswordMatching = await verifyHash(
+      userFromToken.password,
+      data.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new WrongCredentialsException();
+    }
+
+    const isExistingEmail = await this.userRepository.findOneByCondition({
+      email: data.email,
+    });
+
+    if (isExistingEmail) {
+      throw new UserAlreadyExistException();
+    }
+
+    const requests = await this.requestService.findManyByUserIdAndType(
+      userFromToken.id,
+      TypeRequests.RESET_EMAIL,
+    );
+
+    if (requests.count >= UserConstant.MAX_RESET_EMAIL_REQUEST) {
+      throw new BadRequestException(
+        'You have reached the limit of request to reset email',
+      );
+    }
+
+    const newJWTToken = await this.generateTokenForResetEmail({
+      user_id: userIdRequest,
+      action: 'reset email',
+    });
+
+    const expiredTime = Dayjs()
+      .add(
+        this.configService.get<number>(
+          ConfigKey.JWT_REQUEST_TOKEN_EXPIRATION_TIME,
+        ),
+        'seconds',
+      )
+      .valueOf();
+
+    await this.requestService.createRequest({
+      used: false,
+      expiredTime: expiredTime,
+      token: newJWTToken,
+      metaData: { newEmail: data.email },
+      userId: userFromToken._id,
+      type: TypeRequests.RESET_EMAIL,
+    });
+
+    const resetlink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}/reset-email?token=${newJWTToken}`;
+    this.mailService.sendResetEmailMail(
+      data.email,
+      'Reset email link',
+      resetlink,
+    );
+
+    return true;
+  }
+
+  async resetEmail(
+    token: string,
+    userFromToken: User,
+    userRequestId: string,
+  ): Promise<boolean> {
+    if (!this.verifyUserFromToken(userRequestId, userFromToken.id)) {
+      throw new InvalidTokenException();
+    }
+    const requests = await this.requestService.findManyByUserIdAndType(
+      userFromToken.id,
+      TypeRequests.RESET_EMAIL,
+    );
+
+    const isTokenMatching = requests.items[0].token === token;
+
+    if (!isTokenMatching) {
+      throw new InvalidTokenException();
+    }
+
+    await this.requestService.updateRequestStatus(requests.items[0].id, true);
+
+    const result = await this.userRepository.update(userFromToken.id, {
+      email: requests.items[0].metaData['newEmail'],
+    });
+
+    if (!result) {
+      throw new InternalServerErrorException();
+    }
+
+    return true;
+  }
+
+  generateTokenForResetEmail(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: `${this.configService.get<number>(ConfigKey.REQUEST_SECRET_KEY)}`,
+      expiresIn: `${this.configService.get<string>(
+        ConfigKey.JWT_REQUEST_TOKEN_EXPIRATION_TIME,
+      )}s`,
+    });
   }
 
   async updateEmail(data: UpdateEmailDto, user: User) {}

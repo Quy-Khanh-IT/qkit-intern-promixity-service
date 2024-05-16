@@ -6,7 +6,7 @@ export class EmailExistedException extends BaseException {
     super(
       ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED,
       ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED],
-      400,
+      409,
     );
   }
 }
@@ -14,9 +14,9 @@ export class EmailExistedException extends BaseException {
 export class EmailNotExistedException extends BaseException {
   constructor() {
     super(
-      ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED,
-      ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED],
-      400,
+      ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED],
+      404,
     );
   }
 }
@@ -86,7 +86,7 @@ export class TokenResetExceededLimitException extends BaseException {
     super(
       ERRORS_DICTIONARY.AUTH_TOKEN_RESET_EXEEDED_LIMIT,
       ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_TOKEN_RESET_EXEEDED_LIMIT],
-      400,
+      429,
     );
   }
 }
@@ -96,7 +96,7 @@ export class OTPNotMatchException extends BaseException {
     super(
       ERRORS_DICTIONARY.AUTH_OTP_NOT_MATCH,
       ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_OTP_NOT_MATCH],
-      400,
+      409,
     );
   }
 }

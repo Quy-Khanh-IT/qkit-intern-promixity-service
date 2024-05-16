@@ -23,6 +23,9 @@ export class Requests extends BaseEntity {
   })
   expiredAt: Date;
 
+  @Prop({ required: true, type: Object, default: {}, name: 'meta_data' })
+  metaData: object;
+
   @Prop({ required: true, trim: true, enum: TypeRequests })
   type: string;
 

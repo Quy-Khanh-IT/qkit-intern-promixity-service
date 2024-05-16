@@ -4,6 +4,7 @@ import {
   HttpCode,
   Param,
   Patch,
+  Post,
   Req,
   UploadedFile,
   UseGuards,
@@ -14,15 +15,18 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiHeader,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NoContentResponseDto } from './dto/change-password.response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RequesUpdateEmail } from './dto/request-update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
@@ -30,7 +34,6 @@ import { UserService } from './user.service';
 
 @Controller('users')
 @ApiTags('User')
-@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -50,6 +53,7 @@ export class UserController {
     type: NoContentResponseDto,
     description: 'User successfully reset password.',
   })
+  @ApiBearerAuth()
   async resetPassword(
     @Body() data: ChangePasswordDto,
     @Req() req: Request,
@@ -64,6 +68,7 @@ export class UserController {
   @UseGuards(JwtAccessTokenGuard)
   @Patch(':userId/profile')
   @HttpCode(201)
+  @ApiBearerAuth()
   @ApiBody({
     type: UpdateGeneralInfoDto,
   })
@@ -91,6 +96,7 @@ export class UserController {
     },
   })
   @Patch(':userId/avatar')
+  @ApiBearerAuth()
   @HttpCode(201)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image', UploadFileConstraint.MULTER_OPTION))
@@ -101,6 +107,48 @@ export class UserController {
   ): Promise<NoContentResponseDto> {
     return {
       isSuccess: await this.userService.updateImage(req.user, id, image),
+    };
+  }
+
+  @UseGuards(JwtAccessTokenGuard)
+  @Post(':userId/email/forgot-email')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiBody({
+    type: RequesUpdateEmail,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully request update email.',
+  })
+  async requestUpdateEmail(
+    @Body() data: RequesUpdateEmail,
+    @Req() req: Request,
+    @Param('userId') id: string,
+  ): Promise<NoContentResponseDto> {
+    return {
+      isSuccess: await this.userService.requestResetEmail(data, req.user, id),
+    };
+  }
+
+  @UseGuards(JwtRequestTokenGuard)
+  @Patch(':userId/email/reset-email')
+  @HttpCode(200)
+  @ApiHeader({
+    name: 'request-token-header',
+    description: 'The reset email token',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully reset email.',
+  })
+  async resetEmail(
+    @Req() req: Request,
+    @Param('userId') id: string,
+  ): Promise<NoContentResponseDto> {
+    const JWTtoken: string = req.headers['request-token-header'].toString();
+    return {
+      isSuccess: await this.userService.resetEmail(JWTtoken, req.user, id),
     };
   }
 }

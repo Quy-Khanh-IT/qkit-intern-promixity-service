@@ -1,4 +1,10 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
+  IsString,
+} from 'class-validator';
 import { ObjectId } from 'mongoose';
 import { TypeRequests } from 'src/common/enums';
 
@@ -12,6 +18,9 @@ export class CreateRequestDto {
 
   @IsNotEmpty()
   expiredTime: number;
+
+  @IsObject()
+  metaData: object = {};
 
   @IsEnum(TypeRequests)
   @IsNotEmpty()

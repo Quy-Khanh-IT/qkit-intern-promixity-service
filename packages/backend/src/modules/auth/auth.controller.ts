@@ -6,20 +6,20 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  SignUpDto,
-  LoginDto,
-  LoginResponeDto,
-  ResetPasswordDto,
-  RequestResetPasswordDto,
-} from './dto/index';
+import { Request } from 'express';
+import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
-import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
-import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
+import { AuthService } from './auth.service';
+import {
+  LoginDto,
+  LoginResponeDto,
+  RequestResetPasswordDto,
+  ResetPasswordDto,
+  SignUpDto,
+} from './dto/index';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -47,8 +47,6 @@ export class AuthController {
       'Welcome to our Proximity Service',
     );
   }
-  
-  
 
   @Post('login')
   @HttpCode(200)
@@ -65,7 +63,7 @@ export class AuthController {
 
   @Post('reset-password')
   @ApiHeader({
-    name: 'reset-token-header',
+    name: 'request-token-header',
     description: 'The reset password token',
   })
   @HttpCode(200)
@@ -76,13 +74,13 @@ export class AuthController {
     status: 200,
     description: 'User successfully reset.',
   })
-  @UseGuards(JwtResetPasswordTokenGuard)
+  @UseGuards(JwtRequestTokenGuard)
   async resetPassword(@Body() data: ResetPasswordDto, @Req() req: Request) {
     const JWTtoken: string = req.headers['reset-token-header'].toString();
     await this.authService.resetPassword(data, req.user, JWTtoken);
   }
 
-  @Post('reset-password/request')
+  @Post('forgot-password')
   @HttpCode(200)
   @ApiBody({
     type: RequestResetPasswordDto,

@@ -130,7 +130,7 @@ export class AuthService {
     const expiredTime = Dayjs()
       .add(
         this.configService.get<number>(
-          ConfigKey.JWT_RESET_PASSWORD_TOKEN_EXPIRATION_TIME,
+          ConfigKey.JWT_REQUEST_TOKEN_EXPIRATION_TIME,
         ),
         'seconds',
       )
@@ -140,6 +140,7 @@ export class AuthService {
       token: newJWTToken,
       expiredTime: expiredTime,
       used: false,
+      metaData: {},
       type: TypeRequests.FORGOT_PASSWORD,
       userId: user._id,
     });
