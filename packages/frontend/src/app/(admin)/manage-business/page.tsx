@@ -93,7 +93,7 @@ const ManageBusiness = () => {
       width: 30,
       render: (avgRating: number) => (
         <Flex justify='center' align='center'>
-          <Typography.Text>{avgRating}</Typography.Text>
+          <Typography.Text style={{ width: 40, textAlign: 'end' }}>{avgRating}</Typography.Text>
           <i className='fa-solid fa-star ms-2' style={{ color: '#FFD43B' }}></i>
         </Flex>
       )
@@ -129,22 +129,6 @@ const ManageBusiness = () => {
 
   return (
     <>
-      <Flex justify='space-between' style={{ marginBottom: 16, height: 40 }}>
-        <Typography.Title className='mb-0' level={3}>
-          Business
-        </Typography.Title>
-        <Button
-          type='primary'
-          icon={<PlusOutlined />}
-          className='h-100'
-          style={{
-            fontWeight: 700,
-            padding: '0 20px'
-          }}
-        >
-          Add Business
-        </Button>
-      </Flex>
       <TableComponent
         isFetching={false}
         columns={listColumns}

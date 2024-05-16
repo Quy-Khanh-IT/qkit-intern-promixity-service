@@ -26,6 +26,13 @@
     text-align: center !important;
   }
 
+  tr > td {
+    padding: 4px 12px !important;
+    &:first-child span {
+      padding: 12px !important;
+    }
+  }
+
   tr:nth-child(odd) {
     background-color: $gray-row-hover;
   }

@@ -1,0 +1,30 @@
+@import "@/sass/common/_common.scss";
+
+.view-modal {
+  .ant-modal-content {
+    padding: 0 !important;
+
+    .ant-modal-title {
+      padding: 16px;
+      border-bottom: $gray-border 1px solid;
+    }
+
+    .content-box {
+      padding: 0 16px;
+      width: 100%;
+
+      table{
+        border: $gray-border 1px solid !important;
+      }
+
+      .ant-descriptions-item-label{
+        background-color: $gray-row-hover !important;
+      }
+    }
+
+    .ant-modal-footer {
+      padding: 12px 16px 12px 16px;
+      border-top: $gray-border 1px solid;
+    }
+  }
+}

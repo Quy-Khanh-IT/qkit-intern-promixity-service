@@ -11,6 +11,7 @@ import './admin.scss'
 import { useRouter } from 'next/navigation'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { ROUTE } from '@/constants/route'
+import Link from 'next/link'
 
 const { useBreakpoint } = Grid
 
@@ -67,7 +68,7 @@ export default function RootLayout({
   const screens = useBreakpoint()
 
   const [routeValue, setRouteValue, removeRouteValue] = useLocalStorage('routeValue', ROUTE.MANAGE_USER)
-  const [selectedMenuKey, setSelectedMenuKey] = useState<string>('1')
+  const [selectedMenuKey, setSelectedMenuKey] = useState<string>('')
 
   useEffect(() => {
     if (routeValue) {
@@ -149,13 +150,15 @@ export default function RootLayout({
               }}
               className='h-100'
             >
-              <Image
-                src='/logo_light.png'
-                className='header-logo'
-                preview={false}
-                alt='error'
-                style={{ paddingLeft: 24 }}
-              />
+              <Link href='/manage-user' onClick={() => setRouteValue(ROUTE.MANAGE_USER)}>
+                <Image
+                  src='/logo_light.png'
+                  className='header-logo'
+                  preview={false}
+                  alt='error'
+                  style={{ paddingLeft: 24 }}
+                />
+              </Link>
               <Button
                 type='text'
                 icon={

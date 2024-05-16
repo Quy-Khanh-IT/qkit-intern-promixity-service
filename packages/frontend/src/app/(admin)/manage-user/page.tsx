@@ -1,27 +1,14 @@
 'use client'
+import TableComponent from '@/app/components/admin/Table/Table'
+import ViewRowDetailsModal, { ViewRowDetailsModalMethods } from '@/app/components/admin/ViewRowDetails/ViewRowDetails'
+import { IUserInformation } from '@/types/user'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import {
-  Button,
-  Dropdown,
-  Flex,
-  MenuProps,
-  Table,
-  TableProps,
-  Tag,
-  Typography,
-  Pagination,
-  Row,
-  Col,
-  Space
-} from 'antd'
+import { Col, Dropdown, Flex, InputNumber, MenuProps, Row, TableProps, Tag, Typography, theme } from 'antd'
 import { useRef, useState } from 'react'
 import userData from './user-data.json'
-import { PlusOutlined } from '@ant-design/icons'
-import TableComponent from '@/app/components/admin/Table/Table'
-import { IUserInformation } from '@/types/user'
-import ViewRowDetailsModal, { ViewRowDetailsModalMethods } from '@/app/components/admin/ViewRowDetails/ViewRowDetails'
+import './manage-user.scss'
 
-const { Text } = Typography
+
 
 export interface IManageUserProps {}
 
@@ -29,7 +16,19 @@ type ColumnsType<T extends object> = TableProps<T>['columns']
 
 const ManageUser = () => {
   const [userOption, setUserOption] = useState()
-  const refUserModal = useRef<ViewRowDetailsModalMethods | null>(null)
+  const [userOne, setUserOne] = useState<IUserInformation>()
+  const refViewDetailsModal = useRef<ViewRowDetailsModalMethods | null>(null)
+
+  const handleModal = (selectedOpt: number) => {
+    if (selectedOpt === 1) {
+      refViewDetailsModal.current?.showModal()
+    }
+    // else if (selectedOpt === 2) {
+    //   decentralizeRoleRef.current?.showModal()
+    // } else if (selectedOpt === 3) {
+    //   deleteUserRef.current?.showModal()
+    // }
+  }
 
   const listColumns: ColumnsType<IUserInformation> = [
     {
@@ -38,16 +37,18 @@ const ManageUser = () => {
       render: () => {
         const items: MenuProps['items'] = [
           {
-            key: 'Xem chi tiết',
-            label: <span>Xem chi tiết</span>,
-            icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+            key: 'View details',
+            label: <span>View Details</span>,
+            icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+            onClick: () => handleModal(1)
           },
           ...(!(userOption === '2')
             ? [
                 {
-                  key: 'Phân quyền',
-                  label: <span>Phân quyền</span>,
-                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+                  key: 'Decentralize',
+                  label: <span>Decentralize</span>,
+                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: () => handleModal(2)
                 }
               ]
             : []),
@@ -56,20 +57,22 @@ const ManageUser = () => {
                 {
                   key: 'Xoá',
                   label: <span>Xoá</span>,
-                  icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+                  icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: () => handleModal(3)
                 }
               ]
             : [
                 {
                   key: 'Khôi phục',
                   label: <span>Khôi phục</span>,
-                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: () => handleModal(3)
                 }
               ])
         ]
         return (
           <>
-            <Dropdown menu={{ items }} placement='bottom' trigger={['click']}>
+            <Dropdown menu={{ items }} placement='bottom' trigger={['click']} arrow>
               <EllipsisOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
             </Dropdown>
           </>
@@ -128,51 +131,13 @@ const ManageUser = () => {
 
   return (
     <>
-      <Flex justify='space-between' style={{ marginBottom: 16, height: 40 }}>
-        <Typography.Title className='mb-0' level={3}>
-          User
-        </Typography.Title>
-        <Button
-          type='primary'
-          icon={<PlusOutlined />}
-          className='h-100'
-          style={{
-            fontWeight: 700,
-            padding: '0 20px'
-          }}
-        >
-          Add User
-        </Button>
-      </Flex>
       <TableComponent
         isFetching={false}
         columns={listColumns}
         dataSource={usersWithKeys}
         className='--manage-user-table'
       />
-      <ViewRowDetailsModal title={''} data={null}>
-        <Row>
-          <Col span={8}>
-            <Space direction='vertical'>
-              <Text>Họ:</Text>
-              <Text>Tên:</Text>
-              <Text>Email:</Text>
-              <Text>Số điện thoại:</Text>
-              <Text>Địa chỉ:</Text>
-            </Space>
-          </Col>
-
-          <Col span={16}>
-            <Space direction='vertical'>
-              {/* <Text> {userOne.}</Text>
-                <Text> {userOne.}</Text>
-                <Text> {userOne?.email}</Text>
-                <Text> {userOne?.phone}</Text>
-                <Text> {userOne?.address}</Text> */}
-            </Space>
-          </Col>
-        </Row>
-      </ViewRowDetailsModal>
+      <ViewRowDetailsModal title={'User details'} data={userData[0]} ref={refViewDetailsModal} />
     </>
   )
 }

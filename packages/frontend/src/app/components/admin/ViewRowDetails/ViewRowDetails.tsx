@@ -1,9 +1,13 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import { Button, Modal, Space, Typography } from 'antd'
-import '~/sass/ManageUser/view-user-modal.scss'
-import { Row, Col } from 'antd'
-import { IUserInformation } from '@/types/user'
+import variables from '@/sass/common/_variables.module.scss'
 import { IBusiness } from '@/types/business'
+import { IUserInformation } from '@/types/user'
+import { Button, Modal, Carousel, Image, Descriptions, DescriptionsProps } from 'antd'
+import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import './view-row-details.scss'
+import { PLACEHOLDER } from '@/types/common'
+import ViewUserDescription from '@/app/(admin)/manage-user/user-details.pipe'
+
+const { grayBg } = variables
 
 export interface ViewRowDetailsModalMethods {
   showModal: () => void
@@ -12,17 +16,15 @@ export interface ViewRowDetailsModalMethods {
 
 export interface ViewRowDetailsProps {
   title: string
-  data: IUserInformation | IBusiness | null
-  children: React.ReactNode
+  data: any
 }
 
-const { Text } = Typography
-
 const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods, ViewRowDetailsProps> = (
-  { title, data, children },
+  { title, data },
   ref
 ) => {
   const [open, setOpen] = useState(false)
+  const pipedData: DescriptionsProps['items'] = ViewUserDescription(data as IUserInformation)
 
   useImperativeHandle(ref, () => ({
     showModal: () => setOpen(true),
@@ -43,12 +45,23 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods
         transitionName='ant-move-up'
         width={'800px'}
         footer={[
-          <Button className='btn-cancel' onClick={handleCancel} type='primary' key={'close'}>
-            Đóng
+          <Button
+            className='h-100'
+            style={{
+              fontWeight: 700,
+              padding: '8px 20px',
+              background: grayBg
+            }}
+            onClick={handleCancel}
+            key={'close'}
+          >
+            Close
           </Button>
         ]}
       >
-        <div className='content-box'>{children}</div>
+        <div className='content-box'>
+          <Descriptions bordered items={pipedData} size='small' layout="vertical"/>
+        </div>
       </Modal>
     </>
   )
