@@ -12,6 +12,10 @@ import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
 import { AddressModule } from './modules/address/address.module';
+import { SeedService } from './seeds/seed.service';
+import { DistrictRepository } from './modules/address/repository/district.repository';
+import { DistrictModule } from './modules/address/district.module';
+import { ProvinceModule } from './modules/address/province.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,9 +32,12 @@ import { AddressModule } from './modules/address/address.module';
     AuthModule,
     RequestModule,
     AddressModule,
+    DistrictModule,
+    ProvinceModule,
   ],
   controllers: [AppController],
   providers: [
+    SeedService,
     AppService,
     {
       provide: APP_FILTER,
@@ -38,4 +45,13 @@ import { AddressModule } from './modules/address/address.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly seedService: SeedService) {
+    this.seed();
+  }
+
+  async seed() {
+    await this.seedService.seedDistricts();
+    await this.seedService.seedProvinces();
+  }
+}
