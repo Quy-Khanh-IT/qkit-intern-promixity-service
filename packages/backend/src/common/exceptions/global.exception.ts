@@ -3,12 +3,10 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  BadRequestException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { ConfigKey } from '../constants/config-key.constant';
-import { error } from 'console';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -25,10 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.message
         : 'Server is busy, please try again later! (Internal Server Error)';
 
-    if (
-      exception.response.message instanceof Array &&
-      message === 'Bad Request Exception'
-    ) {
+    if (status == 400) {
       console.log('Validation Exception');
       exception.response = exception.response.message.reduce((acc, curr) => {
         const [field, ...errorMessages] = curr.split(' ');

@@ -1,14 +1,5 @@
-import { string } from '@hapi/joi';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Address } from 'cluster';
-import {
-  model,
-  Document,
-  HydratedDocument,
-  Types,
-  VirtualType,
-} from 'mongoose';
-import { UserRole } from 'src/common/enums';
+import { HydratedDocument, Types } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type UserDocument = HydratedDocument<User>;

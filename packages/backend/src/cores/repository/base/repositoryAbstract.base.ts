@@ -1,9 +1,9 @@
-import { Model, FilterQuery, QueryOptions } from 'mongoose';
-import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { BaseRepositoryInterface } from './repostioryInterface.base';
-import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import * as dayjs from 'dayjs';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { BaseRepositoryInterface } from './repostioryInterface.base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -103,13 +103,12 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   }
 
   async update(id: string, dto: Partial<T>): Promise<T> {
-    const result = await this.model.findOneAndUpdate(
-      { _id: id, deleted_at: null } as FilterQuery<T>,
-      dto,
-      {
+    const result = (await this.model
+      .findOneAndUpdate({ _id: id, deleted_at: null } as FilterQuery<T>, dto, {
         new: true,
-      },
-    );
+      })
+      .lean()
+      .exec()) as T;
     if (result) {
       result.id = transObjectIdToString(result._id);
     }

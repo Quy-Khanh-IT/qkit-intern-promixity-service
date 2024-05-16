@@ -1,18 +1,16 @@
-import { required } from '@hapi/joi';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId, Types } from 'mongoose';
+import { TypeRequests } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
-export type TokenDocument = HydratedDocument<Token>;
-
-
+export type RequestDocument = HydratedDocument<Requests>;
 
 @Schema({
   timestamps: {
     createdAt: 'created_at',
   },
 })
-export class Token extends BaseEntity {
+export class Requests extends BaseEntity {
   @Prop({ required: true, trim: true })
   token: string;
 
@@ -25,13 +23,19 @@ export class Token extends BaseEntity {
   })
   expiredAt: Date;
 
+  @Prop({ required: true, type: Object, default: {}, name: 'meta_data' })
+  metaData: object;
+
+  @Prop({ required: true, trim: true, enum: TypeRequests })
+  type: string;
+
   @Prop({ required: true, default: false })
   used: boolean;
 }
 
-export const TokenSchema = SchemaFactory.createForClass(Token);
+export const RequestsSchema = SchemaFactory.createForClass(Requests);
 
-TokenSchema.index(
+RequestsSchema.index(
   { expiredAt: 1 },
   { expireAfterSeconds: 0, background: true, name: 'expired_at_index' },
 );

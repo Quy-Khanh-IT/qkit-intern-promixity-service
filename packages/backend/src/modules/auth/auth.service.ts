@@ -12,6 +12,7 @@ import {
   ERROR_MESSAGES,
 } from 'src/common/constants';
 import { AuthConstant } from 'src/common/constants/auth.constant';
+import { TypeRequests } from 'src/common/enums';
 import {
   EmailExistedException,
   EmailNotExistedException,
@@ -24,7 +25,7 @@ import {
 import { verifyHash } from 'src/common/utils';
 import { MailService } from '../mail/mail.service';
 import { OtpService } from '../otp/otp.service';
-import { TokenService } from '../token/token.service';
+import { RequestService } from '../request/request.service';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import {
@@ -44,7 +45,7 @@ export class AuthService {
     private readonly JWTTokenService: JWTTokenService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
-    private readonly tokenService: TokenService,
+    private readonly requestService: RequestService,
   ) {}
 
   public async signUp(registrationData: SignUpDto): Promise<User> {
@@ -112,8 +113,9 @@ export class AuthService {
       throw new UserNotFoundException();
     }
 
-    const tokens = await this.tokenService.findManyByUserId(
+    const tokens = await this.requestService.findManyByUserIdAndType(
       user._id.toString(),
+      TypeRequests.FORGOT_PASSWORD,
     );
 
     if (tokens.count >= AuthConstant.TOKEN_RESET_LIMIT_TIME) {
@@ -128,16 +130,18 @@ export class AuthService {
     const expiredTime = Dayjs()
       .add(
         this.configService.get<number>(
-          ConfigKey.JWT_RESET_PASSWORD_TOKEN_EXPIRATION_TIME,
+          ConfigKey.JWT_REQUEST_TOKEN_EXPIRATION_TIME,
         ),
         'seconds',
       )
       .valueOf();
 
-    await this.tokenService.createToken({
+    await this.requestService.createRequest({
       token: newJWTToken,
       expiredTime: expiredTime,
       used: false,
+      metaData: {},
+      type: TypeRequests.FORGOT_PASSWORD,
       userId: user._id,
     });
 
@@ -160,7 +164,10 @@ export class AuthService {
       );
     }
 
-    const tokens = await this.tokenService.findManyByUserId(user.id);
+    const tokens = await this.requestService.findManyByUserIdAndType(
+      user.id,
+      TypeRequests.FORGOT_PASSWORD,
+    );
     if (
       !tokens.count ||
       tokens.items[0].used === true ||
@@ -178,6 +185,6 @@ export class AuthService {
       throw new InternalServerErrorException('Update password failed');
     }
 
-    await this.tokenService.updateTokenStatus(tokens.items[0].id, true);
+    await this.requestService.updateRequestStatus(tokens.items[0].id, true);
   }
 }

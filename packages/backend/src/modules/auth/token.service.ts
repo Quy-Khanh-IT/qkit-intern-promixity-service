@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import TokenPayload from './key.payload';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigKey } from 'src/common/constants';
+import TokenPayload from './key.payload';
 
 @Injectable()
 export class JWTTokenService {
@@ -31,9 +31,9 @@ export class JWTTokenService {
 
   async generateResetPasswordToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
-      secret: `${this.configService.get<number>(ConfigKey.RESET_PASSWORD_SECRET_KEY)}`,
+      secret: `${this.configService.get<number>(ConfigKey.REQUEST_SECRET_KEY)}`,
       expiresIn: `${this.configService.get<string>(
-        ConfigKey.JWT_RESET_PASSWORD_TOKEN_EXPIRATION_TIME,
+        ConfigKey.JWT_REQUEST_TOKEN_EXPIRATION_TIME,
       )}s`,
     });
   }

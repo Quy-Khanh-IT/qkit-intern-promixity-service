@@ -1,16 +1,14 @@
 import {
   Controller,
-  NestInterceptor,
   Post,
-  Type,
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { UploadFileService } from './upload-file.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+import { UploadFileService } from './upload-file.service';
 
 @Controller('images')
 @ApiTags('Cloudianry')

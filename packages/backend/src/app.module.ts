@@ -4,11 +4,11 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GlobalExceptionFilter } from './common/exceptions/global.exception';
+import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
 import { DatabaseModule } from './cores/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OtpModule } from './modules/otp/otp.module';
-import { TokenModule } from './modules/token/token.module';
+import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
 @Module({
@@ -21,12 +21,11 @@ import { UserModule } from './modules/user/user.module';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
-
     DatabaseModule,
     UserModule,
     OtpModule,
     AuthModule,
-    TokenModule,
+    RequestModule,
   ],
   controllers: [AppController],
   providers: [

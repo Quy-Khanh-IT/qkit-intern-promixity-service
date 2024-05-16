@@ -49,6 +49,20 @@ export class OtpService {
     return await this.create(email, 4 * 60);
   }
 
+  async createForUpdateEmail(email: string): Promise<OTP> {
+    const TTL = 4 * 60;
+    const isExistingEmail = await this.userService.checkEmailExist(email);
+    if (!isExistingEmail) {
+      throw new EmailNotExistedException();
+    }
+
+    const otpCodeCount = await this.otpRepo.findAll({ email });
+    if (otpCodeCount.count >= OTPConstant.OTP_MAX_REGISTRATION) {
+      throw new OTPExceedLimitException();
+    }
+    return await this.create(email, TTL);
+  }
+
   async createForResetpassword(email: string): Promise<OTP> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (!isExistingEmail) {

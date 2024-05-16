@@ -1,0 +1,4 @@
+export enum TypeRequests {
+  FORGOT_PASSWORD = 'FORGOT_PASSWORD',
+  RESET_EMAIL = 'RESET_EMAIL',
+}
