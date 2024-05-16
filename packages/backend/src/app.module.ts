@@ -32,15 +32,11 @@ import { AddressModule } from './modules/address/address.module';
     UserModule,
     OtpModule,
     AuthModule,
-<<<<<<< HEAD
     RequestModule,
     AddressModule,
     DistrictModule,
     ProvinceModule,
-=======
-    TokenModule,
     AddressModule,
->>>>>>> cf4812b (feat: Add CRUD Apis of Province, District, Ward and Address Apis)
   ],
   controllers: [AppController],
   providers: [
