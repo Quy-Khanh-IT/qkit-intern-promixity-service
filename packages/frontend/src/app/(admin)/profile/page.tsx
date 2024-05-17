@@ -1,7 +1,7 @@
 'use client'
 import { UserOutlined } from '@ant-design/icons'
 import type { FormInstance } from 'antd'
-import { Avatar, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
+import { Avatar, Button, Flex, Form, Input, Modal, Space, Tag, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import './profile.scss'
@@ -80,6 +80,7 @@ const Profile: React.FC = () => {
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
   const changePwModalRef = useRef<IModalMethods | null>(null)
+  const [open, setOpen] = useState(false)
 
   const onLoadingCallback = (loading: boolean) => {
     setConfirmLoading(loading)
@@ -222,7 +223,6 @@ const Profile: React.FC = () => {
           </Flex>
         </div>
       </Flex>
-      
       <ChangePasswordModal ref={changePwModalRef} id={''} value={''} description={''} />
     </>
   )
