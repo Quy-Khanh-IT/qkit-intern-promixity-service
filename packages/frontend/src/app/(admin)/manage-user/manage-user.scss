@@ -1,5 +1,14 @@
 @import '@/sass/common/_common.scss';
 
-.border-box{
-  border: 1px solid $gray-border;
+.--manage-user{
+
+  .filter-input{
+    @include sm{
+      margin-left: 16px !important;
+    }
+  }
+  
+  .border-box{
+    border: 1px solid $gray-border;
+  }
 }

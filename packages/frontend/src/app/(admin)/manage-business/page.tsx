@@ -1,19 +1,18 @@
 'use client'
+import TableComponent from '@/app/components/admin/Table/Table'
+import { IBusiness } from '@/types/business'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import { Button, Dropdown, Flex, MenuProps, Table, TableProps, Tag, Typography, Pagination, Row } from 'antd'
+import { Col, Dropdown, Flex, Input, MenuProps, Row, Select, TableProps, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import businessData from './business-data.json'
-import { PlusOutlined } from '@ant-design/icons'
-import TableComponent from '@/app/components/admin/Table/Table'
 import './manage-business.scss'
-import { IBusiness } from '@/types/business'
 
 export interface IManageUserProps {}
 
 type ColumnsType<T extends object> = TableProps<T>['columns']
 
 const ManageBusiness = () => {
-  const [userOption, setUserOption] = useState()
+  const [userOption, setUserOption] = useState('1')
 
   const listColumns: ColumnsType<IBusiness> = [
     {
@@ -117,25 +116,57 @@ const ManageBusiness = () => {
   const options = [
     {
       value: '1',
-      label: 'Người dùng còn hoạt động'
+      label: 'Actice businesses'
     },
     {
       value: '2',
-      label: 'Người dùng đã bị xoá'
+      label: 'Deleted businesses'
     }
   ]
 
   const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
 
   return (
-    <>
+    <div className='--manage-business'>
+      <Row className='pb-3'>
+        <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <Col span={5}>
+            <Select
+              // onChange={onChangeSelection}
+              // style={{ marginTop: 16 }}
+              optionFilterProp='children'
+              filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
+              className='filter-select w-100'
+              value={userOption}
+              // defaultValue={options[0]}
+              options={options}
+            />
+          </Col>
+          <Col span={12}>
+            <Input
+              // value={inputFilter}
+              // style={{ marginTop: 16 }}
+              className='filter-input'
+              // onChange={(e) => onChangeInput(e.target.value)}
+              placeholder='Filter by name'
+            />
+          </Col>
+        </Col>
+
+        <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* 'users?.itemCount' */}
+          <span>
+            Total: <strong>{'8'}</strong>
+          </span>
+        </Col>
+      </Row>
       <TableComponent
         isFetching={false}
         columns={listColumns}
         dataSource={businessWithKeys}
-        className='--manage-business-table'
+        className='manage-business-table'
       />
-    </>
+    </div>
   )
 }
 

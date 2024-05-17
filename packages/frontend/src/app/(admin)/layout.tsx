@@ -186,7 +186,9 @@ export default function RootLayout({
                 <BellOutlined style={{ fontSize: 24 }} className='action-button' />
               </Badge>
             </Tooltip>
-            <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
+            <Link href='/profile'>
+              <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
+            </Link>
           </Space>
         </Col>
       </Col>
@@ -218,7 +220,7 @@ export default function RootLayout({
                 theme='light'
                 onClick={onMenuClick}
                 mode='inline'
-                defaultSelectedKeys={[selectedMenuKey]}
+                defaultSelectedKeys={['1']}
                 selectedKeys={[selectedMenuKey]}
                 className='h-100'
                 items={[

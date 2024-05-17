@@ -1,27 +1,17 @@
 import variables from '@/sass/common/_variables.module.scss'
-import { IBusiness } from '@/types/business'
-import { IUserInformation } from '@/types/user'
-import { Button, Modal, Carousel, Image, Descriptions, DescriptionsProps } from 'antd'
+import { Button, Descriptions, DescriptionsProps, Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import { IModalMethods } from '../modal'
+import '../modal.scss'
 import './view-row-details.scss'
-import { PLACEHOLDER } from '@/types/common'
 
 const { grayBg } = variables
 
-export interface ViewRowDetailsModalMethods {
-  showModal: () => void
-  hideModal: () => void
-}
-
 export interface ViewRowDetailsProps {
-  title: string
   data: DescriptionsProps['items']
 }
 
-const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods, ViewRowDetailsProps> = (
-  { title, data },
-  ref
-) => {
+const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDetailsProps> = ({ data }, ref) => {
   const [open, setOpen] = useState(false)
 
   useImperativeHandle(ref, () => ({
@@ -37,28 +27,19 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<ViewRowDetailsModalMethods
     <>
       <Modal
         className='view-modal'
-        title={title}
+        title='User details'
         open={open}
         onCancel={handleCancel}
         transitionName='ant-move-up'
         width={'800px'}
         footer={[
-          <Button
-            className='h-100'
-            style={{
-              fontWeight: 700,
-              padding: '8px 20px',
-              background: grayBg
-            }}
-            onClick={handleCancel}
-            key={'close'}
-          >
+          <Button className='h-100 btn-cancel' onClick={handleCancel} key='cancel' type='primary'>
             Close
           </Button>
         ]}
       >
         <div className='content-box'>
-          <Descriptions bordered items={data} size='small' layout="vertical" />
+          <Descriptions bordered items={data} size='small' layout='vertical' />
         </div>
       </Modal>
     </>

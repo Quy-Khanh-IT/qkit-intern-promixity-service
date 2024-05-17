@@ -1,0 +1,11 @@
+@import '@/sass/common/_common.scss';
+
+.content-box {
+  padding: 0 16px;
+  width: 100%;
+
+  .ant-typography {
+    display: block;
+    font-weight: 500;
+  }
+}

@@ -24,8 +24,8 @@ const TableComponent: React.FC<ITableProps<T>> = ({ isFetching, columns, dataSou
         columns={columns}
         pagination={false}
         dataSource={dataSource}
-        // 80 header, 48 external padding, 40 internal padding, "56 header content", 60px for pagination
-        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px)' }}
+        // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
+        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
         className={`scroll-bar-2 --manage-table ${className}`}
       />
       <Row justify='end' align='bottom' style={{ height: 50 }}>

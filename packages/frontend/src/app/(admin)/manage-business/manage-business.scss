@@ -1,5 +1,16 @@
-.--manage-business-table {
-  tr > .ant-table-cell:nth-last-child(-n + 3) {
-    text-align: center !important;
+@import '@/sass/common/_common.scss';
+
+.--manage-business{
+
+  .filter-input{
+    @include sm{
+      margin-left: 16px !important;
+    }
+  }
+
+  .manage-business-table {
+    tr > .ant-table-cell:nth-last-child(-n + 3) {
+      text-align: center !important;
+    }
   }
 }

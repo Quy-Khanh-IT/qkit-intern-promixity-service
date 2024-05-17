@@ -1,0 +1,18 @@
+.view-modal {
+  .ant-modal-content {
+    padding: 0 !important;
+
+    .ant-modal-title {
+      padding: 16px;
+    }
+
+    .ant-modal-footer {
+      padding: 16px;
+      margin-top: 8px !important;
+
+      button{
+        padding: 6px 20px !important;
+      }
+    }
+  }
+}
