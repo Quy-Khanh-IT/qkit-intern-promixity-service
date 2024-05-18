@@ -4,8 +4,10 @@ import {
   SoftDeleteBaseRepositoryAbstract,
 } from '../../../cores/repository/base/repositoryAbstract.base';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { SoftDeleteModel } from 'mongoose-delete';
+import { FilterQuery, Model } from 'mongoose';
+import * as dayjs from 'dayjs';
+import { transStringToObjectId } from 'src/common/utils';
+import { BusinessStatusEnum } from 'src/common/enums';
 
 export class BusinessRepository extends BaseRepositoryAbstract<Business> {
   constructor(

@@ -6,8 +6,8 @@ export class BaseEntity {
   // Transform _id to id
   id?: string;
 
-  @Prop({ default: null })
-  deleted_at?: Date;
+  @Prop({ default: null, name: 'deleted_at' })
+  deletedAt?: Date;
 
   createdAt?: Date;
 

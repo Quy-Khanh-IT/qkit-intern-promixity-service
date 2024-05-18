@@ -7,17 +7,8 @@ export const ParseFloat = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
 
     data.forEach((data) => {
-      if (!request.body[data]) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail: `Missing ${data} in request body`,
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
-      }
-
-      const value = request?.body[data];
+      const value =
+        request?.body[data] || request?.query[data] || request?.params[data];
 
       if (value) {
         const floatValue = parseFloat(value);
@@ -32,7 +23,9 @@ export const ParseFloat = createParamDecorator(
           );
         }
 
-        request.body[data] = floatValue;
+        if (request?.body[data]) request.body[data] = floatValue;
+        if (request?.query[data]) request.query[data] = floatValue;
+        if (request?.params[data]) request.params[data] = floatValue;
       }
     });
   },
