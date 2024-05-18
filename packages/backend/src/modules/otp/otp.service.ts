@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import * as Dayjs from 'dayjs';
 import * as OTPGenerator from 'otp-generator';
-import { OTPConstant } from 'src/common/constants';
+import {
+  ERRORS_DICTIONARY,
+  ERROR_MESSAGES,
+  OTPConstant,
+} from 'src/common/constants';
 import {
   EmailExistedException,
   EmailNotExistedException,

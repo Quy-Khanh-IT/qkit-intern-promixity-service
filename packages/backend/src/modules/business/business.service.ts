@@ -233,97 +233,7 @@ export class BusinessService {
 
     const business = await this.businessRepository.findOneById(businessId);
 
-    if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business is not belong to user',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
-    }
-
-    return !!(await this.businessRepository.update(
-      businessId,
-      updateBusinessDto,
-    ));
-  }
-
-  async updateAddresses(
-    businessId: string,
-    userBusinesses: Types.ObjectId[],
-    updateAddressDto: UpdateAddressDto,
-  ): Promise<Business> {
-    // check if business belongs to user
-    const found = userBusinesses.find((id) => id.toString() === businessId);
-
-    if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business is not belong to user',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
-    }
-
-    const business = await this.businessRepository.findOneById(businessId);
-
     return business;
-  }
-
-  async updateImages(
-    businessId: string,
-    userBusinesses: Types.ObjectId[],
-    updateAddressDto: UpdateAddressDto,
-  ): Promise<Business> {
-    // check if business belongs to user
-    const found = userBusinesses.find((id) => id.toString() === businessId);
-
-    if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business is not belong to user',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
-    }
-
-    const business = await this.businessRepository.findOneById(businessId);
-
-    return business;
-  }
-
-  async softDelete(businessId: string, user: User): Promise<boolean> {
-    const business = await this.businessRepository.findOneById(businessId);
-
-    if (!business) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business not found',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
-    }
-
-    // Check if business belong to user
-    const found = user.businesses.find((id) => id.toString() === businessId);
-
-    if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
-          detail: 'Cannot delete business that does not belong to you',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
-      );
-    }
-
-    const isDeleted = await this.businessRepository.softDelete(businessId);
-
-    return isDeleted;
   }
 
   async updateImages(
@@ -572,7 +482,7 @@ export class BusinessService {
       }
     }
 
-    return business;
+    return false;
   }
 }
 

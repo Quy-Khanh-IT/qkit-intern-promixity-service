@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import * as MongooseDelete from 'mongoose-delete';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
@@ -28,7 +27,7 @@ const defaultStars: StarSchema[] = [
     star: StarEnum.FIVE,
     count: 0,
   },
-] as Array<Star>;
+];
 
 @Schema({
   timestamps: {
@@ -89,12 +88,7 @@ export class Business extends BaseEntity {
   deleted: boolean;
 
   @Prop({ default: null })
-  deletedAt: MongooseSchema.Types.Date;
+  deleted_at: MongooseSchema.Types.Date;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
-
-// BusinessSchema.plugin(MongooseDelete, {
-//   deletedAt: true,
-//   overrideMethods: 'all',
-// });

@@ -30,11 +30,7 @@ import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
-  Injectable,
-  InternalServerErrorException,
-  forwardRef,
-  Inject,
-} from '@nestjs/common';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { Business } from '../business/entities/business.entity';
 import { BusinessService } from '../business/business.service';

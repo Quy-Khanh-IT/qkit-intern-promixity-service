@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -150,6 +151,8 @@ export class UserController {
     return {
       isSuccess: await this.userService.resetEmail(JWTtoken, req.user, id),
     };
+  }
+
   @Get('/allBusinesses')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)

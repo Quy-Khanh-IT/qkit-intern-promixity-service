@@ -30,7 +30,7 @@ import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import {
   LoginDto,
-  LoginResponeDto,
+  LoginResponseDto,
   RequestResetPasswordDto,
   ResetPasswordDto,
 } from './dto/index';
