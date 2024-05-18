@@ -1,3 +1,4 @@
+@import '@/sass/common/common.scss';
 $header-height: 48px;
 
 .auth-container {
@@ -287,7 +288,7 @@ $header-height: 48px;
 }
 
 .error-input {
-  color: #d32f2f;
+  color: $error;
   line-height: 1.2;
   font-size: 12px;
   margin-left: 8px;
