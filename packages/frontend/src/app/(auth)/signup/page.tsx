@@ -14,6 +14,8 @@ export default function SignUp() {
   const [selectedCity, setSelectedCity] = useState('')
   const [selectedProvince, setSelectedProvince] = useState('')
 
+  const [isGetOTP, setIsGetOTP] = useState(true)
+
   const [registrationOTP, { data: otpData, isSuccess, isError, isLoading, error }] = useRegistrationOTPMutation()
   const getCode = async () => {
     if (!email) {
@@ -55,6 +57,10 @@ export default function SignUp() {
   const SignIn = () => {
     toast(`${email} ${password}`)
   }
+
+  const GetOTP = () => {
+    setIsGetOTP(false)
+  }
   return (
     <div className='auth-container'>
       <div className='auth-wrapper'>
@@ -66,127 +72,132 @@ export default function SignUp() {
             <div className='form-wrapper f-form'>
               <h2>Welcome to Proximity Service</h2>
               <div>Please Enter Information To Join With Us</div>
-              <div className='container'>
-                <div className='row'>
-                  <div className='col-6'>
-                    <div className='form'>
-                      <div className='mb-3'>
-                        <label className='form-label'>Email address</label>
-                        <input
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          type='email'
-                          className='form-control'
-                          placeholder='name@example.com'
-                        />
-                      </div>
-                      <div className='mb-3'>
-                        <label className='form-label'>OTP</label>
-
-                        <div className='form-control'>
-                          <input placeholder='Input OTP code with 6 digits'></input>
-                          <button>
-                            <div onClick={() => getCode()}>Get Code</div>
-                          </button>
+              <div className={`container ${!isGetOTP && 'fade-in'}`}>
+                {isGetOTP ? (
+                  <div className='row mt-5'>
+                    <div className='col-3' />
+                    <div className='col-6'>
+                      <div className='form'>
+                        <div className='mb-3'>
+                          <label className='form-label'>Email address</label>
+                          <input
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            type='email'
+                            className='form-control'
+                            placeholder='name@example.com'
+                          />
                         </div>
-                        {/* <button
-                          onClick={() => alert("get code")}
-                          className="otp-btn"
-                        >
-                          Get code
-                        </button> */}
-                      </div>
-
-                      <div className='mb-3'>
-                        <label className='form-label'>Password</label>
-                        <input
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          type='password'
-                          className='form-control'
-                          placeholder='********'
-                        />
-                      </div>
-                      <div className='mb-3'>
-                        <label className='form-label'>Re-Password</label>
-                        <input
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          type='password'
-                          className='form-control'
-                          placeholder='********'
-                        />
                       </div>
                     </div>
+                    <div className='col-3' />
                   </div>
-                  <div className='col-6'>
-                    <div className='form'>
-                      <div className='mb-3'>
-                        <label className='form-label'>First name</label>
-                        <input type='text' className='form-control' placeholder='Chinh' />
-                      </div>
-                      <div className='mb-3'>
-                        <label className='form-label'>Last name</label>
-                        <input type='text' className='form-control' placeholder='Truong Nguyen Cong' />
-                      </div>
-                      <div className='mb-3'>
-                        <label className='form-label'>Phone Number</label>
-                        <input type='text' className='form-control' placeholder='0123456789' />
-                      </div>
-                      <div className='mb-3 container'>
-                        <div className='row'>
-                          <div className='col-sm-12 col-md-6'>
-                            <div className='mb-3'>
-                              <label className='form-label'>Province</label>
-                              <select
-                                value={selectedCity}
-                                onChange={(e) => setSelectedCity(e.target.value)}
-                                className='form-control'
-                              >
-                                <option value={''}>----</option>
-                                {cities && cities.length > 0
-                                  ? cities.map((city: any) => (
-                                      <option key={city.id} value={city.id}>
-                                        {city.name}
-                                      </option>
-                                    ))
-                                  : ''}
-                              </select>
-                            </div>
+                ) : (
+                  <div className='row'>
+                    <div className='col-6'>
+                      <div className='form'>
+                        <div className='mb-3'>
+                          <label className='form-label'>OTP</label>
+
+                          <div className='form-control'>
+                            <input placeholder='Input OTP code with 6 digits'></input>
                           </div>
-                          <div className='col-sm-12 col-md-6'>
-                            <div className='mb-3'>
-                              <label className='form-label'>District</label>
-                              <select
-                                value={selectedProvince}
-                                onChange={(e) => setSelectedProvince(e.target.value)}
-                                className='form-control'
-                              >
-                                <option value={''}>----</option>
-                                {provinces && provinces.length > 0
-                                  ? provinces.map((province: any) => (
-                                      <option key={province.id} value={province.id}>
-                                        {province.name}
-                                      </option>
-                                    ))
-                                  : ''}
-                              </select>
-                            </div>
+                        </div>
+
+                        <div className='mb-3'>
+                          <label className='form-label'>Password</label>
+                          <input
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            type='password'
+                            className='form-control'
+                            placeholder='********'
+                          />
+                        </div>
+                        <div className='mb-3'>
+                          <label className='form-label'>Re-Password</label>
+                          <input
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            type='password'
+                            className='form-control'
+                            placeholder='********'
+                          />
+                        </div>
+                        <div className='mb-3'>
+                          <label className='form-label'>Phone Number</label>
+                          <input type='text' className='form-control' placeholder='0123456789' />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='col-6'>
+                      <div className='form'>
+                        <div className='mb-3'>
+                          <label className='form-label'>First name</label>
+                          <input type='text' className='form-control' placeholder='Chinh' />
+                        </div>
+                        <div className='mb-3'>
+                          <label className='form-label'>Last name</label>
+                          <input type='text' className='form-control' placeholder='Truong Nguyen Cong' />
+                        </div>
+
+                        <div className='mb-3 '>
+                          <div className='mb-3'>
+                            <label className='form-label'>Province</label>
+                            <select
+                              value={selectedCity}
+                              onChange={(e) => setSelectedCity(e.target.value)}
+                              className='form-control'
+                            >
+                              <option value={''}>--Choose Province--</option>
+                              {cities && cities.length > 0
+                                ? cities.map((city: any) => (
+                                    <option key={city.id} value={city.id}>
+                                      {city.name}
+                                    </option>
+                                  ))
+                                : ''}
+                            </select>
                           </div>
+                        </div>
+
+                        <div className='mb-3'>
+                          <label className='form-label'>District</label>
+                          <select
+                            value={selectedProvince}
+                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            className='form-control'
+                          >
+                            <option value={''}>--Choose District--</option>
+                            {provinces && provinces.length > 0
+                              ? provinces.map((province: any) => (
+                                  <option key={province.id} value={province.id}>
+                                    {province.name}
+                                  </option>
+                                ))
+                              : ''}
+                          </select>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             <div
               className='d-flex  align-items-center justify-content-center'
               style={{ padding: '0 72x', flexDirection: 'column' }}
             >
-              <button style={{ width: '200px' }} onClick={SignIn} className='form-btn'>
-                Sign Up
-              </button>
+              {isGetOTP ? (
+                <button style={{ width: '200px' }} onClick={GetOTP} className='form-btn mt-3'>
+                  Get OTP
+                </button>
+              ) : (
+                <button style={{ width: '200px' }} onClick={SignIn} className='form-btn'>
+                  Sign Up
+                </button>
+              )}
+
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 {' '}
                 Already have an account?{' '}
