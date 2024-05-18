@@ -3,15 +3,7 @@ $header-height: 48px;
 .auth-container {
   color: white;
   height: 100vh;
-  background-image: linear-gradient(
-    to bottom right,
-    #0d091a,  /* #160f29 tối hơn nữa */
-    #1c1230,  /* #2b1e47 tối hơn nữa */
-    #27183e,  /* #3f2a6a tối hơn nữa */
-    #9a0f34,  /* #ed1651 tối hơn nữa */
-    #2f244e,  /* #4d3582 tối hơn nữa */
-    #392959   /* #5b3f98 tối hơn nữa */
-);
+  background-image: linear-gradient(to bottom right, #0d091a, #1c1230, #27183e, #9a0f34, #2f244e, #392959);
 
   display: flex;
   align-items: center;
@@ -26,6 +18,7 @@ $header-height: 48px;
     background-color: #ed1651;
     font-size: 16px;
     font-weight: 700;
+    color: white;
 
     &:hover {
       opacity: 0.8;
