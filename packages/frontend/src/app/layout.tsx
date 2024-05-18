@@ -7,6 +7,7 @@ import { Bounce, ToastContainer } from 'react-toastify'
 import 'slick-carousel/slick/slick-theme.css'
 import 'slick-carousel/slick/slick.css'
 import './globals.scss'
+import 'react-toastify/dist/ReactToastify.css'
 
 export const metadata: Metadata = {
   title: 'Proximity Service',
@@ -34,15 +35,6 @@ export default function RootLayout({
         />
       </head>
       <body className={'vh-100'}>
-        {/* <ScrollToTopButton /> */}
-        <AntdRegistry>
-          <ConfigProvider theme={themConfig}>
-            <StoreProvider>{children}</StoreProvider>
-          </ConfigProvider>
-        </AntdRegistry>
-
-        <ToastContainer></ToastContainer>
-
         <ToastContainer
           position='bottom-right'
           autoClose={5000}
@@ -55,7 +47,13 @@ export default function RootLayout({
           pauseOnHover
           theme='light'
           transition={Bounce}
-        />
+        ></ToastContainer>
+        {/* <ScrollToTopButton /> */}
+        <AntdRegistry>
+          <ConfigProvider theme={themConfig}>
+            <StoreProvider>{children}</StoreProvider>
+          </ConfigProvider>
+        </AntdRegistry>
 
         <script defer src='https://kit.fontawesome.com/03244eb91d.js' crossOrigin='anonymous'></script>
         <script
