@@ -33,8 +33,6 @@ export class BusinessService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
-    private readonly axiosService: AxiosService,
-    private readonly configService: ConfigService,
     private readonly nominatimOsmService: NominatimOsmService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
