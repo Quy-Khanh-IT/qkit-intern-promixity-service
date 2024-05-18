@@ -1,51 +1,66 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import axios from '../../../services/axiosInstance'
 import Link from 'next/link'
 import { useRegistrationOTPMutation } from '@/services/otp.service'
+import { any } from 'prop-types'
+import { last, set } from 'lodash'
+import { useGetProvincesQuery } from '@/services/address.service'
 
 export default function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
   const [cities, setCities] = useState([])
   const [provinces, setProvinces] = useState([])
 
   const [selectedCity, setSelectedCity] = useState('')
   const [selectedProvince, setSelectedProvince] = useState('')
 
+  const [registerData, setRegisterData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    country: 'Vietnam',
+    otp: ''
+  })
+
+  const [registerDataErrors, setRegisterDataErrors] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    country: '',
+    otp: ''
+  })
+
   const [isGetOTP, setIsGetOTP] = useState(true)
 
-  const [registrationOTP, { data: otpData, isSuccess, isError, isLoading, error }] = useRegistrationOTPMutation()
-  const getCode = async () => {
-    if (!email) {
-      toast.error('Please input email')
-    } else {
-      await registrationOTP({
-        email
-      })
+  const [registrationOTP, { data: otpData, isSuccess: isOTPSuccess, isError: isOTPError, error: otpError }] =
+    useRegistrationOTPMutation()
 
-      if (isSuccess) {
-        toast.success('Email sent successfully')
-      }
+  const { data: provincesData, isSuccess: isProvincesSuccess } = useGetProvincesQuery({})
+
+  useEffect(() => {
+    if (isProvincesSuccess) {
+      setProvinces(provincesData.items)
     }
-  }
+  }, [isProvincesSuccess, provincesData])
 
-  const fetchProvinces = async () => {
-    const response = await fetch('https://vnprovinces.pythonanywhere.com/api/provinces/?basic=true&limit=100')
-    const listCity = await response.json()
-    setCities(listCity.results)
-  }
+  const fetchProvinces = async () => {}
 
   useEffect(() => {
     fetchProvinces()
   }, [])
 
-  const fetchProvince = async () => {
-    const response = await fetch(`https://vnprovinces.pythonanywhere.com//api/provinces/${selectedCity}`)
-    const listCity = await response.json()
-    setProvinces(listCity.districts)
-  }
+  const fetchProvince = async () => {}
 
   useEffect(() => {
     if (selectedCity === '') return
@@ -58,9 +73,69 @@ export default function SignUp() {
     toast(`${email} ${password}`)
   }
 
-  const GetOTP = () => {
-    setIsGetOTP(false)
+  const GetOTP = async () => {
+    if (!registerData.email) {
+      toast.error('Please input email')
+    } else {
+      await registrationOTP({
+        email: registerData.email
+      })
+    }
   }
+
+  useEffect(() => {
+    if (isOTPSuccess) {
+      toast.success('OTP sent to your email')
+      setIsGetOTP(false)
+    }
+    if (isOTPError) {
+      handleError(otpError)
+    }
+  }, [isOTPSuccess, isOTPError])
+
+  const handleError = (error: any) => {
+    toast.error(error?.data.message)
+
+    const inputTypes = [
+      'email',
+      'password',
+      'firstName',
+      'lastName',
+      'phoneNumber',
+      'city',
+      'province',
+      'country',
+      'otp'
+    ]
+
+    const newErrors: any = { ...registerDataErrors }
+
+    inputTypes.forEach((type) => {
+      newErrors[type] = error?.data?.errors[type]?.[0]
+    })
+
+    setRegisterDataErrors(newErrors)
+  }
+
+  const onChangeRegisterData = (value: string, type: string) => {
+    setRegisterData({
+      ...registerData,
+      [type]: value
+    })
+
+    setRegisterDataErrors({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      city: '',
+      province: '',
+      country: '',
+      otp: ''
+    })
+  }
+
   return (
     <div className='auth-container'>
       <div className='auth-wrapper'>
@@ -80,9 +155,16 @@ export default function SignUp() {
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>Email address</label>
+                          {registerDataErrors.email ? (
+                            <div>
+                              <span className='error-input mb-2'> {registerDataErrors.email}</span>
+                            </div>
+                          ) : (
+                            ''
+                          )}
                           <input
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={registerData.email}
+                            onChange={(e) => onChangeRegisterData(e.target.value, 'email')}
                             type='email'
                             className='form-control'
                             placeholder='name@example.com'
@@ -150,10 +232,10 @@ export default function SignUp() {
                               className='form-control'
                             >
                               <option value={''}>--Choose Province--</option>
-                              {cities && cities.length > 0
-                                ? cities.map((city: any) => (
-                                    <option key={city.id} value={city.id}>
-                                      {city.name}
+                              {provinces && provinces.length > 0
+                                ? provinces.map((province: any) => (
+                                    <option key={province.id} value={province.code}>
+                                      {province.full_name}
                                     </option>
                                   ))
                                 : ''}
