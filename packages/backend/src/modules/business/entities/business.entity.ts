@@ -3,59 +3,11 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import * as MongooseDelete from 'mongoose-delete';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
+import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
+import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
+import { StarSchema } from './star.entity';
 
-export type BusinessDocument =
-  HydratedDocument<MongooseDelete.SoftDeleteDocument>;
-
-@Schema({
-  _id: false,
-})
-export class DayOpenCloseTime {
-  @Prop({ required: true, trim: true })
-  day: string;
-
-  @Prop({ required: true, trim: true })
-  openTime: string;
-
-  @Prop({ required: true, trim: true })
-  closeTime: string;
-}
-
-export class Star {
-  @Prop({ enum: StarEnum })
-  star: string;
-
-  @Prop({})
-  count: number;
-}
-
-@Schema({
-  _id: false,
-})
-export class CloundinaryImage {
-  @Prop({ required: true, trim: true })
-  publicId: string;
-
-  @Prop({ required: true, trim: true })
-  url: string;
-
-  @Prop({ required: true, trim: true })
-  secureUrl: string;
-
-  @Prop({ required: true, trim: true })
-  format: string;
-
-  @Prop({ required: true, trim: true })
-  width: number;
-
-  @Prop({ required: true, trim: true })
-  height: number;
-}
-
-const DayOpenCloseTimeSchema = SchemaFactory.createForClass(DayOpenCloseTime);
-const CloundinaryImageSchema = SchemaFactory.createForClass(CloundinaryImage);
-
-const defaultStars = [
+const defaultStars: StarSchema[] = [
   {
     star: StarEnum.ONE,
     count: 0,
@@ -85,7 +37,7 @@ const defaultStars = [
   },
 })
 export class Business extends BaseEntity {
-  @Prop({ required: true, unique: true, trim: true, maxlength: 100 })
+  @Prop({ required: true, trim: true, maxlength: 100 })
   name: string;
 
   @Prop({ default: '', trim: true, maxlength: 500 })
@@ -97,14 +49,14 @@ export class Business extends BaseEntity {
   @Prop({ default: '', trim: true })
   website: string;
 
-  @Prop([CloundinaryImageSchema])
+  @Prop([CloundinaryImage])
   images: CloundinaryImage[];
 
   @Prop({ required: true, trim: true })
   category: string;
 
-  @Prop({ default: null })
-  services: string;
+  @Prop({ type: [String], default: [] })
+  services: string[];
 
   @Prop({ default: 0 })
   overallRating: number;
@@ -112,8 +64,8 @@ export class Business extends BaseEntity {
   @Prop({ default: 0 })
   totalReview: number;
 
-  @Prop({ default: defaultStars })
-  stars: Star[];
+  @Prop({ type: [StarSchema], default: defaultStars })
+  stars: StarSchema[];
 
   @Prop({ required: true, trim: true })
   country: string;
@@ -128,7 +80,7 @@ export class Business extends BaseEntity {
   addressLine: string;
 
   @Prop([DayOpenCloseTimeSchema])
-  dayOfWeek: DayOpenCloseTime[];
+  dayOfWeek: DayOpenCloseTimeSchema[];
 
   @Prop({ trim: true })
   longitude: string;
@@ -136,7 +88,10 @@ export class Business extends BaseEntity {
   @Prop({ trim: true })
   latitude: string;
 
-  @Prop({ enum: BusinessStatusEnum, default: BusinessStatusEnum.PENDING })
+  @Prop({
+    enum: BusinessStatusEnum,
+    default: BusinessStatusEnum.PENDING,
+  })
   status: string;
 
   @Prop({ default: false })
