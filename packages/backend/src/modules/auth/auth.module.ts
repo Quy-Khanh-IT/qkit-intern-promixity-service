@@ -11,6 +11,8 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { PassportModule } from '@nestjs/passport';
 import { JwtAccessTokenStrategy } from './strategies/jwt-access-token.strategy';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
+import { TokenModule } from '../token/token.module';
+import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 import { TokenModule } from '../token/token.module';
 

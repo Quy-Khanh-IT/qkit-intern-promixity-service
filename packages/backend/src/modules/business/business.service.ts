@@ -30,6 +30,8 @@ import { ValidateAddress } from './dto/validate-address.dto';
 @Injectable()
 export class BusinessService {
   constructor(
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
     private readonly axiosService: AxiosService,
     private readonly configService: ConfigService,
@@ -87,8 +89,8 @@ export class BusinessService {
     createBusinessDto: CreateBusinessDto,
     userId: string,
   ): Promise<Business> {
-    const { dayOfWeek } = createBusinessDto;
     // Validate open time and close time
+    const { dayOfWeek } = createBusinessDto;
     for (const day of dayOfWeek) {
       const startHH = parseInt(day.openTime.split(':')[0]);
       const startMM = parseInt(day.openTime.split(':')[1]);
@@ -133,7 +135,7 @@ export class BusinessService {
       }
     }
 
-    // Format HH or MM from 0 to 00, 1 to 01, 2 to 02,...
+    // Format if not true form of HH or MM from 0 to 00, 1 to 01, 2 to 02,...
     dayOfWeek.forEach((day) => {
       day.openTime = day.openTime
         .split(':')
@@ -482,7 +484,136 @@ export class BusinessService {
       }
     }
 
-    return business;
+  async handleStatus(id: string, type: StatusActionsEnum): Promise<boolean> {
+    // Check exist business
+    const business = await this.businessRepository.findOneById(id);
+
+    if (!business) {
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Business not found',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
+    }
+
+    // handle APPROVE
+    if (type === StatusActionsEnum.APPROVE) {
+      if (business.status !== BusinessStatusEnum.PENDING_APPROVED) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.INVALID_INPUT,
+            detail:
+              'Cannot approve business. Business must be pending approved first',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+        );
+      }
+
+      // TODO: Add logic after ban business
+
+      return !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.APPROVED,
+      }));
+    }
+
+    // handle REJECT
+    if (type === StatusActionsEnum.REJECT) {
+      if (business.status !== BusinessStatusEnum.PENDING_APPROVED) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.INVALID_INPUT,
+            detail:
+              'Cannot approve business. Business must be pending approved first',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+        );
+      }
+
+      // TODO: Add logic after ban business
+
+      return !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.REJECTED,
+      }));
+    }
+
+    // handle BANNED
+    if (type === StatusActionsEnum.BANNED) {
+      if (business.status !== BusinessStatusEnum.APPROVED) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.INVALID_INPUT,
+            detail: 'Cannot ban business. Business must be approved first',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+        );
+      }
+
+      // TODO: Add logic after ban business
+
+      return !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.BANNED,
+      }));
+    }
+
+    // handle PENDING
+    if (type === StatusActionsEnum.PENDING) {
+      if (business.status !== BusinessStatusEnum.APPROVED) {
+        throw new HttpException(
+          {
+            message: ERRORS_DICTIONARY.INVALID_INPUT,
+            detail: 'Cannot pending business. Business must be approved first',
+          },
+          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+        );
+      }
+
+      // TODO: Add logic after pending a business
+
+      return !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.PENDING,
+      }));
+    }
+
+    return false;
+  }
+
+  async validateAddress(validateAddress: ValidateAddress): Promise<Boolean> {
+    const structureData = await this.nominatimOsmService.structure({
+      country: validateAddress.country,
+      province: validateAddress.province,
+      district: validateAddress.district,
+      addressLine: validateAddress.addressLine,
+    });
+
+    if (structureData.length === 0) {
+      return false;
+    }
+
+    const reverseData = await this.nominatimOsmService.reverse({
+      latitude: validateAddress.latitude,
+      longitude: validateAddress.longitude,
+    });
+
+    let i = 1;
+
+    for (const item of structureData) {
+      console.log('i', i++);
+      if (
+        item?.address?.country === reverseData?.address?.country &&
+        // item?.address?.state === reverseData?.address?.state &&
+        item?.address?.city === reverseData?.address?.city &&
+        item?.address?.suburb === reverseData?.address?.suburb &&
+        item?.address?.road === reverseData?.address?.road
+      ) {
+        console.log('item', item);
+
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

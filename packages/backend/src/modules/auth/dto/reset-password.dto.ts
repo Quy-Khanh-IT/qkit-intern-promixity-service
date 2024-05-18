@@ -14,7 +14,7 @@ export class ResetPasswordDto {
   @IsString()
   @MinLength(8)
   @ApiProperty({ description: 'New password', example: 'NewPassword123@' })
-  @Matches(UserConstant.regrexPassword, {
+  @Matches(UserConstant.regexPassword, {
     message:
       'Password must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })

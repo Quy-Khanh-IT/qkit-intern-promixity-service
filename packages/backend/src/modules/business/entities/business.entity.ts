@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import * as MongooseDelete from 'mongoose-delete';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
@@ -28,12 +27,12 @@ const defaultStars: StarSchema[] = [
     star: StarEnum.FIVE,
     count: 0,
   },
-] as Array<Star>;
+];
 
 @Schema({
   timestamps: {
-    createdAt: true,
-    updatedAt: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   },
 })
 export class Business extends BaseEntity {
@@ -67,17 +66,17 @@ export class Business extends BaseEntity {
   @Prop({ type: [StarSchema], default: defaultStars })
   stars: StarSchema[];
 
-  @Prop({ required: true, trim: true })
-  country: string;
-
-  @Prop({ required: true, trim: true })
-  province: string;
-
-  @Prop({ required: true, trim: true })
-  city: string;
-
   @Prop({ trim: true })
   addressLine: string;
+
+  @Prop({ required: true })
+  province: string;
+
+  @Prop({ required: true })
+  district: string;
+
+  @Prop({ required: true })
+  country: string;
 
   @Prop([DayOpenCloseTimeSchema])
   dayOfWeek: DayOpenCloseTimeSchema[];
@@ -94,16 +93,9 @@ export class Business extends BaseEntity {
   })
   status: string;
 
-  @Prop({ default: false })
-  deleted: boolean;
-
   @Prop({ default: null })
-  deletedAt: MongooseSchema.Types.Date;
+  deleted_at: MongooseSchema.Types.Date;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
-
-// BusinessSchema.plugin(MongooseDelete, {
-//   deletedAt: true,
-//   overrideMethods: 'all',
-// });
+export type BusinessDocument = HydratedDocument<Business>;

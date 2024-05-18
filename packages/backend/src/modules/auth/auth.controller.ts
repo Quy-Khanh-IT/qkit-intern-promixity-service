@@ -19,7 +19,6 @@ import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 
 @Controller('auth')
