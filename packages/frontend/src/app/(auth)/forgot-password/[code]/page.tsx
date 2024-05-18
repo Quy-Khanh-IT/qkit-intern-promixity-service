@@ -1,7 +1,5 @@
 import Link from 'next/link'
 
-import './reset-password.scss'
-
 export default function ResetPassword() {
   return (
     <div className='auth-container'>
@@ -19,7 +17,6 @@ export default function ResetPassword() {
               <div className='content-wrapper d-flex  flex-column mt-1'>
                 <div className='text-center'>We have sent password reset link to</div>
                 <div className='text-center'>test1239090@gmail.com</div>
-                <button className='btn-send-link btn btn-primary btn-lg mt-5'>Open email app</button>
 
                 <div className='mt-4 text-center'>
                   Didn't receive email? <strong>Click to resend</strong>
