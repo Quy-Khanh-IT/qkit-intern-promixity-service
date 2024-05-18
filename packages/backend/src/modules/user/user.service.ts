@@ -86,14 +86,15 @@ export class UserService {
     } as Partial<User>;
 
     const user = await this.userRepository.update(userId, update);
+
     if (!user) {
       throw new InternalServerErrorException('Remove business failed');
     }
     return user;
   }
 
-  async getAllBusiness(user: User): Promise<FindAllResponse<Business> | []> {
-    const businesses = await this.BusinessService.getAllByCurrentUser(user);
+  async getAllByUser(user: User): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByUser(user);
 
     return businesses;
   }

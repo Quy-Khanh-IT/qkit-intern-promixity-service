@@ -4,7 +4,11 @@ import { AxiosController } from './axios.controller';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [HttpModule],
+  imports: [
+    HttpModule.register({
+      timeout: 20000,
+    }),
+  ],
   controllers: [AxiosController],
   providers: [AxiosService],
   exports: [AxiosService],
