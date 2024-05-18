@@ -67,15 +67,6 @@ export class Business extends BaseEntity {
   @Prop({ type: [StarSchema], default: defaultStars })
   stars: StarSchema[];
 
-  @Prop({ required: true, trim: true })
-  country: string;
-
-  @Prop({ required: true, trim: true })
-  province: string;
-
-  @Prop({ required: true, trim: true })
-  city: string;
-
   @Prop({ trim: true })
   addressLine: string;
 

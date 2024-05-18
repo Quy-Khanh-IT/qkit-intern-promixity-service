@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
 import {
   ApiBearerAuth,
@@ -92,6 +93,78 @@ export class BusinessController {
     return result;
   }
 
+  @Patch(':id')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateBusinessDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateInformation(
+    @Param('id') id: string,
+    @Body()
+    @ParseFloat(['longitude', 'latitude'])
+    updateBusinessDto: UpdateBusinessDto,
+    @Req() req: Request,
+  ) {
+    const result: Boolean = await this.businessService.updateInformation(
+      id,
+      req.user.businesses,
+      updateBusinessDto,
+    );
+
+    return result;
+  }
+
+  @Patch('addresses/:id')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateAddresses(
+    @Param('id') id: string,
+    @Body()
+    @ParseFloat(['longitude', 'latitude'])
+    updateAddressDto: UpdateAddressDto,
+    @Req() req: Request,
+  ) {
+    const result: Business = await this.businessService.updateAddresses(
+      id,
+      req.user.businesses,
+      updateAddressDto,
+    );
+
+    return result;
+  }
+
+  @Patch('images/:id')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateImages(
+    @Param('id') id: string,
+    @Body()
+    @ParseFloat(['longitude', 'latitude'])
+    updateAddressDto: UpdateAddressDto,
+    @Req() req: Request,
+  ) {
+    const result: Business = await this.businessService.updateAddresses(
+      id,
+      req.user.businesses,
+      updateAddressDto,
+    );
+
+    return result;
+  }
+
   @Delete(':id')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
@@ -105,18 +178,19 @@ export class BusinessController {
     @Query('type') type: string,
     @Req() req: Request,
   ) {
-    const userId = transObjectIdToString(req.user._id);
-
     if (type === DeleteActionEnum.SOFT) {
-      const result: Boolean = await this.businessService.softDelete(id);
+      const result: Boolean = await this.businessService.softDelete(
+        id,
+        req.user,
+      );
 
       return result;
     }
 
     if (type === DeleteActionEnum.HARD) {
       const result: Boolean = await this.businessService.forceDelete(
-        userId,
         id,
+        req.user,
       );
 
       return result;
