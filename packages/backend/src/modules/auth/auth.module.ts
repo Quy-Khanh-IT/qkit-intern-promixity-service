@@ -14,7 +14,6 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy
 import { TokenModule } from '../token/token.module';
 import { JwtResetPasswordTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
-import { TokenModule } from '../token/token.module';
 
 @Module({
   imports: [
