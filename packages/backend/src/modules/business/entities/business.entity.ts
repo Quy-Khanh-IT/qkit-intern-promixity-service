@@ -31,8 +31,8 @@ const defaultStars: StarSchema[] = [
 
 @Schema({
   timestamps: {
-    createdAt: true,
-    updatedAt: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   },
 })
 export class Business extends BaseEntity {
@@ -69,6 +69,15 @@ export class Business extends BaseEntity {
   @Prop({ trim: true })
   addressLine: string;
 
+  @Prop({ required: true })
+  province: string;
+
+  @Prop({ required: true })
+  district: string;
+
+  @Prop({ required: true })
+  country: string;
+
   @Prop([DayOpenCloseTimeSchema])
   dayOfWeek: DayOpenCloseTimeSchema[];
 
@@ -84,11 +93,9 @@ export class Business extends BaseEntity {
   })
   status: string;
 
-  @Prop({ default: false })
-  deleted: boolean;
-
   @Prop({ default: null })
   deleted_at: MongooseSchema.Types.Date;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
+export type BusinessDocument = HydratedDocument<Business>;

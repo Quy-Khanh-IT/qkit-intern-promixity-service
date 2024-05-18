@@ -21,7 +21,6 @@ import {
 } from './dto/index';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
-import { JwtResetPasswordStrategy } from './strategies/jwt-reset-token.strategy';
 
 @Controller('auth')
 @ApiTags('Authentication')

@@ -33,6 +33,8 @@ export class BusinessService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
+    private readonly axiosService: AxiosService,
+    private readonly configService: ConfigService,
     private readonly nominatimOsmService: NominatimOsmService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
@@ -87,8 +89,8 @@ export class BusinessService {
     createBusinessDto: CreateBusinessDto,
     userId: string,
   ): Promise<Business> {
-    const { dayOfWeek } = createBusinessDto;
     // Validate open time and close time
+    const { dayOfWeek } = createBusinessDto;
     for (const day of dayOfWeek) {
       const startHH = parseInt(day.openTime.split(':')[0]);
       const startMM = parseInt(day.openTime.split(':')[1]);
@@ -133,7 +135,7 @@ export class BusinessService {
       }
     }
 
-    // Format HH or MM from 0 to 00, 1 to 01, 2 to 02,...
+    // Format if not true form of HH or MM from 0 to 00, 1 to 01, 2 to 02,...
     dayOfWeek.forEach((day) => {
       day.openTime = day.openTime
         .split(':')

@@ -3,10 +3,7 @@ import { BusinessService } from './business.service';
 import { BusinessController } from './business.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Business, BusinessSchema } from './entities/business.entity';
-import {
-  BusinessRepository,
-  BusinessSoftDeleteRepository,
-} from './repository/business.repository';
+import { BusinessRepository } from './repository/business.repository';
 import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
 import { AxiosModule } from '../axios/axios.module';
@@ -17,17 +14,10 @@ import { NominatimOmsModule } from '../nominatim-osm/nominatim-osm.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: Business.name,
-        useFactory: () => {
-          const schema = BusinessSchema;
-          schema.plugin(require('mongoose-delete'), {
-            deletedAt: true,
-            overrideMethods: 'all',
-          });
-          return schema;
-        },
+        schema: BusinessSchema,
       },
     ]),
     forwardRef(() => UserModule),
@@ -36,11 +26,7 @@ import { NominatimOmsModule } from '../nominatim-osm/nominatim-osm.module';
     NominatimOmsModule,
   ],
   controllers: [BusinessController],
-  providers: [
-    BusinessService,
-    BusinessRepository,
-    BusinessSoftDeleteRepository,
-  ],
+  providers: [BusinessService, BusinessRepository],
   exports: [BusinessService],
 })
 export class BusinessModule implements NestModule {
