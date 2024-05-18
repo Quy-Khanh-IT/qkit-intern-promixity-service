@@ -63,7 +63,7 @@ export default function SignIn() {
                 <div className='mb-3'>
                   <label className='form-label'>Email address</label>
                   <div>
-                    <span className='error-input'>{inputError.email}</span>
+                    <span className='error-input'> {inputError.email}</span>
                   </div>
                   <input
                     value={email}

@@ -5,8 +5,8 @@ import Navbar from '@/app/components/NavBar'
 import ServiceSlider from '@/app/components/ServiceSlider'
 import StarsCanvas from './components/canvas/Star'
 import CredibilitySection from './components/CredibilitySection'
-import NavProcessBar from './components/NavProcessBar'
-import AboutUsSection from './components/AboutUsSection'
+import NavProcessBar from './components/NavProcessbar'
+import AboutUsSection from './components/CredibilitySection'
 
 export default function Home() {
   return (
