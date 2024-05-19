@@ -1,13 +1,15 @@
 'use client'
 import TableComponent from '@/app/components/admin/Table/Table'
+import variables from '@/sass/common/_variables.module.scss'
 import { IBusiness } from '@/types/business'
+import { ColumnsType } from '@/types/common'
 import {
   DeleteOutlined,
   EllipsisOutlined,
   FolderViewOutlined,
+  SearchOutlined,
   UndoOutlined,
-  UserAddOutlined,
-  SearchOutlined
+  UserAddOutlined
 } from '@ant-design/icons'
 import {
   Button,
@@ -21,16 +23,14 @@ import {
   Select,
   Space,
   TableColumnType,
-  TableProps,
   Tag,
   Typography
 } from 'antd'
-import { useRef, useState } from 'react'
-import businessData from './business-data.json'
-import variables from '@/sass/common/_variables.module.scss'
-import './manage-business.scss'
 import { FilterDropdownProps } from 'antd/es/table/interface'
+import { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
+import businessData from './business-data.json'
+import './manage-business.scss'
 
 const { starColor } = variables
 
@@ -38,8 +38,6 @@ export interface IManageUserProps {}
 
 // For search
 type DataIndex = keyof IBusiness
-
-type ColumnsType<T extends object> = TableProps<T>['columns']
 
 const ManageBusiness = () => {
   const [userOption, setUserOption] = useState('1')
@@ -331,15 +329,6 @@ const ManageBusiness = () => {
               value={userOption}
               // defaultValue={options[0]}
               options={options}
-            />
-          </Col>
-          <Col span={12}>
-            <Input
-              // value={inputFilter}
-              // style={{ marginTop: 16 }}
-              className='filter-input'
-              // onChange={(e) => onChangeInput(e.target.value)}
-              placeholder='Filter by name'
             />
           </Col>
         </Col>

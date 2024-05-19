@@ -4,7 +4,7 @@ export interface IUserInformation {
   email?: string
   phone?: string
   address: string
-  roles: string[]
+  role: string
 }
 
 export interface RoleFiltered {
