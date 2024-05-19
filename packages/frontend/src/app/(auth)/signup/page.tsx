@@ -15,6 +15,30 @@ export default function SignUp() {
   const [selectedProvince, setSelectedProvince] = useState<string>('')
   const [selectedDistrict, setSelectedDistrict] = useState<string>('')
 
+  const [registerData, setRegisterData] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    country: 'Vietnam',
+    otp: ''
+  })
+
+  const [registerDataErrors, setRegisterDataErrors] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    city: '',
+    province: '',
+    country: '',
+    otp: ''
+  })
+
   const [isGetOTP, setIsGetOTP] = useState(true)
 
   const toastService = new ToastService()
@@ -126,7 +150,7 @@ export default function SignUp() {
         email: registerData.email
       })
     }
-  }
+  }, [isProvincesSuccess, provincesData])
 
   useEffect(() => {
     if (isOTPSuccess) {
