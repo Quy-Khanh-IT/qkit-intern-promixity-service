@@ -16,7 +16,6 @@ import { BusinessModule } from './modules/business/business.module';
 import { join } from 'path';
 import { TokenModule } from './modules/token/token.module';
 import { AxiosModule } from './modules/axios/axios.module';
-import { ExtractClientIpMiddleware } from 'src/cores/middlewares/extract-client-ip.middleware';
 import { ServiceModule } from './modules/service/service.module';
 import { CategoryModule } from './modules/category/category.module';
 import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';

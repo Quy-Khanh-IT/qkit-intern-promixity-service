@@ -22,6 +22,11 @@ export class UpdateAddressDto {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ example: '612/A Lý Tự Trọng' })
+  addressLineFull: string;
+
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({ example: 'Hồ Chí Minh' })
   province: string;
 

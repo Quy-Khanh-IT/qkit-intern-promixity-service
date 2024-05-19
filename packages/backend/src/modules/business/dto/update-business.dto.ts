@@ -58,7 +58,7 @@ export class UpdateBusinessDto {
   @ApiProperty({
     example: [
       { day: 'thursday', openTime: '08:00', closeTime: '12:00' },
-      { day: 'friday', openTime: '10 :00', closeTime: '12:00' },
+      { day: 'friday', openTime: '10:00', closeTime: '12:00' },
     ],
   })
   dayOfWeek?: DayOpenCloseTime[];

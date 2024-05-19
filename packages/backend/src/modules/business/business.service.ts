@@ -1,5 +1,5 @@
 import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CreateBusinessDto } from './dto/create-business.dto';
+import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
@@ -19,13 +19,14 @@ import {
   GetBusinessesByStatusEnum,
   StatusActionsEnum,
   AvailableActions,
+  OrderNumberDay,
 } from 'src/common/enums';
 import { ConfigService } from '@nestjs/config';
 import { ExtendedActionResponse } from './types/availableActionResponse.type';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { Types } from 'mongoose';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
-import { ValidateAddress } from './dto/validate-address.dto';
+import { ValidateAddressDto } from './dto/validate-address.dto';
 
 @Injectable()
 export class BusinessService {
@@ -90,13 +91,15 @@ export class BusinessService {
     userId: string,
   ): Promise<Business> {
     // Validate open time and close time
-    const { dayOfWeek } = createBusinessDto;
+    let { dayOfWeek } = createBusinessDto;
+
     for (const day of dayOfWeek) {
       const startHH = parseInt(day.openTime.split(':')[0]);
       const startMM = parseInt(day.openTime.split(':')[1]);
       const endHH = parseInt(day.closeTime.split(':')[0]);
       const endMM = parseInt(day.closeTime.split(':')[1]);
 
+      // Validate open time and close time must be between 0 and 23
       if (startHH < 0 || startHH > 23 || endHH < 0 || endHH > 23) {
         throw new HttpException(
           {
@@ -106,6 +109,8 @@ export class BusinessService {
           ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
         );
       }
+
+      // Validate open time and close time must be between 0 and 59
       if (startMM < 0 || startMM > 59 || endMM < 0 || endMM > 59) {
         throw new HttpException(
           {
@@ -115,6 +120,7 @@ export class BusinessService {
           ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
         );
       }
+
       // opening 24H
       if (
         startHH === endHH &&
@@ -124,6 +130,7 @@ export class BusinessService {
       ) {
         continue;
       }
+
       if (startHH > endHH || (startHH === endHH && startMM >= endMM)) {
         throw new HttpException(
           {
@@ -147,9 +154,29 @@ export class BusinessService {
         .join(':');
     });
 
+    // Assign order number for each day
+    dayOfWeek = dayOfWeek.map((day) => {
+      return {
+        ...day,
+        order: OrderNumberDay[day.day],
+      };
+    }) as DayOpenCloseTime[];
+
+    // Sort day of week by order number
+    dayOfWeek = dayOfWeek.sort(
+      (a, b) => a.order - b.order,
+    ) as DayOpenCloseTime[];
+
+    // Assign day of week to createBusinessDto
+    createBusinessDto = {
+      ...createBusinessDto,
+      dayOfWeek,
+    };
+
     const { country, province, district, addressLine, latitude, longitude } =
       createBusinessDto;
 
+    // Validate address
     const isValid = await this.validateAddress({
       country,
       province,
@@ -169,6 +196,8 @@ export class BusinessService {
       );
     }
 
+    // Start transaction assign business to user in userSchema if create business success
+    // If create business fail, rollback transaction
     const transactionSession = await this.connection.startSession();
 
     try {
@@ -182,12 +211,21 @@ export class BusinessService {
 
       await transactionSession.commitTransaction();
 
+      transactionSession.endSession();
+
       return business;
     } catch (err) {
       await transactionSession.abortTransaction();
-      throw err;
-    } finally {
+
       transactionSession.endSession();
+
+      throw new HttpException(
+        {
+          message: ERRORS_DICTIONARY.INVALID_INPUT,
+          detail: 'Create business fail. Please try again later',
+        },
+        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
+      );
     }
   }
 
@@ -450,41 +488,79 @@ export class BusinessService {
     return false;
   }
 
-  async validateAddress(validateAddress: ValidateAddress): Promise<Boolean> {
-    const structureData = await this.nominatimOsmService.structure({
-      country: validateAddress.country,
-      province: validateAddress.province,
-      district: validateAddress.district,
-      addressLine: validateAddress.addressLine,
+  async validateAddress(
+    validateAddressDto: ValidateAddressDto,
+  ): Promise<Boolean> {
+    const reverseData = await this.nominatimOsmService.reverse({
+      latitude: validateAddressDto.latitude,
+      longitude: validateAddressDto.longitude,
     });
 
-    if (structureData.length === 0) {
+    if (
+      !(
+        (reverseData?.address?.country && validateAddressDto.country) ===
+        reverseData?.address?.country
+      ) &&
+      !(
+        (reverseData?.address?.city && validateAddressDto.province) ===
+        reverseData?.address?.city
+      ) &&
+      !(
+        (reverseData?.address?.suburb && validateAddressDto.district) ===
+        reverseData?.address?.suburb
+      )
+    ) {
       return false;
     }
 
-    const reverseData = await this.nominatimOsmService.reverse({
-      latitude: validateAddress.latitude,
-      longitude: validateAddress.longitude,
+    // Check if address line is valid
+    // create mark array which mark all character in road to true
+    // then check if all character in address line is in mark array
+    const counts = {} as Object;
+
+    let splitReverseRoad = (reverseData?.address?.road as string).split(' ');
+
+    if (splitReverseRoad.includes('Đường')) {
+      splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
+    }
+
+    let reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
+      return acc.concat(item);
+    }, '');
+
+    splitReverseRoad = reverseRoadStr.split('');
+
+    splitReverseRoad.forEach((element) => {
+      counts[element] = 0;
     });
 
-    let i = 1;
+    let slitAddressLine = validateAddressDto.addressLine.split(' ');
 
-    for (const item of structureData) {
-      console.log('i', i++);
-      if (
-        item?.address?.country === reverseData?.address?.country &&
-        // item?.address?.state === reverseData?.address?.state &&
-        item?.address?.city === reverseData?.address?.city &&
-        item?.address?.suburb === reverseData?.address?.suburb &&
-        item?.address?.road === reverseData?.address?.road
-      ) {
-        console.log('item', item);
+    if (slitAddressLine.includes('Đường')) {
+      slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
+    }
 
-        return true;
+    let AddressLineStr = slitAddressLine.reduce((acc, item) => {
+      return acc.concat(item);
+    }, '');
+
+    slitAddressLine = AddressLineStr.split('');
+
+    for (const char of slitAddressLine) {
+      if (!counts.hasOwnProperty(char)) {
+        return false;
+      } else {
+        counts[char] += 1;
       }
     }
 
-    return false;
+    for (const key in counts) {
+      if (counts[key] === 0 || counts[key] > 1) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 
@@ -546,3 +622,118 @@ export class BusinessService {
 //   country: 'Việt Nam',
 //   country_code: 'vn'
 // },
+
+[
+  {
+    place_id: 254086363,
+    licence:
+      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+    osm_type: 'way',
+    osm_id: 55451561,
+    lat: '10.8110139',
+    lon: '106.7091645',
+    category: 'highway',
+    type: 'primary',
+    place_rank: 26,
+    importance: 0.0533433333333333,
+    addresstype: 'road',
+    name: 'Đinh Bộ Lĩnh',
+    display_name:
+      'Đinh Bộ Lĩnh, Phường 26, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72309, Việt Nam',
+    address: {
+      road: 'Đinh Bộ Lĩnh',
+      quarter: 'Phường 26',
+      suburb: 'Quận Bình Thạnh',
+      city: 'Thành phố Hồ Chí Minh',
+      'ISO3166-2-lvl4': 'VN-SG',
+      postcode: '72309',
+      country: 'Việt Nam',
+      country_code: 'vn',
+    },
+    boundingbox: ['10.8092144', '10.8133163', '106.7091403', '106.7095349'],
+  },
+  {
+    place_id: 253295410,
+    licence:
+      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+    osm_type: 'way',
+    osm_id: 977523912,
+    lat: '10.8166219',
+    lon: '106.711287',
+    category: 'highway',
+    type: 'primary',
+    place_rank: 26,
+    importance: 0.0533433333333333,
+    addresstype: 'road',
+    name: 'Đường Đinh Bộ Lĩnh',
+    display_name:
+      'Đường Đinh Bộ Lĩnh, Phường 26, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72309, Việt Nam',
+    address: {
+      road: 'Đường Đinh Bộ Lĩnh',
+      quarter: 'Phường 26',
+      suburb: 'Quận Bình Thạnh',
+      city: 'Thành phố Hồ Chí Minh',
+      'ISO3166-2-lvl4': 'VN-SG',
+      postcode: '72309',
+      country: 'Việt Nam',
+      country_code: 'vn',
+    },
+    boundingbox: ['10.8161120', '10.8171528', '106.7109048', '106.7119466'],
+  },
+  {
+    place_id: 253281506,
+    licence:
+      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+    osm_type: 'way',
+    osm_id: 192512367,
+    lat: '10.8044597',
+    lon: '106.7094595',
+    category: 'highway',
+    type: 'primary',
+    place_rank: 26,
+    importance: 0.0533433333333333,
+    addresstype: 'road',
+    name: 'Đường Đinh Bộ Lĩnh',
+    display_name:
+      'Đường Đinh Bộ Lĩnh, Phường 24, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72508, Việt Nam',
+    address: {
+      road: 'Đường Đinh Bộ Lĩnh',
+      quarter: 'Phường 24',
+      suburb: 'Quận Bình Thạnh',
+      city: 'Thành phố Hồ Chí Minh',
+      'ISO3166-2-lvl4': 'VN-SG',
+      postcode: '72508',
+      country: 'Việt Nam',
+      country_code: 'vn',
+    },
+    boundingbox: ['10.8031202', '10.8059090', '106.7093858', '106.7095085'],
+  },
+  {
+    place_id: 253649538,
+    licence:
+      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+    osm_type: 'way',
+    osm_id: 1105792206,
+    lat: '10.8012953',
+    lon: '106.7092837',
+    category: 'highway',
+    type: 'primary',
+    place_rank: 26,
+    importance: 0.0533433333333333,
+    addresstype: 'road',
+    name: 'Đường Đinh Bộ Lĩnh',
+    display_name:
+      'Đường Đinh Bộ Lĩnh, Phường 15, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72508, Việt Nam',
+    address: {
+      road: 'Đường Đinh Bộ Lĩnh',
+      quarter: 'Phường 15',
+      suburb: 'Quận Bình Thạnh',
+      city: 'Thành phố Hồ Chí Minh',
+      'ISO3166-2-lvl4': 'VN-SG',
+      postcode: '72508',
+      country: 'Việt Nam',
+      country_code: 'vn',
+    },
+    boundingbox: ['10.8012953', '10.8014646', '106.7092837', '106.7092926'],
+  },
+];

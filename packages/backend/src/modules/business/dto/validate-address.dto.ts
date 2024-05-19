@@ -15,7 +15,7 @@ import { Type } from 'class-transformer';
 import { DayOpenCloseTimeSchema } from '../entities/dayOpenCloseTime.entity';
 import { UpdateAddressDto } from './update-address.dto';
 
-export class ValidateAddress extends PartialType(UpdateAddressDto) {
+export class ValidateAddressDto extends PartialType(UpdateAddressDto) {
   @IsString()
   @IsNotEmpty()
   country: string;

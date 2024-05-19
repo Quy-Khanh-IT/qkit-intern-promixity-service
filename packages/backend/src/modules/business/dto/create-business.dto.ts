@@ -12,6 +12,7 @@ import {
   ValidateNested,
   IsEnum,
   Matches,
+  isArray,
 } from 'class-validator';
 import { BusinessConstant } from 'src/common/constants/business.constant';
 import { DayEnum } from 'src/common/enums';
@@ -34,6 +35,13 @@ export class DayOpenCloseTime {
   })
   @ApiProperty({ example: '12:00' })
   closeTime: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(7)
+  @ApiProperty({ example: 1 })
+  order: number;
 }
 
 export class CreateBusinessDto {
@@ -49,6 +57,11 @@ export class CreateBusinessDto {
   @IsString()
   @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
   category: string;
+
+  @IsOptional()
+  @IsArray()
+  @ApiProperty({ example: ['66446c971b53183d5e868de4'] })
+  services: string[];
 
   @IsOptional()
   @IsPhoneNumber('VN')
@@ -87,6 +100,11 @@ export class CreateBusinessDto {
   @IsNotEmpty()
   @ApiProperty({ example: 'Lý Tự Trọng' })
   addressLine: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '612/A Lý Tự Trọng' })
+  addressLineFull: string;
 
   @IsNotEmpty()
   @IsNumber()

@@ -69,6 +69,9 @@ export class Business extends BaseEntity {
   @Prop({ trim: true })
   addressLine: string;
 
+  @Prop({ trim: true })
+  addressLineFull: string;
+
   @Prop({ required: true })
   province: string;
 

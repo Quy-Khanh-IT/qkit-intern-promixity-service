@@ -6,7 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     HttpModule.register({
-      timeout: 20000,
+      timeout: 7000,
     }),
   ],
   controllers: [AxiosController],

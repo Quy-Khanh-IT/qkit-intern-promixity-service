@@ -1,5 +1,6 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import { DayEnum } from 'src/common/enums';
+import { OrderNumberDay } from 'src/common/enums';
 
 @Schema({
   _id: false,
@@ -13,4 +14,7 @@ export class DayOpenCloseTimeSchema {
 
   @Prop({ required: true, trim: true })
   closeTime: string;
+
+  @Prop({ required: true, enum: OrderNumberDay })
+  order: number;
 }

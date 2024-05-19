@@ -5,7 +5,7 @@ import { UserConstant } from 'src/common/constants';
 export class ChangePasswordDto {
   @IsNotEmpty()
   @ApiProperty({ example: 'oldPassword123@' })
-  @Matches(UserConstant.regrexPassword, {
+  @Matches(UserConstant.regexPassword, {
     message:
       'oldPassword must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })
@@ -13,7 +13,7 @@ export class ChangePasswordDto {
 
   @IsNotEmpty()
   @ApiProperty({ example: 'newPassword123@' })
-  @Matches(UserConstant.regrexPassword, {
+  @Matches(UserConstant.regexPassword, {
     message:
       'newPassword must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })
@@ -21,7 +21,7 @@ export class ChangePasswordDto {
 
   @IsNotEmpty()
   @ApiProperty({ example: 'newPassword123@' })
-  @Matches(UserConstant.regrexPassword, {
+  @Matches(UserConstant.regexPassword, {
     message:
       'confirmPassword must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })
