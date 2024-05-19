@@ -21,6 +21,26 @@ export class ConfirmPassNotMatchException extends BaseException {
   }
 }
 
+export class UserNotAcceptRoleException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_NOT_ACCEPTED_ROLE,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_ACCEPTED_ROLE],
+      403,
+    );
+  }
+}
+
+export class UserConflictAdminException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_CONFLICT_ADMIN,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_CONFLICT_ADMIN],
+      409,
+    );
+  }
+}
+
 export class UserNotFoundException extends BaseException {
   constructor() {
     super(

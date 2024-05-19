@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MailModule } from '../mail/mail.module';
 import { RequestModule } from '../request/request.module';
 import { UploadFileModule } from '../upload-file/upload-file.module';
+import { AdminController } from './admin.controller';
 import { User, UserSchema } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 import { UserController } from './user.controller';
@@ -24,7 +25,7 @@ import { UserService } from './user.service';
     ConfigModule,
     MailModule,
   ],
-  controllers: [UserController],
+  controllers: [UserController, AdminController],
   providers: [UserService, UserRepository],
   exports: [UserService],
 })

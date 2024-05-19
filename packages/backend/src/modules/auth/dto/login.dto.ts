@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { EmailRegrex } from 'src/common/utils';
 
 export class LoginDto {
-  @IsEmail()
+  @Matches(EmailRegrex, { message: 'email must follow with RFC 5322 standard' })
   @IsNotEmpty()
   @ApiProperty({ description: 'Email', example: 'example123@gmail.com' })
   email: string;

@@ -1,5 +1,5 @@
 import * as dayjs from 'dayjs';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
@@ -13,6 +13,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   }
 
   async restore(id: string): Promise<T> {
+    this.model.aggregate();
     const result = await this.model.findOneAndUpdate(
       {
         _id: transStringToObjectId(id),
@@ -58,6 +59,10 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   async create(dto: T | any): Promise<T> {
     const created_data = await this.model.create(dto);
     return created_data.toObject() as T;
+  }
+
+  async aggregate(pipeline: PipelineStage[]): Promise<any[]> {
+    return await this.model.aggregate(pipeline).exec();
   }
 
   async findOneById(id: string): Promise<T> {

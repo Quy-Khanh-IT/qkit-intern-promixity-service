@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Matches } from 'class-validator';
+import { EmailRegrex } from 'src/common/utils';
 
 export class RequesUpdateEmail {
   @IsNotEmpty()
@@ -9,7 +10,7 @@ export class RequesUpdateEmail {
   })
   password: string;
 
-  @IsEmail()
+  @Matches(EmailRegrex, { message: 'email must follow with RFC 5322 standard' })
   @IsNotEmpty()
   @ApiProperty({
     description: 'Email',

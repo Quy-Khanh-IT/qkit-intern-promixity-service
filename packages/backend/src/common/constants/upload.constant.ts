@@ -1,4 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import { FileTypeException } from '../exceptions/file.exception';
 export class UploadFileConstraint {
   static LIMIT_FILE_SIZE = 400 * 1024;
   static QUALITY_COMPRESSED_IMAGE = 50;
@@ -9,16 +10,15 @@ export class UploadFileConstraint {
     'image/png',
     'image/jpg',
   ];
-  static MULTER_OPTION = {
+  static MULTER_OPTION: MulterOptions = {
     limits: {
       fileSize: this.MAX_UPLOAD_FILE_SIZE,
     },
     fileFilter: (req, file, callback) => {
-      if (this.ACCEPTED_FILE_MIMETYPE.includes(file.mimetype)) {
-        callback(null, true);
-      } else {
-        callback(new BadRequestException('Only '), false);
+      if (!this.ACCEPTED_FILE_MIMETYPE.includes(file.mimetype)) {
+        callback(new FileTypeException(), false);
       }
+      callback(null, true);
     },
   };
 }

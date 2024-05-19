@@ -1,17 +1,7 @@
-import {
-  IsNotEmpty,
-  IsString,
-  Length,
-  IsEmail,
-  IsArray,
-  IsOptional,
-  IsStrongPassword,
-  Matches,
-  IsEnum,
-  IsPhoneNumber,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import { UserConstant } from 'src/common/constants/user.constant';
 import { UserRole } from 'src/common/enums';
+import { EmailRegrex } from 'src/common/utils';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -25,7 +15,7 @@ export class CreateUserDto {
   lastName: string;
 
   @IsNotEmpty()
-  @IsEmail()
+  @Matches(EmailRegrex, { message: 'email must follow with RFC 5322 standard' })
   email: string;
 
   @IsNotEmpty()

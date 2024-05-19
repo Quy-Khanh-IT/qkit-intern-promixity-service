@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Param,
   Patch,
@@ -19,13 +20,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NoContentResponseDto } from './dto/change-password.response.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { RequesUpdateEmail } from './dto/request-update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
@@ -37,9 +38,11 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const result: User = await this.userService.create(createUserDto);
-    return result;
+  @Get(':userId')
+  @HttpCode(200)
+  async findUserById(@Param('userId') userId: string) {
+    const user = await this.userService.findOneById(userId);
+    return plainToClass(User, user);
   }
 
   @UseGuards(JwtAccessTokenGuard)
