@@ -8,14 +8,39 @@ import { ToastService } from '@/services/toast.service'
 import { useRegisterUserMutation } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 
-export default function SignUp() {
-  const [provinces, setProvinces] = useState([])
-  const [districts, setDistricts] = useState([])
+interface RegisterData {
+  email: string
+  password: string
+  rePassword?: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
+  city: string
+  province: string
+  country: string
+  otp: string
+}
 
+interface RegisterDataErrors {
+  email?: string
+  password?: string
+  rePassword?: string
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  city?: string
+  province?: string
+  country?: string
+  otp?: string
+}
+
+export default function SignUp() {
+  const [provinces, setProvinces] = useState<any[]>([])
+  const [districts, setDistricts] = useState<any[]>([])
   const [selectedProvince, setSelectedProvince] = useState<string>('')
   const [selectedDistrict, setSelectedDistrict] = useState<string>('')
 
-  const [registerData, setRegisterData] = useState({
+  const [registerData, setRegisterData] = useState<RegisterData>({
     email: '',
     password: '',
     firstName: '',
@@ -27,48 +52,10 @@ export default function SignUp() {
     otp: ''
   })
 
-  const [registerDataErrors, setRegisterDataErrors] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    city: '',
-    province: '',
-    country: '',
-    otp: ''
-  })
+  const [registerDataErrors, setRegisterDataErrors] = useState<RegisterDataErrors>({})
 
   const [isGetOTP, setIsGetOTP] = useState(true)
-
   const toastService = new ToastService()
-
-  const [registerData, setRegisterData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    city: '',
-    province: '',
-    country: 'Vietnam',
-    otp: '',
-    rePassword: ''
-  })
-
-  const [registerDataErrors, setRegisterDataErrors] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    city: '',
-    province: '',
-    country: '',
-    otp: '',
-    rePassword: ''
-  })
-
   const router = useRouter()
 
   const [registrationOTP, { isSuccess: isOTPSuccess, isError: isOTPError, error: otpError }] =
@@ -79,13 +66,15 @@ export default function SignUp() {
 
   const { data: provincesData, isSuccess: isProvincesSuccess } = useGetProvincesQuery({})
   const { data: districtData, isSuccess: isDistrictsSuccess } = useGetDistrictByProvinceCodeQuery(selectedProvince)
+
   useEffect(() => {
-    if (isProvincesSuccess) {
+    if (isProvincesSuccess && provincesData) {
       setProvinces(provincesData.items)
     }
   }, [isProvincesSuccess, provincesData])
+
   useEffect(() => {
-    if (isDistrictsSuccess) {
+    if (isDistrictsSuccess && districtData) {
       setDistricts(districtData.items)
     }
   }, [isDistrictsSuccess, districtData])
@@ -121,13 +110,15 @@ export default function SignUp() {
 
   const SignUp = async () => {
     if (registerData.password !== registerData.rePassword) {
-      toast.error('Password and re-password not match')
+      toast.error('Password and re-password do not match')
       setRegisterDataErrors((prevData) => ({
         ...prevData,
-        rePassword: 'Password and re-password not match',
-        password: 'Password and re-password not match'
+        rePassword: 'Password and re-password do not match',
+        password: 'Password and re-password do not match'
       }))
-    } else {
+      return
+    }
+    try {
       await registerUser({
         email: registerData.email,
         password: registerData.password,
@@ -139,18 +130,24 @@ export default function SignUp() {
         country: registerData.country,
         otp: registerData.otp
       })
+    } catch (error) {
+      handleError(error)
     }
   }
 
   const GetOTP = async () => {
     if (!registerData.email) {
       toast.error('Please input email')
-    } else {
+      return
+    }
+    try {
       await registrationOTP({
         email: registerData.email
       })
+    } catch (error) {
+      handleError(error)
     }
-  }, [isProvincesSuccess, provincesData])
+  }
 
   useEffect(() => {
     if (isOTPSuccess) {
@@ -189,29 +186,23 @@ export default function SignUp() {
     const newErrors: any = { ...registerDataErrors }
 
     inputTypes.forEach((type) => {
-      newErrors[type] = error?.data?.errors[type]?.[0]
+      if (error?.data?.errors[type]?.[0]) {
+        newErrors[type] = error.data.errors[type][0]
+      }
     })
 
     setRegisterDataErrors(newErrors)
   }
 
-  const onChangeRegisterData = (value: string, type: string) => {
+  const onChangeRegisterData = (value: string, type: keyof RegisterData) => {
     setRegisterData({
       ...registerData,
       [type]: value
     })
 
     setRegisterDataErrors({
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      city: '',
-      province: '',
-      country: '',
-      otp: '',
-      rePassword: ''
+      ...registerDataErrors,
+      [type]: ''
     })
   }
 
@@ -234,12 +225,10 @@ export default function SignUp() {
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>Email address</label>
-                          {registerDataErrors.email ? (
+                          {registerDataErrors.email && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.email}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
                             value={registerData.email}
@@ -259,14 +248,11 @@ export default function SignUp() {
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>OTP</label>
-                          {registerDataErrors.otp ? (
+                          {registerDataErrors.otp && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.otp}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
-
                           <input
                             value={registerData.otp}
                             type='text'
@@ -275,15 +261,12 @@ export default function SignUp() {
                             placeholder='Input OTP code with 6 digits'
                           ></input>
                         </div>
-
                         <div className='mb-3'>
                           <label className='form-label'>Password</label>
-                          {registerDataErrors.password ? (
+                          {registerDataErrors.password && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.password}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
                             value={registerData.password}
@@ -295,15 +278,13 @@ export default function SignUp() {
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Re-Password</label>
-                          {registerDataErrors.rePassword ? (
+                          {registerDataErrors.rePassword && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.rePassword}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
-                            value={registerData.rePassword}
+                            value={registerData.rePassword || ''}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'rePassword')}
                             type='password'
                             className={`form-control ${registerDataErrors.rePassword ? 'error-input' : ''}`}
@@ -312,12 +293,10 @@ export default function SignUp() {
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Phone Number</label>
-                          {registerDataErrors.phoneNumber ? (
+                          {registerDataErrors.phoneNumber && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.phoneNumber}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
                             type='text'
@@ -333,12 +312,10 @@ export default function SignUp() {
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>First name</label>
-                          {registerDataErrors.firstName ? (
+                          {registerDataErrors.firstName && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.firstName}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
                             type='text'
@@ -350,12 +327,10 @@ export default function SignUp() {
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Last name</label>
-                          {registerDataErrors.lastName ? (
+                          {registerDataErrors.lastName && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.lastName}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <input
                             type='text'
@@ -365,56 +340,44 @@ export default function SignUp() {
                             onChange={(e) => onChangeRegisterData(e.target.value, 'lastName')}
                           />
                         </div>
-
-                        <div className='mb-3 '>
-                          <div className='mb-3'>
-                            <label className='form-label'>Province</label>
-                            {registerDataErrors.city ? (
-                              <div>
-                                <span className='error-message mb-2'> {registerDataErrors.city}</span>
-                              </div>
-                            ) : (
-                              ''
-                            )}
-                            <select
-                              value={selectedProvince}
-                              onChange={(e) => setSelectedProvince(e.target.value)}
-                              className={`form-control ${registerDataErrors.city ? 'error-input' : ''}`}
-                            >
-                              <option value={''}>--Choose Province--</option>
-                              {provinces && provinces.length > 0
-                                ? provinces.map((province: any) => (
-                                    <option key={province.id} value={province.code}>
-                                      {province.full_name}
-                                    </option>
-                                  ))
-                                : ''}
-                            </select>
-                          </div>
+                        <div className='mb-3'>
+                          <label className='form-label'>Province</label>
+                          {registerDataErrors.city && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.city}</span>
+                            </div>
+                          )}
+                          <select
+                            value={selectedProvince}
+                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            className={`form-control ${registerDataErrors.city ? 'error-input' : ''}`}
+                          >
+                            <option value=''>--Choose Province--</option>
+                            {provinces.map((province: any) => (
+                              <option key={province.id} value={province.code}>
+                                {province.full_name}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-
                         <div className='mb-3'>
                           <label className='form-label'>District</label>
-                          {registerDataErrors.province ? (
+                          {registerDataErrors.province && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.province}</span>
                             </div>
-                          ) : (
-                            ''
                           )}
                           <select
                             value={selectedDistrict}
                             onChange={(e) => setSelectedDistrict(e.target.value)}
                             className={`form-control ${registerDataErrors.province ? 'error-input' : ''}`}
                           >
-                            <option value={''}>--Choose District--</option>
-                            {districts && districts.length > 0
-                              ? districts.map((district: any) => (
-                                  <option key={district.id} value={district.code}>
-                                    {district.full_name}
-                                  </option>
-                                ))
-                              : ''}
+                            <option value=''>--Choose District--</option>
+                            {districts.map((district: any) => (
+                              <option key={district.id} value={district.code}>
+                                {district.full_name}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       </div>
@@ -424,7 +387,7 @@ export default function SignUp() {
               </div>
             </div>
             <div
-              className='d-flex  align-items-center justify-content-center'
+              className='d-flex align-items-center justify-content-center'
               style={{ padding: '0 72x', flexDirection: 'column' }}
             >
               {isGetOTP ? (
@@ -436,9 +399,7 @@ export default function SignUp() {
                   Sign Up
                 </button>
               )}
-
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                {' '}
                 Already have an account?{' '}
                 <strong style={{ cursor: 'pointer' }}>
                   <Link
