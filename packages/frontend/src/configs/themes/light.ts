@@ -27,7 +27,10 @@ export const themConfig: ThemeConfig = {
     },
     Table: {
       headerBg: subColor,
-      rowHoverBg: grayRowHover
+      rowHoverBg: grayRowHover,
+      headerSortActiveBg: subColor,
+      headerSortHoverBg: subColor,
+      bodySortBg: subColor2
     }
   }
   // components: {

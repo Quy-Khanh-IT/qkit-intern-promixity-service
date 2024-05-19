@@ -11,4 +11,10 @@
   .border-box{
     border: 1px solid $gray-border;
   }
+
+  .--manage-user-table{
+    tr > th:nth-last-child(2){
+      min-width: 180px !important;
+    }
+  }
 }

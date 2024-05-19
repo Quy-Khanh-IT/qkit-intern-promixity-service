@@ -3,7 +3,8 @@
     "key": "1",
     "firstName": "John",
     "lastName": "Brown",
-    "address": "Nhà hát Thành Phố Hồ Chí Minh",
+    "address": "Nhà hát Thành Phố Hồ Chí Minh, Quận 5, TPHCM",
+    "email": "abcjashfjlashdfasdhflskfdj@gmail.com",
     "roles": [
       "ADMIN",
       "USER",
@@ -14,7 +15,8 @@
     "key": "2",
     "firstName": "Jim",
     "lastName": "Green",
-    "address": "London No. 1 Lake Park",
+    "address": "Nhà hát Thành Phố Hồ Chí Minh",
+    "email": "bcd1@gmail.com",
     "roles": [
       "USER"
     ]
@@ -23,403 +25,464 @@
     "key": "3",
     "firstName": "Jane",
     "lastName": "Doe",
-    "address": "Los Angeles No. 1 Lake Park",
+    "address": "Some Address",
+    "email": "jane.doe@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "4",
-    "firstName": "Michael",
+    "firstName": "Alice",
     "lastName": "Smith",
-    "address": "Chicago No. 1 Lake Park",
+    "address": "Another Address",
+    "email": "alice.smith@example.com",
+    "roles": [
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "5",
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": "123 Main St",
+    "email": "john.doe@example.com",
     "roles": [
       "USER"
     ]
   },
   {
-    "key": "5",
-    "firstName": "Emily",
-    "lastName": "Johnson",
-    "address": "San Francisco No. 1 Lake Park",
+    "key": "6",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "address": "456 Elm St",
+    "email": "jane.smith@example.com",
     "roles": [
       "ADMIN",
       "USER"
     ]
   },
   {
-    "key": "6",
-    "firstName": "Daniel",
-    "lastName": "Williams",
-    "address": "Seattle No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
     "key": "7",
-    "firstName": "Olivia",
-    "lastName": "Jones",
-    "address": "Houston No. 1 Lake Park",
+    "firstName": "Mike",
+    "lastName": "Johnson",
+    "address": "789 Oak St",
+    "email": "mike.johnson@example.com",
     "roles": [
-      "USER"
+      "BUSINESS"
     ]
   },
   {
     "key": "8",
-    "firstName": "William",
-    "lastName": "Davis",
-    "address": "Miami No. 1 Lake Park",
+    "firstName": "Sarah",
+    "lastName": "Brown",
+    "address": "321 Pine St",
+    "email": "sarah.brown@example.com",
     "roles": [
-      "ADMIN"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "9",
-    "firstName": "Sophia",
-    "lastName": "Brown",
-    "address": "Denver No. 1 Lake Park",
+    "firstName": "David",
+    "lastName": "Wilson",
+    "address": "654 Maple St",
+    "email": "david.wilson@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "10",
-    "firstName": "Alexander",
-    "lastName": "Miller",
-    "address": "Boston No. 1 Lake Park",
+    "firstName": "Emily",
+    "lastName": "Taylor",
+    "address": "987 Cedar St",
+    "email": "emily.taylor@example.com",
     "roles": [
       "ADMIN",
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "11",
-    "firstName": "Emma",
-    "lastName": "Wilson",
-    "address": "Paris No. 1 Lake Park",
+    "firstName": "Michael",
+    "lastName": "Anderson",
+    "address": "135 Walnut St",
+    "email": "michael.anderson@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "12",
-    "firstName": "Liam",
-    "lastName": "Johnson",
-    "address": "Sydney No. 1 Lake Park",
+    "firstName": "Olivia",
+    "lastName": "Thomas",
+    "address": "246 Birch St",
+    "email": "olivia.thomas@example.com",
     "roles": [
-      "ADMIN",
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "13",
-    "firstName": "Ava",
-    "lastName": "Smith",
-    "address": "Tokyo No. 1 Lake Park",
+    "firstName": "Daniel",
+    "lastName": "Robinson",
+    "address": "357 Oak St",
+    "email": "daniel.robinson@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "14",
-    "firstName": "Noah",
-    "lastName": "Brown",
-    "address": "Berlin No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "15",
-    "firstName": "Isabella",
-    "lastName": "Davis",
-    "address": "Rome No. 1 Lake Park",
+    "firstName": "Sophia",
+    "lastName": "Hernandez",
+    "address": "468 Elm St",
+    "email": "sophia.hernandez@example.com",
     "roles": [
       "ADMIN",
       "USER"
     ]
   },
   {
-    "key": "16",
-    "firstName": "Mia",
-    "lastName": "Wilson",
-    "address": "Madrid No. 1 Lake Park",
+    "key": "15",
+    "firstName": "Matthew",
+    "lastName": "Lopez",
+    "address": "579 Pine St",
+    "email": "matthew.lopez@example.com",
     "roles": [
-      "USER"
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "16",
+    "firstName": "Ava",
+    "lastName": "Gonzalez",
+    "address": "690 Maple St",
+    "email": "ava.gonzalez@example.com",
+    "roles": [
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "17",
-    "firstName": "James",
-    "lastName": "Johnson",
-    "address": "Toronto No. 1 Lake Park",
+    "firstName": "William",
+    "lastName": "Perez",
+    "address": "791 Cedar St",
+    "email": "william.perez@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "18",
-    "firstName": "Benjamin",
-    "lastName": "Smith",
-    "address": "Moscow No. 1 Lake Park",
+    "firstName": "Isabella",
+    "lastName": "Sanchez",
+    "address": "902 Walnut St",
+    "email": "isabella.sanchez@example.com",
     "roles": [
-      "ADMIN"
+      "ADMIN",
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "19",
-    "firstName": "Charlotte",
-    "lastName": "Brown",
-    "address": "Mumbai No. 1 Lake Park",
+    "firstName": "James",
+    "lastName": "Ramirez",
+    "address": "013 Birch St",
+    "email": "james.ramirez@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "20",
-    "firstName": "Elijah",
-    "lastName": "Miller",
-    "address": "Cairo No. 1 Lake Park",
+    "firstName": "Mia",
+    "lastName": "Rivera",
+    "address": "124 Oak St",
+    "email": "mia.rivera@example.com",
     "roles": [
-      "ADMIN",
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "21",
-    "firstName": "Amelia",
-    "lastName": "Wilson",
-    "address": "Rio de Janeiro No. 1 Lake Park",
+    "firstName": "Benjamin",
+    "lastName": "Brooks",
+    "address": "235 Elm St",
+    "email": "benjamin.brooks@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "22",
-    "firstName": "Lucas",
-    "lastName": "Johnson",
-    "address": "Mexico City No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "23",
-    "firstName": "Harper",
-    "lastName": "Smith",
-    "address": "Buenos Aires No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "24",
-    "firstName": "Henry",
-    "lastName": "Davis",
-    "address": "São Paulo No. 1 Lake Park",
+    "firstName": "Charlotte",
+    "lastName": "Long",
+    "address": "346 Pine St",
+    "email": "charlotte.long@example.com",
     "roles": [
       "ADMIN",
       "USER"
     ]
   },
   {
+    "key": "23",
+    "firstName": "Alexander",
+    "lastName": "Foster",
+    "address": "457 Maple St",
+    "email": "alexander.foster@example.com",
+    "roles": [
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "24",
+    "firstName": "Harper",
+    "lastName": "Barnes",
+    "address": "568 Cedar St",
+    "email": "harper.barnes@example.com",
+    "roles": [
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
     "key": "25",
-    "firstName": "Evelyn",
-    "lastName": "Wilson",
-    "address": "Lima No. 1 Lake Park",
+    "firstName": "Ethan",
+    "lastName": "Ross",
+    "address": "679 Walnut St",
+    "email": "ethan.ross@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "26",
-    "firstName": "Michael",
-    "lastName": "Johnson",
-    "address": "Bogotá No. 1 Lake Park",
+    "firstName": "Amelia",
+    "lastName": "Ward",
+    "address": "790 Birch St",
+    "email": "amelia.ward@example.com",
     "roles": [
-      "USER"
+      "ADMIN",
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "27",
-    "firstName": "Sofia",
-    "lastName": "Smith",
-    "address": "Santiago No. 1 Lake Park",
-    "roles": [
-      "ADMIN"
-    ]
-  },
-  {
-    "key": "28",
-    "firstName": "Oliver",
-    "lastName": "Brown",
-    "address": "Caracas No. 1 Lake Park",
+    "firstName": "Daniel",
+    "lastName": "Cox",
+    "address": "901 Oak St",
+    "email": "daniel.cox@example.com",
     "roles": [
       "USER"
     ]
   },
   {
-    "key": "29",
-    "firstName": "Aria",
-    "lastName": "Miller",
-    "address": "Lisbon No. 1 Lake Park",
+    "key": "28",
+    "firstName": "Liam",
+    "lastName": "Hayes",
+    "address": "012 Elm St",
+    "email": "liam.hayes@example.com",
     "roles": [
-      "ADMIN",
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "29",
+    "firstName": "Sophia",
+    "lastName": "Bryant",
+    "address": "123 Pine St",
+    "email": "sophia.bryant@example.com",
+    "roles": [
       "USER"
     ]
   },
   {
     "key": "30",
-    "firstName": "Liam",
-    "lastName": "Wilson",
-    "address": "Dublin No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "31",
-    "firstName": "Mia",
-    "lastName": "Johnson",
-    "address": "Athens No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "32",
-    "firstName": "Noah",
-    "lastName": "Smith",
-    "address": "Vienna No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "33",
-    "firstName": "Isabella",
-    "lastName": "Davis",
-    "address": "Prague No. 1 Lake Park",
+    "firstName": "Oliver",
+    "lastName": "Russell",
+    "address": "234 Maple St",
+    "email": "oliver.russell@example.com",
     "roles": [
       "ADMIN",
       "USER"
     ]
   },
   {
-    "key": "34",
-    "firstName": "James",
-    "lastName": "Wilson",
-    "address": "Warsaw No. 1 Lake Park",
+    "key": "31",
+    "firstName": "Emma",
+    "lastName": "Griffin",
+    "address": "345 Cedar St",
+    "email": "emma.griffin@example.com",
+    "roles": [
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "32",
+    "firstName": "Lucas",
+    "lastName": "Diaz",
+    "address": "456 Walnut St",
+    "email": "lucas.diaz@example.com",
+    "roles": [
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "33",
+    "firstName": "Ava",
+    "lastName": "Hayes",
+    "address": "567 Birch St",
+    "email": "ava.hayes@example.com",
     "roles": [
       "USER"
     ]
   },
   {
+    "key": "34",
+    "firstName": "Noah",
+    "lastName": "Bryant",
+    "address": "678 Oak St",
+    "email": "noah.bryant@example.com",
+    "roles": [
+      "ADMIN",
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
     "key": "35",
-    "firstName": "Benjamin",
-    "lastName": "Johnson",
-    "address": "Stockholm No. 1 Lake Park",
+    "firstName": "Isabella",
+    "lastName": "Russell",
+    "address": "789 Elm St",
+    "email": "isabella.russell@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "36",
-    "firstName": "Charlotte",
-    "lastName": "Smith",
-    "address": "Oslo No. 1 Lake Park",
+    "firstName": "Liam",
+    "lastName": "Griffin",
+    "address": "890 Pine St",
+    "email": "liam.griffin@example.com",
     "roles": [
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "37",
-    "firstName": "Elijah",
-    "lastName": "Brown",
-    "address": "Helsinki No. 1 Lake Park",
+    "firstName": "Mia",
+    "lastName": "Diaz",
+    "address": "901 Maple St",
+    "email": "mia.diaz@example.com",
     "roles": [
-      "ADMIN"
+      "USER"
     ]
   },
   {
     "key": "38",
-    "firstName": "Amelia",
-    "lastName": "Miller",
-    "address": "Copenhagen No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "39",
-    "firstName": "Lucas",
-    "lastName": "Davis",
-    "address": "Dubai No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "40",
-    "firstName": "Harper",
-    "lastName": "Wilson",
-    "address": "Seoul No. 1 Lake Park",
-    "roles": [
-      "USER"
-    ]
-  },
-  {
-    "key": "41",
-    "firstName": "Henry",
-    "lastName": "Johnson",
-    "address": "Beijing No. 1 Lake Park",
+    "firstName": "Benjamin",
+    "lastName": "Hayes",
+    "address": "012 Oak St",
+    "email": "benjamin.hayes@example.com",
     "roles": [
       "ADMIN",
       "USER"
     ]
   },
   {
-    "key": "42",
-    "firstName": "Evelyn",
-    "lastName": "Smith",
-    "address": "Shanghai No. 1 Lake Park",
+    "key": "39",
+    "firstName": "Charlotte",
+    "lastName": "Bryant",
+    "address": "123 Elm St",
+    "email": "charlotte.bryant@example.com",
+    "roles": [
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "40",
+    "firstName": "Alexander",
+    "lastName": "Russell",
+    "address": "234 Pine St",
+    "email": "alexander.russell@example.com",
+    "roles": [
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
+    "key": "41",
+    "firstName": "Harper",
+    "lastName": "Griffin",
+    "address": "345 Maple St",
+    "email": "harper.griffin@example.com",
     "roles": [
       "USER"
     ]
   },
   {
+    "key": "42",
+    "firstName": "Ethan",
+    "lastName": "Diaz",
+    "address": "456 Oak St",
+    "email": "ethan.diaz@example.com",
+    "roles": [
+      "ADMIN",
+      "USER",
+      "BUSINESS"
+    ]
+  },
+  {
     "key": "43",
-    "firstName": "Michael",
-    "lastName": "Brown",
-    "address": "Hong Kong No. 1 Lake Park",
+    "firstName": "Amelia",
+    "lastName": "Hayes",
+    "address": "567 Elm St",
+    "email": "amelia.hayes@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "44",
-    "firstName": "Sofia",
-    "lastName": "Davis",
-    "address": "Singapore No. 1 Lake Park",
+    "firstName": "Daniel",
+    "lastName": "Bryant",
+    "address": "678 Pine St",
+    "email": "daniel.bryant@example.com",
     "roles": [
-      "ADMIN"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "45",
-    "firstName": "Oliver",
-    "lastName": "Miller",
-    "address": "Kuala Lumpur No. 1 Lake Park",
+    "firstName": "Olivia",
+    "lastName": "Russell",
+    "address": "789 Maple St",
+    "email": "olivia.russell@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "46",
-    "firstName": "Aria",
-    "lastName": "Wilson",
-    "address": "Bangkok No. 1 Lake Park",
+    "firstName": "William",
+    "lastName": "Griffin",
+    "address": "890 Oak St",
+    "email": "william.griffin@example.com",
     "roles": [
       "ADMIN",
       "USER"
@@ -427,39 +490,45 @@
   },
   {
     "key": "47",
-    "firstName": "Liam",
-    "lastName": "Johnson",
-    "address": "Manila No. 1 Lake Park",
+    "firstName": "Isabella",
+    "lastName": "Diaz",
+    "address": "901 Elm St",
+    "email": "isabella.diaz@example.com",
     "roles": [
-      "USER"
+      "BUSINESS"
     ]
   },
   {
     "key": "48",
-    "firstName": "Mia",
-    "lastName": "Smith",
-    "address": "Jakarta No. 1 Lake Park",
+    "firstName": "James",
+    "lastName": "Hayes",
+    "address": "012 Pine St",
+    "email": "james.hayes@example.com",
     "roles": [
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   },
   {
     "key": "49",
-    "firstName": "Noah",
-    "lastName": "Davis",
-    "address": "Delhi No. 1 Lake Park",
+    "firstName": "Mia",
+    "lastName": "Bryant",
+    "address": "123 Oak St",
+    "email": "mia.bryant@example.com",
     "roles": [
       "USER"
     ]
   },
   {
     "key": "50",
-    "firstName": "Isabella",
-    "lastName": "Brown",
-    "address": "Munich No. 1 Lake Park",
+    "firstName": "Benjamin",
+    "lastName": "Russell",
+    "address": "234 Elm St",
+    "email": "benjamin.russell@example.com",
     "roles": [
       "ADMIN",
-      "USER"
+      "USER",
+      "BUSINESS"
     ]
   }
 ]

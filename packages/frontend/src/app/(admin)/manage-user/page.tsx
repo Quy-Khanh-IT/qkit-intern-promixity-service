@@ -6,18 +6,7 @@ import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { IUserInformation } from '@/types/user'
 import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import {
-  Col,
-  DescriptionsProps,
-  Dropdown,
-  Flex,
-  Input,
-  MenuProps,
-  Row,
-  Select,
-  TableProps,
-  Tag
-} from 'antd'
+import { Col, DescriptionsProps, Dropdown, Flex, Input, MenuProps, Row, Select, Space, TableProps, Tag } from 'antd'
 import { useRef, useState } from 'react'
 import './manage-user.scss'
 import userData from './user-data.json'
@@ -45,8 +34,8 @@ const ManageUser = () => {
 
   const listColumns: ColumnsType<IUserInformation> = [
     {
-      width: 75,
       align: 'center',
+      width: 75,
       onCell: (user: IUserInformation) => {
         return {
           onClick: () => {
@@ -103,13 +92,19 @@ const ManageUser = () => {
       title: 'First name',
       dataIndex: 'firstName',
       key: 'firstName',
-      width: 200
+      width: 120
     },
     {
       title: 'Last name',
       dataIndex: 'lastName',
       key: 'lastName',
-      width: 200
+      width: 120
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 280
     },
     {
       title: 'Address',
@@ -122,16 +117,16 @@ const ManageUser = () => {
       key: 'roles',
       width: 250,
       render: (roles: string[]) => (
-        <Flex justify='center' wrap>
+        <Space style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
           {roles?.map((role, _index) => {
             const color = role == 'ADMIN' ? 'green' : 'geekblue'
             return (
-              <Tag color={color} key={role} style={{ margin: '6px 0px 0px 6px' }}>
+              <Tag color={color} key={role} className='me-0'>
                 {role}
               </Tag>
             )
           })}
-        </Flex>
+        </Space>
       )
     }
   ]

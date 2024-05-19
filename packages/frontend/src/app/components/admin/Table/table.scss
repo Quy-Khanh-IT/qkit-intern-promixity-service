@@ -8,6 +8,13 @@
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 
+  .ant-table-filter-trigger{
+    span{
+      font-size: 16px !important;
+      color: black !important;
+    }
+  }
+
   .ant-spin-nested-loading {
     margin-right: 1px;
     .ant-table-thead {

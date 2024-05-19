@@ -11,9 +11,57 @@
   color: white !important;
   background-color: $main-color !important;
   transition-duration: 0.4s;
+  border-radius: 6px !important;
   border: transparent solid 1px !important;
   padding: 6px 20px !important;
   height: unset !important;
+  width: unset !important;
+
+  &:hover,
+  &:active {
+    transition-duration: 0.4s;
+    opacity: 0.8;
+    border: transparent solid 1px !important;
+    color: #fff !important;
+  }
+
+  &:disabled {
+    background-color: #858689 !important;
+  }
+}
+
+.btn-primary-small {
+  color: white !important;
+  background-color: $main-color !important;
+  transition-duration: 0.4s;
+  border-radius: 6px !important;
+  border: transparent solid 1px !important;
+  padding: 6px 16px !important;
+  height: unset !important;
+  width: unset !important;
+
+  &:hover,
+  &:active {
+    transition-duration: 0.4s;
+    opacity: 0.8;
+    border: transparent solid 1px !important;
+    color: #fff !important;
+  }
+
+  &:disabled {
+    background-color: #858689 !important;
+  }
+}
+
+@mixin mixin-btn-primary-small{
+  color: white !important;
+  background-color: $main-color !important;
+  transition-duration: 0.4s;
+  border-radius: 6px !important;
+  border: transparent solid 1px !important;
+  padding: 6px 16px !important;
+  height: unset !important;
+  width: unset !important;
 
   &:hover,
   &:active {
@@ -116,10 +164,26 @@
 }
 
 .btn-cancel {
+  color: white !important;
   background-color: $gray !important;
   border-radius: 6px !important;
   padding: 6px 20px !important;
   height: unset !important;
+  width: unset !important;
+
+  &:hover {
+    transition-duration: 0.4s;
+    background-color: rgba($color: $gray, $alpha: 0.8) !important;
+  }
+}
+
+.btn-cancel-small {
+  color: white !important;
+  background-color: $gray !important;
+  border-radius: 6px !important;
+  padding: 6px 16px !important;
+  height: unset !important;
+  width: unset !important;
 
   &:hover {
     transition-duration: 0.4s;
@@ -132,12 +196,43 @@
   padding: 6px 20px !important;
   border: 1px solid $gray-border !important;
   height: unset !important;
+  width: unset !important;
 
-  // &:hover {
-  //   transition-duration: 0.4s;
-  //   border: 1px solid $main-color !important;
-  //   color: $main-color !important;
-  // }
+  &:hover {
+    transition-duration: 0.4s;
+    border: 1px solid $main-color !important;
+    color: $main-color !important;
+  }
+}
+
+.btn-negative-small {
+  border-radius: 6px !important;
+  padding: 6px 16px !important;
+  border: 1px solid $gray-border !important;
+  height: unset !important;
+  width: unset !important;
+  color: $dark !important;
+
+  &:hover {
+    transition-duration: 0.4s;
+    border: 1px solid $main-color !important;
+    color: $main-color !important;
+  }
+}
+
+@mixin mixin-btn-negative-small{
+  border-radius: 6px !important;
+  padding: 6px 16px !important;
+  border: 1px solid $gray-border !important;
+  height: unset !important;
+  width: unset !important;
+  color: $dark !important;
+
+  &:hover {
+    transition-duration: 0.4s;
+    border: 1px solid $main-color !important;
+    color: $main-color !important;
+  }
 }
 
 .text-link {

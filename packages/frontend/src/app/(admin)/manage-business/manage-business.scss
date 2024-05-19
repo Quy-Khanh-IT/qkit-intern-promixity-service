@@ -9,8 +9,8 @@
   }
 
   .manage-business-table {
-    tr > .ant-table-cell:nth-last-child(-n + 3) {
-      text-align: center !important;
+    tr > th:nth-last-child(4){
+      min-width: 180px !important;
     }
   }
 }
