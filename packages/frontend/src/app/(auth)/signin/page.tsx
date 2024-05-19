@@ -1,6 +1,8 @@
 'use client'
 import { useLoginUserMutation } from '@/services/auth.service'
+import { ToastService } from '@/services/toast.service'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 // import * as bootstrap from "bootstrap/dist/css/bootstrap.css";
 
@@ -8,32 +10,47 @@ export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const toastService = new ToastService()
+
   const [inputError, setInputError] = useState({
     email: '',
     password: ''
   })
-  const [loginUser, { data: loginData, isSuccess, isError, isLoading, error }] = useLoginUserMutation()
+
+  const [loginUser, { data: loginData, isSuccess: isLoginSuccess, isError: isLoginError, error: loginError }] =
+    useLoginUserMutation()
+
+  const router = useRouter()
   useEffect(() => {
-    if (isSuccess) {
-      console.log('Login successful', loginData)
+    if (isLoginSuccess) {
+      toastService.success('Login success')
     }
-    if (isError) {
-      console.log('Login error', error)
+    if (isLoginError) {
+      handleError(loginError)
+      toastService.showRestError(loginError)
     }
-  }, [isSuccess, isError])
+  }, [isLoginSuccess, isLoginError])
+
+  const handleError = (error: any) => {
+    if (error?.data?.errors) {
+      setInputError((prevInputError) => {
+        const newInputError: any = { ...prevInputError }
+        const inputTypes = ['email', 'password']
+        for (const inputType of inputTypes) {
+          if (error?.data?.errors[inputType]) {
+            newInputError[inputType] = error?.data?.errors[inputType][0]
+          }
+        }
+        return newInputError
+      })
+    }
+  }
 
   const SignIn = async () => {
-    if (!password && !email) {
-      setInputError({
-        email: !email ? 'Please input email' : '',
-        password: !password ? 'Please input email' : ''
-      })
-    } else {
-      await loginUser({
-        email,
-        password
-      })
-    }
+    await loginUser({
+      email,
+      password
+    })
   }
 
   const onChangeData = (value: string, type: string) => {
@@ -48,13 +65,21 @@ export default function SignIn() {
       password: ''
     })
   }
+
+  const handleKeyDown = (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      SignIn()
+    }
+  }
+
   return (
-    <div className='auth-container'>
+    <div className='auth-container' onKeyDown={handleKeyDown}>
       <div className='auth-wrapper'>
         <div className='content-wrapper'>
           <div className='content-left'>
             <div className='logo-wrapper'>
-              <img src='/logo.png' alt='logo' />
+              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper'>
               <h2>Welcome back</h2>
@@ -63,7 +88,7 @@ export default function SignIn() {
                 <div className='mb-3'>
                   <label className='form-label'>Email address</label>
                   <div>
-                    <span className='error-input'> {inputError.email}</span>
+                    <span className='error-message'> {inputError.email}</span>
                   </div>
                   <input
                     value={email}
@@ -76,7 +101,7 @@ export default function SignIn() {
                 <div className='mb-3'>
                   <label className='form-label'>Password</label>
                   <div>
-                    <span className='error-input'>{inputError.password}</span>
+                    <span className='error-message'>{inputError.password}</span>
                   </div>
                   <input
                     value={password}

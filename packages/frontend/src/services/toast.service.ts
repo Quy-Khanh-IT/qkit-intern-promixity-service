@@ -1,9 +1,21 @@
 import { toast } from 'react-toastify'
 
 export class ToastService {
-  private handleError(error: any) {}
+  private handleError(error: any): string {
+    const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
+    let errorMessage = error?.data?.message || 'Something wrong on server!'
 
-  showRestError(error: any) {}
+    const startsWithAny = prefixes.some((prefix) => errorMessage.startsWith(prefix))
+
+    if (startsWithAny) {
+      errorMessage = error?.data?.errors?.detail
+    }
+    return errorMessage
+  }
+
+  showRestError(error: any) {
+    toast.error(this.handleError(error))
+  }
 
   success(message: string) {
     toast.success(message)

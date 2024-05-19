@@ -6,8 +6,11 @@ export const addressApi = createApi({
   endpoints: (builder) => ({
     getProvinces: builder.query({
       query: () => '/provinces'
+    }),
+    getDistrictByProvinceCode: builder.query({
+      query: (provinceCode: string) => `/districts/${provinceCode}`
     })
   })
 })
 
-export const { useGetProvincesQuery } = addressApi
+export const { useGetProvincesQuery, useGetDistrictByProvinceCodeQuery } = addressApi
