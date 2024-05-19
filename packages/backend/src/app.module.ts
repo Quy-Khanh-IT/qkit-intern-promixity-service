@@ -11,6 +11,11 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
+import { AddressModule } from './modules/address/address.module';
+import { SeedService } from './seeds/seed.service';
+import { DistrictModule } from './modules/address/district.module';
+import { ProvinceModule } from './modules/address/province.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,9 +31,14 @@ import { UserModule } from './modules/user/user.module';
     OtpModule,
     AuthModule,
     RequestModule,
+    AddressModule,
+    DistrictModule,
+    ProvinceModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [
+    SeedService,
     AppService,
     {
       provide: APP_FILTER,
@@ -36,4 +46,13 @@ import { UserModule } from './modules/user/user.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly seedService: SeedService) {
+    this.seed();
+  }
+
+  async seed() {
+    await this.seedService.seedDistricts();
+    await this.seedService.seedProvinces();
+  }
+}
