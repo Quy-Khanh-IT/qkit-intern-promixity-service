@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Exclude } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
@@ -21,6 +22,7 @@ export class User extends BaseEntity {
   email: string;
 
   @Prop({ required: true, minlength: 8 })
+  @Exclude()
   password: string;
 
   @Prop({ required: true, minlength: 2, maxlength: 50 })
@@ -30,7 +32,8 @@ export class User extends BaseEntity {
   lastName: string;
 
   @Prop([String])
-  roles: string[];
+  @Exclude()
+  roles: string[]; //Partial index
 
   @Prop()
   image: string;
@@ -46,6 +49,7 @@ export class User extends BaseEntity {
   address: Object;
 
   @Prop([Types.ObjectId])
+  @Exclude()
   businesses: Types.ObjectId[];
 }
 

@@ -25,7 +25,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (status == 400) {
       if (exception.response.message instanceof Array) {
-        console.log('Validation Exception');
         exception.response = exception.response.message.reduce((acc, curr) => {
           const [field, ...errorMessages] = curr.split(' ');
           acc[field] = (acc[field] || []).concat(errorMessages.join(' '));

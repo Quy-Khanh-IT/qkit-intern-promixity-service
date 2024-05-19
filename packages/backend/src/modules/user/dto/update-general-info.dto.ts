@@ -1,21 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsOptional, IsPhoneNumber, IsString, Length } from 'class-validator';
 
 export class UpdateGeneralInfoDto {
-  @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @Length(2, 50)
   @ApiProperty({ example: 'John' })
   firstName: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @Length(2, 50)
   @ApiProperty({ example: 'Doe' })
   lastName: string;
@@ -27,19 +21,4 @@ export class UpdateGeneralInfoDto {
   })
   @IsPhoneNumber('VN')
   phoneNumber: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ example: 'Ho Chi Minh' })
-  city: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ example: 'District 1' })
-  province: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ example: 'Vietnam' })
-  country: string;
 }
