@@ -94,8 +94,7 @@ $header-height: 48px;
 
           .form {
             margin-top: 48px;
-            .form-label {
-            }
+
             .otp-wrapper {
               display: flex;
               align-items: center;
@@ -116,7 +115,7 @@ $header-height: 48px;
             .form-control {
               display: flex;
               justify-content: space-between;
-              color: black;
+              color: black !important;
               margin-bottom: 20px;
               border-radius: 20px;
               border: none;
@@ -130,7 +129,7 @@ $header-height: 48px;
               }
 
               &:focus {
-                outline: none;
+                outline: none !important;
               }
 
               option {
@@ -192,8 +191,7 @@ $header-height: 48px;
 
           form {
             margin-top: 48px;
-            .form-label {
-            }
+
             input {
               color: black;
               margin-bottom: 20px;
@@ -209,7 +207,7 @@ $header-height: 48px;
               }
 
               &:focus {
-                outline: none;
+                outline: none !important;
               }
             }
           }
@@ -246,6 +244,21 @@ $header-height: 48px;
             right: 0;
             bottom: 0;
             z-index: 99;
+            transition: transform 0.3s ease;
+            @media screen and (max-width: 1550px) {
+              bottom: 0px;
+              right: -120px;
+              img {
+                max-width: 80%;
+                transform: scale(0.9);
+              }
+            }
+            @media screen and (max-width: 1350px) {
+              right: -200px;
+              img {
+                max-width: 70%;
+              }
+            }
           }
 
           .btn-wrapper {
@@ -292,7 +305,7 @@ $header-height: 48px;
   }
 }
 
-.error-input {
+.error-message {
   color: $error;
   line-height: 1.2;
   font-size: 12px;
@@ -313,4 +326,13 @@ $header-height: 48px;
 
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
+}
+
+.error-input {
+  border: 3px solid $error !important;
+}
+
+.thumb img {
+  max-width: 100%;
+  height: auto;
 }
