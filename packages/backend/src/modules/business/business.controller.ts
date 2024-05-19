@@ -27,8 +27,8 @@ import { Request } from 'express';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 
 import {
+  BusinessStatusEnum,
   DeleteActionEnum,
-  GetBusinessesByStatusEnum,
   StatusActionsEnum,
 } from 'src/common/enums';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -54,12 +54,12 @@ export class BusinessController {
   @Get('status')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
-  @ApiQuery({ name: 'type', enum: GetBusinessesByStatusEnum, required: true })
+  @ApiQuery({ name: 'type', enum: BusinessStatusEnum, required: true })
   @ApiResponse({
     status: 200,
     description: 'User successfully modify status business',
   })
-  async getBusinessesByStatus(@Query('type') type: GetBusinessesByStatusEnum) {
+  async getBusinessesByStatus(@Query('type') type: BusinessStatusEnum) {
     const result = await this.businessService.getBusinessesByStatus(type);
 
     return result;
@@ -184,7 +184,7 @@ export class BusinessController {
     }
 
     if (type === DeleteActionEnum.HARD) {
-      const result: Boolean = await this.businessService.forceDelete(
+      const result: Boolean = await this.businessService.hardDelete(
         id,
         req.user,
       );

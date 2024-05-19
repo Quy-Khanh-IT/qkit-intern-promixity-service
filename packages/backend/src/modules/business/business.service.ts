@@ -16,7 +16,6 @@ import { transObjectIdToString } from 'src/common/utils';
 import { AxiosService } from '../axios/axios.service';
 import {
   BusinessStatusEnum,
-  GetBusinessesByStatusEnum,
   StatusActionsEnum,
   AvailableActions,
   OrderNumberDay,
@@ -27,6 +26,11 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 import { Types } from 'mongoose';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { ValidateAddressDto } from './dto/validate-address.dto';
+import {
+  BusinessInvalidException,
+  BusinessNotFoundException,
+  BusinessStatusException,
+} from 'src/common/exceptions/business.exception';
 
 @Injectable()
 export class BusinessService {
@@ -47,9 +51,9 @@ export class BusinessService {
   }
 
   async getBusinessesByStatus(
-    type: GetBusinessesByStatusEnum,
+    type: BusinessStatusEnum,
   ): Promise<ExtendedActionResponse<Business>> {
-    if (type === GetBusinessesByStatusEnum.DELETED) {
+    if (type === BusinessStatusEnum.DELETED) {
       const businesses = await this.businessRepository.findAllWithDeleted({});
 
       const availableActions: string[] = [];
@@ -303,68 +307,45 @@ export class BusinessService {
     const business = await this.businessRepository.findOneById(businessId);
 
     if (!business) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business not found',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
+      throw new BusinessNotFoundException();
     }
 
     // Check if business belong to user
     const found = user.businesses.find((id) => id.toString() === businessId);
 
     if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
-          detail: 'Cannot delete business that does not belong to you',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
-      );
+      throw new BusinessInvalidException();
     }
+
+    await this.businessRepository.update(businessId, {
+      status: BusinessStatusEnum.DELETED,
+    });
 
     const isDeleted = await this.businessRepository.softDelete(businessId);
 
     return isDeleted;
   }
 
-  async forceDelete(businessId: string, user: User): Promise<boolean> {
+  async hardDelete(businessId: string, user: User): Promise<boolean> {
     const business = await this.businessRepository.findOneById(businessId);
 
     if (!business) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business not found',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
+      throw new BusinessNotFoundException();
     }
 
     // Check if business is already deleted
-    if (business.deleted_at === null) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
-          detail: 'Cannot delete business',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
-      );
+    if (
+      business.deleted_at === null &&
+      business.status !== BusinessStatusEnum.DELETED
+    ) {
+      throw new BusinessStatusException();
     }
 
     // Check if business belong to user
     const found = user.businesses.find((id) => id.toString() === businessId);
 
     if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
-          detail: 'Cannot delete business that does not belong to you',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_FORBIDDEN],
-      );
+      throw new BusinessInvalidException();
     }
 
     const transactionSession = await this.connection.startSession();
@@ -398,29 +379,14 @@ export class BusinessService {
     const business = await this.businessRepository.findOneById(id);
 
     if (!business) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.INVALID_INPUT,
-          detail: 'Business not found',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-      );
+      throw new BusinessNotFoundException();
     }
 
     // handle APPROVE
-    if (type === StatusActionsEnum.APPROVE) {
-      if (business.status !== BusinessStatusEnum.PENDING_APPROVED) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail:
-              'Cannot approve business. Business must be pending approved first',
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
+    if (type === StatusActionsEnum.APPROVED) {
+      if (business.status !== BusinessStatusEnum.PENDING) {
+        throw new BusinessStatusException();
       }
-
-      // TODO: Add logic after ban business
 
       return !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.APPROVED,
@@ -428,19 +394,10 @@ export class BusinessService {
     }
 
     // handle REJECT
-    if (type === StatusActionsEnum.REJECT) {
-      if (business.status !== BusinessStatusEnum.PENDING_APPROVED) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail:
-              'Cannot approve business. Business must be pending approved first',
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
+    if (type === StatusActionsEnum.REJECTED) {
+      if (business.status !== BusinessStatusEnum.PENDING) {
+        throw new BusinessStatusException();
       }
-
-      // TODO: Add logic after ban business
 
       return !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.REJECTED,
@@ -450,38 +407,11 @@ export class BusinessService {
     // handle BANNED
     if (type === StatusActionsEnum.BANNED) {
       if (business.status !== BusinessStatusEnum.APPROVED) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail: 'Cannot ban business. Business must be approved first',
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
+        throw new BusinessStatusException();
       }
-
-      // TODO: Add logic after ban business
 
       return !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.BANNED,
-      }));
-    }
-
-    // handle PENDING
-    if (type === StatusActionsEnum.PENDING) {
-      if (business.status !== BusinessStatusEnum.APPROVED) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail: 'Cannot pending business. Business must be approved first',
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
-      }
-
-      // TODO: Add logic after pending a business
-
-      return !!(await this.businessRepository.update(id, {
-        status: BusinessStatusEnum.PENDING,
       }));
     }
 
