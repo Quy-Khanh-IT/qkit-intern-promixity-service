@@ -17,11 +17,9 @@ import { AxiosService } from '../axios/axios.service';
 import {
   BusinessStatusEnum,
   StatusActionsEnum,
-  AvailableActions,
   OrderNumberDay,
 } from 'src/common/enums';
 import { ConfigService } from '@nestjs/config';
-import { ExtendedActionResponse } from './types/availableActionResponse.type';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { Types } from 'mongoose';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
@@ -52,16 +50,15 @@ export class BusinessService {
 
   async getBusinessesByStatus(
     type: BusinessStatusEnum,
-  ): Promise<ExtendedActionResponse<Business>> {
+  ): Promise<FindAllResponse<Business>> {
     if (type === BusinessStatusEnum.DELETED) {
       const businesses = await this.businessRepository.findAllWithDeleted({});
 
       const availableActions: string[] = [];
 
-      const response: ExtendedActionResponse<Business> = {
+      const response: FindAllResponse<Business> = {
         count: businesses.count,
         items: businesses.items,
-        availableActions,
       };
 
       return response;
@@ -71,12 +68,13 @@ export class BusinessService {
       status: type,
     });
 
-    const availableActions: string[] = AvailableActions[type];
+    const availableActions: string[] = [];
 
-    const response: ExtendedActionResponse<Business> = {
+    console.log('availableActions: ', availableActions);
+
+    const response: FindAllResponse<Business> = {
       count: businesses.count,
       items: businesses.items,
-      availableActions,
     };
 
     return response;
@@ -242,13 +240,7 @@ export class BusinessService {
     const found = userBusinesses.find((id) => id.toString() === businessId);
 
     if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business is not belong to user',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
+      throw new BusinessNotFoundException();
     }
 
     return !!(await this.businessRepository.update(
@@ -360,18 +352,30 @@ export class BusinessService {
 
       await transactionSession.commitTransaction();
 
+      transactionSession.endSession();
+
       return deleteBusiness;
     } catch (err) {
       await transactionSession.abortTransaction();
 
-      throw err;
-    } finally {
       transactionSession.endSession();
+
+      throw err;
     }
   }
 
-  async restore(id: string): Promise<boolean> {
-    return !!(await this.businessRepository.restore(id));
+  async restore(businessId: string): Promise<boolean> {
+    const business = await this.businessRepository.findOneById(businessId);
+
+    if (business.status !== BusinessStatusEnum.DELETED) {
+      throw new BusinessStatusException();
+    }
+
+    await this.businessRepository.update(businessId, {
+      status: BusinessStatusEnum.APPROVED,
+    });
+
+    return !!(await this.businessRepository.restore(businessId));
   }
 
   async handleStatus(id: string, type: StatusActionsEnum): Promise<boolean> {
@@ -486,6 +490,16 @@ export class BusinessService {
 
     for (const key in counts) {
       if (counts[key] === 0 || counts[key] > 1) {
+        if (counts[key] > 1) {
+          const countWord = splitReverseRoad.filter((item) => item == key);
+
+          if (countWord.length !== counts[key]) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+
         return false;
       }
     }

@@ -24,10 +24,10 @@ import { StructureDto } from './dto/structure.dto';
 import { ReverseDto } from './dto/reverse.dto';
 import { ParseFloat } from 'src/cores/decorators/parseFloat.decorator';
 
-@Controller('nominatim-oms')
-@ApiTags('nominatim-oms')
+@Controller('nominatim-osm')
+@ApiTags('nominatim-osm')
 @ApiBearerAuth()
-export class NominatimOmsController {
+export class NominatimOsmController {
   constructor(private readonly nominatimOsmService: NominatimOsmService) {}
 
   @Get('structure')

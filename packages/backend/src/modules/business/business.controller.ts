@@ -39,18 +39,6 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
-  @Get(':id')
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getById(@Param('id') id: string) {
-    const result: Business = await this.businessService.getById(id);
-
-    return result;
-  }
-
   @Get('status')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
@@ -61,6 +49,18 @@ export class BusinessController {
   })
   async getBusinessesByStatus(@Query('type') type: BusinessStatusEnum) {
     const result = await this.businessService.getBusinessesByStatus(type);
+
+    return result;
+  }
+
+  @Get(':id')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business.',
+  })
+  async getById(@Param('id') id: string) {
+    const result: Business = await this.businessService.getById(id);
 
     return result;
   }

@@ -84,6 +84,9 @@ export class Business extends BaseEntity {
   @Prop([DayOpenCloseTimeSchema])
   dayOfWeek: DayOpenCloseTimeSchema[];
 
+  @Prop({ type: [CloundinaryImage], default: [] })
+  imgs: CloundinaryImage[];
+
   @Prop({ trim: true })
   longitude: string;
 
