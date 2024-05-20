@@ -1,17 +1,16 @@
 'use client'
 import { UserOutlined } from '@ant-design/icons'
 import type { FormInstance } from 'antd'
-import { Avatar, Button, Flex, Form, Input, Modal, Space, Tag, Typography } from 'antd'
+import { Avatar, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
-import { toast } from 'react-toastify'
 import './profile.scss'
 
 // import ChangePasswordModal, { IChangePasswordModalMethods } from '~/components/ManageUser/Profile/ChangePasswordModal'
 // import { getMyProfile } from '~/services/user.service'
 // import { useChangeProfileMutation } from '~/services/user.service'
-import { IUserInformation } from '@/types/user'
 import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import { IUserInformation } from '@/types/user'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -28,12 +27,12 @@ interface ProfileProps {
 }
 
 const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
-  form,
+  // form,
   children,
   isEditInfo,
-  onChangeEditBtn
+  // onChangeEditBtn
 }) => {
-  const [submittable, setSubmittable] = useState<boolean>(true) // false (original)
+  const [submittable, _setSubmittable] = useState<boolean>(true) // false (original)
   // const { userInformation } = useAuth()
   // const [changeProfile, { isLoading: confirmLoading }] = useChangeProfileMutation()
   // const values = Form.useWatch([], form)
@@ -47,7 +46,7 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
   //     .catch(() => setSubmittable(false))
   // }, [form, values])
 
-  const onEditProfile = async () => {
+  const _onEditProfile = async () => {
     // changeProfile({ id: userInformation.id, userData: values })
     //   .unwrap()
     //   .then(() => {
@@ -75,12 +74,12 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<IUserInformation>()
+  const [user, _setUser] = useState<IUserInformation>()
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
   const changePwModalRef = useRef<IModalMethods | null>(null)
-  const [open, setOpen] = useState(false)
+  const [_open, _setOpen] = useState(false)
 
   const onLoadingCallback = (loading: boolean) => {
     setConfirmLoading(loading)

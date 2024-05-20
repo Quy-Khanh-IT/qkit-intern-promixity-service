@@ -46,22 +46,76 @@
 }
 
 .table-pagination {
-  .ant-pagination-prev,
-  .ant-pagination-next {
-    min-width: 36px !important;
-    height: 36px !important;
+  // .ant-pagination-prev,
+  // .ant-pagination-next {
+  //   @include xs{
+  //     min-width: 28px !important;
+  //     height: 28px !important;
+  //   }
+
+  //   @include sm{
+  //     min-width: 36px !important;
+  //     height: 36px !important;
+  //   }
+
+  //   button {
+  //     // padding: 3px !important;
+  //   }
+  // }
+
+  // .ant-pagination-item {
+  //   @include xs{
+  //     min-width: 28px !important;
+  //     height: 28px !important;
+  //   }
+
+  //   @include sm{
+  //     min-width: 36px !important;
+  //     height: 36px !important;
+  //   }
+
+  //   a {
+  //     // padding: 3px 6px !important;
+  //   }
+  // }
+
+  .ant-pagination-next, .ant-pagination-prev, .ant-pagination-item{
+    @include xs{
+      min-width: 28px !important;
+      height: 28px !important;
+    }
+
+    @include sm{
+      min-width: 36px !important;
+      height: 36px !important;
+    }
 
     button {
-      padding: 3px !important;
+      @include xs{
+        padding: unset !important;
+        line-height: 28px !important;
+      }
+      
+      @include sm{
+        padding: 3px !important;
+        height: unset !important;
+      }
+    }
+
+    a {
+      @include xs{
+        padding: unset !important;
+        line-height: 28px !important;
+      }
+
+      @include sm{
+        padding: 3px 6px !important;
+        height: unset !important;
+      }
     }
   }
 
-  .ant-pagination-item {
-    min-width: 36px !important;
-    height: 36px !important;
-
-    a {
-      padding: 3px 6px !important;
-    }
+  .ant-pagination-item-link{
+    padding: 0 !important;
   }
 }

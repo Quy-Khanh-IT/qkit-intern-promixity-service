@@ -40,7 +40,7 @@ export interface IManageUserProps {}
 type DataIndex = keyof IBusiness
 
 const ManageBusiness = () => {
-  const [userOption, setUserOption] = useState('1')
+  const [userOption, _setUserOption] = useState('1')
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
