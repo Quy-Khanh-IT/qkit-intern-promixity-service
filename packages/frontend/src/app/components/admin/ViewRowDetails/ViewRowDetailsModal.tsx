@@ -5,7 +5,7 @@ import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
 
-const { grayBg } = variables
+const { _grayBg } = variables
 
 export interface ViewRowDetailsProps {
   data: DescriptionsProps['items']

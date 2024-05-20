@@ -319,7 +319,7 @@ const ManageBusiness = () => {
     <div className='--manage-business'>
       <Row className='pb-3'>
         <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <Col span={5}>
+          <Col xs={21} sm={16} md={14} lg={10} xl={6}>
             <Select
               // onChange={onChangeSelection}
               // style={{ marginTop: 16 }}
