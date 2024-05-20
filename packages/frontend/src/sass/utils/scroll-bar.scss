@@ -1,0 +1,36 @@
+@import "./animate.scss";
+@import "../common/common";
+
+.scroll-bar-1::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scroll-bar-1::-webkit-scrollbar-track {
+  background-color: rgb(99, 99, 99);
+  opacity: 0.1 !important;
+}
+
+.scroll-bar-1::-webkit-scrollbar-thumb {
+  background: #151030;
+  border-radius: 20px;
+  animation: animate 2s infinite linear;
+}
+
+.scroll-bar-2::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-radius: 4px;
+  border: 1px solid $gray-border;
+}
+.scroll-bar-2::-webkit-scrollbar-track {
+  background-color: $gray-border;
+  opacity: 0.1 !important;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.scroll-bar-2::-webkit-scrollbar-thumb {
+  background: $sub-color;
+  border-radius: 4px;
+  animation: animate 2s infinite linear;
+}

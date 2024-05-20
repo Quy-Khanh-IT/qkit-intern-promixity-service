@@ -1,0 +1,16 @@
+@import '@/sass/common/_common.scss';
+
+.--manage-business{
+
+  .filter-select{
+    .ant-select-selector{
+      padding: 4px 12px !important;
+    }
+  }
+
+  .manage-business-table {
+    tr > th:nth-last-child(4){
+      min-width: 180px !important;
+    }
+  }
+}

@@ -1,0 +1,153 @@
+.aboutus-section-container {
+  // border-top: #64ffda 1px solid;
+  height: 100vh;
+  padding-top: 112px;
+  color: white;
+
+  .aboutus-section-top {
+    display: flex;
+    .aboutus-content {
+      width: 50%;
+
+      .nav-tabs {
+        border: none;
+        margin-top: 56px;
+        list-style: none;
+        display: flex;
+        padding: 0;
+
+        .nav-item {
+          padding-right: 12px;
+          line-height: 1;
+          font-size: 18px;
+          font-weight: 500;
+
+          &:hover {
+            color: #ed1651;
+            text-decoration: underline;
+          }
+
+          &:not(:first-child) {
+            border-left: 1px grey solid;
+            padding-left: 12px;
+          }
+        }
+
+        .active {
+          font-weight: 600;
+          color: #ed1651;
+          text-decoration: underline;
+        }
+      }
+
+      .tab-content {
+        color: #cccccc;
+        margin-top: 4px;
+
+        .content {
+          font-size: 14px;
+        }
+        .tab-item {
+          .critia-list {
+            list-style: none;
+            margin-top: 8px;
+            padding: 0;
+
+            .critia-item {
+              font-size: 16px;
+              color: white;
+              display: flex;
+              align-items: center;
+
+              i {
+                color: #ed1651;
+                font-size: 18px;
+                margin-right: 12px;
+              }
+            }
+          }
+        }
+      }
+      .sub-title {
+        color: rgb(163, 163, 163);
+        font-weight: 700;
+      }
+
+      .title {
+        img {
+          height: 112px;
+          position: absolute;
+          bottom: -65px;
+          left: 10px;
+        }
+        h1 {
+          font-weight: 600;
+          margin: 0;
+          line-height: 1.6;
+          strong {
+            color: #64ffda;
+          }
+          position: relative;
+        }
+      }
+    }
+    .aboutus-thumb {
+      width: 50%;
+      padding: 0 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .thumb-1 {
+        height: 400px;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .aboutus-section-bottom {
+    margin-top: 130px;
+    width: 100%;
+    max-width: 1920px;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    justify-content: center;
+    align-items: center;
+    .bento-wrapper {
+      display: grid;
+      grid-gap: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: 60% 40%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      width: 100%;
+
+      .primary-item {
+        background-color: #2f27ce;
+        color: rgb(251, 251, 254);
+
+        font-weight: 700;
+        margin: 0;
+      }
+
+      li {
+        list-style-type: none;
+        padding: 5rem 1rem;
+        text-align: center;
+        max-width: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        overflow: hidden;
+        gap: 10px;
+        line-height: 2.25;
+      }
+
+      h2 {
+      }
+    }
+  }
+}

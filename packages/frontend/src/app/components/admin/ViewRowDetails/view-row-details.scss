@@ -1,0 +1,19 @@
+@import "@/sass/common/_common.scss";
+
+.content-box {
+  padding: 0 16px;
+  width: 100%;
+
+  table{
+    border: $gray-border 1px solid !important;
+
+    td, th {
+      border-inline-end-color: $gray-border !important
+    }
+    
+    .ant-descriptions-item-label{
+      font-weight: 600;
+      background-color: $gray-row-hover !important;
+    }
+  }
+}

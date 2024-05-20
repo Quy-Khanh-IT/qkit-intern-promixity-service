@@ -1,0 +1,58 @@
+@import "@/sass/utils/animate.scss";
+@import "@/sass/utils/scroll-bar.scss";
+@import "@/sass/utils/utils.scss";
+@import "@/sass/common/common.scss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+main {
+  background-color: #060817;
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.col-0 {
+  flex: 0 0 auto;
+  width: 0%;
+}
+
+.ant-input{
+  padding: 6px 12px !important;
+}
+
+.ant-select{
+  height: 100% !important;
+}
+
+.ant-select-item{
+  padding: 6px 12px !important;
+}
+
+.ant-table-filter-dropdown{
+  .ant-input-affix-wrapper{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    input{
+      padding: 4px 8px !important;
+    }
+  }
+
+  .ant-table-filter-dropdown-btns{
+    .ant-btn-link{
+      @include mixin-btn-negative-small;
+    }
+
+    .ant-btn-primary{
+      @include mixin-btn-primary-small;
+    }
+  }
+}

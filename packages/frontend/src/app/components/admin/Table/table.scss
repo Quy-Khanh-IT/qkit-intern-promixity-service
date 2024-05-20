@@ -1,0 +1,67 @@
+@import "@/sass/common/common.scss";
+
+.--manage-table {
+  overflow-y: auto;
+  overflow-x: auto;
+  border-left: 1px solid $gray-border;
+  border-right: 1px solid $gray-border;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+
+  .ant-table-filter-trigger{
+    span{
+      font-size: 16px !important;
+      color: black !important;
+    }
+  }
+
+  .ant-spin-nested-loading {
+    margin-right: 1px;
+    .ant-table-thead {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 2;
+    }
+  }
+
+  th {
+    white-space: nowrap;
+  }
+
+  tr > th:last-child {
+    text-align: center !important;
+  }
+
+  tr > td {
+    padding: 4px 12px !important;
+    &:first-child span {
+      padding: 12px !important;
+    }
+  }
+
+  tr:nth-child(odd) {
+    background-color: $gray-row-hover;
+  }
+}
+
+.table-pagination {
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 36px !important;
+    height: 36px !important;
+
+    button {
+      padding: 3px !important;
+    }
+  }
+
+  .ant-pagination-item {
+    min-width: 36px !important;
+    height: 36px !important;
+
+    a {
+      padding: 3px 6px !important;
+    }
+  }
+}

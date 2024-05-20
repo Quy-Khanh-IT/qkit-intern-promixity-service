@@ -1,0 +1,16 @@
+@import "../common/common";
+
+.action-button {
+  padding: 6px;
+  border-radius: 50%;
+  transition: all ease-in 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $gray-hover;
+  }
+}
+
+.cursor {
+  cursor: pointer;
+}
