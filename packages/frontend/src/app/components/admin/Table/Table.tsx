@@ -30,11 +30,10 @@ const TableComponent: React.FC<ITableProps<T>> = ({
         columns={columns}
         pagination={false}
         dataSource={dataSource}
-        // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
-        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
+        // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
         className={`scroll-bar-2 --manage-table ${className}`}
       />
-      <Row justify='end' align='bottom' style={{ height: 50 }}>
+      <Row justify='end' align='bottom' className='row-pagination'>
         <Pagination
           showSizeChanger={false}
           // current={2}

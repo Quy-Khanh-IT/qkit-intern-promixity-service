@@ -7,6 +7,16 @@
   border-right: 1px solid $gray-border;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
+  // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
+
+  @include xs{
+    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+  }
+
+  @media screen and (min-width: 468px) {
+    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+  }
 
   .ant-table-filter-trigger{
     span{
@@ -45,77 +55,42 @@
   }
 }
 
-.table-pagination {
-  // .ant-pagination-prev,
-  // .ant-pagination-next {
-  //   @include xs{
-  //     min-width: 28px !important;
-  //     height: 28px !important;
-  //   }
+.row-pagination{
+  margin-top: 16px;
 
-  //   @include sm{
-  //     min-width: 36px !important;
-  //     height: 36px !important;
-  //   }
-
-  //   button {
-  //     // padding: 3px !important;
-  //   }
-  // }
-
-  // .ant-pagination-item {
-  //   @include xs{
-  //     min-width: 28px !important;
-  //     height: 28px !important;
-  //   }
-
-  //   @include sm{
-  //     min-width: 36px !important;
-  //     height: 36px !important;
-  //   }
-
-  //   a {
-  //     // padding: 3px 6px !important;
-  //   }
-  // }
-
-  .ant-pagination-next, .ant-pagination-prev, .ant-pagination-item{
-    @include xs{
-      min-width: 28px !important;
-      height: 28px !important;
-    }
-
-    @include sm{
-      min-width: 36px !important;
-      height: 36px !important;
-    }
-
-    button {
+  .table-pagination {
+    .ant-pagination-prev,
+    .ant-pagination-next {
       @include xs{
-        padding: unset !important;
-        line-height: 28px !important;
+        min-width: 36px !important;
+        height: 36px !important;
       }
-      
+  
       @include sm{
+        min-width: 36px !important;
+        height: 36px !important;
+      }
+  
+      button {
         padding: 3px !important;
-        height: unset !important;
       }
     }
-
-    a {
+  
+    .ant-pagination-item {
       @include xs{
-        padding: unset !important;
-        line-height: 28px !important;
+        min-width: 36px !important;
+        height: 36px !important;
       }
-
+  
       @include sm{
+        min-width: 36px !important;
+        height: 36px !important;
+      }
+  
+      a {
         padding: 3px 6px !important;
-        height: unset !important;
       }
     }
-  }
-
-  .ant-pagination-item-link{
-    padding: 0 !important;
   }
 }
+

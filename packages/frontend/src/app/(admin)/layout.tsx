@@ -270,7 +270,7 @@ export default function RootLayout({
                   borderRadius: 8,
                   padding: 20,
                   // padding 24px vs 80px for header
-                  height: 'calc(100vh - 80px - 40px)'
+                  height: 'calc(100vh - 80px - 48px)'
                 }}
               >
                 {children}

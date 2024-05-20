@@ -3,7 +3,7 @@ import { ThemeConfig } from 'antd'
 import { Nunito } from 'next/font/google'
 const { mainColor, light, dark, subColor, subColor2, grayRowHover, errorColor } = variables
 
-const nunitoFont = Nunito({
+const _nunitoFont = Nunito({
   subsets: ['latin'],
   weight: ['300', '400', '500', '700', '900']
 })
