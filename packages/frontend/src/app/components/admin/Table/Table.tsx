@@ -1,8 +1,8 @@
-import { Button, Flex, Pagination, Row, Skeleton, Table, Typography } from 'antd'
+import { Pagination, Row, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { PlusOutlined } from '@ant-design/icons'
 import './table.scss'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type T = any
 export interface ITableProps<T> {
   isFetching: boolean
@@ -17,7 +17,13 @@ export interface ITableProps<T> {
   className: string
 }
 
-const TableComponent: React.FC<ITableProps<T>> = ({ isFetching, columns, dataSource, pagination, className }) => {
+const TableComponent: React.FC<ITableProps<T>> = ({
+  // isFetching,
+  columns,
+  dataSource,
+  // pagination,
+  className
+}) => {
   return (
     <>
       <Table
