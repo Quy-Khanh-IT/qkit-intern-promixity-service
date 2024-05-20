@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Image } from 'antd'
 
 export default function ResetPassword() {
   return (
@@ -7,7 +8,7 @@ export default function ResetPassword() {
         <div className='content-wrapper'>
           <div className='content-full'>
             <div className='logo-wrapper'>
-              <img src='/logo.png' alt='logo' />
+              <Image src='/logo.png' alt='logo' />
             </div>
             <div className='reset-password-wrapper d-flex justify-content-center align-items-center flex-column'>
               <div className='icon-email-wrapper d-flex justify-content-center align-items-center'>
