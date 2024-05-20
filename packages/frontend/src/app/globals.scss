@@ -1,6 +1,7 @@
 @import "@/sass/utils/animate.scss";
 @import "@/sass/utils/scroll-bar.scss";
 @import "@/sass/utils/utils.scss";
+@import "@/sass/common/common.scss";
 
 * {
   margin: 0;
@@ -33,4 +34,25 @@ body {
 
 .ant-select-item{
   padding: 6px 12px !important;
+}
+
+.ant-table-filter-dropdown{
+  .ant-input-affix-wrapper{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+
+    input{
+      padding: 4px 8px !important;
+    }
+  }
+
+  .ant-table-filter-dropdown-btns{
+    .ant-btn-link{
+      @include mixin-btn-negative-small;
+    }
+
+    .ant-btn-primary{
+      @include mixin-btn-primary-small;
+    }
+  }
 }

@@ -1,6 +1,6 @@
 $main-color: #ee1752; //
 $sub-color: #f27d9d; //
-$sub-color-2: #f4c2cf7a; //
+$sub-color-2: #f9d2dc; //f4c2cf7a
 // ---------
 $text-gray: #979393;
 $primary-darker: #2c306f;
@@ -18,8 +18,9 @@ $error: #ea1d18; //
 $error-hover: #ff9997;
 $success: #48c14e; //
 $success-hover: #b9f6ca;
-$warning: #cbd62a; //
+$warning: #FFD43B; //
 $warning-hover: #eaefa2;
+$star-color: orange;
 
 :export {
   mainColor: $main-color;
@@ -30,4 +31,6 @@ $warning-hover: #eaefa2;
   dark: $dark;
   light: $light;
   errorColor: $error;
+  warningColor: $warning;
+  starColor: $star-color;
 }

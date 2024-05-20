@@ -12,7 +12,7 @@
     "address": "3 Pham Van Dong, Da Nang 3 Pham Van Dong, Da Nang 3 Pham Van Dong, Da Nang",
     "totalReviews": 123,
     "overallRating": 4.5,
-    "status": "ACCEPTED"
+    "status": "Accepted"
   },
   {
     "key": "2",
@@ -23,7 +23,7 @@
     "address": "15 Tran Hung Dao, Hanoi",
     "totalReviews": 87,
     "overallRating": 4.2,
-    "status": "ACCEPTED"
+    "status": "Pending"
   },
   {
     "key": "3",
@@ -34,7 +34,7 @@
     "address": "25 Le Loi, Ho Chi Minh City",
     "totalReviews": 65,
     "overallRating": 4.0,
-    "status": "ACCEPTED"
+    "status": "Rejected"
   },
   {
     "key": "4",
@@ -44,7 +44,7 @@
     ],
     "address": "10 Nguyen Hue, Da Nang",
     "totalReviews": 42,
-    "overallRating": 4.8,
+    "overallRating": 3.8,
     "status": "accepted"
   },
   {
@@ -77,7 +77,7 @@
     ],
     "address": "30 Le Duan, Ho Chi Minh City",
     "totalReviews": 53,
-    "overallRating": 4.1,
+    "overallRating": 1.1,
     "status": "accepted"
   },
   {
@@ -99,7 +99,7 @@
     ],
     "address": "12 Tran Phu, Hanoi",
     "totalReviews": 81,
-    "overallRating": 4.4,
+    "overallRating": 2.4,
     "status": "accepted"
   },
   {
@@ -110,7 +110,7 @@
     ],
     "address": "18 Le Loi, Ho Chi Minh City",
     "totalReviews": 69,
-    "overallRating": 4.0,
+    "overallRating": 5.0,
     "status": "accepted"
   },
   {
@@ -132,7 +132,7 @@
     ],
     "address": "25 Le Duan, Ho Chi Minh City",
     "totalReviews": 62,
-    "overallRating": 4.3,
+    "overallRating": 3.3,
     "status": "accepted"
   },
   {
@@ -154,7 +154,7 @@
     ],
     "address": "15 Tran Phu, Hanoi",
     "totalReviews": 78,
-    "overallRating": 4.2,
+    "overallRating": 2.2,
     "status": "accepted"
   },
   {

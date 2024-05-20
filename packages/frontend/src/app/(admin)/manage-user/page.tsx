@@ -5,26 +5,39 @@ import { IModalMethods } from '@/app/components/admin/modal'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { IUserInformation } from '@/types/user'
-import { DeleteOutlined, EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
+  DeleteOutlined,
+  EllipsisOutlined,
+  FolderViewOutlined,
+  SearchOutlined,
+  UndoOutlined,
+  UserAddOutlined
+} from '@ant-design/icons'
+import {
+  Button,
   Col,
   DescriptionsProps,
   Dropdown,
-  Flex,
   Input,
+  InputRef,
   MenuProps,
   Row,
   Select,
-  TableProps,
+  Space,
+  TableColumnType,
   Tag
 } from 'antd'
+import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useRef, useState } from 'react'
+import Highlighter from 'react-highlight-words'
 import './manage-user.scss'
 import userData from './user-data.json'
+import { ColumnsType } from '@/types/common'
 
 export interface IManageUserProps {}
 
-type ColumnsType<T extends object> = TableProps<T>['columns']
+// For search
+type DataIndex = keyof IUserInformation
 
 const ManageUser = () => {
   const [userOption, setUserOption] = useState('1')
@@ -32,6 +45,10 @@ const ManageUser = () => {
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeRoleModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
+
+  const [searchText, setSearchText] = useState('')
+  const [searchedColumn, setSearchedColumn] = useState('')
+  const searchInput = useRef<InputRef>(null)
 
   const handleModal = (selectedOpt: number) => {
     if (selectedOpt === 1) {
@@ -43,10 +60,88 @@ const ManageUser = () => {
     }
   }
 
+  const handleSearch = (selectedKeys: string[], confirm: FilterDropdownProps['confirm'], dataIndex: DataIndex) => {
+    confirm()
+    setSearchText(selectedKeys[0])
+    setSearchedColumn(dataIndex)
+  }
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters()
+    setSearchText('')
+  }
+
+  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<IUserInformation> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type='primary'
+            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size='small'
+            style={{ width: 90 }}
+            className='btn-primary-small'
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size='small'
+            style={{ width: 90 }}
+            className='btn-negative-small'
+          >
+            Reset
+          </Button>
+          <Button
+            type='link'
+            size='small'
+            className='btn-cancel-small'
+            onClick={() => {
+              close()
+            }}
+          >
+            Close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ?.toString()
+        .toLowerCase()
+        .includes((value as string).toLowerCase()) || false,
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100)
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={(text || '') as string}
+        />
+      ) : (
+        <>{text}</>
+      )
+  })
+
   const listColumns: ColumnsType<IUserInformation> = [
     {
-      width: 75,
       align: 'center',
+      width: 75,
       onCell: (user: IUserInformation) => {
         return {
           onClick: () => {
@@ -103,36 +198,62 @@ const ManageUser = () => {
       title: 'First name',
       dataIndex: 'firstName',
       key: 'firstName',
-      width: 200
+      width: 120,
+      ...getColumnSearchProps('firstName')
     },
     {
       title: 'Last name',
       dataIndex: 'lastName',
       key: 'lastName',
-      width: 200
+      width: 120,
+      ...getColumnSearchProps('lastName')
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: 280,
+      ...getColumnSearchProps('email')
     },
     {
       title: 'Address',
       dataIndex: 'address',
-      key: 'address'
+      key: 'address',
+      ...getColumnSearchProps('address')
     },
     {
-      title: 'Roles',
-      dataIndex: 'roles',
-      key: 'roles',
+      title: 'Role',
+      dataIndex: 'role',
+      align: 'center',
+      key: 'role',
       width: 250,
-      render: (roles: string[]) => (
-        <Flex justify='center' wrap>
-          {roles?.map((role, _index) => {
-            const color = role == 'ADMIN' ? 'green' : 'geekblue'
-            return (
-              <Tag color={color} key={role} style={{ margin: '6px 0px 0px 6px' }}>
-                {role}
-              </Tag>
-            )
-          })}
-        </Flex>
-      )
+      render: (role: string) => {
+        console.log('role: ', role)
+        const color = role == 'ADMIN' ? 'green' : 'geekblue'
+        return (
+          <Tag color={color} key={role} className='me-0'>
+            {role}
+          </Tag>
+        )
+      },
+      filters: [
+        {
+          text: 'ADMIN',
+          value: 'ADMIN'
+        },
+        {
+          text: 'USER',
+          value: 'USER'
+        },
+        {
+          text: 'BUSINESS',
+          value: 'BUSINESS'
+        }
+      ],
+      filterMode: 'tree',
+      onFilter: (value, record: IUserInformation) => {
+        return record.role.includes(value as string)
+      }
     }
   ]
 
@@ -153,19 +274,19 @@ const ManageUser = () => {
       children: userOne?.address
     },
     {
-      label: 'Roles',
+      label: 'Role',
       span: 4,
       children: (
-        <Flex wrap>
-          {userOne?.roles?.map((role, _index) => {
-            const color = role == 'ADMIN' ? 'green' : 'geekblue'
+        <>
+          {[userOne?.role].map((role) => {
+            const color = role === 'ADMIN' ? 'green' : 'geekblue'
             return (
               <Tag color={color} key={role} style={{ display: 'flex', alignItems: 'center' }}>
                 {role}
               </Tag>
             )
           })}
-        </Flex>
+        </>
       )
     }
   ]
@@ -197,15 +318,6 @@ const ManageUser = () => {
               value={userOption}
               // defaultValue={options[0]}
               options={options}
-            />
-          </Col>
-          <Col span={12}>
-            <Input
-              // value={inputFilter}
-              // style={{ marginTop: 16 }}
-              className='filter-input'
-              // onChange={(e) => onChangeInput(e.target.value)}
-              placeholder='Filter by email'
             />
           </Col>
         </Col>

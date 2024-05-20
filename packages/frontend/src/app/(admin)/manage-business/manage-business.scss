@@ -2,15 +2,15 @@
 
 .--manage-business{
 
-  .filter-input{
-    @include sm{
-      margin-left: 16px !important;
+  .filter-select{
+    .ant-select-selector{
+      padding: 4px 12px !important;
     }
   }
 
   .manage-business-table {
-    tr > .ant-table-cell:nth-last-child(-n + 3) {
-      text-align: center !important;
+    tr > th:nth-last-child(4){
+      min-width: 180px !important;
     }
   }
 }

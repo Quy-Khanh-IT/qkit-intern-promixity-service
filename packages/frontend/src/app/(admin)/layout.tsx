@@ -1,7 +1,7 @@
 'use client'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
-import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, UserOutlined } from '@ant-design/icons'
+import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons'
 import { Button, Col, Flex, Image, Menu, Row, theme, Grid, MenuProps, Space, Tooltip, Avatar, Badge } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
@@ -237,12 +237,12 @@ export default function RootLayout({
                       </Flex>
                     ),
                     label: 'Manage business'
+                  },
+                  {
+                    key: '3',
+                    icon: <SettingOutlined />,
+                    label: 'Setting'
                   }
-                  // {
-                  //   key: '3',
-                  //   icon: <UploadOutlined />,
-                  //   label: 'nav 3'
-                  // }
                 ]}
               />
             </Sider>
