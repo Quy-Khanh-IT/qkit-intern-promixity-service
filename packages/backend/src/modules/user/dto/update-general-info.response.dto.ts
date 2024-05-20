@@ -18,13 +18,4 @@ export class UpdateGeneralInfoResponseDto {
 
   @ApiProperty({ example: '0389185482' })
   phoneNumber: string;
-
-  @ApiProperty({
-    example: {
-      city: 'Ho Chi Minh',
-      province: 'District 1',
-      country: 'Vietnam',
-    },
-  })
-  address: Object;
 }

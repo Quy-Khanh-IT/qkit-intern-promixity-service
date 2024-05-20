@@ -37,7 +37,7 @@ export class MailService {
     this.mailerService.sendMail({
       to: email,
       subject: 'Reset your password in Proximity Service',
-      template: './reset-password',
+      template: './reset-password2',
       context: {
         resetLink: resetLink,
       },

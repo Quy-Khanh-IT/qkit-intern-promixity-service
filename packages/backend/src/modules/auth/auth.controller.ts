@@ -77,7 +77,7 @@ export class AuthController {
   })
   @UseGuards(JwtRequestTokenGuard)
   async resetPassword(@Body() data: ResetPasswordDto, @Req() req: Request) {
-    const JWTtoken: string = req.headers['reset-token-header'].toString();
+    const JWTtoken: string = req.headers['request-token-header'].toString();
     await this.authService.resetPassword(data, req.user, JWTtoken);
   }
 

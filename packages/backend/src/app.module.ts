@@ -19,6 +19,10 @@ import { AxiosModule } from './modules/axios/axios.module';
 import { ServiceModule } from './modules/service/service.module';
 import { CategoryModule } from './modules/category/category.module';
 import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';
+import { AddressModule } from './modules/address/address.module';
+import { SeedService } from './seeds/seed.service';
+import { DistrictModule } from './modules/address/district.module';
+import { ProvinceModule } from './modules/address/province.module';
 
 @Module({
   imports: [
@@ -40,9 +44,14 @@ import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module
     ServiceModule,
     CategoryModule,
     NominatimOmsModule,
+    AddressModule,
+    DistrictModule,
+    ProvinceModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [
+    SeedService,
     AppService,
     {
       provide: APP_FILTER,
@@ -50,4 +59,13 @@ import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly seedService: SeedService) {
+    this.seed();
+  }
+
+  async seed() {
+    await this.seedService.seedDistricts();
+    await this.seedService.seedProvinces();
+  }
+}

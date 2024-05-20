@@ -1,19 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsString,
-  IsEmail,
-  Length,
   IsNotEmpty,
-  MaxLength,
-  MinLength,
   IsOptional,
   IsPhoneNumber,
+  IsString,
+  Length,
   Matches,
+  MaxLength,
 } from 'class-validator';
 import { OTPConstant, UserConstant } from 'src/common/constants';
+import { EmailRegrex } from 'src/common/utils';
 
 export class SignUpDto {
-  @IsEmail()
+  @Matches(EmailRegrex, { message: 'email must follow with RFC 5322 standard' })
   @IsNotEmpty()
   @MaxLength(100)
   @ApiProperty({ example: 'example123@gmail.com' })

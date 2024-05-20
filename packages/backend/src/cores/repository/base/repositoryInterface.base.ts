@@ -1,3 +1,4 @@
+import { PipelineStage } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 
 export interface BaseRepositoryInterface<T> {
@@ -8,6 +9,8 @@ export interface BaseRepositoryInterface<T> {
   findOneByCondition(condition?: object, projection?: string): Promise<T>;
 
   findAll(condition: object, options?: object): Promise<FindAllResponse<T>>;
+
+  aggregate(pipeline: PipelineStage[]): Promise<any[]>;
 
   findAllWithDeleted(
     condition: object,
