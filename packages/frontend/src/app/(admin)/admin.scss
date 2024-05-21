@@ -1,0 +1,65 @@
+@import "@/sass/common/common.scss";
+
+.--admin-layout {
+  .--admin-header {
+    border-right: 0.5px solid $gray-border;
+    padding: 0;
+
+    .header-logo {
+      @include xs {
+        width: 120px;
+      }
+
+      @include lg {
+        width: 140px;
+      }
+    }
+  }
+
+  .ant-layout-sider-children {
+    height: 100%;
+
+    .ant-menu {
+      padding: 12px;
+      .ant-menu-item {
+        padding: 12px;
+      }
+    }
+  }
+
+  .sidebar-col {
+    height: 100%;
+    border-top: 0.5px solid $gray-border;
+
+    @include xs {
+      position: fixed;
+      z-index: 99;
+      width: 50%;
+    }
+
+    @include md {
+      position: unset;
+      z-index: unset;
+      width: unset;
+    }
+
+    .ant-layout-sider {
+      // width: calc(100% / 6) !important;
+      max-width: unset !important;
+      min-width: unset !important;
+      width: unset !important;
+      height: 100% !important;
+
+      .ant-menu {
+        height: 100%;
+
+        .ant-menu-item {
+          height: 45px;
+        }
+      }
+    }
+  }
+
+  .content-col {
+  }
+}

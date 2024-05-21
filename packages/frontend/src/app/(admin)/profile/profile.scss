@@ -1,0 +1,59 @@
+@import '@/sass/common/_common.scss';
+
+.--profile-wrapper{
+  overflow-y: auto;
+  max-height: calc(100vh - 170px);
+
+  .profile-cover {
+    position: relative;
+  
+    // @include ssm {
+    //   width: 90%;
+    // }
+  
+    // @include md {
+    //   width: 60%;
+    // }
+  
+    // @include xl {
+    //   width: 40%;
+    // }
+  
+    .avatar-cover {
+      position: relative;
+      .role {
+        position: absolute;
+        right: -25%;
+        top: 10%;
+      }
+    }
+  
+    .editable-btn {
+      position: absolute;
+      // bottom: calc(4% + -1px);
+      // right: 28%;
+      bottom: calc(4% - 2.5px);
+      right: 105px;
+      transition-duration: 0.4s;
+    }
+  
+    .loading {
+      right: 130px !important;
+    }
+  }
+  
+  .password-cover {
+    // @include ssm {
+    //   width: 90%;
+    // }
+  
+    // @include md {
+    //   width: 60%;
+    // }
+  
+    // @include xl {
+    //   width: 40%;
+    // }
+  }
+}
+

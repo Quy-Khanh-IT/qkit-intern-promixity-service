@@ -1,0 +1,36 @@
+$main-color: #ee1752; //
+$sub-color: #f27d9d; //
+$sub-color-2: #f9d2dc; //f4c2cf7a
+// ---------
+$text-gray: #979393;
+$primary-darker: #2c306f;
+$primary: #74c1df;
+$primary-light: rgb(224, 239, 255);
+$dark: #000000; //
+$gray: #6b778c;
+$gray-bg: #ededed;
+$gray-hover: #c6cbd074;
+$gray-row-hover: #ececec74;
+$gray-border: #c6cace; //
+$input-disable: #b9bdbf17;
+$light: #ffffff; //
+$error: #ea1d18; //
+$error-hover: #ff9997;
+$success: #48c14e; //
+$success-hover: #b9f6ca;
+$warning: #FFD43B; //
+$warning-hover: #eaefa2;
+$star-color: orange;
+
+:export {
+  mainColor: $main-color;
+  grayBg: $gray-bg;
+  subColor: $sub-color;
+  subColor2: $sub-color-2;
+  grayRowHover: $gray-row-hover;
+  dark: $dark;
+  light: $light;
+  errorColor: $error;
+  warningColor: $warning;
+  starColor: $star-color;
+}

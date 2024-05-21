@@ -1,0 +1,107 @@
+.process-bar {
+  position: fixed;
+  margin-right: -9px;
+  right: 24px;
+  bottom: 50vh;
+  -webkit-box-align: end;
+  -ms-flex-align: end;
+  align-items: flex-end;
+  color: white;
+  z-index: 9999;
+
+  .nav-inner {
+    position: relative;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+
+    .nav-item {
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+
+      .is-active {
+        &::before {
+          background: transparent;
+        }
+
+        &::after {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+        }
+      }
+
+      .nav-item-button {
+        width: 20px;
+        height: 20px;
+        margin-top: -10px;
+        margin-bottom: -10px;
+        position: relative;
+        display: block;
+
+        -moz-appearance: none;
+        appearance: none;
+        -ms-appearance: none;
+        border-radius: 0;
+        background-color: transparent;
+        outline: 0;
+        resize: none;
+        margin: 0;
+        padding: 0;
+        zoom: 1;
+        border: none;
+        color: inherit;
+        font-size: inherit;
+        font-family: inherit;
+        letter-spacing: inherit;
+        text-align: inherit;
+        cursor: pointer;
+
+        .nav-item-button-inner {
+          pointer-events: none;
+          margin: 0;
+          padding: 0;
+          border: 0;
+
+          font: inherit;
+          line-height: inherit;
+          vertical-align: baseline;
+        }
+
+        &::before {
+          margin-top: -1.5px;
+          margin-left: -1.5px;
+          width: 6px;
+          height: 6px;
+          background: transparent;
+
+          content: "";
+          display: block;
+          background: currentColor;
+          opacity: 0.6;
+          border-radius: 50%;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+        }
+
+        &::after {
+          content: "";
+          display: block;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+
+          transition:
+            transform 500ms ease-in-out,
+            -webkit-transform 500ms ease-in-out;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
