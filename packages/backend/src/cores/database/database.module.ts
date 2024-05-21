@@ -11,11 +11,19 @@ import { DatabaseService } from './database.service';
       useFactory: async (configService: ConfigService) => {
         // const username = configService.get('MONGO_USERNAME');
         // const password = configService.get('MONGO_PASSWORD');
-        //--- Above atrributes are only used in mongo atlas, local dont use account
+        //LOCAL
+        // const database = configService.get(ConfigKey.MONGO_NAME);
+        // const host = configService.get(ConfigKey.MONGO_HOST);
+        // const port = configService.get(ConfigKey.MONGO_PORT);
+        // const urlConnection = `mongodb://${host}:${port}/${database}`;
+        //CLOUD
+        const userName = configService.get(ConfigKey.MONGO_USER_NAME);
+        const password = configService.get(ConfigKey.MONGO_PASSWORD);
+        const urlConnection = configService
+          .get(ConfigKey.MONGO_CLOUD_CONNECTION_STRING)
+          .replace('<username>', userName)
+          .replace('<password>', password);
         const database = configService.get(ConfigKey.MONGO_NAME);
-        const host = configService.get(ConfigKey.MONGO_HOST);
-        const port = configService.get(ConfigKey.MONGO_PORT);
-        const urlConnection = `mongodb://${host}:${port}/${database}`;
         return {
           uri: `${urlConnection}`,
           dbName: database,
