@@ -11,7 +11,7 @@ import { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 import { UploadFileService } from './upload-file.service';
 
 @Controller('images')
-@ApiTags('Cloudianry')
+@ApiTags('Cloundinary')
 export class UploadFileController {
   constructor(private readonly uploadFileService: UploadFileService) {}
 
@@ -43,7 +43,7 @@ export class UploadFileController {
     return result;
   }
 
-  @Post('uploadMutiple')
+  @Post('uploadMultiple')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

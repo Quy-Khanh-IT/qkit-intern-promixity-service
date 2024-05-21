@@ -10,6 +10,8 @@ import { User, UserSchema } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { BusinessModule } from '../business/business.module';
+import { forwardRef } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { UserService } from './user.service';
     RequestModule,
     ConfigModule,
     MailModule,
+    forwardRef(() => BusinessModule),
   ],
   controllers: [UserController, AdminController],
   providers: [UserService, UserRepository],

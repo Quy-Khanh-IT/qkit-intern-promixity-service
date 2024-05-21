@@ -30,7 +30,7 @@ import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import {
   LoginDto,
-  LoginResponeDto,
+  LoginResponseDto,
   RequestResetPasswordDto,
   ResetPasswordDto,
 } from './dto/index';
@@ -83,7 +83,7 @@ export class AuthService {
     });
   }
 
-  public async login(loginData: LoginDto): Promise<LoginResponeDto> {
+  public async login(loginData: LoginDto): Promise<LoginResponseDto> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new EmailNotExistedException();

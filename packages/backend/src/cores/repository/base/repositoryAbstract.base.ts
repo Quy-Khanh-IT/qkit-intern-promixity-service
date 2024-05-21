@@ -2,8 +2,8 @@ import * as dayjs from 'dayjs';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { BaseRepositoryInterface } from './repositoryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { BaseRepositoryInterface } from './repostioryInterface.base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -58,6 +58,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
   async create(dto: T | any): Promise<T> {
     const created_data = await this.model.create(dto);
+
+    created_data.id = transObjectIdToString(created_data._id);
+
     return created_data.toObject() as T;
   }
 
@@ -70,7 +73,8 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     if (result) {
       result.id = transObjectIdToString(result._id);
     }
-    return result.deleted_at ? null : result;
+
+    return result.deletedAt ? null : result;
   }
 
   async findOneByCondition(condition = {}): Promise<T | null> {

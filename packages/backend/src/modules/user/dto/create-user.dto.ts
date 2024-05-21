@@ -20,7 +20,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @Matches(UserConstant.regrexPassword, {
+  @Matches(UserConstant.regexPassword, {
     message:
       'Password must be 6-25 characters long, include at least one uppercase letter, one number, and one special character.',
   })
