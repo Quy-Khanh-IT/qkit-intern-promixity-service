@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
+import { UserRole } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type UserDocument = HydratedDocument<User>;
@@ -31,22 +32,15 @@ export class User extends BaseEntity {
   @Prop({ required: true, minlength: 2, maxlength: 50 })
   lastName: string;
 
-  @Prop([String])
+  @Prop({ required: true, enum: UserRole, default: UserRole.USER })
   @Exclude()
-  roles: string[]; //Partial index
+  role: UserRole; //Partial index
 
   @Prop()
   image: string;
 
   @Prop()
   phoneNumber: string;
-
-  @Prop({
-    type: AddressUser,
-    _id: false,
-    required: true,
-  })
-  address: Object;
 
   @Prop([Types.ObjectId])
   @Exclude()

@@ -3,8 +3,8 @@ import * as Dayjs from 'dayjs';
 import * as OTPGenerator from 'otp-generator';
 import { OTPConstant } from 'src/common/constants';
 import {
-  EmailExistedException,
   EmailNotExistedException,
+  PhoneExistedException,
 } from 'src/common/exceptions';
 import { OTPExceedLimitException } from 'src/common/exceptions/otp.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
@@ -39,7 +39,7 @@ export class OtpService {
   async createForRegister(email: string): Promise<OTP> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (isExistingEmail) {
-      throw new EmailExistedException();
+      throw new PhoneExistedException();
     }
 
     const otpCodeCount = await this.otpRepo.findAll({ email });

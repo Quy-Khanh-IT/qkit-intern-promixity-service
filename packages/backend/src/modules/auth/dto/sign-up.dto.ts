@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -41,26 +41,9 @@ export class SignUpDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({
-    example: '0389185482',
-  })
+  @ApiPropertyOptional({ example: '0389185482' })
   @IsPhoneNumber('VN')
   phoneNumber: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Ho Chi Minh' })
-  city: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'District 1' })
-  province: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Vietnam' })
-  country: string;
 
   @IsString()
   @IsNotEmpty()

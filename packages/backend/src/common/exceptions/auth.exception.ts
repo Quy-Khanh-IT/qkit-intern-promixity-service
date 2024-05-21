@@ -11,6 +11,16 @@ export class EmailExistedException extends BaseException {
   }
 }
 
+export class PhoneExistedException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_PHONE_EXISTED,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_PHONE_EXISTED],
+      409,
+    );
+  }
+}
+
 export class EmailNotExistedException extends BaseException {
   constructor() {
     super(

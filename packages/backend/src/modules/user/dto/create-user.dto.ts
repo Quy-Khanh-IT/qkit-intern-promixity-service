@@ -35,13 +35,6 @@ export class CreateUserDto {
   phoneNumber: string;
 
   @IsNotEmpty()
-  address: {
-    city: string;
-    province: string;
-    country: string;
-  };
-
-  @IsNotEmpty()
   @IsEnum(UserRole, { each: true })
-  roles: string[];
+  role: UserRole;
 }

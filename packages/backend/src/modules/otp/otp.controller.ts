@@ -12,22 +12,6 @@ export class OtpController {
     private readonly mailService: MailService,
   ) {}
 
-  @Post('updating-email')
-  @HttpCode(204)
-  @ApiBody({
-    type: CreateOTPRegistrationDto,
-  })
-  async createForUpdateEmail(
-    @Body() data: CreateOTPRegistrationDto,
-  ): Promise<void> {
-    const result = await this.otpService.createForUpdateEmail(data.email);
-    return this.mailService.sendOTPMail(
-      data.email,
-      'OTP Code for reseting email',
-      result.otp,
-    );
-  }
-
   @Post('registration')
   @HttpCode(204)
   @ApiBody({

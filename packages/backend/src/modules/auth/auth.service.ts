@@ -12,11 +12,11 @@ import {
   ERROR_MESSAGES,
 } from 'src/common/constants';
 import { AuthConstant } from 'src/common/constants/auth.constant';
-import { TypeRequests } from 'src/common/enums';
+import { TypeRequests, UserRole } from 'src/common/enums';
 import {
-  EmailExistedException,
   EmailNotExistedException,
   OTPNotMatchException,
+  PhoneExistedException,
   TokenExpiredException,
   TokenResetExceededLimitException,
   UserNotFoundException,
@@ -53,7 +53,15 @@ export class AuthService {
       registrationData.email,
     );
     if (isExistingEmail) {
-      throw new EmailExistedException();
+      throw new PhoneExistedException();
+    }
+
+    const isExistingPhone = await this.userService.checkPhoneExist(
+      registrationData.phoneNumber,
+    );
+
+    if (isExistingPhone) {
+      throw new PhoneExistedException();
     }
 
     const otps = await this.otpService.findManyByEmail(
@@ -72,13 +80,8 @@ export class AuthService {
       lastName: registrationData.lastName,
       email: registrationData.email,
       password: hashedPassword,
-      address: {
-        city: registrationData.city,
-        country: registrationData.country,
-        province: registrationData.province,
-      },
       phoneNumber: registrationData.phoneNumber,
-      roles: ['user'],
+      role: UserRole.USER,
       image: null,
     });
   }

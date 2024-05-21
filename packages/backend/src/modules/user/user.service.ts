@@ -64,6 +64,13 @@ export class UserService {
     return await this.userRepository.softDelete(id);
   }
 
+  async checkPhoneExist(phone: string): Promise<boolean> {
+    const result = await this.userRepository.findOneByCondition({
+      phoneNumber: phone,
+    });
+    return result ? true : false;
+  }
+
   async checkCRUDConditionForAdmin(
     userId: string,
     adminId: string,
@@ -374,7 +381,7 @@ export class UserService {
     await this.checkCRUDConditionForAdmin(updateUserId, adminId);
 
     const result = await this.userRepository.update(updateUserId, {
-      roles: [role],
+      role: role,
     });
 
     if (!result) {
