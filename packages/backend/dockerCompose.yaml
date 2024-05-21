@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: nest-docker-postgres
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - mongodb
+    networks:
+      - my-network
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db
+    hostname: mongodb
+    ports:
+      - '27019:27017'
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+volumes:
+  mongodb_data:
