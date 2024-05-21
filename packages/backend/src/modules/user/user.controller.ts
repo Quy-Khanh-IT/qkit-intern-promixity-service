@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   Param,
   Patch,
@@ -10,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -153,5 +153,17 @@ export class UserController {
     return {
       isSuccess: await this.userService.resetEmail(JWTtoken, req.user, id),
     };
+  }
+
+  @Get('/allBusinesses')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business.',
+  })
+  async getAllBusiness(@Req() req: Request) {
+    const result = await this.userService.getAllByUser(req.user);
+    return result;
   }
 }

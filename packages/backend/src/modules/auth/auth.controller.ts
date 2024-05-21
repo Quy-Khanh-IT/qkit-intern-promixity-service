@@ -6,7 +6,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
@@ -15,11 +14,13 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import {
   LoginDto,
-  LoginResponeDto,
+  LoginResponseDto,
   RequestResetPasswordDto,
   ResetPasswordDto,
   SignUpDto,
 } from './dto/index';
+import { ConfigService } from '@nestjs/config';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -57,7 +58,7 @@ export class AuthController {
     status: 200,
     description: 'User successfully logged in.',
   })
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponeDto> {
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return await this.authService.login(loginDto);
   }
 

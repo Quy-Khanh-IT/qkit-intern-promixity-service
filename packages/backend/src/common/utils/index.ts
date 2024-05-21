@@ -17,6 +17,36 @@ export const transStringToObjectId = (id: string) => {
   return new mongoose.Types.ObjectId(id);
 };
 
+export const buildQueryParams = (options: object) => {
+  let queryString = '?';
+  for (const key in options) {
+    if (options.hasOwnProperty(key)) {
+      const value = options[key];
+      // Encode the key and value
+      const encodedKey = encodeURIComponent(key);
+      const encodedValue = encodeURIComponent(value);
+      // Append to the query string
+      queryString += `${encodedKey}=${encodedValue}&`;
+    }
+  }
+
+  // Remove the trailing '&' if present
+  queryString = queryString.replace(/&$/, '');
+  return queryString;
+};
+
+export const validateRoad = (inputString, targetStrings) => {
+  const normalizedInput = inputString.toLowerCase();
+
+  const normalizedTargets = targetStrings.map((str) => str.toLowerCase());
+
+  for (const target of normalizedTargets) {
+    if (normalizedInput.includes(target)) {
+      return true;
+    }
+  }
+  return false;
+};
 export const DateRegrex: RegExp =
   /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
 

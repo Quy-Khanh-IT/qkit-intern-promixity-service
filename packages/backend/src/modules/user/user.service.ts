@@ -35,7 +35,6 @@ import { MailService } from '../mail/mail.service';
 import { RequestService } from '../request/request.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { DeleteUserQueryDto } from './dto/delete-user.query.dto';
 import { FindAllUserQuery } from './dto/find-all-user.query.dto';
 import { RequesUpdateEmail } from './dto/request-update-email.dto';
@@ -45,6 +44,11 @@ import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
+
+import { CreateUserDto } from './dto/create-user.dto';
+import { Business } from '../business/entities/business.entity';
+import { BusinessService } from '../business/business.service';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -54,6 +58,8 @@ export class UserService {
     private readonly requestService: RequestService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    // @Inject(forwardRef(() => BusinessService))
+    private readonly BusinessService: BusinessService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
@@ -414,5 +420,37 @@ export class UserService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.userRepository.create(createUserDto);
     return user;
+  }
+
+  async addBusiness(userId: string, businessId: string): Promise<User> {
+    const update = {
+      $addToSet: { businesses: businessId },
+    } as Partial<User>;
+
+    const user = await this.userRepository.update(userId, update);
+
+    if (!user) {
+      throw new InternalServerErrorException('Update business failed');
+    }
+    return user;
+  }
+
+  async removeBusiness(userId: string, businessId: string): Promise<User> {
+    const update = {
+      $pull: { businesses: businessId },
+    } as Partial<User>;
+
+    const user = await this.userRepository.update(userId, update);
+
+    if (!user) {
+      throw new InternalServerErrorException('Remove business failed');
+    }
+    return user;
+  }
+
+  async getAllByUser(user: User): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByUser(user);
+
+    return businesses;
   }
 }
