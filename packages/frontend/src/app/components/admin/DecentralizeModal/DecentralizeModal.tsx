@@ -1,11 +1,10 @@
 import { Button, Col, Modal, Row, Select, Space, Typography } from 'antd'
-import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from 'react'
-import { toast } from 'react-toastify'
+import React, { forwardRef, useImperativeHandle, useState } from 'react'
 // import { ManageUserReloadContext } from '@/context/ManageUserContext'
-import '../modal.scss'
-import './decentralize-role-modal.scss'
 import { IUserInformation, RoleFiltered } from '@/types/user'
 import { IModalMethods } from '../modal'
+import '../modal.scss'
+import './decentralize-role-modal.scss'
 // import { useDecentralizeRoleMutation } from '@/services/user.service'
 
 export interface IDecentralizeRoleProps {
@@ -22,7 +21,7 @@ export interface IDecentralizeOptions {
 const { Text } = Typography
 
 const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDecentralizeRoleProps> = (
-  { userOne, decentralizeOpts },
+  { userOne: _temp, decentralizeOpts },
   ref
 ) => {
   const [open, setOpen] = useState(false)
@@ -32,20 +31,15 @@ const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDec
     hideModal: () => setOpen(false)
   }))
 
-  const onChangeSelection = (value: string) => {
-  }
+  const onChangeSelection = (_value: string) => {}
 
   const handleCancel = () => {
     setOpen(false)
   }
 
-  const handleDecentralizeRole = async () => {
-   
-  }
+  const _handleDecentralizeRole = async () => {}
 
-  const handleOk = () => {
-
-  }
+  const handleOk = () => {}
 
   return (
     <>

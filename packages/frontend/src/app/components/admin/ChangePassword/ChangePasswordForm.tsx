@@ -1,8 +1,7 @@
 import { VALIDATION } from '@/constants'
 import type { FormInstance } from 'antd'
 import { Button, Flex, Form, Input, Space } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
+import React, { useState } from 'react'
 
 // import { useAuth } from '~/context/AuthContext'
 // import { useChangePasswordMutation } from '~/services/auth.service'
@@ -17,7 +16,7 @@ interface ChangePasswordFormProps {
 }
 
 const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ closeModal, form, children }) => {
-  const [submittable, setSubmittable] = useState<boolean>(false)
+  const [_submittable, _setSubmittable] = useState<boolean>(false)
   // const [changePassword, { isLoading }] = useChangePasswordMutation()
   // const { userInformation } = useAuth()
 

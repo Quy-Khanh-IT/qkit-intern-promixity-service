@@ -1,10 +1,10 @@
 import '../modal.scss'
 
-import { Button, Modal } from 'antd'
+import { Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 
-import ChangePasswordForm from './ChangePasswordForm'
 import { IModalMethods } from '../modal'
+import ChangePasswordForm from './ChangePasswordForm'
 
 interface IChangePassword {
   id: string
@@ -12,7 +12,7 @@ interface IChangePassword {
   description: string
 }
 
-const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChangePassword> = ({id}, ref) => {
+const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChangePassword> = ({ id: _id }, ref) => {
   const [open, setOpen] = useState(false)
 
   // Expose methods via ref

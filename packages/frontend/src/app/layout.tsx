@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <head>
-        <script src='https://cdn.lordicon.com/lordicon.js'></script>
+        <script src='https://cdn.lordicon.com/lordicon.js' defer></script>
         <link
           href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css'
           rel='stylesheet'

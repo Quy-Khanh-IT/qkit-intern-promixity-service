@@ -1,8 +1,8 @@
-import { Button, Flex, Pagination, Row, Skeleton, Table, Typography } from 'antd'
+import { Pagination, Row, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { PlusOutlined } from '@ant-design/icons'
 import './table.scss'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type T = any
 export interface ITableProps<T> {
   isFetching: boolean
@@ -17,18 +17,23 @@ export interface ITableProps<T> {
   className: string
 }
 
-const TableComponent: React.FC<ITableProps<T>> = ({ isFetching, columns, dataSource, pagination, className }) => {
+const TableComponent: React.FC<ITableProps<T>> = ({
+  // isFetching,
+  columns,
+  dataSource,
+  // pagination,
+  className
+}) => {
   return (
     <>
       <Table
         columns={columns}
         pagination={false}
         dataSource={dataSource}
-        // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
-        style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
+        // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
         className={`scroll-bar-2 --manage-table ${className}`}
       />
-      <Row justify='end' align='bottom' style={{ height: 50 }}>
+      <Row justify='end' align='bottom' className='row-pagination'>
         <Pagination
           showSizeChanger={false}
           // current={2}

@@ -1,24 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
+import { ROUTE } from '@/constants/route'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
-import { MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons'
-import { Button, Col, Flex, Image, Menu, Row, theme, Grid, MenuProps, Space, Tooltip, Avatar, Badge } from 'antd'
+import { BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Badge, Button, Col, Flex, Grid, Image, Menu, MenuProps, Row, Space, theme, Tooltip } from 'antd'
 import { Content, Header } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
-import { motion, useAnimationControls } from 'framer-motion'
+import { useAnimationControls } from 'framer-motion'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import './admin.scss'
-import { useRouter } from 'next/navigation'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { ROUTE } from '@/constants/route'
-import Link from 'next/link'
 
 const { useBreakpoint } = Grid
 
 const { subColor2 } = variables
 const headerHeight = 80
 
-const containerVariants = {
+const _containerVariants = {
   close: {
     x: -400,
     transition: {
@@ -39,7 +40,7 @@ const containerVariants = {
   }
 }
 
-const contentVariants = {
+const _contentVariants = {
   close: {
     transition: {
       type: 'spring',
@@ -67,7 +68,7 @@ export default function RootLayout({
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
 
-  const [routeValue, setRouteValue, removeRouteValue] = useLocalStorage('routeValue', ROUTE.MANAGE_USER)
+  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage('routeValue', ROUTE.MANAGE_USER)
   const [selectedMenuKey, setSelectedMenuKey] = useState<string>('')
 
   useEffect(() => {

@@ -40,7 +40,7 @@ export interface IManageUserProps {}
 type DataIndex = keyof IUserInformation
 
 const ManageUser = () => {
-  const [userOption, setUserOption] = useState('1')
+  const [userOption, _setUserOption] = useState('1')
   const [userOne, setUserOne] = useState<IUserInformation>()
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeRoleModal = useRef<IModalMethods | null>(null)
@@ -142,7 +142,7 @@ const ManageUser = () => {
     {
       align: 'center',
       width: 75,
-      onCell: (user: IUserInformation) => {
+      onCell: (_user: IUserInformation) => {
         return {
           onClick: () => {
             setUserOne(userData[0])
@@ -228,7 +228,6 @@ const ManageUser = () => {
       key: 'role',
       width: 250,
       render: (role: string) => {
-        console.log('role: ', role)
         const color = role == 'ADMIN' ? 'green' : 'geekblue'
         return (
           <Tag color={color} key={role} className='me-0'>
@@ -278,10 +277,10 @@ const ManageUser = () => {
       span: 4,
       children: (
         <>
-          {[userOne?.role].map((role) => {
+          {[userOne?.role].map((role, index) => {
             const color = role === 'ADMIN' ? 'green' : 'geekblue'
             return (
-              <Tag color={color} key={role} style={{ display: 'flex', alignItems: 'center' }}>
+              <Tag color={color} key={`${role}-${index}`} style={{ display: 'flex', alignItems: 'center' }}>
                 {role}
               </Tag>
             )
@@ -308,7 +307,7 @@ const ManageUser = () => {
     <div className='--manage-user'>
       <Row className='pb-3'>
         <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <Col span={4}>
+          <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
               // onChange={onChangeSelection}
               // style={{ marginTop: 16 }}

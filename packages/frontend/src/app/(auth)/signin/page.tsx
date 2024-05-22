@@ -3,42 +3,45 @@ import { useLoginUserMutation } from '@/services/auth.service'
 import { ToastService } from '@/services/toast.service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-// import * as bootstrap from "bootstrap/dist/css/bootstrap.css";
+import { useEffect, useMemo, useState } from 'react'
+import { ErrorResponse } from '@/types/error'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const toastService = new ToastService()
+  const toastService = useMemo(() => new ToastService(), [])
 
   const [inputError, setInputError] = useState({
     email: '',
     password: ''
   })
 
-  const [loginUser, { data: loginData, isSuccess: isLoginSuccess, isError: isLoginError, error: loginError }] =
-    useLoginUserMutation()
+  const [loginUser, { isSuccess: isLoginSuccess, isError: isLoginError, error: loginError }] = useLoginUserMutation()
 
   const router = useRouter()
+
   useEffect(() => {
     if (isLoginSuccess) {
       toastService.success('Login success')
     }
     if (isLoginError) {
-      handleError(loginError)
-      toastService.showRestError(loginError)
+      const errorResponse = loginError as ErrorResponse
+      handleError(errorResponse)
+      toastService.showRestError(errorResponse)
     }
-  }, [isLoginSuccess, isLoginError])
+  }, [isLoginSuccess, isLoginError, loginError, toastService])
 
-  const handleError = (error: any) => {
+  const handleError = (error: ErrorResponse) => {
     if (error?.data?.errors) {
       setInputError((prevInputError) => {
-        const newInputError: any = { ...prevInputError }
-        const inputTypes = ['email', 'password']
+        const newInputError: { email: string; password: string } = { ...prevInputError }
+        const inputTypes: Array<keyof typeof newInputError> = ['email', 'password']
         for (const inputType of inputTypes) {
-          if (error?.data?.errors[inputType]) {
-            newInputError[inputType] = error?.data?.errors[inputType][0]
+          if (error.data?.errors?.[inputType]) {
+            newInputError[inputType] = error.data.errors[inputType][0] || ''
+          } else {
+            newInputError[inputType] = ''
           }
         }
         return newInputError
@@ -53,11 +56,19 @@ export default function SignIn() {
     })
   }
 
+  const handleSignIn = () => {
+    SignIn()
+      .then(() => {})
+      .catch(() => {
+        toastService.error('Login failed')
+      })
+  }
+
   const onChangeData = (value: string, type: string) => {
-    if (type == 'email') {
+    if (type === 'email') {
       setEmail(value)
     }
-    if (type == 'password') {
+    if (type === 'password') {
       setPassword(value)
     }
     setInputError({
@@ -66,7 +77,7 @@ export default function SignIn() {
     })
   }
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       SignIn()
@@ -79,7 +90,7 @@ export default function SignIn() {
         <div className='content-wrapper'>
           <div className='content-left'>
             <div className='logo-wrapper'>
-              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' />
+              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' width={100} height={100} />
             </div>
             <div className='form-wrapper'>
               <h2>Welcome back</h2>
@@ -128,7 +139,7 @@ export default function SignIn() {
                   Forget Password
                 </div>
               </div>
-              <button style={{ color: 'white' }} onClick={SignIn} className='form-btn'>
+              <button style={{ color: 'white' }} onClick={handleSignIn} className='form-btn'>
                 Sign In
               </button>
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
@@ -152,13 +163,13 @@ export default function SignIn() {
           <div className='content-right d-none d-xl-block'>
             <div className='header'></div>
             <div className='content'>
-              <h1>What's our </h1>
+              <h1>What&apos;s our </h1>
               <h1>Developer Said.</h1>
               <i className='fa-solid fa-quote-left'></i>
               <div className='quote'>
-                "Amidst this vast world, map-search applications serve as gateways to explore the wonders of our planet,
-                guiding us from narrow streets to towering mountains. They not only lead us to places but also instill a
-                sense of wonder in the art of discovery."
+                &quot;Amidst this vast world, map-search applications serve as gateways to explore the wonders of our
+                planet, guiding us from narrow streets to towering mountains. They not only lead us to places but also
+                instill a sense of wonder in the art of discovery.;
               </div>
               <div className='quote-owner'>Trương Nguyễn Công Chính</div>
               <div style={{ marginTop: '8px' }}>Full-stack Intern at QKIT Software</div>

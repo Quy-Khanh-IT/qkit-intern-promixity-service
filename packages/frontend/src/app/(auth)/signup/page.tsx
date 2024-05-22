@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
 import { useRegistrationOTPMutation } from '@/services/otp.service'
@@ -7,36 +7,12 @@ import { useGetDistrictByProvinceCodeQuery, useGetProvincesQuery } from '@/servi
 import { ToastService } from '@/services/toast.service'
 import { useRegisterUserMutation } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
-
-interface RegisterData {
-  email: string
-  password: string
-  rePassword?: string
-  firstName: string
-  lastName: string
-  phoneNumber: string
-  city: string
-  province: string
-  country: string
-  otp: string
-}
-
-interface RegisterDataErrors {
-  email?: string
-  password?: string
-  rePassword?: string
-  firstName?: string
-  lastName?: string
-  phoneNumber?: string
-  city?: string
-  province?: string
-  country?: string
-  otp?: string
-}
+import { ErrorResponse, RegisterData, RegisterDataErrors } from '@/types/error'
+import { ProvincesQueryResponse, DistrictsQueryResponse, Province, District } from '@/types/address'
 
 export default function SignUp() {
-  const [provinces, setProvinces] = useState<any[]>([])
-  const [districts, setDistricts] = useState<any[]>([])
+  const [provinces, setProvinces] = useState<Province[]>([])
+  const [districts, setDistricts] = useState<District[]>([])
   const [selectedProvince, setSelectedProvince] = useState<string>('')
   const [selectedDistrict, setSelectedDistrict] = useState<string>('')
 
@@ -55,7 +31,7 @@ export default function SignUp() {
   const [registerDataErrors, setRegisterDataErrors] = useState<RegisterDataErrors>({})
 
   const [isGetOTP, setIsGetOTP] = useState(true)
-  const toastService = new ToastService()
+  const toastService = useMemo(() => new ToastService(), [])
   const router = useRouter()
 
   const [registrationOTP, { isSuccess: isOTPSuccess, isError: isOTPError, error: otpError }] =
@@ -64,8 +40,9 @@ export default function SignUp() {
   const [registerUser, { isSuccess: isRegisterSuccess, isError: isRegisterError, error: registerError }] =
     useRegisterUserMutation()
 
-  const { data: provincesData, isSuccess: isProvincesSuccess } = useGetProvincesQuery({})
-  const { data: districtData, isSuccess: isDistrictsSuccess } = useGetDistrictByProvinceCodeQuery(selectedProvince)
+  const { data: provincesData, isSuccess: isProvincesSuccess } = useGetProvincesQuery<ProvincesQueryResponse>({})
+  const { data: districtData, isSuccess: isDistrictsSuccess } =
+    useGetDistrictByProvinceCodeQuery<DistrictsQueryResponse>(selectedProvince)
 
   useEffect(() => {
     if (isProvincesSuccess && provincesData) {
@@ -85,7 +62,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (selectedProvince && provincesData) {
-      const selectedProvinceData = provincesData.items.find((province: any) => province.code === selectedProvince)
+      const selectedProvinceData = provincesData.items.find((province: Province) => province.code === selectedProvince)
       if (selectedProvinceData) {
         setRegisterData((prevData) => ({
           ...prevData,
@@ -98,7 +75,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (selectedDistrict && districtData) {
-      const selectedDistrictData = districtData.items.find((district: any) => district.code === selectedDistrict)
+      const selectedDistrictData = districtData.items.find((district: District) => district.code === selectedDistrict)
       if (selectedDistrictData) {
         setRegisterData((prevData) => ({
           ...prevData,
@@ -118,80 +95,95 @@ export default function SignUp() {
       }))
       return
     }
-    try {
-      await registerUser({
-        email: registerData.email,
-        password: registerData.password,
-        firstName: registerData.firstName,
-        lastName: registerData.lastName,
-        phoneNumber: registerData.phoneNumber,
-        city: registerData.city,
-        province: registerData.province,
-        country: registerData.country,
-        otp: registerData.otp
+
+    await registerUser({
+      email: registerData.email,
+      password: registerData.password,
+      firstName: registerData.firstName,
+      lastName: registerData.lastName,
+      phoneNumber: registerData.phoneNumber,
+      city: registerData.city,
+      province: registerData.province,
+      country: registerData.country,
+      otp: registerData.otp
+    })
+  }
+
+  const handleSignUp = () => {
+    SignUp()
+      .then(() => {})
+      .catch(() => {
+        toastService.error('Error to register')
       })
-    } catch (error) {
-      handleError(error)
-    }
   }
 
   const GetOTP = async () => {
     if (!registerData.email) {
-      toast.error('Please input email')
+      toastService.error('Please input email')
       return
     }
-    try {
-      await registrationOTP({
-        email: registerData.email
+
+    await registrationOTP({
+      email: registerData.email
+    })
+  }
+
+  const handleGetOTP = () => {
+    GetOTP()
+      .then(() => {})
+      .catch(() => {
+        toastService.error('Error to get OTP')
       })
-    } catch (error) {
-      handleError(error)
-    }
   }
 
   useEffect(() => {
     if (isOTPSuccess) {
-      toast.success('OTP sent to your email')
+      toastService.success('OTP sent to your email')
       setIsGetOTP(false)
     }
     if (isOTPError) {
-      handleError(otpError)
+      const errorResponse = otpError as ErrorResponse
+      handleError(errorResponse)
+      toastService.showRestError(errorResponse)
     }
   }, [isOTPSuccess, isOTPError])
 
   useEffect(() => {
     if (isRegisterSuccess) {
-      toast.success('Registered successfully')
+      toastService.success('Registered successfully')
       router.push('/signin')
     }
     if (isRegisterError) {
-      handleError(registerError)
+      const errorResponse = registerError as ErrorResponse
+      handleError(errorResponse)
+      toastService.showRestError(errorResponse)
     }
   }, [isRegisterSuccess, isRegisterError])
 
-  const handleError = (error: any) => {
-    toastService.showRestError(error)
-    const inputTypes = [
-      'email',
-      'password',
-      'firstName',
-      'lastName',
-      'phoneNumber',
-      'city',
-      'province',
-      'country',
-      'otp'
-    ]
+  const handleError = (error: ErrorResponse) => {
+    if (error?.data?.errors) {
+      setRegisterDataErrors((prevInputError) => {
+        const newInputError: RegisterDataErrors = { ...prevInputError }
+        const inputTypes: Array<keyof typeof newInputError> = [
+          'email',
+          'password',
+          'firstName',
+          'lastName',
+          'phoneNumber',
+          'city',
+          'province',
+          'country',
+          'otp'
+        ]
+        inputTypes.forEach((type) => {
+          if (error?.data?.errors && Array.isArray(error.data.errors[type]) && error.data.errors[type].length > 0) {
+            newInputError[type] = error.data.errors[type][0]
+          }
+        })
 
-    const newErrors: any = { ...registerDataErrors }
-
-    inputTypes.forEach((type) => {
-      if (error?.data?.errors[type]?.[0]) {
-        newErrors[type] = error.data.errors[type][0]
-      }
-    })
-
-    setRegisterDataErrors(newErrors)
+        return newInputError
+      })
+    }
   }
 
   const onChangeRegisterData = (value: string, type: keyof RegisterData) => {
@@ -206,13 +198,17 @@ export default function SignUp() {
     })
   }
 
+  const redirectHome = () => {
+    router.push('/')
+  }
+
   return (
     <div className='auth-container'>
       <div className='auth-wrapper'>
         <div className='content-wrapper'>
           <div className='content-full'>
             <div className='logo-wrapper'>
-              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' />
+              <img onClick={redirectHome} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper f-form'>
               <h2>Welcome to Proximity Service</h2>
@@ -353,8 +349,8 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.city ? 'error-input' : ''}`}
                           >
                             <option value=''>--Choose Province--</option>
-                            {provinces.map((province: any) => (
-                              <option key={province.id} value={province.code}>
+                            {provinces.map((province: Province) => (
+                              <option key={province.code} value={province.code}>
                                 {province.full_name}
                               </option>
                             ))}
@@ -373,8 +369,8 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.province ? 'error-input' : ''}`}
                           >
                             <option value=''>--Choose District--</option>
-                            {districts.map((district: any) => (
-                              <option key={district.id} value={district.code}>
+                            {districts.map((district: District) => (
+                              <option key={district.code} value={district.code}>
                                 {district.full_name}
                               </option>
                             ))}
@@ -391,11 +387,11 @@ export default function SignUp() {
               style={{ padding: '0 72x', flexDirection: 'column' }}
             >
               {isGetOTP ? (
-                <button style={{ width: '200px' }} onClick={GetOTP} className='form-btn mt-3'>
+                <button style={{ width: '200px' }} onClick={handleGetOTP} className='form-btn mt-3'>
                   Get OTP
                 </button>
               ) : (
-                <button style={{ width: '200px' }} onClick={SignUp} className='form-btn'>
+                <button style={{ width: '200px' }} onClick={handleSignUp} className='form-btn'>
                   Sign Up
                 </button>
               )}

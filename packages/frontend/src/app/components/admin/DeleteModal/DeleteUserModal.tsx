@@ -16,7 +16,7 @@ export interface IDeleteUserProps {
 }
 
 const _DeleteUserModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserProps> = (
-  { userOne, isDeleted },
+  { userOne: _temp, isDeleted },
   ref
 ) => {
   const [open, setOpen] = useState(false)
