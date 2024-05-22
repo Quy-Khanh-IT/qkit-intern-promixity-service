@@ -11,6 +11,16 @@ export class NewPassNotMatchOldException extends BaseException {
   }
 }
 
+export class ExceedResetEmailRequestException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_EXCEED_RESET_EMAIL_REQUEST,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_EXCEED_RESET_EMAIL_REQUEST],
+      403,
+    );
+  }
+}
+
 export class ConfirmPassNotMatchException extends BaseException {
   constructor() {
     super(
