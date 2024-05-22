@@ -1,4 +1,3 @@
-import { Image } from 'antd'
 import './service-slick.scss'
 
 export default function ServiceSlick(service: { service: { image: string; name: string } }) {
