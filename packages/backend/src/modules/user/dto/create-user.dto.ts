@@ -37,4 +37,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsEnum(UserRole, { each: true })
   role: UserRole;
+
+  @IsNotEmpty()
+  isVerified: boolean;
 }

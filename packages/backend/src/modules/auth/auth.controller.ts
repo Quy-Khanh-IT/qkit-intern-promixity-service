@@ -6,10 +6,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AuthConstant } from 'src/common/constants/auth.constant';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
+import { JwtVerifyTokenGuard } from 'src/cores/guard/jwt-verify-token.guard';
 import { MailService } from '../mail/mail.service';
+import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import {
@@ -19,8 +23,8 @@ import {
   ResetPasswordDto,
   SignUpDto,
 } from './dto/index';
-import { ConfigService } from '@nestjs/config';
-import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { UnVerifyResponseDto } from './dto/unverify-response.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -41,12 +45,32 @@ export class AuthController {
     status: 201,
     description: 'User successfully signed up.',
   })
-  async signUp(@Body() signUpDto: SignUpDto) {
+  async signUp(@Body() signUpDto: SignUpDto): Promise<UnVerifyResponseDto> {
     const result = await this.authService.signUp(signUpDto);
-    this.mailService.sendWelcomeMail(
-      result.email,
-      'Welcome to our Proximity Service',
-    );
+    return {
+      token: result,
+      message: 'Verify Unsuccessfully.! Please verify your email',
+    };
+  }
+
+  @Post('verify-email')
+  @HttpCode(200)
+  @ApiHeader({
+    name: AuthConstant.VERIFY_STRATEGY_HEADER_NAME,
+    description: 'The verification token',
+  })
+  @UseGuards(JwtVerifyTokenGuard)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully verified.',
+  })
+  async verifyEmail(
+    @Body() data: VerifyEmailDto,
+    @Req() req: Request,
+  ): Promise<NoContentResponseDto> {
+    return {
+      isSuccess: await this.authService.verifyUser(req.user, data.otp),
+    };
   }
 
   @Post('login')
@@ -58,7 +82,7 @@ export class AuthController {
     status: 200,
     description: 'User successfully logged in.',
   })
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto | void> {
     return await this.authService.login(loginDto);
   }
 

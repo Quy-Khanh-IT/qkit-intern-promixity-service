@@ -1,6 +1,6 @@
+import { HttpException } from '@nestjs/common';
 import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
 import { BaseException } from './base/base-message.exception';
-
 export class EmailExistedException extends BaseException {
   constructor() {
     super(
@@ -17,6 +17,19 @@ export class PhoneExistedException extends BaseException {
       ERRORS_DICTIONARY.USER_PHONE_EXISTED,
       ERROR_MESSAGES[ERRORS_DICTIONARY.USER_PHONE_EXISTED],
       409,
+    );
+  }
+}
+
+export class UnVerifiedUser extends HttpException {
+  constructor(token: string) {
+    super(
+      {
+        message: ERRORS_DICTIONARY.USER_UNVERIFIED,
+        detail: ERROR_MESSAGES[ERRORS_DICTIONARY.USER_UNVERIFIED],
+        token: token,
+      },
+      401,
     );
   }
 }

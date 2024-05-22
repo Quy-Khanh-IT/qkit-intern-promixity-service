@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -45,9 +47,9 @@ import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { Business } from '../business/entities/business.entity';
 import { BusinessService } from '../business/business.service';
+import { Business } from '../business/entities/business.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -58,12 +60,16 @@ export class UserService {
     private readonly requestService: RequestService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    // @Inject(forwardRef(() => BusinessService))
+    @Inject(forwardRef(() => BusinessService))
     private readonly BusinessService: BusinessService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
+  }
+
+  async updateVerifiedStatusByEmail(id: string, status: boolean) {
+    return await this.userRepository.update(id, { isVerified: status });
   }
 
   async softDeleteById(id: string): Promise<boolean> {

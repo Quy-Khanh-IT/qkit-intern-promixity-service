@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { JwtAccessTokenStrategy } from './stragegies/jwt-access-token.strategy';
 import { JwtRefreshTokenStrategy } from './stragegies/jwt-refresh-token.strategy';
 import { JwtResetPasswordStrategy } from './stragegies/jwt-reset-token.strategy';
+import { JwtVeiryEmailStrategy } from './stragegies/jwt-verify-token.strategy';
 import { JWTTokenService } from './token.service';
 
 @Module({
@@ -31,6 +32,7 @@ import { JWTTokenService } from './token.service';
     JwtAccessTokenStrategy,
     JwtRefreshTokenStrategy,
     JwtResetPasswordStrategy,
+    JwtVeiryEmailStrategy,
   ],
 })
 export class AuthModule {}

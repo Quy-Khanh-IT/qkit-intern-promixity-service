@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Param,
   Patch,
@@ -9,7 +10,6 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {

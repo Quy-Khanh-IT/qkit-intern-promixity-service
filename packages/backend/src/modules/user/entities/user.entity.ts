@@ -45,6 +45,9 @@ export class User extends BaseEntity {
   @Prop([Types.ObjectId])
   @Exclude()
   businesses: Types.ObjectId[];
+
+  @Prop({ default: false })
+  isVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
