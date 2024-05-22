@@ -35,6 +35,6 @@ export const OrderNumberDay = {
   [DayEnum.FRIDAY]: 5,
   [DayEnum.SATURDAY]: 6,
   [DayEnum.SUNDAY]: 7,
-};
+} as const;
 
 export const AvailableActions = {};
