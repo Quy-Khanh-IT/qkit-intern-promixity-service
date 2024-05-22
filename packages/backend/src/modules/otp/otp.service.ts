@@ -1,4 +1,10 @@
-import { HttpException, Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  HttpException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+} from '@nestjs/common';
 import * as Dayjs from 'dayjs';
 import * as OTPGenerator from 'otp-generator';
 import {
@@ -9,6 +15,7 @@ import {
 import { EmailNotExistedException } from 'src/common/exceptions';
 import { OTPExceedLimitException } from 'src/common/exceptions/otp.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { MailService } from '../mail/mail.service';
 import { UserService } from '../user/user.service';
 import { OTP } from './entities/otp.entity';
 import { OtpRepository } from './repository/otp.repository';
@@ -18,6 +25,7 @@ export class OtpService {
     private readonly otpRepo: OtpRepository,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    private mailService: MailService,
   ) {}
   private async create(email: string, TTLSecond: number): Promise<OTP> {
     const otpCode = OTPGenerator.generate(OTPConstant.OTP_LENGTH, {
@@ -37,7 +45,7 @@ export class OtpService {
     return result;
   }
 
-  async createForUpdateingEmail(email: string): Promise<OTP> {
+  async createForUpdatingEmail(email: string): Promise<void> {
     const isExistingEmail = await this.userService.checkEmailExist(email);
     if (!isExistingEmail) {
       throw new EmailNotExistedException();
@@ -47,7 +55,16 @@ export class OtpService {
       throw new OTPExceedLimitException();
     }
     const TTL = 4 * 60; // 4 minutes
-    return await this.create(email, TTL);
+
+    const result = await this.create(email, TTL);
+    if (!result) {
+      throw new InternalServerErrorException();
+    }
+    this.mailService.sendOTPMail(
+      email,
+      'OTP Code for updateing email',
+      result.otp,
+    );
   }
 
   async createForRegister(email: string): Promise<OTP> {
