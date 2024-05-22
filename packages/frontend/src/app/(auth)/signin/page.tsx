@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorRespone } from '@/types/error'
-import Image from 'next/image'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -91,7 +90,7 @@ export default function SignIn() {
         <div className='content-wrapper'>
           <div className='content-left'>
             <div className='logo-wrapper'>
-              <Image onClick={() => router.push('/')} src='/logo.png' alt='logo' width={100} height={100} />
+              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' width={100} height={100} />
             </div>
             <div className='form-wrapper'>
               <h2>Welcome back</h2>
@@ -185,7 +184,7 @@ export default function SignIn() {
               </div>
 
               <div className='thumb'>
-                <Image src='./images/star.png' alt='star' width={100} height={100} />
+                <img src='./images/star.png' alt='star' />
               </div>
             </div>
           </div>
