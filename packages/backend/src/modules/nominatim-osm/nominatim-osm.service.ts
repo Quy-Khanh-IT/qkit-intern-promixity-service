@@ -51,6 +51,7 @@ export class NominatimOsmService {
       lon: reverseDto.longitude,
       lat: reverseDto.latitude,
     };
+
     const params = { ...constructor, ...this.optsParam };
 
     const queryParams = buildQueryParams(params);

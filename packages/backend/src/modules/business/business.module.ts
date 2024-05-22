@@ -1,15 +1,14 @@
-import { Module } from '@nestjs/common';
-import { BusinessService } from './business.service';
-import { BusinessController } from './business.controller';
+import { HttpModule } from '@nestjs/axios';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+
+import { AxiosModule } from '../axios/axios.module';
+import { NominatimOmsModule } from '../nominatim-osm/nominatim-osm.module';
+import { UserModule } from '../user/user.module';
+import { BusinessController } from './business.controller';
+import { BusinessService } from './business.service';
 import { Business, BusinessSchema } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
-import { UserService } from '../user/user.service';
-import { UserModule } from '../user/user.module';
-import { AxiosModule } from '../axios/axios.module';
-import { forwardRef } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { NominatimOmsModule } from '../nominatim-osm/nominatim-osm.module';
 
 @Module({
   imports: [

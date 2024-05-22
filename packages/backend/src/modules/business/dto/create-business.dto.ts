@@ -1,18 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsString,
+  IsArray,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPhoneNumber,
-  IsArray,
-  IsNumber,
-  Min,
-  Max,
-  ValidateNested,
-  IsEnum,
+  IsString,
   Matches,
-  isArray,
+  Max,
+  Min,
+  ValidateNested,
 } from 'class-validator';
 import { BusinessConstant } from 'src/common/constants/business.constant';
 import { DayEnum } from 'src/common/enums';
@@ -100,17 +99,15 @@ export class CreateBusinessDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: '612/A Lý Tự Trọng' })
-  addressLineFull: string;
+  fullAddress: string;
 
   @IsNotEmpty()
-  @Min(-180)
-  @Max(180)
-  @ApiProperty({ example: '106.698387' })
-  longitude: string;
-
-  @IsNotEmpty()
-  @Min(-90)
-  @Max(90)
-  @ApiProperty({ example: '10.775114' })
-  latitude: string;
+  @ApiProperty({
+    example: {
+      coordinates: [106.698387, 10.775114],
+    },
+  })
+  location: {
+    coordinates: number[];
+  };
 }

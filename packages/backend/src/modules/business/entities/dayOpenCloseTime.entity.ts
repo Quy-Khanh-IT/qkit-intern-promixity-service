@@ -1,6 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
-import { DayEnum } from 'src/common/enums';
-import { OrderNumberDay } from 'src/common/enums';
+import { DayEnum, OrderNumberDay } from 'src/common/enums';
 
 @Schema({
   _id: false,
