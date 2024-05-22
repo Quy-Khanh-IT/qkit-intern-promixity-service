@@ -85,3 +85,14 @@
     }
   }
 }
+
+.ts-card {
+  &:first-child {
+    --card-color: #146ef5;
+    --blur-color: rgba(21, 115, 255, 0.45);
+  }
+  &:last-child {
+    --card-color: #ed52cb;
+    --blur-color: rgba(237, 82, 203, 0.4);
+  }
+}

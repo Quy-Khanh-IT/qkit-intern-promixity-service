@@ -1,6 +1,7 @@
+import Image from 'next/image'
 import './service-slick.scss'
 
-export default function ServiceSlick(service: any) {
+export default function ServiceSlick(service: { service: { image: string; name: string } }) {
   return (
     <div className='service-slick'>
       <div className='slick-container'>
@@ -16,7 +17,7 @@ export default function ServiceSlick(service: any) {
               justifyContent: 'center'
             }}
           >
-            <img style={{ height: '42px' }} src={service.service.image}></img>
+            <Image style={{ height: '42px' }} src={service.service.image} alt='' />
           </div>
         </div>
 

@@ -1,19 +1,22 @@
+import { ErrorRespone } from '@/types/error'
 import { toast } from 'react-toastify'
 
 export class ToastService {
-  private handleError(error: any): string {
+  private handleError(error: ErrorRespone): string {
     const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
-    let errorMessage = error?.data?.message || 'Something wrong on server!'
+    let errorMessage: string | undefined = error?.data?.message || 'Something wrong on server!'
 
-    const startsWithAny = prefixes.some((prefix) => errorMessage.startsWith(prefix))
+    const startsWithAny = prefixes.some((prefix) => errorMessage?.startsWith(prefix))
 
     if (startsWithAny) {
-      errorMessage = error?.data?.errors?.detail
+      errorMessage = Array.isArray(error?.data?.errors?.detail)
+        ? error?.data?.errors?.detail.join(', ')
+        : error?.data?.errors?.detail || errorMessage
     }
-    return errorMessage
+    return errorMessage || ''
   }
 
-  showRestError(error: any) {
+  showRestError(error: ErrorRespone) {
     toast.error(this.handleError(error))
   }
 
