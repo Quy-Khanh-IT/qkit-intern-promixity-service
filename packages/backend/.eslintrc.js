@@ -10,10 +10,13 @@ module.exports = {
     '@typescript-eslint/eslint-plugin',
     'simple-import-sort',
     'unused-imports',
+    'eslint-plugin-import',
+    // "import"
   ],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:import/recommended',
   ],
   root: true,
   env: {
