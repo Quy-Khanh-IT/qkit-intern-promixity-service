@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import Navbar from '@/app/components/NavBar'
+import NavBar from '@/app/components/NavBar'
 import { Image } from 'antd'
 import StarsCanvas from './components/canvas/Star'
 import './not-found.scss'

@@ -1,8 +1,8 @@
-import { ErrorRespone } from '@/types/error'
+import { ErrorResponse } from '@/types/error'
 import { toast } from 'react-toastify'
 
 export class ToastService {
-  private handleError(error: ErrorRespone): string {
+  private handleError(error: ErrorResponse): string {
     const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
     let errorMessage: string | undefined = error?.data?.message || 'Something wrong on server!'
 
@@ -16,7 +16,7 @@ export class ToastService {
     return errorMessage || ''
   }
 
-  showRestError(error: ErrorRespone) {
+  showRestError(error: ErrorResponse) {
     toast.error(this.handleError(error))
   }
 
