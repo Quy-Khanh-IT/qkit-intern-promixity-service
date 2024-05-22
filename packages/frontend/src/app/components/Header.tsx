@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import './nav-bar.scss'
+import './header.scss'
 import { useEffect, useState } from 'react'
 
 export default function Header() {
