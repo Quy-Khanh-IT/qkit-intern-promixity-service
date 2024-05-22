@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
+import { BaseEntity } from 'src/cores/entity/base/entity.base';
+
 import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { StarSchema } from './star.entity';
@@ -87,11 +88,20 @@ export class Business extends BaseEntity {
   @Prop({ type: [CloundinaryImage], default: [] })
   imgs: CloundinaryImage[];
 
-  @Prop({ trim: true })
-  longitude: string;
-
-  @Prop({ trim: true })
-  latitude: string;
+  @Prop({
+    type: {
+      type: String,
+      required: true,
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  })
+  location: {
+    coordinates: number[];
+  };
 
   @Prop({
     enum: BusinessStatusEnum,
@@ -104,4 +114,7 @@ export class Business extends BaseEntity {
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
+
+BusinessSchema.index({ location: '2dsphere' });
+
 export type BusinessDocument = HydratedDocument<Business>;

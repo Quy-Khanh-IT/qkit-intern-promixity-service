@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 import { StructureDto } from './dto/structure.dto';
 import { ReverseDto } from './dto/reverse.dto';
-import { ParseFloat } from 'src/cores/decorators/parseFloat.decorator';
 
 @Controller('nominatim-osm')
 @ApiTags('nominatim-osm')
@@ -57,9 +56,7 @@ export class NominatimOsmController {
 
     description: 'Get reverse address successfully.',
   })
-  async reverse(
-    @ParseFloat(['longitude', 'latitude']) @Query() reverseQuery: ReverseDto,
-  ) {
+  async reverse(@Query() reverseQuery: ReverseDto) {
     const result = await this.nominatimOsmService.reverse(reverseQuery);
     return result;
   }

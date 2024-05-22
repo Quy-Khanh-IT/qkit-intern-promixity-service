@@ -35,18 +35,6 @@ export const buildQueryParams = (options: object) => {
   return queryString;
 };
 
-export const validateRoad = (inputString, targetStrings) => {
-  const normalizedInput = inputString.toLowerCase();
-
-  const normalizedTargets = targetStrings.map((str) => str.toLowerCase());
-
-  for (const target of normalizedTargets) {
-    if (normalizedInput.includes(target)) {
-      return true;
-    }
-  }
-  return false;
-};
 export const DateRegrex: RegExp =
   /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
 

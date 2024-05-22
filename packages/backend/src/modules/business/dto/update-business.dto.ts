@@ -1,16 +1,14 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateBusinessDto, DayOpenCloseTime } from './create-business.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsNumber,
   IsOptional,
   IsPhoneNumber,
   IsString,
-  Max,
-  Min,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+
+import { DayOpenCloseTime } from './create-business.dto';
 
 export class UpdateBusinessDto {
   @IsOptional()

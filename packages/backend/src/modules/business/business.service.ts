@@ -1,34 +1,35 @@
-import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
-import { Business } from './entities/business.entity';
-import { BusinessRepository } from './repository/business.repository';
-import {
-  ERRORS_DICTIONARY,
-  ERROR_CODES,
-} from 'src/common/constants/error.constant';
-import { User } from '../user/entities/user.entity';
-import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { UserService } from '../user/user.service';
-import { transObjectIdToString } from 'src/common/utils';
-import { AxiosService } from '../axios/axios.service';
+import { Types } from 'mongoose';
+import {
+  ERROR_CODES,
+  ERRORS_DICTIONARY,
+} from 'src/common/constants/error.constant';
 import {
   BusinessStatusEnum,
-  StatusActionsEnum,
   OrderNumberDay,
+  StatusActionsEnum,
 } from 'src/common/enums';
-import { ConfigService } from '@nestjs/config';
-import { UpdateAddressDto } from './dto/update-address.dto';
-import { Types } from 'mongoose';
-import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
-import { ValidateAddressDto } from './dto/validate-address.dto';
 import {
   BusinessInvalidException,
   BusinessNotFoundException,
   BusinessStatusException,
 } from 'src/common/exceptions/business.exception';
+import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { transObjectIdToString } from 'src/common/utils';
+
+import { AxiosService } from '../axios/axios.service';
+import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
+import { ValidateAddressDto } from './dto/validate-address.dto';
+import { Business } from './entities/business.entity';
+import { BusinessRepository } from './repository/business.repository';
 
 @Injectable()
 export class BusinessService {
@@ -175,7 +176,7 @@ export class BusinessService {
       dayOfWeek,
     };
 
-    const { country, province, district, addressLine, latitude, longitude } =
+    const { country, province, district, addressLine, location } =
       createBusinessDto;
 
     // Validate address
@@ -184,8 +185,7 @@ export class BusinessService {
       province,
       district,
       addressLine,
-      latitude,
-      longitude,
+      location,
     });
 
     if (!isValid) {
@@ -235,7 +235,7 @@ export class BusinessService {
     businessId: string,
     userBusinesses: Types.ObjectId[],
     updateBusinessDto: UpdateBusinessDto,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     // check if business belongs to user
     const found = userBusinesses.find((id) => id.toString() === businessId);
 
@@ -424,10 +424,14 @@ export class BusinessService {
 
   async validateAddress(
     validateAddressDto: ValidateAddressDto,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
+    const { location } = validateAddressDto;
+
+    const [longitude, latitude] = location.coordinates;
+
     const reverseData = await this.nominatimOsmService.reverse({
-      latitude: validateAddressDto.latitude,
-      longitude: validateAddressDto.longitude,
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
     });
 
     if (
@@ -458,7 +462,7 @@ export class BusinessService {
       splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
     }
 
-    let reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
+    const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
       return acc.concat(item);
     }, '');
 
@@ -474,7 +478,7 @@ export class BusinessService {
       slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
     }
 
-    let AddressLineStr = slitAddressLine.reduce((acc, item) => {
+    const AddressLineStr = slitAddressLine.reduce((acc, item) => {
       return acc.concat(item);
     }, '');
 
@@ -506,178 +510,25 @@ export class BusinessService {
 
     return true;
   }
+
+  async findNearBy(
+    longitude: string,
+    latitude: string,
+    maxDistance: string,
+  ): Promise<FindAllResponse<Business>> {
+    const businesses: FindAllResponse<Business> =
+      await this.businessRepository.findAll({
+        location: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [longitude, latitude],
+            },
+            $maxDistance: maxDistance,
+          },
+        },
+      });
+
+    return businesses;
+  }
 }
-
-// address: {
-//   amenity: 'Thư viện Khoa học Tổng hợp TP.HCM',
-//   house_number: '69',
-//   road: 'Lý Tự Trọng',
-//   quarter: 'Phường Bến Thành',
-//   suburb: 'Quận 1',
-//   city: 'Thành phố Hồ Chí Minh',
-//   'ISO3166-2-lvl4': 'VN-SG',
-//   postcode: '71009',
-//   country: 'Việt Nam',
-//   country_code: 'vn'
-// },
-
-//// REVERSE
-// address: {
-//   highway: 'Lý Tự Trọng',
-//   road: 'Pasteur',
-//   quarter: 'Phường Bến Nghé',
-//   suburb: 'Quận 1',
-//   city: 'Thành phố Hồ Chí Minh',
-//   'ISO3166-2-lvl4': 'VN-SG',
-//   postcode: '71006',
-//   country: 'Việt Nam',
-//   country_code: 'vn'
-// },
-
-// address: {
-//   road: 'Lý Tự Trọng',
-//   quarter: 'Phường Bến Thành',
-//   suburb: 'Quận 1',
-//   city: 'Thành phố Hồ Chí Minh',
-//   'ISO3166-2-lvl4': 'VN-SG',
-//   postcode: '71009',
-//   country: 'Việt Nam',
-//   country_code: 'vn'
-// },
-
-// address: {
-//   road: 'Lý Tự Trọng',
-//   quarter: 'Phường Bến Nghé',
-//   suburb: 'Quận 1',
-//   city: 'Thành phố Hồ Chí Minh',
-//   'ISO3166-2-lvl4': 'VN-SG',
-//   postcode: '71006',
-//   country: 'Việt Nam',
-//   country_code: 'vn'
-// },
-
-// address: {
-//   road: 'Lý Tự Trọng',
-//   quarter: 'Phường Bến Nghé',
-//   suburb: 'Quận 1',
-//   city: 'Thành phố Hồ Chí Minh',
-//   'ISO3166-2-lvl4': 'VN-SG',
-//   postcode: '77000',
-//   country: 'Việt Nam',
-//   country_code: 'vn'
-// },
-
-[
-  {
-    place_id: 254086363,
-    licence:
-      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-    osm_type: 'way',
-    osm_id: 55451561,
-    lat: '10.8110139',
-    lon: '106.7091645',
-    category: 'highway',
-    type: 'primary',
-    place_rank: 26,
-    importance: 0.0533433333333333,
-    addresstype: 'road',
-    name: 'Đinh Bộ Lĩnh',
-    display_name:
-      'Đinh Bộ Lĩnh, Phường 26, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72309, Việt Nam',
-    address: {
-      road: 'Đinh Bộ Lĩnh',
-      quarter: 'Phường 26',
-      suburb: 'Quận Bình Thạnh',
-      city: 'Thành phố Hồ Chí Minh',
-      'ISO3166-2-lvl4': 'VN-SG',
-      postcode: '72309',
-      country: 'Việt Nam',
-      country_code: 'vn',
-    },
-    boundingbox: ['10.8092144', '10.8133163', '106.7091403', '106.7095349'],
-  },
-  {
-    place_id: 253295410,
-    licence:
-      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-    osm_type: 'way',
-    osm_id: 977523912,
-    lat: '10.8166219',
-    lon: '106.711287',
-    category: 'highway',
-    type: 'primary',
-    place_rank: 26,
-    importance: 0.0533433333333333,
-    addresstype: 'road',
-    name: 'Đường Đinh Bộ Lĩnh',
-    display_name:
-      'Đường Đinh Bộ Lĩnh, Phường 26, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72309, Việt Nam',
-    address: {
-      road: 'Đường Đinh Bộ Lĩnh',
-      quarter: 'Phường 26',
-      suburb: 'Quận Bình Thạnh',
-      city: 'Thành phố Hồ Chí Minh',
-      'ISO3166-2-lvl4': 'VN-SG',
-      postcode: '72309',
-      country: 'Việt Nam',
-      country_code: 'vn',
-    },
-    boundingbox: ['10.8161120', '10.8171528', '106.7109048', '106.7119466'],
-  },
-  {
-    place_id: 253281506,
-    licence:
-      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-    osm_type: 'way',
-    osm_id: 192512367,
-    lat: '10.8044597',
-    lon: '106.7094595',
-    category: 'highway',
-    type: 'primary',
-    place_rank: 26,
-    importance: 0.0533433333333333,
-    addresstype: 'road',
-    name: 'Đường Đinh Bộ Lĩnh',
-    display_name:
-      'Đường Đinh Bộ Lĩnh, Phường 24, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72508, Việt Nam',
-    address: {
-      road: 'Đường Đinh Bộ Lĩnh',
-      quarter: 'Phường 24',
-      suburb: 'Quận Bình Thạnh',
-      city: 'Thành phố Hồ Chí Minh',
-      'ISO3166-2-lvl4': 'VN-SG',
-      postcode: '72508',
-      country: 'Việt Nam',
-      country_code: 'vn',
-    },
-    boundingbox: ['10.8031202', '10.8059090', '106.7093858', '106.7095085'],
-  },
-  {
-    place_id: 253649538,
-    licence:
-      'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
-    osm_type: 'way',
-    osm_id: 1105792206,
-    lat: '10.8012953',
-    lon: '106.7092837',
-    category: 'highway',
-    type: 'primary',
-    place_rank: 26,
-    importance: 0.0533433333333333,
-    addresstype: 'road',
-    name: 'Đường Đinh Bộ Lĩnh',
-    display_name:
-      'Đường Đinh Bộ Lĩnh, Phường 15, Quận Bình Thạnh, Thành phố Hồ Chí Minh, 72508, Việt Nam',
-    address: {
-      road: 'Đường Đinh Bộ Lĩnh',
-      quarter: 'Phường 15',
-      suburb: 'Quận Bình Thạnh',
-      city: 'Thành phố Hồ Chí Minh',
-      'ISO3166-2-lvl4': 'VN-SG',
-      postcode: '72508',
-      country: 'Việt Nam',
-      country_code: 'vn',
-    },
-    boundingbox: ['10.8012953', '10.8014646', '106.7092837', '106.7092926'],
-  },
-];

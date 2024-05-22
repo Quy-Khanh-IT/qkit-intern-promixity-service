@@ -1,18 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateBusinessDto } from './create-business.dto';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Max,
-  Min,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { DayOpenCloseTimeSchema } from '../entities/dayOpenCloseTime.entity';
+import { PartialType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
+
 import { UpdateAddressDto } from './update-address.dto';
 
 export class ValidateAddressDto extends PartialType(UpdateAddressDto) {

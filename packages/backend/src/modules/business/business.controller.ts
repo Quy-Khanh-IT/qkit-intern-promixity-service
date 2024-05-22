@@ -1,43 +1,65 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
   HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
   Req,
   UseGuards,
-  Query,
 } from '@nestjs/common';
-import { BusinessService } from './business.service';
-import { CreateBusinessDto } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
-import { Business } from './entities/business.entity';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiQuery,
   ApiResponse,
   ApiTags,
-  ApiQuery,
 } from '@nestjs/swagger';
-import { ParseFloat } from '../../cores/decorators/parseFloat.decorator';
 import { Request } from 'express';
-import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
-
 import {
   BusinessStatusEnum,
   DeleteActionEnum,
   StatusActionsEnum,
 } from 'src/common/enums';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+
+import { BusinessService } from './business.service';
+import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
+import { Business } from './entities/business.entity';
 
 @Controller('businesses')
 @ApiTags('businesses')
 @ApiBearerAuth()
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
+
+  @Get('nearby')
+  @HttpCode(200)
+  @ApiQuery({ name: 'longitude', required: true })
+  @ApiQuery({ name: 'latitude', required: true })
+  @ApiQuery({ name: 'maxDistance', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business nearby.',
+  })
+  async getNearby(
+    @Query('longitude') longitude: string,
+    @Query('latitude') latitude: string,
+    @Query('maxDistance') maxDistance: string,
+  ) {
+    const result = await this.businessService.findNearBy(
+      longitude,
+      latitude,
+      maxDistance,
+    );
+
+    return result;
+  }
 
   @Get('status')
   @UseGuards(JwtAccessTokenGuard)
@@ -77,7 +99,6 @@ export class BusinessController {
   })
   async create(
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     createBusinessDto: CreateBusinessDto,
     @Req() req: Request,
   ) {
@@ -100,11 +121,10 @@ export class BusinessController {
   async updateInformation(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateBusinessDto: UpdateBusinessDto,
     @Req() req: Request,
   ) {
-    const result: Boolean = await this.businessService.updateInformation(
+    const result: boolean = await this.businessService.updateInformation(
       id,
       req.user.businesses,
       updateBusinessDto,
@@ -124,7 +144,6 @@ export class BusinessController {
   async updateAddresses(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateAddressDto: UpdateAddressDto,
     @Req() req: Request,
   ) {
@@ -148,7 +167,6 @@ export class BusinessController {
   async updateImages(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateAddressDto: UpdateAddressDto,
     @Req() req: Request,
   ) {
@@ -175,7 +193,7 @@ export class BusinessController {
     @Req() req: Request,
   ) {
     if (type === DeleteActionEnum.SOFT) {
-      const result: Boolean = await this.businessService.softDelete(
+      const result: boolean = await this.businessService.softDelete(
         id,
         req.user,
       );
@@ -184,7 +202,7 @@ export class BusinessController {
     }
 
     if (type === DeleteActionEnum.HARD) {
-      const result: Boolean = await this.businessService.hardDelete(
+      const result: boolean = await this.businessService.hardDelete(
         id,
         req.user,
       );
@@ -203,7 +221,7 @@ export class BusinessController {
     description: 'User successfully restore business.',
   })
   async restore(@Param('id') id: string) {
-    const result: Boolean = await this.businessService.restore(id);
+    const result: boolean = await this.businessService.restore(id);
 
     return result;
   }
@@ -221,7 +239,7 @@ export class BusinessController {
     @Param('id') id: string,
     @Query('type') type: StatusActionsEnum,
   ) {
-    const result: Boolean = await this.businessService.handleStatus(id, type);
+    const result: boolean = await this.businessService.handleStatus(id, type);
 
     return result;
   }

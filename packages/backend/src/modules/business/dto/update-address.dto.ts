@@ -1,18 +1,5 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateBusinessDto } from './create-business.dto';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Max,
-  Min,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { DayOpenCloseTimeSchema } from '../entities/dayOpenCloseTime.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 export class UpdateAddressDto {
   @IsString()
@@ -35,17 +22,16 @@ export class UpdateAddressDto {
   @ApiProperty({ example: 'Quận 1' })
   district: string;
 
+  @IsObject()
   @IsNotEmpty()
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
-  @ApiProperty({ example: '106.698387' })
-  longitude: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
-  @ApiProperty({ example: '10.775114' })
-  latitude: string;
+  @ApiProperty({
+    example: {
+      location: {
+        coordinates: [106.698387, 10.775114],
+      },
+    },
+  })
+  location: {
+    coordinates: number[];
+  };
 }
