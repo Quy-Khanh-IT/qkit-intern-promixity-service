@@ -22,7 +22,6 @@ import {
   ApiTags,
   ApiQuery,
 } from '@nestjs/swagger';
-import { ParseFloat } from '../../cores/decorators/parseFloat.decorator';
 import { Request } from 'express';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 
@@ -77,7 +76,6 @@ export class BusinessController {
   })
   async create(
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     createBusinessDto: CreateBusinessDto,
     @Req() req: Request,
   ) {
@@ -100,7 +98,6 @@ export class BusinessController {
   async updateInformation(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateBusinessDto: UpdateBusinessDto,
     @Req() req: Request,
   ) {
@@ -124,7 +121,6 @@ export class BusinessController {
   async updateAddresses(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateAddressDto: UpdateAddressDto,
     @Req() req: Request,
   ) {
@@ -148,7 +144,6 @@ export class BusinessController {
   async updateImages(
     @Param('id') id: string,
     @Body()
-    @ParseFloat(['longitude', 'latitude'])
     updateAddressDto: UpdateAddressDto,
     @Req() req: Request,
   ) {

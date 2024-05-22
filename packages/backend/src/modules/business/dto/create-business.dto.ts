@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsString,
@@ -18,7 +18,7 @@ import { BusinessConstant } from 'src/common/constants/business.constant';
 import { DayEnum } from 'src/common/enums';
 
 export class DayOpenCloseTime {
-  @IsEnum(DayEnum) // Validate against the DayEnum enum
+  @IsEnum(DayEnum)
   @ApiProperty({ enum: DayEnum })
   day: string;
 
@@ -48,9 +48,8 @@ export class CreateBusinessDto {
   @ApiProperty({ example: 'QKIT Coffee làng đại học' })
   name: string;
 
-  @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'This is coffee shop' })
+  @ApiPropertyOptional({ example: 'This is coffee shop' })
   description: string;
 
   @IsNotEmpty()
@@ -58,25 +57,22 @@ export class CreateBusinessDto {
   @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
   category: string;
 
-  @IsOptional()
   @IsArray()
-  @ApiProperty({ example: ['66446c971b53183d5e868de4'] })
+  @ApiPropertyOptional({ example: ['66446c971b53183d5e868de4'] })
   services: string[];
 
-  @IsOptional()
   @IsPhoneNumber('VN')
-  @ApiProperty({ example: '0816429333' })
+  @ApiPropertyOptional({ example: '0816429333' })
   phoneNumber: string;
 
   @IsOptional()
   @ApiProperty({ example: 'https://qkit.vn/company-profile' })
   website: string;
 
-  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DayOpenCloseTime)
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: [{ day: 'monday', openTime: '08:00', closeTime: '12:00' }],
   })
   dayOfWeek: DayOpenCloseTime[];
@@ -96,8 +92,8 @@ export class CreateBusinessDto {
   @ApiProperty({ example: 'Quận 1' })
   district: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   @ApiProperty({ example: 'Lý Tự Trọng' })
   addressLine: string;
 
@@ -107,14 +103,12 @@ export class CreateBusinessDto {
   addressLineFull: string;
 
   @IsNotEmpty()
-  @IsNumber()
   @Min(-180)
   @Max(180)
   @ApiProperty({ example: '106.698387' })
   longitude: string;
 
   @IsNotEmpty()
-  @IsNumber()
   @Min(-90)
   @Max(90)
   @ApiProperty({ example: '10.775114' })
