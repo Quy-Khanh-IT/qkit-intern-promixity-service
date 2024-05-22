@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { Image } from 'antd'
 import './service-slick.scss'
 
 export default function ServiceSlick(service: { service: { image: string; name: string } }) {
@@ -17,7 +17,7 @@ export default function ServiceSlick(service: { service: { image: string; name: 
               justifyContent: 'center'
             }}
           >
-            <Image style={{ height: '42px' }} src={service.service.image} alt='' />
+            <img style={{ height: '42px' }} src={service.service.image} alt='' />
           </div>
         </div>
 

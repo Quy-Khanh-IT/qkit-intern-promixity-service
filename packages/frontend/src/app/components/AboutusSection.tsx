@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './about-us-section.scss'
-import Image from 'next/image'
+import { Image } from 'antd'
 
 export default function AboutUsSection() {
   const [tabs, setTabs] = useState<number>(0)
