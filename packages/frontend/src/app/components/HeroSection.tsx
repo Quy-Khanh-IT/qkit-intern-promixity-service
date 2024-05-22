@@ -40,10 +40,10 @@ export default function HeroSection() {
           </div>
           <div style={{ maxWidth: '700px', marginTop: '8px' }}>
             <span>
-              Welcome to <strong style={{ color: '#64ffda', fontWeight: '500' }}> Proximity Service</strong> ! We're a
-              platform dedicated to providing exceptional location-based experiences with unique customization options
-              and utilities. With advanced technology and a vast database, we make it easy for you to find places,
-              calculate distances, and even create proximity zones. Discover how{' '}
+              Welcome to <strong style={{ color: '#64ffda', fontWeight: '500' }}> Proximity Service</strong> !
+              We`&apos;re a platform dedicated to providing exceptional location-based experiences with unique
+              customization options and utilities. With advanced technology and a vast database, we make it easy for you
+              to find places, calculate distances, and even create proximity zones. Discover how{' '}
               <strong style={{ color: '#64ffda', fontWeight: '500' }}> Proximity Service</strong> can enhance your
               journey starting now!
             </span>

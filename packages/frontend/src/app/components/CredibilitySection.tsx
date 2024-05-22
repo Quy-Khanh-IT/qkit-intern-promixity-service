@@ -1,6 +1,5 @@
 'use client'
 import './creadibility-section.scss'
-import { useRef } from 'react'
 
 export default function AboutUsSection() {
   return (
@@ -26,15 +25,7 @@ export default function AboutUsSection() {
             </div>
           </div>
         </div>
-        <div
-          className='ts-card'
-          style={
-            {
-              '--card-color': '#146ef5',
-              '--blur-color': 'rgba(21, 115, 255, 0.45)'
-            } as any
-          }
-        >
+        <div className='ts-card'>
           <div className='ts-card-content'>
             <div className='ts-card-title'>RESPONSE SPEED</div>
             <div className='ts-card-description'>
@@ -47,15 +38,7 @@ export default function AboutUsSection() {
             </div>
           </div>
         </div>
-        <div
-          className='ts-card'
-          style={
-            {
-              '--card-color': '#ed52cb',
-              '--blur-color': 'rgba(237, 82, 203,0.4)'
-            } as any
-          }
-        >
+        <div className='ts-card'>
           <div className='ts-card-content'>
             <div className='ts-card-title'>OBSERVE</div>
             <div className='ts-card-description'>
