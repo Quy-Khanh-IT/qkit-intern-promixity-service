@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './about-us-section.scss'
+import './about-section.scss'
 import { Image } from 'antd'
 
 export default function AboutUsSection() {
