@@ -1,34 +1,35 @@
-import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
-import { Business } from './entities/business.entity';
-import { BusinessRepository } from './repository/business.repository';
-import {
-  ERRORS_DICTIONARY,
-  ERROR_CODES,
-} from 'src/common/constants/error.constant';
-import { User } from '../user/entities/user.entity';
-import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { UserService } from '../user/user.service';
-import { transObjectIdToString } from 'src/common/utils';
-import { AxiosService } from '../axios/axios.service';
+import { Types } from 'mongoose';
+import {
+  ERROR_CODES,
+  ERRORS_DICTIONARY,
+} from 'src/common/constants/error.constant';
 import {
   BusinessStatusEnum,
-  StatusActionsEnum,
   OrderNumberDay,
+  StatusActionsEnum,
 } from 'src/common/enums';
-import { ConfigService } from '@nestjs/config';
-import { UpdateAddressDto } from './dto/update-address.dto';
-import { Types } from 'mongoose';
-import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
-import { ValidateAddressDto } from './dto/validate-address.dto';
 import {
   BusinessInvalidException,
   BusinessNotFoundException,
   BusinessStatusException,
 } from 'src/common/exceptions/business.exception';
+import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { transObjectIdToString } from 'src/common/utils';
+
+import { AxiosService } from '../axios/axios.service';
+import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
+import { ValidateAddressDto } from './dto/validate-address.dto';
+import { Business } from './entities/business.entity';
+import { BusinessRepository } from './repository/business.repository';
 
 @Injectable()
 export class BusinessService {
@@ -235,7 +236,7 @@ export class BusinessService {
     businessId: string,
     userBusinesses: Types.ObjectId[],
     updateBusinessDto: UpdateBusinessDto,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     // check if business belongs to user
     const found = userBusinesses.find((id) => id.toString() === businessId);
 
@@ -424,7 +425,7 @@ export class BusinessService {
 
   async validateAddress(
     validateAddressDto: ValidateAddressDto,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     const reverseData = await this.nominatimOsmService.reverse({
       latitude: validateAddressDto.latitude,
       longitude: validateAddressDto.longitude,
@@ -458,7 +459,7 @@ export class BusinessService {
       splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
     }
 
-    let reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
+    const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
       return acc.concat(item);
     }, '');
 
@@ -474,7 +475,7 @@ export class BusinessService {
       slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
     }
 
-    let AddressLineStr = slitAddressLine.reduce((acc, item) => {
+    const AddressLineStr = slitAddressLine.reduce((acc, item) => {
       return acc.concat(item);
     }, '');
 
