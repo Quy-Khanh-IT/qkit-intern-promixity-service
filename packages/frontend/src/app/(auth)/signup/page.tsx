@@ -9,7 +9,6 @@ import { useRegisterUserMutation } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 import { ErrorRespone, RegisterData, RegisterDataErrors } from '@/types/error'
 import { ProvincesQueryResponse, DistrictsQueryResponse, Province, District } from '@/types/address'
-import Image from 'next/image'
 
 export default function SignUp() {
   const [provinces, setProvinces] = useState<Province[]>([])
@@ -209,7 +208,7 @@ export default function SignUp() {
         <div className='content-wrapper'>
           <div className='content-full'>
             <div className='logo-wrapper'>
-              <Image onClick={redirectHome} src='/logo.png' alt='logo' />
+              <img onClick={redirectHome} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper f-form'>
               <h2>Welcome to Proximity Service</h2>
