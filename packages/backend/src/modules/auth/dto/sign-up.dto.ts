@@ -8,7 +8,7 @@ import {
   Matches,
   MaxLength,
 } from 'class-validator';
-import { OTPConstant, UserConstant } from 'src/common/constants';
+import { UserConstant } from 'src/common/constants';
 import { EmailRegrex } from 'src/common/utils';
 
 export class SignUpDto {
@@ -44,10 +44,4 @@ export class SignUpDto {
   @ApiPropertyOptional({ example: '0389185482' })
   @IsPhoneNumber('VN')
   phoneNumber: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: '1H34as' })
-  @Length(OTPConstant.OTP_LENGTH)
-  otp: string;
 }

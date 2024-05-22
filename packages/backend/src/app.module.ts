@@ -7,22 +7,19 @@ import { AppService } from './app.service';
 import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
 import { DatabaseModule } from './cores/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BusinessModule } from './modules/business/business.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
-import { BusinessModule } from './modules/business/business.module';
 
-import { join } from 'path';
-import { TokenModule } from './modules/token/token.module';
-import { AxiosModule } from './modules/axios/axios.module';
-import { ServiceModule } from './modules/service/service.module';
-import { CategoryModule } from './modules/category/category.module';
-import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';
 import { AddressModule } from './modules/address/address.module';
-import { SeedService } from './seeds/seed.service';
 import { DistrictModule } from './modules/address/district.module';
 import { ProvinceModule } from './modules/address/province.module';
+import { CategoryModule } from './modules/category/category.module';
+import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';
+import { ServiceModule } from './modules/service/service.module';
+import { SeedService } from './seeds/seed.service';
 
 @Module({
   imports: [

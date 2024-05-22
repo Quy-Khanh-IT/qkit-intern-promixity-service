@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -54,12 +56,16 @@ export class UserService {
     private readonly requestService: RequestService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    // @Inject(forwardRef(() => BusinessService))
+    @Inject(forwardRef(() => BusinessService))
     private readonly BusinessService: BusinessService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
+  }
+
+  async updateVerifiedStatusByEmail(id: string, status: boolean) {
+    return await this.userRepository.update(id, { isVerified: status });
   }
 
   async softDeleteById(id: string): Promise<boolean> {

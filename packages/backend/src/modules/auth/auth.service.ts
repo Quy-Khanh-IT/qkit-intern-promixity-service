@@ -10,19 +10,22 @@ import {
   ConfigKey,
   ERRORS_DICTIONARY,
   ERROR_MESSAGES,
+  OTPConstant,
 } from 'src/common/constants';
 import { AuthConstant } from 'src/common/constants/auth.constant';
 import { TypeRequests, UserRole } from 'src/common/enums';
 import {
+  EmailExistedException,
   EmailNotExistedException,
   OTPNotMatchException,
   PhoneExistedException,
   TokenExpiredException,
   TokenResetExceededLimitException,
+  UnVerifiedUser,
   UserNotFoundException,
   WrongCredentialsException,
 } from 'src/common/exceptions';
-import { verifyHash } from 'src/common/utils';
+import { transObjectIdToString, verifyHash } from 'src/common/utils';
 import { MailService } from '../mail/mail.service';
 import { OtpService } from '../otp/otp.service';
 import { RequestService } from '../request/request.service';
@@ -48,12 +51,28 @@ export class AuthService {
     private readonly requestService: RequestService,
   ) {}
 
-  public async signUp(registrationData: SignUpDto): Promise<User> {
+  public async verifyUser(user: User, otp: string): Promise<boolean> {
+    const otps = await this.otpService.findManyByEmail(user.email, 5);
+
+    if (!otps.count || otps.items[0].otp !== otp) {
+      throw new OTPNotMatchException();
+    }
+
+    await this.userService.updateVerifiedStatusByEmail(user.id, true);
+
+    this.mailService.sendWelcomeMail(
+      user.email,
+      'Welcome to our Proximity Service',
+    );
+    return true;
+  }
+
+  public async signUp(registrationData: SignUpDto): Promise<string> {
     const isExistingEmail = await this.userService.checkEmailExist(
       registrationData.email,
     );
     if (isExistingEmail) {
-      throw new PhoneExistedException();
+      throw new EmailExistedException();
     }
 
     const isExistingPhone = await this.userService.checkPhoneExist(
@@ -64,18 +83,9 @@ export class AuthService {
       throw new PhoneExistedException();
     }
 
-    const otps = await this.otpService.findManyByEmail(
-      registrationData.email,
-      5,
-    );
-
-    if (!otps.count || otps.items[0].otp !== registrationData.otp) {
-      throw new OTPNotMatchException();
-    }
-
     const hashedPassword: string = await argon2.hash(registrationData.password);
 
-    return await this.userService.create({
+    const result = await this.userService.create({
       firstName: registrationData.firstName,
       lastName: registrationData.lastName,
       email: registrationData.email,
@@ -83,10 +93,25 @@ export class AuthService {
       phoneNumber: registrationData.phoneNumber,
       role: UserRole.USER,
       image: null,
+      isVerified: false,
     });
+
+    const [jwtToken, otpResult] = await Promise.all([
+      this.JWTTokenService.generateVerifyToken({
+        action: 'verify',
+        user_id: transObjectIdToString(result._id),
+      }),
+      this.otpService.createForRegister(registrationData.email),
+    ]);
+    this.mailService.sendOTPMail(
+      registrationData.email,
+      'OTP Code for registration',
+      otpResult.otp,
+    );
+    return jwtToken;
   }
 
-  public async login(loginData: LoginDto): Promise<LoginResponseDto> {
+  public async login(loginData: LoginDto): Promise<LoginResponseDto | void> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new EmailNotExistedException();
@@ -98,14 +123,37 @@ export class AuthService {
     if (!isMatchingPassword) {
       throw new WrongCredentialsException();
     }
+
+    if (!user.isVerified) {
+      return this.processLoginWithUnVerifiedUser(user);
+    }
+
     const pairToken = await this.JWTTokenService.genNewPairToken({
       user_id: user._id.toString(),
       action: 'login',
     });
+
     return {
       accessToken: pairToken[0],
       refreshToken: pairToken[1],
     };
+  }
+
+  async processLoginWithUnVerifiedUser(user: User) {
+    const jwt = await this.JWTTokenService.generateVerifyToken({
+      action: 'verify',
+      user_id: user.id,
+    });
+    const otpCodes = await this.otpService.findManyByEmail(user.email, 5);
+    if (otpCodes.count < OTPConstant.OTP_MAX_VERIFY_EMAIL) {
+      const newOtpCode = await this.otpService.createForRegister(user.email);
+      this.mailService.sendOTPMail(
+        user.email,
+        'OTP Code for registration',
+        newOtpCode.otp,
+      );
+    }
+    throw new UnVerifiedUser(jwt);
   }
 
   public async requestResetPassword(

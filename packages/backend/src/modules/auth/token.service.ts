@@ -20,6 +20,15 @@ export class JWTTokenService {
     });
   }
 
+  async generateVerifyToken(payload: TokenPayload) {
+    return this.jwtService.sign(payload, {
+      secret: `${this.configService.get<number>(ConfigKey.VERIFY_TOKEN_KEY)}`,
+      expiresIn: `${this.configService.get<string>(
+        ConfigKey.JWT_VERIFY_TOKEN_EXPIRATION_TIME,
+      )}s`,
+    });
+  }
+
   async generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       secret: `${this.configService.get<number>(ConfigKey.REFRESH_SECRET_KEY)}`,

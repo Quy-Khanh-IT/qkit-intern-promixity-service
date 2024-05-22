@@ -16,7 +16,7 @@ export class Requests extends BaseEntity {
 
   @Prop({ required: true, trim: true, type: Types.ObjectId })
   userId: ObjectId;
-
+  //host/users/requeset-reset-email
   @Prop({
     required: true,
     name: 'expired_at',

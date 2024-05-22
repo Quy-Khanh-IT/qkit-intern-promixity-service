@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude } from 'class-transformer';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { UserRole } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
@@ -40,6 +40,9 @@ export class User extends BaseEntity {
 
   @Prop({ unique: true })
   phoneNumber: string;
+
+  @Prop({ default: false })
+  isVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
