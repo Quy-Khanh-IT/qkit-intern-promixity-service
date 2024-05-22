@@ -5,19 +5,19 @@ import NavBar from '@/app/components/NavBar'
 import ServiceSlider from '@/app/components/ServiceSlider'
 import StarsCanvas from './components/canvas/Star'
 import CredibilitySection from './components/CredibilitySection'
-import NavProcessBar from './components/NavProcessBar'
-import AboutUsSection from './components/AboutUsSection'
+import ProcessBar from './components/ProcessBar'
+import AboutSection from './components/AboutSection'
 
 export default function Home() {
   return (
     <main>
-      <NavProcessBar />
+      <ProcessBar />
       <NavBar />
       <div style={{ position: 'relative', zIndex: 0 }} className='scroll-bar-1'>
         <HeroSection />
         <CredibilitySection />
         <StarsCanvas />
-        <AboutUsSection />
+        <AboutSection />
       </div>
       <ServiceSlider />
 
