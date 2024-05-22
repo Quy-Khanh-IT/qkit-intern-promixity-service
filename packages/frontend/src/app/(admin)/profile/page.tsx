@@ -91,20 +91,20 @@ const Profile: React.FC = () => {
 
   // async
   const fetchUser = () => {
-    try {
-      // const response = await getMyProfile()
-      // form.setFieldsValue({
-      //   firstName: response.firstName,
-      //   lastName: response.lastName,
-      //   email: response.email,
-      //   phone: response.phone,
-      //   address: response.address
-      // })
-      // setUser(response)
-    } catch (error: any) {
-      console.error('Error when get data in view user details:', error)
-      // toast.error(error.response.data.message)
-    }
+    // try {
+    //   // const response = await getMyProfile()
+    //   // form.setFieldsValue({
+    //   //   firstName: response.firstName,
+    //   //   lastName: response.lastName,
+    //   //   email: response.email,
+    //   //   phone: response.phone,
+    //   //   address: response.address
+    //   // })
+    //   // setUser(response)
+    // } catch (error: any) {
+    //   console.error('Error when get data in view user details:', error)
+    //   // toast.error(error.response.data.message)
+    // }
   }
 
   const onChangeEditBtn = () => {

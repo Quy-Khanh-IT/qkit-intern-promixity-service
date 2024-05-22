@@ -7,7 +7,7 @@ import { useGetDistrictByProvinceCodeQuery, useGetProvincesQuery } from '@/servi
 import { ToastService } from '@/services/toast.service'
 import { useRegisterUserMutation } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
-import { ErrorRespone, RegisterData, RegisterDataErrors } from '@/types/error'
+import { ErrorResponse, RegisterData, RegisterDataErrors } from '@/types/error'
 import { ProvincesQueryResponse, DistrictsQueryResponse, Province, District } from '@/types/address'
 
 export default function SignUp() {
@@ -142,7 +142,7 @@ export default function SignUp() {
       setIsGetOTP(false)
     }
     if (isOTPError) {
-      const errorResponse = otpError as ErrorRespone
+      const errorResponse = otpError as ErrorResponse
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
@@ -154,13 +154,13 @@ export default function SignUp() {
       router.push('/signin')
     }
     if (isRegisterError) {
-      const errorResponse = registerError as ErrorRespone
+      const errorResponse = registerError as ErrorResponse
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
   }, [isRegisterSuccess, isRegisterError])
 
-  const handleError = (error: ErrorRespone) => {
+  const handleError = (error: ErrorResponse) => {
     if (error?.data?.errors) {
       setRegisterDataErrors((prevInputError) => {
         const newInputError: RegisterDataErrors = { ...prevInputError }

@@ -4,7 +4,7 @@ import { ToastService } from '@/services/toast.service'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
-import { ErrorRespone } from '@/types/error'
+import { ErrorResponse } from '@/types/error'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -26,13 +26,13 @@ export default function SignIn() {
       toastService.success('Login success')
     }
     if (isLoginError) {
-      const errorResponse = loginError as ErrorRespone
+      const errorResponse = loginError as ErrorResponse
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
   }, [isLoginSuccess, isLoginError, loginError, toastService])
 
-  const handleError = (error: ErrorRespone) => {
+  const handleError = (error: ErrorResponse) => {
     if (error?.data?.errors) {
       setInputError((prevInputError) => {
         const newInputError: { email: string; password: string } = { ...prevInputError }

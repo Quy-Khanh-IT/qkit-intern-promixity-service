@@ -1,4 +1,4 @@
-export interface ErrorRespone {
+export interface ErrorResponse {
   data?: {
     errors?: {
       [key: string]: string[]
