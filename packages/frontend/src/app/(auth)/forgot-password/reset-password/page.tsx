@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function ResetPassword() {
   const [resetPassworData, setResetPasswordData] = useState({
@@ -21,7 +22,7 @@ export default function ResetPassword() {
         <div className='content-wrapper'>
           <div className='content-full'>
             <div className='logo-wrapper'>
-              <img src='/logo.png' alt='logo' />
+              <Image src='/logo.png' alt='logo' />
             </div>
             <div className='reset-password-wrapper d-flex justify-content-center align-items-center flex-column'>
               <div className='icon-email-wrapper d-flex justify-content-center align-items-center'>

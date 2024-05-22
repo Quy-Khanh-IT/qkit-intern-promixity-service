@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './about-us-section.scss'
+import Image from 'next/image'
 
 export default function AboutUsSection() {
   const [tabs, setTabs] = useState<number>(0)
@@ -17,7 +18,7 @@ export default function AboutUsSection() {
             <h1>
               {' '}
               We provide the best <strong>finding</strong> service for you
-              <img src='./images/zigzag.png' alt='zigzag' />
+              <Image src='./images/zigzag.png' alt='zigzag' />
             </h1>
           </div>
 
@@ -74,7 +75,7 @@ export default function AboutUsSection() {
             ) : tabs === 2 ? (
               <div className='tab-item'>
                 <div className='content'>
-                  Our vision is to become an indispensable part of people's daily lives, by providing a smart and
+                  Our vision is to become an indispensable part of people&apos;s daily lives, by providing a smart and
                   convenient connectivity platform. We hope to create a strong community where people can enjoy
                   memorable relationships and experiences in everyday life.
                 </div>
@@ -94,7 +95,7 @@ export default function AboutUsSection() {
         </div>
 
         <div className='aboutus-thumb'>
-          <img className='thumb-1' src='./images/earth-aboutus.svg' alt='thumb'></img>
+          <Image className='thumb-1' src='./images/earth-aboutus.svg' alt='thumb' />
         </div>
       </div>
       <div className='aboutus-section-bottom'>
