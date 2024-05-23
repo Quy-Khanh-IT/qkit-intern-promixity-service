@@ -5,18 +5,18 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react'
 
 // import { ManageUserReloadContext } from '~/context/ManageUserContext'
 // import { useDeleteUserMutation, useRestoreUserMutation } from '~/services/user.service'
+import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './delete-user.scss'
-import { IUserInformation } from '@/types/user'
-import { IModalMethods } from '../modal'
 
 export interface IDeleteUserProps {
-  userOne: IUserInformation | null
-  isDeleted: boolean | null
+  title: string
+  content: React.ReactNode
+  handleConfirm: () => void
 }
 
-const _DeleteUserModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserProps> = (
-  { userOne: _temp, isDeleted },
+const _DeleteModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserProps> = (
+  { title, content, handleConfirm },
   ref
 ) => {
   const [open, setOpen] = useState(false)
@@ -30,11 +30,15 @@ const _DeleteUserModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUse
     hideModal: () => setOpen(false)
   }))
 
-  const handleCancel = () => {
+  const handleCancelChild = () => {
     setOpen(false)
   }
 
-  const handleDeleteUser = async () => {
+  const handleConfirmChild = () => {
+    handleConfirm()
+  }
+
+  const _handleDeleteUser = async () => {
     // if (userOne) {
     //   isDeleted
     //     ? await restoreUser(userOne.id)
@@ -60,26 +64,22 @@ const _DeleteUserModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUse
     // }
   }
 
-  const handleOk = () => {
-    handleDeleteUser()
-  }
-
   return (
     <>
       <Modal
         className='view-modal'
-        title='Xoá tài khoản'
+        title={title}
         open={open}
         transitionName='ant-move-up'
         width={'600px'}
-        onCancel={handleCancel}
+        onCancel={handleCancelChild}
         footer={[
-          <Button className='btn-cancel' onClick={handleCancel} type='primary' key='cancel'>
+          <Button className='btn-cancel' onClick={handleConfirmChild} type='primary' key='cancel'>
             Đóng
           </Button>,
           <Button
             className='btn-primary'
-            onClick={handleOk}
+            onClick={handleConfirm}
             type='primary'
             key='ok'
             // loading={confirmLoading}
@@ -88,14 +88,11 @@ const _DeleteUserModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUse
           </Button>
         ]}
       >
-        <div className='content-box'>
-          {isDeleted ? 'Bạn chắc chắn muốn khôi phục tài khoản' : 'Bạn chắc chắn muốn xoá tài khoản'}
-          <strong>{' ' + 'ndtuan21@gmail.com'}</strong>?
-        </div>
+        <div className='content-box'>{content}</div>
       </Modal>
     </>
   )
 }
 
-const DeleteUserModal = forwardRef(_DeleteUserModal)
-export default DeleteUserModal
+const DeleteModal = forwardRef(_DeleteModal)
+export default DeleteModal
