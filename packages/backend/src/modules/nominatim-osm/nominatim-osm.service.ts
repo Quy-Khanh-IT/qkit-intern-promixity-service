@@ -32,7 +32,7 @@ export class NominatimOsmService {
       country: structureDto.country,
       city: structureDto.district,
       state: structureDto.province,
-      street: structureDto.addressLine,
+      street: structureDto.address_line,
     };
 
     const params = { ...constructor, ...this.optsParam };

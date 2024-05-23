@@ -43,7 +43,7 @@ export class SignUpDto {
   @IsOptional()
   @ApiPropertyOptional({ example: '0389185482' })
   @IsPhoneNumber('VN')
-  phoneNumber: string;
+  phone_number: string;
 
   @IsString()
   @IsNotEmpty()

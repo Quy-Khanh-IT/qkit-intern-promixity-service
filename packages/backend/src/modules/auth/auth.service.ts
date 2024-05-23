@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     const isExistingPhone = await this.userService.checkPhoneExist(
-      registrationData.phoneNumber,
+      registrationData.phone_number,
     );
 
     if (isExistingPhone) {
@@ -80,7 +80,7 @@ export class AuthService {
       lastName: registrationData.lastName,
       email: registrationData.email,
       password: hashedPassword,
-      phoneNumber: registrationData.phoneNumber,
+      phone_number: registrationData.phone_number,
       role: UserRole.USER,
       image: null,
     });

@@ -72,7 +72,7 @@ export class UserService {
 
   async checkPhoneExist(phone: string): Promise<boolean> {
     const result = await this.userRepository.findOneByCondition({
-      phoneNumber: phone,
+      phone_number: phone,
     });
     return result ? true : false;
   }
@@ -106,7 +106,7 @@ export class UserService {
       firstName: result.firstName,
       lastName: result.lastName,
       image: result.image,
-      phoneNumber: result.phoneNumber,
+      phone_number: result.phone_number,
     };
   }
 
@@ -139,7 +139,7 @@ export class UserService {
       matchStage['businesses'] = transStringToObjectId(query.businessId);
     }
     if (query.phone) {
-      matchStage['phoneNumber'] = query.phone;
+      matchStage['phone_number'] = query.phone;
     }
 
     const result = PaginationHelper.configureBaseQueryFilter(
@@ -233,7 +233,7 @@ export class UserService {
       firstName: result.firstName,
       lastName: result.lastName,
       image: result.image,
-      phoneNumber: result.phoneNumber,
+      phone_number: result.phone_number,
     };
   }
 
@@ -448,8 +448,8 @@ export class UserService {
     return user;
   }
 
-  async getAllByUser(user: User): Promise<FindAllResponse<Business> | []> {
-    const businesses = await this.BusinessService.getAllByUser(user);
+  async getAllByUser(userId: string): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByUser(userId);
 
     return businesses;
   }

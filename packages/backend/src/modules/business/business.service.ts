@@ -1,5 +1,4 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Types } from 'mongoose';
@@ -13,20 +12,18 @@ import {
   StatusActionsEnum,
 } from 'src/common/enums';
 import {
-  BusinessInvalidException,
+  BusinessInvalidAddressException,
+  BusinessNotBelongException,
   BusinessNotFoundException,
   BusinessStatusException,
 } from 'src/common/exceptions/business.exception';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { transObjectIdToString } from 'src/common/utils';
 
-import { AxiosService } from '../axios/axios.service';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
-import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
+import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
@@ -37,8 +34,6 @@ export class BusinessService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly businessRepository: BusinessRepository,
-    private readonly axiosService: AxiosService,
-    private readonly configService: ConfigService,
     private readonly nominatimOsmService: NominatimOsmService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
@@ -71,8 +66,6 @@ export class BusinessService {
 
     const availableActions: string[] = [];
 
-    console.log('availableActions: ', availableActions);
-
     const response: FindAllResponse<Business> = {
       count: businesses.count,
       items: businesses.items,
@@ -81,9 +74,9 @@ export class BusinessService {
     return response;
   }
 
-  async getAllByUser(user: User): Promise<FindAllResponse<Business>> {
+  async getAllByUser(userId: string): Promise<FindAllResponse<Business>> {
     const businesses = await this.businessRepository.findAll({
-      _id: { $in: user.businesses },
+      user_id: userId,
     });
 
     return businesses;
@@ -94,9 +87,9 @@ export class BusinessService {
     userId: string,
   ): Promise<Business> {
     // Validate open time and close time
-    let { dayOfWeek } = createBusinessDto;
+    let { day_of_week } = createBusinessDto;
 
-    for (const day of dayOfWeek) {
+    for (const day of day_of_week) {
       const startHH = parseInt(day.openTime.split(':')[0]);
       const startMM = parseInt(day.openTime.split(':')[1]);
       const endHH = parseInt(day.closeTime.split(':')[0]);
@@ -115,13 +108,7 @@ export class BusinessService {
 
       // Validate open time and close time must be between 0 and 59
       if (startMM < 0 || startMM > 59 || endMM < 0 || endMM > 59) {
-        throw new HttpException(
-          {
-            message: ERRORS_DICTIONARY.INVALID_INPUT,
-            detail: 'Open time and close time must be between 0 and 59',
-          },
-          ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-        );
+        throw new BusinessInvalidAddressException();
       }
 
       // opening 24H
@@ -146,7 +133,7 @@ export class BusinessService {
     }
 
     // Format if not true form of HH or MM from 0 to 00, 1 to 01, 2 to 02,...
-    dayOfWeek.forEach((day) => {
+    day_of_week.forEach((day) => {
       day.openTime = day.openTime
         .split(':')
         .map((time) => (time.length === 1 ? `0${time}` : time))
@@ -158,7 +145,7 @@ export class BusinessService {
     });
 
     // Assign order number for each day
-    dayOfWeek = dayOfWeek.map((day) => {
+    day_of_week = day_of_week.map((day) => {
       return {
         ...day,
         order: OrderNumberDay[day.day],
@@ -166,17 +153,17 @@ export class BusinessService {
     }) as DayOpenCloseTime[];
 
     // Sort day of week by order number
-    dayOfWeek = dayOfWeek.sort(
+    day_of_week = day_of_week.sort(
       (a, b) => a.order - b.order,
     ) as DayOpenCloseTime[];
 
     // Assign day of week to createBusinessDto
     createBusinessDto = {
       ...createBusinessDto,
-      dayOfWeek,
+      day_of_week,
     };
 
-    const { country, province, district, addressLine, location } =
+    const { country, province, district, address_line, location } =
       createBusinessDto;
 
     // Validate address
@@ -184,90 +171,85 @@ export class BusinessService {
       country,
       province,
       district,
-      addressLine,
+      address_line,
       location,
     });
 
     if (!isValid) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.INVALID_INPUT,
-          detail: 'Invalid address line',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-      );
+      throw new BusinessInvalidAddressException();
     }
 
-    // Start transaction assign business to user in userSchema if create business success
-    // If create business fail, rollback transaction
-    const transactionSession = await this.connection.startSession();
+    const business = await this.businessRepository.create({
+      ...createBusinessDto,
+      user_id: userId,
+    });
 
-    try {
-      transactionSession.startTransaction();
-
-      const business = await this.businessRepository.create(createBusinessDto);
-
-      const businessId = transObjectIdToString(business._id);
-
-      await this.userService.addBusiness(userId, businessId);
-
-      await transactionSession.commitTransaction();
-
-      transactionSession.endSession();
-
-      return business;
-    } catch (err) {
-      await transactionSession.abortTransaction();
-
-      transactionSession.endSession();
-
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.INVALID_INPUT,
-          detail: 'Create business fail. Please try again later',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.INVALID_INPUT],
-      );
-    }
+    return business;
   }
 
   async updateInformation(
     businessId: string,
-    userBusinesses: Types.ObjectId[],
-    updateBusinessDto: UpdateBusinessDto,
+    userId: string,
+    updateInformationDto: UpdateInformationDto,
   ): Promise<boolean> {
     // check if business belongs to user
-    const found = userBusinesses.find((id) => id.toString() === businessId);
 
-    if (!found) {
+    const business = await this.businessRepository.findOneById(businessId);
+
+    if (!business) {
       throw new BusinessNotFoundException();
+    }
+
+    if (business.user_id.toString() !== userId) {
+      throw new BusinessNotBelongException();
+    }
+
+    if (business.status !== BusinessStatusEnum.APPROVED) {
+      throw new BusinessStatusException();
     }
 
     return !!(await this.businessRepository.update(
       businessId,
-      updateBusinessDto,
+      updateInformationDto,
     ));
   }
 
   async updateAddresses(
     businessId: string,
-    userBusinesses: Types.ObjectId[],
+    userId: string,
     updateAddressDto: UpdateAddressDto,
   ): Promise<Business> {
-    // check if business belongs to user
-    const found = userBusinesses.find((id) => id.toString() === businessId);
+    const found_business =
+      await this.businessRepository.findOneById(businessId);
 
-    if (!found) {
-      throw new HttpException(
-        {
-          message: ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
-          detail: 'Business is not belong to user',
-        },
-        ERROR_CODES[ERRORS_DICTIONARY.BUSINESS_NOT_FOUND],
-      );
+    if (!found_business) {
+      throw new BusinessNotFoundException();
     }
 
-    const business = await this.businessRepository.findOneById(businessId);
+    // check if business belongs to user
+    if (found_business.user_id.toString() !== userId) {
+      throw new BusinessNotBelongException();
+    }
+
+    const { country, province, district, address_line, location } =
+      updateAddressDto;
+
+    const validAddress = await this.validateAddress({
+      country,
+      province,
+      district,
+      address_line,
+      location,
+    });
+
+    if (!validAddress) {
+      throw new BusinessInvalidAddressException();
+    }
+
+    const business = await this.businessRepository.updateAddress(
+      businessId,
+      updateAddressDto,
+    );
 
     return business;
   }
@@ -295,18 +277,19 @@ export class BusinessService {
     return business;
   }
 
-  async softDelete(businessId: string, user: User): Promise<boolean> {
-    const business = await this.businessRepository.findOneById(businessId);
+  async softDelete(businessId: string, userId: string): Promise<boolean> {
+    const foundBusiness = await this.businessRepository.findOneById(businessId);
 
-    if (!business) {
+    if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
-    // Check if business belong to user
-    const found = user.businesses.find((id) => id.toString() === businessId);
+    if (foundBusiness.user_id.toString() !== userId) {
+      throw new BusinessNotBelongException();
+    }
 
-    if (!found) {
-      throw new BusinessInvalidException();
+    if (foundBusiness.status !== BusinessStatusEnum.APPROVED) {
+      throw new BusinessStatusException();
     }
 
     await this.businessRepository.update(businessId, {
@@ -318,50 +301,26 @@ export class BusinessService {
     return isDeleted;
   }
 
-  async hardDelete(businessId: string, user: User): Promise<boolean> {
-    const business = await this.businessRepository.findOneById(businessId);
+  async hardDelete(businessId: string, userId: string): Promise<boolean> {
+    const foundBusiness = await this.businessRepository.findOneById(businessId);
 
-    if (!business) {
+    if (!foundBusiness) {
       throw new BusinessNotFoundException();
+    }
+
+    if (foundBusiness.user_id.toString() !== userId) {
+      throw new BusinessNotBelongException();
     }
 
     // Check if business is already deleted
     if (
-      business.deleted_at === null &&
-      business.status !== BusinessStatusEnum.DELETED
+      foundBusiness.deleted_at === null &&
+      foundBusiness.status !== BusinessStatusEnum.DELETED
     ) {
       throw new BusinessStatusException();
     }
 
-    // Check if business belong to user
-    const found = user.businesses.find((id) => id.toString() === businessId);
-
-    if (!found) {
-      throw new BusinessInvalidException();
-    }
-
-    const transactionSession = await this.connection.startSession();
-
-    try {
-      transactionSession.startTransaction();
-
-      const deleteBusiness =
-        await this.businessRepository.hardDelete(businessId);
-
-      await this.userService.removeBusiness(user.id, businessId);
-
-      await transactionSession.commitTransaction();
-
-      transactionSession.endSession();
-
-      return deleteBusiness;
-    } catch (err) {
-      await transactionSession.abortTransaction();
-
-      transactionSession.endSession();
-
-      throw err;
-    }
+    return !!(await this.businessRepository.hardDelete(businessId));
   }
 
   async restore(businessId: string): Promise<boolean> {
@@ -371,11 +330,7 @@ export class BusinessService {
       throw new BusinessStatusException();
     }
 
-    await this.businessRepository.update(businessId, {
-      status: BusinessStatusEnum.APPROVED,
-    });
-
-    return !!(await this.businessRepository.restore(businessId));
+    return !!(await this.businessRepository.restoreBusiness(businessId));
   }
 
   async handleStatus(id: string, type: StatusActionsEnum): Promise<boolean> {
@@ -419,13 +374,47 @@ export class BusinessService {
       }));
     }
 
+    // handle PENDING
+    if (type === StatusActionsEnum.PENDING) {
+      if (business.status !== BusinessStatusEnum.REJECTED) {
+        throw new BusinessStatusException();
+      }
+
+      return !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.PENDING,
+      }));
+    }
+
     return false;
+  }
+
+  async findNearBy(
+    longitude: string,
+    latitude: string,
+    maxDistance: string,
+  ): Promise<FindAllResponse<Business>> {
+    const businesses: FindAllResponse<Business> =
+      await this.businessRepository.findAll({
+        location: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [longitude, latitude],
+            },
+            $maxDistance: maxDistance,
+          },
+        },
+      });
+
+    return businesses;
   }
 
   async validateAddress(
     validateAddressDto: ValidateAddressDto,
   ): Promise<boolean> {
     const { location } = validateAddressDto;
+
+    console.log('validateAddressDto', validateAddressDto);
 
     const [longitude, latitude] = location.coordinates;
 
@@ -472,7 +461,7 @@ export class BusinessService {
       counts[element] = 0;
     });
 
-    let slitAddressLine = validateAddressDto.addressLine.split(' ');
+    let slitAddressLine = validateAddressDto.address_line.split(' ');
 
     if (slitAddressLine.includes('Đường')) {
       slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
@@ -509,26 +498,5 @@ export class BusinessService {
     }
 
     return true;
-  }
-
-  async findNearBy(
-    longitude: string,
-    latitude: string,
-    maxDistance: string,
-  ): Promise<FindAllResponse<Business>> {
-    const businesses: FindAllResponse<Business> =
-      await this.businessRepository.findAll({
-        location: {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [longitude, latitude],
-            },
-            $maxDistance: maxDistance,
-          },
-        },
-      });
-
-    return businesses;
   }
 }

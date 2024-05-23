@@ -34,7 +34,7 @@ export class NominatimOsmController {
   @ApiQuery({ name: 'country', type: 'string', required: true })
   @ApiQuery({ name: 'province', type: 'string', required: true })
   @ApiQuery({ name: 'district', type: 'string', required: true })
-  @ApiQuery({ name: 'addressLine', type: 'string', required: true })
+  @ApiQuery({ name: 'address_line', type: 'string', required: true })
   @HttpCode(200)
   @ApiResponse({
     status: 200,

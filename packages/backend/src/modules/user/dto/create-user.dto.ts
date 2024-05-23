@@ -32,7 +32,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @Length(10, 15)
-  phoneNumber: string;
+  phone_number: string;
 
   @IsNotEmpty()
   @IsEnum(UserRole, { each: true })

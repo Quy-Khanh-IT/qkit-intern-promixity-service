@@ -18,5 +18,5 @@ export class UpdateGeneralInfoDto {
   @IsOptional()
   @ApiPropertyOptional({ example: '0987654321' })
   @IsPhoneNumber('VN')
-  phoneNumber: string;
+  phone_number: string;
 }

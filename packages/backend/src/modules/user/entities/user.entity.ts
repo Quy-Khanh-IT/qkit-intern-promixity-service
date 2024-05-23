@@ -40,11 +40,11 @@ export class User extends BaseEntity {
   image: string;
 
   @Prop()
-  phoneNumber: string;
+  phone_number: string;
 
-  @Prop([Types.ObjectId])
-  @Exclude()
-  businesses: Types.ObjectId[];
+  // @Prop([Types.ObjectId])
+  // @Exclude()
+  // businesses: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

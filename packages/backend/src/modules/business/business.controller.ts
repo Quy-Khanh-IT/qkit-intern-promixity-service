@@ -29,7 +29,7 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
-import { UpdateBusinessDto } from './dto/update-business.dto';
+import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
 
 @Controller('businesses')
@@ -87,7 +87,7 @@ export class BusinessController {
     return result;
   }
 
-  @Post('create')
+  @Post('')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(201)
   @ApiBody({
@@ -110,75 +110,6 @@ export class BusinessController {
     return result;
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiBody({ type: UpdateBusinessDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
-  async updateInformation(
-    @Param('id') id: string,
-    @Body()
-    updateBusinessDto: UpdateBusinessDto,
-    @Req() req: Request,
-  ) {
-    const result: boolean = await this.businessService.updateInformation(
-      id,
-      req.user.businesses,
-      updateBusinessDto,
-    );
-
-    return result;
-  }
-
-  @Patch('addresses/:id')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiBody({ type: UpdateAddressDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
-  async updateAddresses(
-    @Param('id') id: string,
-    @Body()
-    updateAddressDto: UpdateAddressDto,
-    @Req() req: Request,
-  ) {
-    const result: Business = await this.businessService.updateAddresses(
-      id,
-      req.user.businesses,
-      updateAddressDto,
-    );
-
-    return result;
-  }
-
-  @Patch('images/:id')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiBody({ type: UpdateAddressDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
-  async updateImages(
-    @Param('id') id: string,
-    @Body()
-    updateAddressDto: UpdateAddressDto,
-    @Req() req: Request,
-  ) {
-    const result: Business = await this.businessService.updateAddresses(
-      id,
-      req.user.businesses,
-      updateAddressDto,
-    );
-
-    return result;
-  }
-
   @Delete(':id')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
@@ -195,7 +126,7 @@ export class BusinessController {
     if (type === DeleteActionEnum.SOFT) {
       const result: boolean = await this.businessService.softDelete(
         id,
-        req.user,
+        req.user.id,
       );
 
       return result;
@@ -204,13 +135,82 @@ export class BusinessController {
     if (type === DeleteActionEnum.HARD) {
       const result: boolean = await this.businessService.hardDelete(
         id,
-        req.user,
+        req.user.id,
       );
 
       return result;
     }
 
     return false;
+  }
+
+  @Patch(':id/information')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateInformationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateInformation(
+    @Param('id') id: string,
+    @Body()
+    updateInformationDto: UpdateInformationDto,
+    @Req() req: Request,
+  ) {
+    const result: boolean = await this.businessService.updateInformation(
+      id,
+      req.user.id,
+      updateInformationDto,
+    );
+
+    return result;
+  }
+
+  @Patch(':id/addresses')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateAddresses(
+    @Param('id') id: string,
+    @Body()
+    updateAddressDto: UpdateAddressDto,
+    @Req() req: Request,
+  ) {
+    const result: Business = await this.businessService.updateAddresses(
+      id,
+      req.user.id,
+      updateAddressDto,
+    );
+
+    return result;
+  }
+
+  @Patch(':id/images')
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  @ApiBody({ type: UpdateAddressDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully update business information.',
+  })
+  async updateImages(
+    @Param('id') id: string,
+    @Body()
+    updateAddressDto: UpdateAddressDto,
+    @Req() req: Request,
+  ) {
+    // const result: Business = await this.businessService.updateAddresses(
+    //   id,
+    //   req.user.id,
+    //   updateAddressDto,
+    // );
+
+    return null;
   }
 
   @Patch(':id/restore')

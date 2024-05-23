@@ -25,5 +25,5 @@ export class RestoreResponseDto {
   @IsNotEmpty()
   @IsString()
   @Length(10, 15)
-  phoneNumber: string;
+  phone_number: string;
 }

@@ -17,5 +17,5 @@ export class UpdateGeneralInfoResponseDto {
   image: string;
 
   @ApiProperty({ example: '0389185482' })
-  phoneNumber: string;
+  phone_number: string;
 }

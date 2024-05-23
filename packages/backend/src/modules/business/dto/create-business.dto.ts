@@ -62,7 +62,7 @@ export class CreateBusinessDto {
 
   @IsPhoneNumber('VN')
   @ApiPropertyOptional({ example: '0816429333' })
-  phoneNumber: string;
+  phone_number: string;
 
   @IsOptional()
   @ApiProperty({ example: 'https://qkit.vn/company-profile' })
@@ -74,7 +74,7 @@ export class CreateBusinessDto {
   @ApiPropertyOptional({
     example: [{ day: 'monday', openTime: '08:00', closeTime: '12:00' }],
   })
-  dayOfWeek: DayOpenCloseTime[];
+  day_of_week: DayOpenCloseTime[];
 
   @IsNotEmpty()
   @IsString()
@@ -94,12 +94,12 @@ export class CreateBusinessDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ example: 'Lý Tự Trọng' })
-  addressLine: string;
+  address_line: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: '612/A Lý Tự Trọng' })
-  fullAddress: string;
+  full_address: string;
 
   @IsNotEmpty()
   @ApiProperty({

@@ -1,37 +1,42 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
 
-export class UpdateAddressDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Lý Tự Trọng' })
-  addressLine: string;
+import { CreateBusinessDto } from './create-business.dto';
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: '612/A Lý Tự Trọng' })
-  addressLineFull: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Hồ Chí Minh' })
-  province: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Quận 1' })
-  district: string;
-
-  @IsObject()
-  @IsNotEmpty()
-  @ApiProperty({
-    example: {
-      location: {
-        coordinates: [106.698387, 10.775114],
-      },
-    },
-  })
-  location: {
-    coordinates: number[];
-  };
+export class UpdateAddressDto extends PickType(CreateBusinessDto, [
+  'address_line',
+  'full_address',
+  'province',
+  'district',
+  'country',
+  'location',
+] as const) {
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty({ example: 'Lý Tự Trọng' })
+  // address_line: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty({ example: '612/A Lý Tự Trọng' })
+  // full_address: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty({ example: 'Hồ Chí Minh' })
+  // province: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty({ example: 'Quận 1' })
+  // district: string;
+  // @IsString()
+  // @IsNotEmpty()
+  // @ApiProperty({ example: 'Việt Nam' })
+  // country: string;
+  // @IsNotEmpty()
+  // @ApiProperty({
+  //   example: {
+  //     coordinates: [106.698387, 10.775114],
+  //   },
+  // })
+  // location: {
+  //   coordinates: number[];
+  // };
 }

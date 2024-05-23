@@ -10,7 +10,7 @@ import {
 
 import { DayOpenCloseTime } from './create-business.dto';
 
-export class UpdateBusinessDto {
+export class UpdateInformationDto {
   @IsOptional()
   @IsString()
   @ApiProperty({ example: 'JangNam' })
@@ -25,18 +25,12 @@ export class UpdateBusinessDto {
   @IsString()
   @IsPhoneNumber('VN')
   @ApiProperty({ example: '0816429494' })
-  phoneNumber?: string;
+  phone_number?: string;
 
   @IsOptional()
   @IsString()
   @ApiProperty({ example: 'https://qkit.vn/company-profile' })
   website?: string;
-
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => CloundinaryImage)
-  // images?: CloundinaryImage[];
 
   @IsOptional()
   @IsString()
@@ -59,5 +53,5 @@ export class UpdateBusinessDto {
       { day: 'friday', openTime: '10:00', closeTime: '12:00' },
     ],
   })
-  dayOfWeek?: DayOpenCloseTime[];
+  day_of_week?: DayOpenCloseTime[];
 }

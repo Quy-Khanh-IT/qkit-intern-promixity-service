@@ -20,5 +20,5 @@ export class StructureDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: '600 Lý Tự Trọng' })
-  addressLine: string;
+  address_line: string;
 }

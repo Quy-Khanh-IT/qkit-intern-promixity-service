@@ -155,7 +155,7 @@ export class UserController {
     };
   }
 
-  @Get('/allBusinesses')
+  @Get('/businesses')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({
@@ -163,7 +163,7 @@ export class UserController {
     description: 'User successfully get business.',
   })
   async getAllBusiness(@Req() req: Request) {
-    const result = await this.userService.getAllByUser(req.user);
+    const result = await this.userService.getAllByUser(req.user.id);
     return result;
   }
 }
