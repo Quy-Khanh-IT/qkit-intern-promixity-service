@@ -182,15 +182,6 @@ const Profile: React.FC = () => {
               >
                 <Input />
               </Form.Item>
-              <Form.Item
-                name='address'
-                initialValue={user?.address}
-                label='Address'
-                rules={[{ required: true, message: 'Please enter your address' }]}
-                validateTrigger={['onBlur']}
-              >
-                <Input />
-              </Form.Item>
 
               <Form.Item>
                 <Flex justify='end'>
