@@ -4,7 +4,15 @@ export const PLACEHOLDER = {
 }
 
 export const MODAL_TEXT = {
+  DELETE_USER_TITLE: 'Delete User',
   DELETE_USER_TEMPORARY: 'Do you want to delete this user?',
   DELETE_USER_PERMANENT: 'Do you want to delete this user permanently?',
-  RESTORE_USER: 'Do you want to restore this user?'
+  RESTORE_USER_TITLE: 'Restore User',
+  RESTORE_USER: 'Do you want to restore this user?',
+
+  DELETE_BUSINESS_TITLE: 'Delete Business',
+  DELETE_BUSINESS_TEMPORARY: 'Do you want to delete this business?',
+  DELETE_BUSINESS_PERMANENT: 'Do you want to delete this business permanently?',
+  RESTORE_BUSINESS_TITLE: 'Restore Business',
+  RESTORE_BUSINESS: 'Do you want to restore this business?'
 }

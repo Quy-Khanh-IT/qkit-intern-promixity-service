@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Select, Space, Typography } from 'antd'
+import { Button, Col, Modal, Row, Select, Space } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 // import { ManageUserReloadContext } from '@/context/ManageUserContext'
 import { SelectionOptions } from '@/types/common'
@@ -92,7 +92,7 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
                       .toLowerCase()
                       .localeCompare(((optionB as { label: string }).label ?? '').toLowerCase())
                   }
-                  // value={selectedOption}
+                  // value={selectionOptions}
                   options={selectionOptions}
                 />
               </Space>

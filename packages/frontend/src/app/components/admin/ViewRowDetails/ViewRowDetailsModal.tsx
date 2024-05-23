@@ -1,11 +1,8 @@
-import variables from '@/sass/common/_variables.module.scss'
 import { Button, Descriptions, DescriptionsProps, Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
-
-const { _grayBg } = variables
 
 export interface ViewRowDetailsProps {
   title: string
