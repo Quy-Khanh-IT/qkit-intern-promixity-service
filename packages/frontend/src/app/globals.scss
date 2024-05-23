@@ -3,6 +3,13 @@
 @import "@/sass/utils/utils.scss";
 @import "@/sass/common/common.scss";
 
+:root {
+  --hue: 223;
+  --bg: hsl(var(--hue), 90%, 95%);
+  --fg: hsl(var(--hue), 90%, 5%);
+  --trans-dur: 0.3s;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -53,6 +60,50 @@ body {
 
     .ant-btn-primary{
       @include mixin-btn-primary-small;
+    }
+  }
+}
+
+.--loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    width: 80px;
+  }
+
+  svg path {
+    --total-length: 136px;
+    stroke-linecap: round;
+    stroke-width: 6;
+    stroke: $main-color;
+    fill: none;
+    stroke-dasharray: var(--total-length) var(--total-length);
+    animation: animate 2s linear infinite;
+  }
+
+  @keyframes animate {
+    0% {
+      stroke-dashoffset: calc(-1 * var(--total-length));
+    }
+
+    30%,
+    50% {
+      stroke-dashoffset: 0;
+    }
+
+    80%,
+    100% {
+      stroke-dashoffset: var(--total-length);
+
     }
   }
 }
