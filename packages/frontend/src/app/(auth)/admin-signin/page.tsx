@@ -1,6 +1,6 @@
 import React from 'react'
 import './admin-sign-in.scss'
-import { Space } from 'antd'
+import { Col, Flex, Space, Typography } from 'antd'
 
 const AdminLogin: React.FC = () => {
   return (
@@ -15,18 +15,22 @@ const AdminLogin: React.FC = () => {
         {/* <div className='login'>
           
         </div> */}
-        <Space vertical>
-          <h3 className='title'>User Login</h3>
-          <div className='text-input'>
-            <i className='ri-user-fill'></i>
-            <input type='text' placeholder='Username' />
-          </div>
-          <div className='text-input'>
-            <i className='ri-lock-fill'></i>
-            <input type='password' placeholder='Password' />
-          </div>
-          <button className='login-btn'>LOGIN</button>
-        </Space>
+        <Flex vertical justify='center'>
+          <Flex align='center' justify='center' gap='large'>
+            <Col span={18} style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+              <h3 className='title'>Admin Login</h3>
+              <div className='text-input w-100'>
+                <i className='ri-user-fill'></i>
+                <input type='text' placeholder='Username' />
+              </div>
+              <div className='text-input w-100'>
+                <i className='ri-lock-fill'></i>
+                <input type='password' placeholder='Password' />
+              </div>
+              <button className='login-btn w-100'>LOGIN</button>
+            </Col>
+          </Flex>
+        </Flex>
       </div>
     </div>
   )
