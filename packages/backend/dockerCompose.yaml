@@ -6,7 +6,7 @@ services:
       dockerfile: DockerFile
     container_name: nest-docker-postgres
     env_file:
-      - .env
+      - .env.cloud
     ports:
       - '${PORT}:${PORT}'
     depends_on:
