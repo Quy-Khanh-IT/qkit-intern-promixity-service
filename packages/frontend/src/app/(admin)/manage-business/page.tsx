@@ -2,15 +2,8 @@
 import TableComponent from '@/app/components/admin/Table/Table'
 import variables from '@/sass/common/_variables.module.scss'
 import { IBusiness } from '@/types/business'
-import { ColumnsType } from '@/types/common'
-import {
-  DeleteOutlined,
-  EllipsisOutlined,
-  FolderViewOutlined,
-  SearchOutlined,
-  UndoOutlined,
-  SnippetsOutlined
-} from '@ant-design/icons'
+import { ColumnsType, SelectionOptions } from '@/types/common'
+import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -36,6 +29,7 @@ import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDe
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import { MODAL_TEXT } from '@/constants'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -46,7 +40,7 @@ export interface IManageUserProps {}
 type DataIndex = keyof IBusiness
 
 const ManageBusiness = () => {
-  const [userOption, _setUserOption] = useState('1')
+  const [businessOption, setBusinessOption] = useState('1')
   const [businessOne, setBusinessOne] = useState<IBusiness>()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -55,12 +49,23 @@ const ManageBusiness = () => {
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refModerateModal = useRef<IModalMethods | null>(null)
   const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
+  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_BUSINESS_TITLE)
+  const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_BUSINESS_TEMPORARY)
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([
+    { label: 'ACCEPTED', value: 'ACCEPTED' },
+    { label: 'PENDING', value: 'PENDING' },
+    { label: 'REJECTED', value: 'REJECTED' }
+  ])
 
   const handleModal = (selectedOpt: number) => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      refModerateModal.current?.showModal()
+      if (businessOption == '2') {
+        refDeleteBusinessModal.current?.showModal()
+      } else {
+        refModerateModal.current?.showModal()
+      }
     } else if (selectedOpt === 3) {
       refDeleteBusinessModal.current?.showModal()
     }
@@ -148,10 +153,10 @@ const ManageBusiness = () => {
     {
       width: 75,
       align: 'center',
-      onCell: (_user: IBusiness) => {
+      onCell: (business: IBusiness) => {
         return {
           onClick: () => {
-            setBusinessOne(businessData[0])
+            setBusinessOne(business)
           }
         }
       },
@@ -163,12 +168,12 @@ const ManageBusiness = () => {
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
           },
-          ...(!(userOption === '2')
+          ...(!(businessOption === '2')
             ? [
                 {
                   key: 'Moderate',
                   label: <span>Moderate</span>,
-                  icon: <SnippetsOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
                   onClick: () => handleModal(2)
                 }
               ]
@@ -177,14 +182,31 @@ const ManageBusiness = () => {
                   key: 'Restore',
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => handleModal(2)
+                  onClick: () => {
+                    setDeleteModalTitle(MODAL_TEXT.RESTORE_BUSINESS_TITLE)
+                    setDeleteModalContent(MODAL_TEXT.RESTORE_BUSINESS)
+                    handleModal(2)
+                  }
                 }
               ]),
           {
-            key: 'Delete',
-            label: <span>Delete</span>,
-            icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-            onClick: () => handleModal(3)
+            key: 'Delete ',
+            label: <span className={businessOption == '2' ? 'error-modal-title' : ''}>Delete</span>,
+            icon: (
+              <i
+                className={`fa-regular fa-trash ${businessOption == '2' ? 'error-modal-title' : 'delete-icon'}`}
+                style={{ fontSize: 15, cursor: 'pointer' }}
+              ></i>
+            ),
+            onClick: () => {
+              setDeleteModalTitle(MODAL_TEXT.DELETE_BUSINESS_TITLE)
+              if (businessOption === '2') {
+                setDeleteModalContent(MODAL_TEXT.DELETE_BUSINESS_PERMANENT)
+              } else {
+                setDeleteModalContent(MODAL_TEXT.DELETE_BUSINESS_TEMPORARY)
+              }
+              handleModal(3)
+            }
           }
         ]
         return (
@@ -385,6 +407,11 @@ const ManageBusiness = () => {
     }
   ]
 
+  const onChangeSelection = (value: string) => {
+    // setInputFilter('')
+    setBusinessOption(value)
+  }
+
   const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
 
   const handleModerate = () => {
@@ -401,12 +428,12 @@ const ManageBusiness = () => {
         <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={21} sm={16} md={14} lg={10} xl={6}>
             <Select
-              // onChange={onChangeSelection}
+              onChange={onChangeSelection}
               // style={{ marginTop: 16 }}
               optionFilterProp='children'
               filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
               className='filter-select w-100'
-              value={userOption}
+              value={businessOption}
               // defaultValue={options[0]}
               options={options}
             />
@@ -429,7 +456,7 @@ const ManageBusiness = () => {
 
       <ViewRowDetailsModal title='Business details' data={detailedItems} ref={refViewDetailsModal} />
       <DecentralizeModal
-        selectionOptions={[]}
+        selectionOptions={decentralizeOpts}
         ref={refModerateModal}
         title={'Moderate business'}
         specificInfo={
@@ -443,11 +470,20 @@ const ManageBusiness = () => {
         <Text>Status:</Text>
       </DecentralizeModal>
       <DeleteModal
-        title='Delete business'
+        title={deleteModalTitle}
         content={
           <>
-            {userOption == '2' ? 'Bạn chắc chắn muốn khôi phục tài khoản' : 'Bạn chắc chắn muốn xoá tài khoản'}
-            <strong>{' ' + 'ndtuan21@gmail.com'}</strong>?
+            <span
+              className={
+                businessOption == '2' && deleteModalContent == MODAL_TEXT.DELETE_BUSINESS_PERMANENT
+                  ? 'error-modal-title'
+                  : ''
+              }
+            >
+              {deleteModalContent}
+            </span>
+            {'('}
+            <strong>{businessOne?.name}</strong> {')'}
           </>
         }
         handleConfirm={handleDeleteBusiness}

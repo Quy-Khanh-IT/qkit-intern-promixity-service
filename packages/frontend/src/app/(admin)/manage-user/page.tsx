@@ -5,14 +5,7 @@ import { IModalMethods } from '@/app/components/admin/modal'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { IUserInformation } from '@/types/user'
-import {
-  DeleteOutlined,
-  EllipsisOutlined,
-  FolderViewOutlined,
-  SearchOutlined,
-  UndoOutlined,
-  UserAddOutlined
-} from '@ant-design/icons'
+import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -33,7 +26,7 @@ import { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import './manage-user.scss'
 import userData from './user-data.json'
-import { ColumnsType } from '@/types/common'
+import { ColumnsType, SelectionOptions } from '@/types/common'
 import { MODAL_TEXT } from '@/constants'
 
 export interface IManageUserProps {}
@@ -49,7 +42,9 @@ const ManageUser = () => {
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
-  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
+  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
+  const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([{label: 'ADMIN', value: 'ADMIN'}, {label: 'USER', value: 'USER'}])
 
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -59,7 +54,11 @@ const ManageUser = () => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      refDecentralizeModal.current?.showModal()
+      if (userOption == '2') {
+        refDeleteUserModal.current?.showModal()
+      } else {
+        refDecentralizeModal.current?.showModal()
+      }
     } else if (selectedOpt === 3) {
       refDeleteUserModal.current?.showModal()
     }
@@ -147,12 +146,12 @@ const ManageUser = () => {
     {
       align: 'center',
       width: 75,
-      onCell: (_user: IUserInformation, index: unknown) => {
+      onCell: (user: IUserInformation) => {
         return {
           onClick: () => {
-            if (typeof index === 'number') {
-              setUserOne(userData[index])
-            }
+            // if (typeof index === 'number') {
+            // }
+            setUserOne(user)
           }
         }
       },
@@ -179,20 +178,27 @@ const ManageUser = () => {
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
                   onClick: () => {
-                    setDeleteModalTitle(MODAL_TEXT.RESTORE_USER)
+                    setDeleteModalTitle(MODAL_TEXT.RESTORE_USER_TITLE)
+                    setDeleteModalContent(MODAL_TEXT.RESTORE_USER)
                     handleModal(2)
                   }
                 }
               ]),
           {
-            key: 'Delete',
-            label: <span>Delete</span>,
-            icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+            key: 'Delete ',
+            label: <span className={userOption == '2' ? 'error-modal-title' : ''}>Delete</span>,
+            icon: (
+              <i
+                className={`fa-regular fa-trash ${userOption == '2' ? 'error-modal-title' : 'delete-icon'}`}
+                style={{ fontSize: 15, cursor: 'pointer' }}
+              ></i>
+            ),
             onClick: () => {
+              setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TITLE)
               if (userOption === '2') {
-                setDeleteModalTitle(MODAL_TEXT.DELETE_USER_PERMANENT)
+                setDeleteModalContent(MODAL_TEXT.DELETE_USER_PERMANENT)
               } else {
-                setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TEMPORARY)
+                setDeleteModalContent(MODAL_TEXT.DELETE_USER_TEMPORARY)
               }
               handleModal(3)
             }
@@ -225,14 +231,14 @@ const ManageUser = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: 280,
       ...getColumnSearchProps('email')
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      ...getColumnSearchProps('address')
+      title: 'Phone number',
+      dataIndex: 'phone',
+      key: 'phone',
+      width: 280,
+      ...getColumnSearchProps('phone')
     },
     {
       title: 'Role',
@@ -281,9 +287,9 @@ const ManageUser = () => {
       children: userOne?.lastName
     },
     {
-      label: 'Address',
+      label: 'Phone number',
       span: 4,
-      children: userOne?.address
+      children: userOne?.phone
     },
     {
       label: 'Role',
@@ -367,7 +373,7 @@ const ManageUser = () => {
       />
       <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
       <DecentralizeModal
-        selectionOptions={[]}
+        selectionOptions={decentralizeOpts}
         ref={refDecentralizeModal}
         title={'Decentralize'}
         specificInfo={
@@ -381,10 +387,18 @@ const ManageUser = () => {
         <Text>Role:</Text>
       </DecentralizeModal>
       <DeleteModal
-        title='Delete account'
+        title={deleteModalTitle}
         content={
           <>
-            {deleteModalTitle} {'('}<strong>{userOne.email}</strong> {')'}
+            <span
+              className={
+                userOption == '2' && deleteModalContent == MODAL_TEXT.DELETE_USER_PERMANENT ? 'error-modal-title' : ''
+              }
+            >
+              {deleteModalContent}
+            </span>
+            {'('}
+            <strong>{userOne?.email}</strong> {')'}
           </>
         }
         handleConfirm={handleDeleteUser}

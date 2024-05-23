@@ -3,400 +3,240 @@
     "key": "1",
     "firstName": "John",
     "lastName": "Brown",
-    "address": "Nhà hát Thành Phố Hồ Chí Minh, Quận 5, TPHCM",
     "email": "abcjashfjlashdfasdhflskfdj@gmail.com",
+    "phone": "0923456543",
     "role": "ADMIN"
   },
   {
     "key": "2",
-    "firstName": "Jim",
-    "lastName": "Green",
-    "address": "Nhà hát Thành Phố Hồ Chí Minh",
-    "email": "bcd1@gmail.com",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "janedoe@gmail.com",
+    "phone": "0987654321",
     "role": "USER"
   },
   {
     "key": "3",
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "address": "Some Address",
-    "email": "jane.doe@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "4",
     "firstName": "Alice",
     "lastName": "Smith",
-    "address": "Another Address",
-    "email": "alice.smith@example.com",
+    "email": "alicesmith@gmail.com",
+    "phone": "0912345678",
     "role": "BUSINESS"
   },
   {
-    "key": "5",
-    "firstName": "Michael",
+    "key": "4",
+    "firstName": "Bob",
     "lastName": "Johnson",
-    "address": "123 Main St",
-    "email": "michael.johnson@example.com",
-    "role": "ADMIN"
+    "email": "bobjohnson@gmail.com",
+    "phone": "0876543210",
+    "role": "USER"
+  },
+  {
+    "key": "5",
+    "firstName": "Emily",
+    "lastName": "Davis",
+    "email": "emilydavis@gmail.com",
+    "phone": "0898765432",
+    "role": "USER"
   },
   {
     "key": "6",
-    "firstName": "Emily",
-    "lastName": "Davis",
-    "address": "456 Elm St",
-    "email": "emily.davis@example.com",
+    "firstName": "David",
+    "lastName": "Lee",
+    "email": "davidlee@gmail.com",
+    "phone": "0865432109",
     "role": "USER"
   },
   {
     "key": "7",
-    "firstName": "David",
+    "firstName": "Sarah",
     "lastName": "Wilson",
-    "address": "789 Oak St",
-    "email": "david.wilson@example.com",
-    "role": "BUSINESS"
+    "email": "sarahwilson@gmail.com",
+    "phone": "0843210987",
+    "role": "USER"
   },
   {
     "key": "8",
-    "firstName": "Sarah",
-    "lastName": "Anderson",
-    "address": "321 Pine St",
-    "email": "sarah.anderson@example.com",
-    "role": "ADMIN"
+    "firstName": "Michael",
+    "lastName": "Johnson",
+    "email": "michaeljohnson@gmail.com",
+    "phone": "0832109876",
+    "role": "USER"
   },
   {
     "key": "9",
-    "firstName": "Matthew",
-    "lastName": "Taylor",
-    "address": "654 Maple St",
-    "email": "matthew.taylor@example.com",
+    "firstName": "Jessica",
+    "lastName": "Smith",
+    "email": "jessicasmith@gmail.com",
+    "phone": "0821098765",
     "role": "USER"
   },
   {
     "key": "10",
-    "firstName": "Olivia",
-    "lastName": "Thomas",
-    "address": "987 Cedar St",
-    "email": "olivia.thomas@example.com",
-    "role": "BUSINESS"
+    "firstName": "Matthew",
+    "lastName": "Davis",
+    "email": "matthewdavis@gmail.com",
+    "phone": "0810987654",
+    "role": "USER"
   },
   {
     "key": "11",
-    "firstName": "Daniel",
-    "lastName": "Robinson",
-    "address": "135 Walnut St",
-    "email": "daniel.robinson@example.com",
-    "role": "ADMIN"
+    "firstName": "Olivia",
+    "lastName": "Lee",
+    "email": "oliviale@gmail.com",
+    "phone": "0809876543",
+    "role": "USER"
   },
   {
     "key": "12",
-    "firstName": "Sophia",
-    "lastName": "Harris",
-    "address": "246 Birch St",
-    "email": "sophia.harris@example.com",
+    "firstName": "Daniel",
+    "lastName": "Wilson",
+    "email": "danielwilson@gmail.com",
+    "phone": "0798765432",
     "role": "USER"
   },
   {
     "key": "13",
-    "firstName": "James",
-    "lastName": "Clark",
-    "address": "357 Spruce St",
-    "email": "james.clark@example.com",
-    "role": "BUSINESS"
+    "firstName": "Sophia",
+    "lastName": "Brown",
+    "email": "sophiabrown@gmail.com",
+    "phone": "0787654321",
+    "role": "USER"
   },
   {
     "key": "14",
-    "firstName": "Ava",
-    "lastName": "Lewis",
-    "address": "468 Oak St",
-    "email": "ava.lewis@example.com",
-    "role": "ADMIN"
+    "firstName": "Ethan",
+    "lastName": "Johnson",
+    "email": "ethanjohnson@gmail.com",
+    "phone": "0776543210",
+    "role": "USER"
   },
   {
     "key": "15",
-    "firstName": "Benjamin",
-    "lastName": "Walker",
-    "address": "579 Pine St",
-    "email": "benjamin.walker@example.com",
+    "firstName": "Isabella",
+    "lastName": "Davis",
+    "email": "isabelladavis@gmail.com",
+    "phone": "0765432109",
     "role": "USER"
   },
   {
     "key": "16",
-    "firstName": "Mia",
-    "lastName": "Hall",
-    "address": "680 Maple St",
-    "email": "mia.hall@example.com",
-    "role": "BUSINESS"
+    "firstName": "Alexander",
+    "lastName": "Smith",
+    "email": "alexandersmith@gmail.com",
+    "phone": "0754321098",
+    "role": "USER"
   },
   {
     "key": "17",
-    "firstName": "Ethan",
-    "lastName": "Young",
-    "address": "791 Cedar St",
-    "email": "ethan.young@example.com",
-    "role": "ADMIN"
+    "firstName": "Mia",
+    "lastName": "Wilson",
+    "email": "miawilson@gmail.com",
+    "phone": "0743210987",
+    "role": "USER"
   },
   {
     "key": "18",
-    "firstName": "Charlotte",
-    "lastName": "Allen",
-    "address": "892 Walnut St",
-    "email": "charlotte.allen@example.com",
+    "firstName": "William",
+    "lastName": "Lee",
+    "email": "williamlee@gmail.com",
+    "phone": "0732109876",
     "role": "USER"
   },
   {
     "key": "19",
-    "firstName": "Alexander",
-    "lastName": "King",
-    "address": "903 Birch St",
-    "email": "alexander.king@example.com",
-    "role": "BUSINESS"
+    "firstName": "Ava",
+    "lastName": "Johnson",
+    "email": "avajohnson@gmail.com",
+    "phone": "0721098765",
+    "role": "USER"
   },
   {
     "key": "20",
-    "firstName": "Harper",
-    "lastName": "Wright",
-    "address": "914 Oak St",
-    "email": "harper.wright@example.com",
-    "role": "ADMIN"
+    "firstName": "James",
+    "lastName": "Smith",
+    "email": "jamessmith@gmail.com",
+    "phone": "0710987654",
+    "role": "USER"
   },
   {
     "key": "21",
-    "firstName": "Sebastian",
-    "lastName": "Lopez",
-    "address": "925 Pine St",
-    "email": "sebastian.lopez@example.com",
+    "firstName": "Charlotte",
+    "lastName": "Davis",
+    "email": "charlottedavis@gmail.com",
+    "phone": "0709876543",
     "role": "USER"
   },
   {
     "key": "22",
-    "firstName": "Lily",
-    "lastName": "Scott",
-    "address": "936 Maple St",
-    "email": "lily.scott@example.com",
-    "role": "BUSINESS"
+    "firstName": "Benjamin",
+    "lastName": "Lee",
+    "email": "benjaminlee@gmail.com",
+    "phone": "0698765432",
+    "role": "USER"
   },
   {
     "key": "23",
-    "firstName": "Carter",
-    "lastName": "Green",
-    "address": "947 Cedar St",
-    "email": "carter.green@example.com",
-    "role": "ADMIN"
+    "firstName": "Amelia",
+    "lastName": "Wilson",
+    "email": "ameliawilson@gmail.com",
+    "phone": "0687654321",
+    "role": "USER"
   },
   {
     "key": "24",
-    "firstName": "Grace",
-    "lastName": "Adams",
-    "address": "958 Walnut St",
-    "email": "grace.adams@example.com",
+    "firstName": "Liam",
+    "lastName": "Johnson",
+    "email": "liamjohnson@gmail.com",
+    "phone": "0676543210",
     "role": "USER"
   },
   {
     "key": "25",
-    "firstName": "Henry",
-    "lastName": "Baker",
-    "address": "969 Birch St",
-    "email": "henry.baker@example.com",
-    "role": "BUSINESS"
+    "firstName": "Harper",
+    "lastName": "Davis",
+    "email": "harperdavis@gmail.com",
+    "phone": "0665432109",
+    "role": "USER"
   },
   {
     "key": "26",
-    "firstName": "Zoe",
-    "lastName": "Gonzalez",
-    "address": "970 Oak St",
-    "email": "zoe.gonzalez@example.com",
-    "role": "ADMIN"
+    "firstName": "Lucas",
+    "lastName": "Smith",
+    "email": "lucassmith@gmail.com",
+    "phone": "0654321098",
+    "role": "USER"
   },
   {
     "key": "27",
-    "firstName": "Liam",
-    "lastName": "Nelson",
-    "address": "971 Pine St",
-    "email": "liam.nelson@example.com",
+    "firstName": "Evelyn",
+    "lastName": "Wilson",
+    "email": "evelynwilson@gmail.com",
+    "phone": "0643210987",
     "role": "USER"
   },
   {
     "key": "28",
-    "firstName": "Victoria",
-    "lastName": "Carter",
-    "address": "972 Maple St",
-    "email": "victoria.carter@example.com",
-    "role": "BUSINESS"
+    "firstName": "Henry",
+    "lastName": "Lee",
+    "email": "henrylee@gmail.com",
+    "phone": "0632109876",
+    "role": "USER"
   },
   {
     "key": "29",
-    "firstName": "Aiden",
-    "lastName": "Perez",
-    "address": "973 Cedar St",
-    "email": "aiden.perez@example.com",
-    "role": "ADMIN"
+    "firstName": "Victoria",
+    "lastName": "Johnson",
+    "email": "victoriajohnson@gmail.com",
+    "phone": "0621098765",
+    "role": "USER"
   },
   {
     "key": "30",
-    "firstName": "Penelope",
-    "lastName": "Roberts",
-    "address": "974 Walnut St",
-    "email": "penelope.roberts@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "31",
-    "firstName": "Daniel",
-    "lastName": "Turner",
-    "address": "975 Birch St",
-    "email": "daniel.turner@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "32",
-    "firstName": "Mila",
-    "lastName": "Phillips",
-    "address": "976 Oak St",
-    "email": "mila.phillips@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "33",
-    "firstName": "Lucas",
-    "lastName": "Campbell",
-    "address": "977 Pine St",
-    "email": "lucas.campbell@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "34",
-    "firstName": "Luna",
-    "lastName": "Parker",
-    "address": "978 Maple St",
-    "email": "luna.parker@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "35",
     "firstName": "Jackson",
-    "lastName": "Evans",
-    "address": "979 Cedar St",
-    "email": "jackson.evans@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "36",
-    "firstName": "Stella",
-    "lastName": "Morris",
-    "address": "980 Walnut St",
-    "email": "stella.morris@example.com",
+    "lastName": "Smith",
+    "email": "jacksonsmith@gmail.com",
+    "phone": "0610987654",
     "role": "USER"
-  },
-  {
-    "key": "37",
-    "firstName": "Elijah",
-    "lastName": "Hughes",
-    "address": "981 Birch St",
-    "email": "elijah.hughes@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "38",
-    "firstName": "Scarlett",
-    "lastName": "Rogers",
-    "address": "982 Oak St",
-    "email": "scarlett.rogers@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "39",
-    "firstName": "Logan",
-    "lastName": "Reed",
-    "address": "983 Pine St",
-    "email": "logan.reed@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "40",
-    "firstName": "Chloe",
-    "lastName": "Cook",
-    "address": "984 Maple St",
-    "email": "chloe.cook@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "41",
-    "firstName": "Lucas",
-    "lastName": "Ward",
-    "address": "985 Cedar St",
-    "email": "lucas.ward@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "42",
-    "firstName": "Zoe",
-    "lastName": "Bell",
-    "address": "986 Walnut St",
-    "email": "zoe.bell@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "43",
-    "firstName": "Ethan",
-    "lastName": "Harrison",
-    "address": "987 Birch St",
-    "email": "ethan.harrison@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "44",
-    "firstName": "Lily",
-    "lastName": "Morgan",
-    "address": "988 Oak St",
-    "email": "lily.morgan@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "45",
-    "firstName": "Aiden",
-    "lastName": "Kennedy",
-    "address": "989 Pine St",
-    "email": "aiden.kennedy@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "46",
-    "firstName": "Mia",
-    "lastName": "Bailey",
-    "address": "990 Maple St",
-    "email": "mia.bailey@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "47",
-    "firstName": "Carter",
-    "lastName": "Coleman",
-    "address": "991 Cedar St",
-    "email": "carter.coleman@example.com",
-    "role": "ADMIN"
-  },
-  {
-    "key": "48",
-    "firstName": "Charlotte",
-    "lastName": "Foster",
-    "address": "992 Walnut St",
-    "email": "charlotte.foster@example.com",
-    "role": "USER"
-  },
-  {
-    "key": "49",
-    "firstName": "Alexander",
-    "lastName": "Butler",
-    "address": "993 Birch St",
-    "email": "alexander.butler@example.com",
-    "role": "BUSINESS"
-  },
-  {
-    "key": "50",
-    "firstName": "Harper",
-    "lastName": "Simmons",
-    "address": "994 Oak St",
-    "email": "harper.simmons@example.com",
-    "role": "ADMIN"
   }
 ]
