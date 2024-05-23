@@ -9,11 +9,12 @@ import {
   FolderViewOutlined,
   SearchOutlined,
   UndoOutlined,
-  UserAddOutlined
+  SnippetsOutlined
 } from '@ant-design/icons'
 import {
   Button,
   Col,
+  DescriptionsProps,
   Dropdown,
   Flex,
   Input,
@@ -31,7 +32,12 @@ import { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import businessData from './business-data.json'
 import './manage-business.scss'
+import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
+import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
+import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
+import { IModalMethods } from '@/app/components/admin/modal'
 
+const { Text } = Typography
 const { starColor } = variables
 
 export interface IManageUserProps {}
@@ -41,9 +47,24 @@ type DataIndex = keyof IBusiness
 
 const ManageBusiness = () => {
   const [userOption, _setUserOption] = useState('1')
+  const [businessOne, setBusinessOne] = useState<IBusiness>()
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
+
+  const refViewDetailsModal = useRef<IModalMethods | null>(null)
+  const refModerateModal = useRef<IModalMethods | null>(null)
+  const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
+
+  const handleModal = (selectedOpt: number) => {
+    if (selectedOpt === 1) {
+      refViewDetailsModal.current?.showModal()
+    } else if (selectedOpt === 2) {
+      refModerateModal.current?.showModal()
+    } else if (selectedOpt === 3) {
+      refDeleteBusinessModal.current?.showModal()
+    }
+  }
 
   const handleSearch = (selectedKeys: string[], confirm: FilterDropdownProps['confirm'], dataIndex: DataIndex) => {
     confirm()
@@ -127,41 +148,48 @@ const ManageBusiness = () => {
     {
       width: 75,
       align: 'center',
+      onCell: (_user: IBusiness) => {
+        return {
+          onClick: () => {
+            setBusinessOne(businessData[0])
+          }
+        }
+      },
       render: () => {
         const items: MenuProps['items'] = [
           {
-            key: 'Xem chi tiết',
-            label: <span>Xem chi tiết</span>,
-            icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+            key: 'View Details',
+            label: <span>View Details</span>,
+            icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+            onClick: () => handleModal(1)
           },
           ...(!(userOption === '2')
             ? [
                 {
-                  key: 'Phân quyền',
-                  label: <span>Phân quyền</span>,
-                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
-                }
-              ]
-            : []),
-          ...(!(userOption === '2')
-            ? [
-                {
-                  key: 'Xoá',
-                  label: <span>Xoá</span>,
-                  icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+                  key: 'Moderate',
+                  label: <span>Moderate</span>,
+                  icon: <SnippetsOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: () => handleModal(2)
                 }
               ]
             : [
                 {
-                  key: 'Khôi phục',
-                  label: <span>Khôi phục</span>,
-                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
+                  key: 'Restore',
+                  label: <span>Restore</span>,
+                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: () => handleModal(2)
                 }
-              ])
+              ]),
+          {
+            key: 'Delete',
+            label: <span>Delete</span>,
+            icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+            onClick: () => handleModal(3)
+          }
         ]
         return (
           <>
-            <Dropdown menu={{ items }} placement='bottom' trigger={['click']}>
+            <Dropdown menu={{ items }} placement='bottom' trigger={['click']} arrow>
               <EllipsisOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
             </Dropdown>
           </>
@@ -302,6 +330,50 @@ const ManageBusiness = () => {
     }
   ]
 
+  const detailedItems: DescriptionsProps['items'] = [
+    {
+      label: 'Name',
+      span: 2,
+      children: businessOne?.name
+    },
+    {
+      label: 'Category',
+      span: 2,
+      children: businessOne?.category.join(', ')
+    },
+    {
+      label: 'Address',
+      span: 4,
+      children: businessOne?.address
+    },
+    {
+      label: 'Total Reviews',
+      span: 2,
+      children: businessOne?.totalReviews
+    },
+    {
+      label: 'Average Rating',
+      span: 2,
+      children: businessOne?.overallRating + ' ⭐️'
+    },
+    {
+      label: 'Role',
+      span: 4,
+      children: (
+        <>
+          {[businessOne?.status].map((role, index) => {
+            const color = role === 'ADMIN' ? 'green' : 'geekblue'
+            return (
+              <Tag color={color} key={`${role}-${index}`}>
+                {role}
+              </Tag>
+            )
+          })}
+        </>
+      )
+    }
+  ]
+
   const options = [
     {
       value: '1',
@@ -314,6 +386,14 @@ const ManageBusiness = () => {
   ]
 
   const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
+
+  const handleModerate = () => {
+    console.log('Moderate')
+  }
+
+  const handleDeleteBusiness = () => {
+    console.log('Delete')
+  }
 
   return (
     <div className='--manage-business'>
@@ -345,6 +425,33 @@ const ManageBusiness = () => {
         columns={listColumns}
         dataSource={businessWithKeys}
         className='manage-business-table'
+      />
+
+      <ViewRowDetailsModal title='Business details' data={detailedItems} ref={refViewDetailsModal} />
+      <DecentralizeModal
+        selectionOptions={[]}
+        ref={refModerateModal}
+        title={'Moderate business'}
+        specificInfo={
+          <>
+            <Text>{businessOne?.name}</Text>
+          </>
+        }
+        handleConfirm={handleModerate}
+      >
+        <Text>Business name:</Text>
+        <Text>Status:</Text>
+      </DecentralizeModal>
+      <DeleteModal
+        title='Delete business'
+        content={
+          <>
+            {userOption == '2' ? 'Bạn chắc chắn muốn khôi phục tài khoản' : 'Bạn chắc chắn muốn xoá tài khoản'}
+            <strong>{' ' + 'ndtuan21@gmail.com'}</strong>?
+          </>
+        }
+        handleConfirm={handleDeleteBusiness}
+        ref={refDeleteBusinessModal}
       />
     </div>
   )

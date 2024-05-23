@@ -8,10 +8,11 @@ import './view-row-details.scss'
 const { _grayBg } = variables
 
 export interface ViewRowDetailsProps {
+  title: string
   data: DescriptionsProps['items']
 }
 
-const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDetailsProps> = ({ data }, ref) => {
+const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDetailsProps> = ({ title, data }, ref) => {
   const [open, setOpen] = useState(false)
 
   useImperativeHandle(ref, () => ({
@@ -27,7 +28,7 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
     <>
       <Modal
         className='view-modal'
-        title='User details'
+        title={title}
         open={open}
         onCancel={handleCancel}
         transitionName='ant-move-up'

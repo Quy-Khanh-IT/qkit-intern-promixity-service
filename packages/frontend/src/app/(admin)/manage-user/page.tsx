@@ -1,6 +1,6 @@
 'use client'
-import DecentralizeRoleModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import DeleteUserModal from '@/app/components/admin/DeleteModal/DeleteUserModal'
+import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
+import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
@@ -25,7 +25,8 @@ import {
   Select,
   Space,
   TableColumnType,
-  Tag
+  Tag,
+  Typography
 } from 'antd'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useRef, useState } from 'react'
@@ -33,18 +34,22 @@ import Highlighter from 'react-highlight-words'
 import './manage-user.scss'
 import userData from './user-data.json'
 import { ColumnsType } from '@/types/common'
+import { MODAL_TEXT } from '@/constants'
 
 export interface IManageUserProps {}
+
+const { Text } = Typography
 
 // For search
 type DataIndex = keyof IUserInformation
 
 const ManageUser = () => {
-  const [userOption, _setUserOption] = useState('1')
+  const [userOption, setUserOption] = useState('1')
   const [userOne, setUserOne] = useState<IUserInformation>()
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
-  const refDecentralizeRoleModal = useRef<IModalMethods | null>(null)
+  const refDecentralizeModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
+  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
 
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -54,7 +59,7 @@ const ManageUser = () => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      refDecentralizeRoleModal.current?.showModal()
+      refDecentralizeModal.current?.showModal()
     } else if (selectedOpt === 3) {
       refDeleteUserModal.current?.showModal()
     }
@@ -142,17 +147,19 @@ const ManageUser = () => {
     {
       align: 'center',
       width: 75,
-      onCell: (_user: IUserInformation) => {
+      onCell: (_user: IUserInformation, index: unknown) => {
         return {
           onClick: () => {
-            setUserOne(userData[0])
+            if (typeof index === 'number') {
+              setUserOne(userData[index])
+            }
           }
         }
       },
       render: () => {
         const items: MenuProps['items'] = [
           {
-            key: 'View details',
+            key: 'View Details',
             label: <span>View Details</span>,
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
@@ -166,24 +173,30 @@ const ManageUser = () => {
                   onClick: () => handleModal(2)
                 }
               ]
-            : []),
-          ...(!(userOption === '2')
-            ? [
-                {
-                  key: 'Xoá',
-                  label: <span>Xoá</span>,
-                  icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => handleModal(3)
-                }
-              ]
             : [
                 {
-                  key: 'Khôi phục',
-                  label: <span>Khôi phục</span>,
+                  key: 'Restore',
+                  label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => handleModal(3)
+                  onClick: () => {
+                    setDeleteModalTitle(MODAL_TEXT.RESTORE_USER)
+                    handleModal(2)
+                  }
                 }
-              ])
+              ]),
+          {
+            key: 'Delete',
+            label: <span>Delete</span>,
+            icon: <DeleteOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+            onClick: () => {
+              if (userOption === '2') {
+                setDeleteModalTitle(MODAL_TEXT.DELETE_USER_PERMANENT)
+              } else {
+                setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TEMPORARY)
+              }
+              handleModal(3)
+            }
+          }
         ]
         return (
           <>
@@ -280,7 +293,7 @@ const ManageUser = () => {
           {[userOne?.role].map((role, index) => {
             const color = role === 'ADMIN' ? 'green' : 'geekblue'
             return (
-              <Tag color={color} key={`${role}-${index}`} style={{ display: 'flex', alignItems: 'center' }}>
+              <Tag color={color} key={`${role}-${index}`}>
                 {role}
               </Tag>
             )
@@ -301,7 +314,16 @@ const ManageUser = () => {
     }
   ]
 
+  const onChangeSelection = (value: string) => {
+    // setInputFilter('')
+    setUserOption(value)
+  }
+
   const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
+
+  const handleDecentralizeRole = () => {}
+
+  const handleDeleteUser = () => {}
 
   return (
     <div className='--manage-user'>
@@ -309,7 +331,7 @@ const ManageUser = () => {
         <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
-              // onChange={onChangeSelection}
+              onChange={onChangeSelection}
               // style={{ marginTop: 16 }}
               optionFilterProp='children'
               filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
@@ -343,9 +365,31 @@ const ManageUser = () => {
         dataSource={usersWithKeys}
         className='--manage-user-table'
       />
-      <ViewRowDetailsModal data={detailedItems} ref={refViewDetailsModal} />
-      <DecentralizeRoleModal userOne={null} decentralizeOpts={[]} ref={refDecentralizeRoleModal} />
-      <DeleteUserModal userOne={null} isDeleted={null} ref={refDeleteUserModal} />
+      <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
+      <DecentralizeModal
+        selectionOptions={[]}
+        ref={refDecentralizeModal}
+        title={'Decentralize'}
+        specificInfo={
+          <>
+            <Text>{userOne?.email}</Text>
+          </>
+        }
+        handleConfirm={handleDecentralizeRole}
+      >
+        <Text>Email:</Text>
+        <Text>Role:</Text>
+      </DecentralizeModal>
+      <DeleteModal
+        title='Delete account'
+        content={
+          <>
+            {deleteModalTitle} {'('}<strong>{userOne.email}</strong> {')'}
+          </>
+        }
+        handleConfirm={handleDeleteUser}
+        ref={refDeleteUserModal}
+      />
     </div>
   )
 }

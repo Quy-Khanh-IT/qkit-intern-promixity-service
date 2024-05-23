@@ -1,15 +1,18 @@
 import { Button, Col, Modal, Row, Select, Space, Typography } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 // import { ManageUserReloadContext } from '@/context/ManageUserContext'
-import { IUserInformation, RoleFiltered } from '@/types/user'
+import { SelectionOptions } from '@/types/common'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './decentralize-role-modal.scss'
 // import { useDecentralizeRoleMutation } from '@/services/user.service'
 
 export interface IDecentralizeRoleProps {
-  userOne: IUserInformation | null
-  decentralizeOpts: RoleFiltered[]
+  title: string
+  specificInfo: React.ReactNode
+  handleConfirm: () => void
+  selectionOptions: SelectionOptions[]
+  children: React.ReactNode
 }
 
 export interface IDecentralizeOptions {
@@ -18,10 +21,8 @@ export interface IDecentralizeOptions {
   description: string
 }
 
-const { Text } = Typography
-
-const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDecentralizeRoleProps> = (
-  { userOne: _temp, decentralizeOpts },
+const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentralizeRoleProps> = (
+  { title, specificInfo, handleConfirm, selectionOptions, children },
   ref
 ) => {
   const [open, setOpen] = useState(false)
@@ -33,31 +34,31 @@ const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDec
 
   const onChangeSelection = (_value: string) => {}
 
-  const handleCancel = () => {
+  const handleCancelChild = () => {
     setOpen(false)
   }
 
-  const _handleDecentralizeRole = async () => {}
-
-  const handleOk = () => {}
+  const handleConfirmChild = () => {
+    handleConfirm()
+  }
 
   return (
     <>
       <Modal
         className='view-modal'
-        title='Decentralize'
+        title={title}
         open={open}
         transitionName='ant-move-up'
         width={'600px'}
-        onCancel={handleCancel}
+        onCancel={handleCancelChild}
         footer={[
-          <Button className='btn-cancel' onClick={handleCancel} type='primary' key='cancel'>
+          <Button className='btn-cancel' onClick={handleCancelChild} type='primary' key='cancel'>
             Close
           </Button>,
           <Button
             // className={isConfirm ? 'btn-primary' : ''}
             className='btn-primary'
-            onClick={handleOk}
+            onClick={handleConfirmChild}
             type='primary'
             key='ok'
             // disabled={!isConfirm}
@@ -70,15 +71,12 @@ const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDec
         <div className='content-box'>
           <Row>
             <Col span={8}>
-              <Space direction='vertical'>
-                <Text>Email:</Text>
-                <Text>Role:</Text>
-              </Space>
+              <Space direction='vertical'>{children}</Space>
             </Col>
 
             <Col span={16}>
               <Space direction='vertical'>
-                <Text>ndtuan@gmail.com</Text>
+                {specificInfo}
                 <Select
                   onChange={onChangeSelection}
                   style={{ width: 200 }}
@@ -95,7 +93,7 @@ const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDec
                       .localeCompare(((optionB as { label: string }).label ?? '').toLowerCase())
                   }
                   // value={selectedOption}
-                  options={decentralizeOpts}
+                  options={selectionOptions}
                 />
               </Space>
             </Col>
@@ -106,5 +104,5 @@ const _DecentralizeRoleModal: React.ForwardRefRenderFunction<IModalMethods, IDec
   )
 }
 
-const DecentralizeRoleModal = forwardRef(_DecentralizeRoleModal)
-export default DecentralizeRoleModal
+const DecentralizeModal = forwardRef(_DecentralizeModal)
+export default DecentralizeModal
