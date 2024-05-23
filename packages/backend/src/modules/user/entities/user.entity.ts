@@ -33,13 +33,12 @@ export class User extends BaseEntity {
   lastName: string;
 
   @Prop({ required: true, enum: UserRole, default: UserRole.USER })
-  @Exclude()
   role: UserRole; //Partial index
 
   @Prop()
   image: string;
 
-  @Prop()
+  @Prop({ unique: true })
   phoneNumber: string;
 
   @Prop([Types.ObjectId])
@@ -48,4 +47,5 @@ export class User extends BaseEntity {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ firstName: 'text', lastName: 'text' });
 //path: packages/backend/src/modules/user/dto/create-user.dto.ts

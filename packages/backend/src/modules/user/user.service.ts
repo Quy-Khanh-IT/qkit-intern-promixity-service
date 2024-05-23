@@ -24,11 +24,7 @@ import {
 } from 'src/common/exceptions/user.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import {
-  hashString,
-  transStringToObjectId,
-  verifyHash,
-} from 'src/common/utils';
+import { hashString, verifyHash } from 'src/common/utils';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 import TokenPayload from '../auth/key.payload';
 import { MailService } from '../mail/mail.service';
@@ -45,9 +41,9 @@ import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response
 import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { Business } from '../business/entities/business.entity';
 import { BusinessService } from '../business/business.service';
+import { Business } from '../business/entities/business.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -111,7 +107,7 @@ export class UserService {
   }
 
   async getAllUser(query: FindAllUserQuery): Promise<PaginationResult<User>> {
-    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/users`;
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/admin/users`;
     const aggregateResult = await PaginationHelper.paginate(
       URL,
       query,
@@ -130,13 +126,20 @@ export class UserService {
     let finalPipeline: PipelineStage[] = [];
 
     if (query.email) {
-      matchStage['email'] = query.email;
+      matchStage['email'] = { $regex: new RegExp(`^${query.email}$`, 'i') };
     }
-    if (query.name) {
-      matchStage['$or'] = [{ firstName: query.name }, { lastName: query.name }];
+    if (query.firstName) {
+      matchStage['firstName'] = {
+        $regex: new RegExp(`${query.firstName}`, 'i'),
+      };
     }
-    if (query.businessId) {
-      matchStage['businesses'] = transStringToObjectId(query.businessId);
+    if (query.role) {
+      matchStage['role'] = query.role;
+    }
+    if (query.lastName) {
+      matchStage['lastName'] = {
+        $regex: new RegExp(`${query.lastName}`, 'i'),
+      };
     }
     if (query.phone) {
       matchStage['phoneNumber'] = query.phone;

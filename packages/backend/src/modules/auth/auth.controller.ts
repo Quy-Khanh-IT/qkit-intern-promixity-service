@@ -6,6 +6,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
@@ -19,8 +20,6 @@ import {
   ResetPasswordDto,
   SignUpDto,
 } from './dto/index';
-import { ConfigService } from '@nestjs/config';
-import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 
 @Controller('auth')
 @ApiTags('Authentication')
