@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
@@ -44,7 +44,7 @@ export class Business extends BaseEntity {
   description: string;
 
   @Prop({ default: '', trim: true })
-  phoneNumber: string;
+  phone_number: string;
 
   @Prop({ default: '', trim: true })
   website: string;
@@ -59,19 +59,19 @@ export class Business extends BaseEntity {
   services: string[];
 
   @Prop({ default: 0 })
-  overallRating: number;
+  overall_rating: number;
 
   @Prop({ default: 0 })
-  totalReview: number;
+  total_review: number;
 
   @Prop({ type: [StarSchema], default: defaultStars })
   stars: StarSchema[];
 
   @Prop({ trim: true })
-  addressLine: string;
+  address_line: string;
 
   @Prop({ trim: true })
-  addressLineFull: string;
+  full_address: string;
 
   @Prop({ required: true })
   province: string;
@@ -83,7 +83,7 @@ export class Business extends BaseEntity {
   country: string;
 
   @Prop([DayOpenCloseTimeSchema])
-  dayOfWeek: DayOpenCloseTimeSchema[];
+  day_of_week: DayOpenCloseTimeSchema[];
 
   @Prop({ type: [CloundinaryImage], default: [] })
   imgs: CloundinaryImage[];
@@ -108,6 +108,9 @@ export class Business extends BaseEntity {
     default: BusinessStatusEnum.PENDING,
   })
   status: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user_id: Types.ObjectId;
 
   @Prop({ default: null })
   deleted_at: MongooseSchema.Types.Date;

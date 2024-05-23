@@ -451,8 +451,8 @@ export class UserService {
     return user;
   }
 
-  async getAllByUser(user: User): Promise<FindAllResponse<Business> | []> {
-    const businesses = await this.BusinessService.getAllByUser(user);
+  async getAllByUser(userId: string): Promise<FindAllResponse<Business> | []> {
+    const businesses = await this.BusinessService.getAllByUser(userId);
 
     return businesses;
   }

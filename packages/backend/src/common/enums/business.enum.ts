@@ -25,6 +25,7 @@ export enum StatusActionsEnum {
   APPROVED = 'approved',
   REJECTED = 'rejected',
   BANNED = 'banned',
+  PENDING = 'pending',
 }
 
 export const OrderNumberDay = {

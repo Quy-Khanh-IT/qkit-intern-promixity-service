@@ -30,3 +30,23 @@ export class BusinessInvalidException extends BaseException {
     );
   }
 }
+
+export class BusinessInvalidAddressException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.BUSINESS_INVALID_ADDRESS,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.BUSINESS_INVALID_ADDRESS],
+      403,
+    );
+  }
+}
+
+export class BusinessNotBelongException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.BUSINESS_NOT_BELONG,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.BUSINESS_NOT_BELONG],
+      403,
+    );
+  }
+}
