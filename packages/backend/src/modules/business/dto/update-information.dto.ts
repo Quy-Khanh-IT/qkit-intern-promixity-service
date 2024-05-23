@@ -10,7 +10,7 @@ import {
 
 import { DayOpenCloseTime } from './create-business.dto';
 
-export class UpdateBusinessDto {
+export class UpdateInformationDto {
   @IsOptional()
   @IsString()
   @ApiProperty({ example: 'JangNam' })
@@ -31,12 +31,6 @@ export class UpdateBusinessDto {
   @IsString()
   @ApiProperty({ example: 'https://qkit.vn/company-profile' })
   website?: string;
-
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => CloundinaryImage)
-  // images?: CloundinaryImage[];
 
   @IsOptional()
   @IsString()

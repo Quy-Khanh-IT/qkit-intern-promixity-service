@@ -40,10 +40,6 @@ export class User extends BaseEntity {
 
   @Prop({ unique: true })
   phoneNumber: string;
-
-  @Prop([Types.ObjectId])
-  @Exclude()
-  businesses: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
