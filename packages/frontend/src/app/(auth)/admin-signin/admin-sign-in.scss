@@ -1,3 +1,4 @@
+@import '@/sass/common/common.scss';
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 
 // *,
@@ -25,7 +26,6 @@
 }
 
 .container {
-  // width: 50vw;
   height: 60vh;
   display: grid;
   grid-template-columns: 100%;
@@ -34,6 +34,19 @@
   border-radius: 20px;
   background: white;
   overflow: hidden;
+
+  @include xs{
+    margin: 0 12px !important;
+    width: 90% !important;
+  }
+
+  @include sm{
+    margin: unset !important;
+  }
+
+  @include lg{
+    width: 60% !important;
+  }
 }
 
 .design {
@@ -103,7 +116,7 @@
 
 .text-input {
   background: #e6e6e6;
-  height: 40px;
+  height: 50px;
   display: flex;
   width: 60%;
   align-items: center;
@@ -130,8 +143,7 @@
 }
 
 .login-btn {
-  width: 68%;
-  padding: 10px;
+  padding: 12px;
   color: white;
   background: linear-gradient(to right, #ff966d, #fa538d, #89379c);
   border: none;
