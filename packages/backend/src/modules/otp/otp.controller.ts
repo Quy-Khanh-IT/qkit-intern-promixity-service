@@ -1,9 +1,17 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { MailService } from '../mail/mail.service';
 import { CreateOTPRegistrationDto } from './dto/create-otp.dto';
 import { OtpService } from './otp.service';
-
 @Controller('otps')
 @ApiTags('Otp')
 export class OtpController {
@@ -26,5 +34,13 @@ export class OtpController {
       'OTP Code for registration',
       result.otp,
     );
+  }
+
+  @Post('updating-email')
+  @HttpCode(204)
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard)
+  async createForUpdatingEmail(@Req() req: Request): Promise<void> {
+    return await this.otpService.createForUpdatingEmail(req.user.email);
   }
 }

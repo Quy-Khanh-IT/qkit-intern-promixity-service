@@ -1,7 +1,8 @@
 import {
-  BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -12,11 +13,13 @@ import { ConfigKey, UserConstant } from 'src/common/constants';
 import { DeleteType, TypeRequests, UserRole } from 'src/common/enums';
 import {
   InvalidTokenException,
+  OTPNotMatchException,
   UnauthorizedException,
   WrongCredentialsException,
 } from 'src/common/exceptions';
 import {
   ConfirmPassNotMatchException,
+  ExceedResetEmailRequestException,
   NewPassNotMatchOldException,
   UserAlreadyExistException,
   UserConflictAdminException,
@@ -43,6 +46,7 @@ import { UserRepository } from './repository/user.repository';
 
 import { BusinessService } from '../business/business.service';
 import { Business } from '../business/entities/business.entity';
+import { OtpService } from '../otp/otp.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
@@ -54,12 +58,18 @@ export class UserService {
     private readonly requestService: RequestService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    // @Inject(forwardRef(() => BusinessService))
+    @Inject(forwardRef(() => OtpService))
+    private readonly otpService: OtpService,
+    @Inject(forwardRef(() => BusinessService))
     private readonly BusinessService: BusinessService,
   ) {}
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
+  }
+
+  async updateVerifiedStatusByEmail(id: string, status: boolean) {
+    return await this.userRepository.update(id, { isVerified: status });
   }
 
   async softDeleteById(id: string): Promise<boolean> {
@@ -245,36 +255,7 @@ export class UserService {
     userFromToken: User,
     userIdRequest: string,
   ): Promise<boolean> {
-    if (!this.verifyUserFromToken(userIdRequest, userFromToken.id)) {
-      throw new UnauthorizedException();
-    }
-    const isPasswordMatching = await verifyHash(
-      userFromToken.password,
-      data.password,
-    );
-
-    if (!isPasswordMatching) {
-      throw new WrongCredentialsException();
-    }
-
-    const isExistingEmail = await this.userRepository.findOneByCondition({
-      email: data.email,
-    });
-
-    if (isExistingEmail) {
-      throw new UserAlreadyExistException();
-    }
-
-    const requests = await this.requestService.findManyByUserIdAndType(
-      userFromToken.id,
-      TypeRequests.RESET_EMAIL,
-    );
-
-    if (requests.count >= UserConstant.MAX_RESET_EMAIL_REQUEST) {
-      throw new BadRequestException(
-        'You have reached the limit of request to reset email',
-      );
-    }
+    await this.validateForUpdatingEmail(data, userFromToken, userIdRequest);
 
     const newJWTToken = await this.generateTokenForResetEmail({
       user_id: userIdRequest,
@@ -309,6 +290,46 @@ export class UserService {
     return true;
   }
 
+  async validateForUpdatingEmail(
+    data: RequesUpdateEmail,
+    userFromToken: User,
+    userIdRequest: string,
+  ): Promise<void> {
+    if (!this.verifyUserFromToken(userIdRequest, userFromToken.id)) {
+      throw new UnauthorizedException();
+    }
+    const isPasswordMatching = await verifyHash(
+      userFromToken.password,
+      data.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new WrongCredentialsException();
+    }
+
+    const isExistingEmail = await this.userRepository.findOneByCondition({
+      email: data.email,
+    });
+
+    if (isExistingEmail) {
+      throw new UserAlreadyExistException();
+    }
+
+    const otps = await this.otpService.findManyByEmail(userFromToken.email, 5);
+
+    if (!otps.count || otps.items[0].otp !== data.otp) {
+      throw new OTPNotMatchException();
+    }
+
+    const requests = await this.requestService.findManyByUserIdAndType(
+      userFromToken.id,
+      TypeRequests.RESET_EMAIL,
+    );
+
+    if (requests.count >= UserConstant.MAX_RESET_EMAIL_REQUEST) {
+      throw new ExceedResetEmailRequestException();
+    }
+  }
   async resetEmail(
     token: string,
     userFromToken: User,
@@ -324,7 +345,7 @@ export class UserService {
 
     const isTokenMatching = requests.items[0].token === token;
 
-    if (!isTokenMatching) {
+    if (!isTokenMatching || requests.items[0].used === true) {
       throw new InvalidTokenException();
     }
 
