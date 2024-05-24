@@ -10,10 +10,14 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -31,6 +35,9 @@ import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { UploadFileConstraint } from 'src/common/constants';
+import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
@@ -192,25 +199,43 @@ export class BusinessController {
 
   @Patch(':id/images')
   @UseGuards(JwtAccessTokenGuard)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FilesInterceptor('images', 4, UploadFileConstraint.MULTER_OPTION),
+  )
   @HttpCode(200)
-  @ApiBody({ type: UpdateAddressDto })
   @ApiResponse({
     status: 200,
     description: 'User successfully update business information.',
   })
   async updateImages(
+    @UploadedFiles() images: Express.Multer.File[],
     @Param('id') id: string,
-    @Body()
-    updateAddressDto: UpdateAddressDto,
     @Req() req: Request,
-  ) {
-    // const result: Business = await this.businessService.updateAddresses(
-    //   id,
-    //   req.user.id,
-    //   updateAddressDto,
-    // );
+  ): Promise<NoContentResponseDto> {
+    const result = await this.businessService.updateImage(
+      id,
+      req.user.id,
+      images,
+    );
 
-    return null;
+    return {
+      isSuccess: result,
+    };
   }
 
   @Patch(':id/restore')

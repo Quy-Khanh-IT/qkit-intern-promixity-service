@@ -9,6 +9,7 @@ import { BusinessController } from './business.controller';
 import { BusinessService } from './business.service';
 import { Business, BusinessSchema } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
+import { UploadFileModule } from '../upload-file/upload-file.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BusinessRepository } from './repository/business.repository';
     AxiosModule,
     HttpModule,
     NominatimOmsModule,
+    UploadFileModule,
   ],
   controllers: [BusinessController],
   providers: [BusinessService, BusinessRepository],

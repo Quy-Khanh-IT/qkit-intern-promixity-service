@@ -7,6 +7,7 @@ import {
 } from 'cloudinary';
 import * as sharp from 'sharp';
 import { ConfigKey, UploadFileConstraint } from 'src/common/constants';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UploadFileService {
@@ -26,12 +27,15 @@ export class UploadFileService {
           folder: this.configService.get<string>(
             ConfigKey.CLOUDINARY_IMAGE_FOLDER,
           ),
+          phash: true,
         },
         (error, result) => {
           if (error) return reject(error);
           resolve(result);
         },
       );
+
+      const md5 = this.calculateMD5Hash(fileBuffer);
 
       uploadStream.end(fileBuffer);
     });
@@ -46,5 +50,9 @@ export class UploadFileService {
       .toBuffer();
 
     return compressedImageBuffer;
+  }
+
+  async calculateMD5Hash(buffer: Buffer): Promise<string> {
+    return crypto.createHash('md5').update(buffer).digest('hex');
   }
 }
