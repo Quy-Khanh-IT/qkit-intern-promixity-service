@@ -27,15 +27,15 @@ import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
+import { UploadFileService } from '../upload-file/upload-file.service';
+import { UploadFileConstraint } from 'src/common/constants';
 
 @Injectable()
 export class BusinessService {
   constructor(
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
+    private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
-    @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
 
   async getById(id: string): Promise<Business> {
@@ -407,6 +407,63 @@ export class BusinessService {
       });
 
     return businesses;
+  }
+
+  async updateImage(
+    businessId: string,
+    userId: string,
+    images: Express.Multer.File[],
+  ): Promise<boolean> {
+    const business = await this.businessRepository.findOneById(businessId);
+
+    if (!business) {
+      throw new BusinessNotFoundException();
+    }
+
+    if (business.user_id.toString() !== userId) {
+      throw new BusinessNotBelongException();
+    }
+
+    let imageUrls = [];
+
+    for (const image of images) {
+      let fileBuffer = image.buffer;
+      if (image.size > UploadFileConstraint.LIMIT_FILE_SIZE) {
+        fileBuffer = await this.uploadFileService.compressImage(fileBuffer);
+      }
+
+      const md5 = await this.uploadFileService.calculateMD5Hash(fileBuffer);
+
+      const md5Arr = business.images.map((img) => {
+        return img.etag;
+      });
+
+      if (md5Arr.includes(md5)) {
+        continue;
+      } else {
+        const img = await this.uploadFileService.uploadImageToCloudinary(image);
+
+        imageUrls.push({
+          url: img.secure_url,
+          public_id: img.public_id,
+          etag: md5,
+          phash: img.phash,
+        });
+      }
+    }
+
+    if (imageUrls.length === 0) {
+      return true;
+    }
+
+    const updateImgsBusiness = await this.businessRepository.update(
+      businessId,
+      {
+        images: imageUrls,
+      },
+    );
+
+    return !!updateImgsBusiness;
   }
 
   async validateAddress(

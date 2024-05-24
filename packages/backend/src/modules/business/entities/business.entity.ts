@@ -3,9 +3,9 @@ import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
-import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { StarSchema } from './star.entity';
+import { Image } from './image.entity';
 
 const defaultStars: StarSchema[] = [
   {
@@ -49,8 +49,8 @@ export class Business extends BaseEntity {
   @Prop({ default: '', trim: true })
   website: string;
 
-  @Prop([CloundinaryImage])
-  images: CloundinaryImage[];
+  @Prop({ type: [Image], default: [] })
+  images: Image[];
 
   @Prop({ required: true, trim: true })
   category: string;
@@ -84,9 +84,6 @@ export class Business extends BaseEntity {
 
   @Prop([DayOpenCloseTimeSchema])
   day_of_week: DayOpenCloseTimeSchema[];
-
-  @Prop({ type: [CloundinaryImage], default: [] })
-  imgs: CloundinaryImage[];
 
   @Prop({
     type: {
