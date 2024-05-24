@@ -1,14 +1,15 @@
+import { API_ENDPOINT } from '@/constants'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const addressApi = createApi({
   reducerPath: 'addressApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/address' }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
   endpoints: (builder) => ({
     getProvinces: builder.query({
-      query: () => '/provinces'
+      query: () => '/address/provinces'
     }),
     getDistrictByProvinceCode: builder.query({
-      query: (provinceCode: string) => `/districts/${provinceCode}`
+      query: (provinceCode: string) => `/address/districts/${provinceCode}`
     })
   })
 })

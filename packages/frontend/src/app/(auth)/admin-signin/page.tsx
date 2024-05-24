@@ -18,7 +18,7 @@ const AdminLogin: React.FC = () => {
         <Flex vertical justify='center'>
           <Flex align='center' justify='center' gap='large'>
             <Col span={18} style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
-              <h3 className='title'>Admin Login</h3>
+              <h3 className='title' style={{fontWeight: 700}}>Admin Login</h3>
               <div className='text-input w-100'>
                 <i className='ri-user-fill'></i>
                 <input type='text' placeholder='Username' />
