@@ -1,6 +1,6 @@
+import { Col, Flex } from 'antd'
 import React from 'react'
 import './admin-sign-in.scss'
-import { Col, Flex, Space, Typography } from 'antd'
 
 const AdminLogin: React.FC = () => {
   return (

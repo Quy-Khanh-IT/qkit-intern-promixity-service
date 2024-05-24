@@ -2,11 +2,10 @@
 import { themConfig } from '@/configs/themes/light'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { ConfigProvider } from 'antd'
-import React, { Suspense, useEffect, useState } from 'react'
-import { Bounce, ToastContainer } from 'react-toastify'
+import { usePathname, useSearchParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import LoaderArea from '../LoaderArea/LoaderArea'
 import StoreProvider from '../StoreProvider'
-import { usePathname, useSearchParams } from 'next/navigation'
 
 interface IContentLayout {
   children: React.ReactNode
@@ -38,9 +37,9 @@ const Content: React.FC<IContentLayout> = ({ children }) => {
     <AntdRegistry>
       <ConfigProvider theme={themConfig}>
         <div className={`app-content blur`}>
-          <Suspense fallback={<LoaderArea />}>
-            <StoreProvider>{children}</StoreProvider>
-          </Suspense>
+          {/* <Suspense fallback={<LoaderArea />}> */}
+          <StoreProvider>{children}</StoreProvider>
+          {/* </Suspense> */}
         </div>
         {loading ? <LoaderArea /> : null}
       </ConfigProvider>

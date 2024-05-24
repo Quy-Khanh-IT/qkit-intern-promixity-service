@@ -146,6 +146,7 @@ export default function SignUp() {
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOTPSuccess, isOTPError])
 
   useEffect(() => {
@@ -158,6 +159,7 @@ export default function SignUp() {
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRegisterSuccess, isRegisterError])
 
   const handleError = (error: ErrorResponse) => {
