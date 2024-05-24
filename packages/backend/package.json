@@ -38,6 +38,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cloudinary": "^2.1.0",
+    "crypto": "^1.0.1",
     "dayjs": "^1.11.10",
     "handlebar": "^1.0.0",
     "handlebars": "^4.7.8",
