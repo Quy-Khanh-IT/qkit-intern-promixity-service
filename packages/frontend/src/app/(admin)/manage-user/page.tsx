@@ -44,7 +44,10 @@ const ManageUser = () => {
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([{label: 'ADMIN', value: 'ADMIN'}, {label: 'USER', value: 'USER'}])
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([
+    { label: 'ADMIN', value: 'ADMIN' },
+    { label: 'USER', value: 'USER' }
+  ])
 
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
