@@ -1,12 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 import { ReviewConstant } from 'src/common/constants/review.constant';
+import { ReviewActionEnum, StarEnum, UserRole } from 'src/common/enums';
 import { BusinessNotFoundException } from 'src/common/exceptions/business.exception';
-import { ReviewNotFoundException } from 'src/common/exceptions/review.exception';
+import {
+  ResponseNotFoundException,
+  ReviewDeleteException,
+  ReviewForbiddenException,
+  ReviewNotFoundException,
+} from 'src/common/exceptions/review.exception';
 
 import { BusinessService } from '../business/business.service';
+import { User } from '../user/entities/user.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { EditResponseDto } from './dto/edit-response.dto';
+import { EditReviewDto } from './dto/edit-review.dto';
 import { ReplyReviewDto } from './dto/reply-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { Review } from './entities/review.entity';
 import { ReviewRepository } from './repository/review.repository';
 
 @Injectable()
@@ -14,7 +25,12 @@ export class ReviewService {
   constructor(
     private readonly businessService: BusinessService,
     private readonly reviewRepository: ReviewRepository,
+    @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
+
+  async findById(id: string): Promise<Review> {
+    return await this.reviewRepository.findOneById(id);
+  }
 
   async create(createReviewDto: CreateReviewDto, userId: string) {
     const business = await this.businessService.getById(
@@ -25,17 +41,37 @@ export class ReviewService {
       throw new BusinessNotFoundException();
     }
 
-    const review = await this.reviewRepository.create({
-      comment: createReviewDto.comment,
-      star: createReviewDto.star,
-      business_id: createReviewDto.businessId,
-      user_id: userId,
-    });
+    const transactionSession = await this.connection.startSession();
 
-    return review;
+    try {
+      transactionSession.startTransaction();
+
+      const review = await this.reviewRepository.create({
+        comment: createReviewDto.comment,
+        star: StarEnum[createReviewDto.star],
+        business_id: business.id,
+        user_id: userId,
+      });
+
+      const updatedBusiness = await this.businessService.updateRating(
+        business.id,
+        ReviewActionEnum.CREATE,
+        createReviewDto.star,
+      );
+
+      await transactionSession.commitTransaction();
+
+      return review;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+
+      transactionSession.endSession();
+
+      throw err;
+    }
   }
 
-  async reply(
+  async response(
     replyReviewDto: ReplyReviewDto,
     parentReviewId: string,
     userId: string,
@@ -52,7 +88,7 @@ export class ReviewService {
       parentReviewId = review.parent_id.toString();
     }
 
-    const newReply = await this.reviewRepository.create({
+    const newResponse = await this.reviewRepository.create({
       comment: replyReviewDto.comment,
       star: null,
       business_id: review.business_id,
@@ -66,22 +102,108 @@ export class ReviewService {
       // is_business_owner_reply: business.user_id.toString() === userId,
     });
 
-    return newReply;
+    return newResponse;
   }
 
-  findAll() {
-    return `This action returns all review`;
+  async editReview(
+    id: string,
+    editReviewDto: EditReviewDto,
+    userId: string,
+  ): Promise<Review> {
+    const review = await this.reviewRepository.findOneByCondition({
+      _id: id,
+      user_id: userId,
+      parent_id: null, // ensure that this is a review, not a response
+      deleted_at: null, // ensure that this review is not deleted
+    });
+
+    if (!review) {
+      throw new ReviewForbiddenException(
+        "Can't edit this review. Review not found or not belong to user or not a review.",
+      );
+    }
+
+    const editedReview = await this.reviewRepository.update(id, {
+      comment: editReviewDto.comment,
+      star: parseInt(editReviewDto.star),
+    });
+
+    return editedReview;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async editResponse(
+    id: string,
+    editResponseDto: EditResponseDto,
+    userId: string,
+  ): Promise<Review> {
+    const response = await this.reviewRepository.findOneByCondition({
+      _id: id,
+      user_id: userId,
+    });
+
+    if (!response) {
+      throw new ResponseNotFoundException(
+        "Can't edit this response. Response not found or not belong to user.",
+      );
+    }
+
+    const editedResponse = await this.reviewRepository.update(id, {
+      comment: editResponseDto.comment,
+    });
+
+    return editedResponse;
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async softDelete(id: string, userId: string): Promise<boolean> {
+    const review = await this.reviewRepository.findOneByCondition({
+      _id: id,
+      user_id: userId,
+      parent_id: null,
+      deleted_at: null,
+    });
+
+    if (!review) {
+      throw new ReviewDeleteException(
+        "Can't delete this review. Review not found or not belong to user or already deleted.",
+      );
+    }
+
+    return !!(await this.reviewRepository.softDelete(id));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async hardDelete(id: string, user: User): Promise<boolean> {
+    const { role } = user;
+
+    if (role !== UserRole.ADMIN) {
+      throw new ReviewDeleteException('Only admin can hard delete.');
+    }
+
+    const review = await this.reviewRepository.findOneByConditionWithDeleted({
+      _id: id,
+      parent_id: null, // ensure that this is a review, not a response
+    });
+
+    if (!review) {
+      throw new ReviewDeleteException(
+        'Review was not deleted or review not found.',
+      );
+    }
+
+    return !!(await this.reviewRepository.hardDelete(id));
+  }
+
+  async deleteResponses(id: string, userId: string): Promise<boolean> {
+    const review = await this.reviewRepository.findOneByCondition({
+      _id: id,
+      user_id: userId,
+    });
+
+    if (!review) {
+      throw new ResponseNotFoundException(
+        "Can't delete this response. Response not found or not belong to user.",
+      );
+    }
+
+    return !!(await this.reviewRepository.hardDelete(id));
   }
 }

@@ -1,17 +1,49 @@
 import { ERRORS_DICTIONARY, ERROR_MESSAGES, ERROR_CODES } from '../constants';
 import { BaseException } from './base/base-message.exception';
 
-export class ReviewNotFoundException extends BaseException {
-  constructor() {
-    super(
-      ERRORS_DICTIONARY.REVIEW_NOT_FOUND,
-      ERROR_MESSAGES[ERRORS_DICTIONARY.REVIEW_NOT_FOUND],
-      404,
-    );
+// Review
+export class ReviewForbiddenException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.REVIEW_FORBIDDEN;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.REVIEW_FORBIDDEN];
+
+    super(errorDictionary, errorMessage, 403);
   }
 }
 
-export class ReplyDepthExceedException extends BaseException {
+export class ReviewNotFoundException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.REVIEW_NOT_FOUND;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.REVIEW_NOT_FOUND];
+
+    super(errorDictionary, errorMessage, 404);
+  }
+}
+
+export class ReviewDeleteException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.REVIEW_CAN_NOT_DELETE;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.REVIEW_CAN_NOT_DELETE];
+
+    super(errorDictionary, errorMessage, 403);
+  }
+}
+
+// Response
+export class ResponseNotFoundException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.RESPONSE_NOT_FOUND;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.RESPONSE_NOT_FOUND];
+
+    super(errorDictionary, errorMessage, 404);
+  }
+}
+
+export class ResponseDepthExceedException extends BaseException {
   constructor() {
     super(
       ERRORS_DICTIONARY.REVIEW_DEPTH_EXCEED,

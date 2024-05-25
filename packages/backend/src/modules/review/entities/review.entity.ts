@@ -25,12 +25,6 @@ export class Review extends BaseEntity {
   @Prop({ type: Types.ObjectId, ref: 'Review' })
   replies: Types.ObjectId[];
 
-  @Prop({ type: Boolean, default: false })
-  is_business_owner_reply: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  can_reply: boolean;
-
   @Prop({ type: Number, default: 0 })
   depth: number;
 
@@ -39,6 +33,9 @@ export class Review extends BaseEntity {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Business' })
   business_id: Types.ObjectId;
+
+  @Prop({ default: null })
+  deleted_at: Date;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
