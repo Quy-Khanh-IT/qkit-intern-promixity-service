@@ -8,6 +8,8 @@ import {
 import {
   BusinessStatusEnum,
   OrderNumberDay,
+  ReviewActionEnum,
+  StarEnum,
   StatusActionsEnum,
 } from 'src/common/enums';
 import {
@@ -461,6 +463,20 @@ export class BusinessService {
     );
 
     return !!updateImgsBusiness;
+  }
+
+  async updateRating(
+    businessId: string,
+    type: ReviewActionEnum,
+    star: string,
+  ): Promise<Business> {
+    const business = await this.businessRepository.updateRating(
+      businessId,
+      type,
+      star,
+    );
+
+    return business;
   }
 
   async validateAddress(
