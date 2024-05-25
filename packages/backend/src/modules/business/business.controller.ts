@@ -9,11 +9,11 @@ import {
   Post,
   Query,
   Req,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -23,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { UploadFileConstraint } from 'src/common/constants';
 import {
   BusinessStatusEnum,
   DeleteActionEnum,
@@ -30,14 +31,12 @@ import {
 } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 
+import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { UploadFileConstraint } from 'src/common/constants';
-import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')

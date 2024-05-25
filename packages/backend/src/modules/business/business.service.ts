@@ -1,7 +1,6 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Types } from 'mongoose';
+import { UploadFileConstraint } from 'src/common/constants';
 import {
   ERROR_CODES,
   ERRORS_DICTIONARY,
@@ -20,15 +19,13 @@ import {
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
-import { UserService } from '../user/user.service';
+import { UploadFileService } from '../upload-file/upload-file.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
-import { UploadFileService } from '../upload-file/upload-file.service';
-import { UploadFileConstraint } from 'src/common/constants';
 
 @Injectable()
 export class BusinessService {
@@ -424,7 +421,7 @@ export class BusinessService {
       throw new BusinessNotBelongException();
     }
 
-    let imageUrls = [];
+    const imageUrls = [];
 
     for (const image of images) {
       let fileBuffer = image.buffer;
