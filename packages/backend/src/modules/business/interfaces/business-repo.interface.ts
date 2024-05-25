@@ -2,6 +2,7 @@ import { BaseRepositoryInterface } from 'src/cores/repository/base/repositoryInt
 
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { Business } from '../entities/business.entity';
+import { ReviewActionEnum } from 'src/common/enums';
 
 export interface BusinessRepositoryInterface
   extends BaseRepositoryInterface<Business> {
@@ -11,4 +12,10 @@ export interface BusinessRepositoryInterface
   ): Promise<Business | null>;
 
   restoreBusiness(id: string): Promise<Business | null>;
+
+  updateRating(
+    id: string,
+    type: ReviewActionEnum,
+    star: string,
+  ): Promise<Business | null>;
 }

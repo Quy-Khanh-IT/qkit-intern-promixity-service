@@ -127,4 +127,20 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   async hardDelete(id: string): Promise<boolean> {
     return !!(await this.model.findByIdAndDelete(id));
   }
+
+  async findOneByConditionWithDeleted(condition = {}): Promise<T | null> {
+    const result = (await this.model
+      .findOne({
+        ...condition,
+        deleted_at: {
+          $ne: null,
+        },
+      })
+      .lean()
+      .exec()) as T;
+    if (result) {
+      result.id = transObjectIdToString(result._id);
+    }
+    return result;
+  }
 }
