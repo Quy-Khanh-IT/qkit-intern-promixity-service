@@ -25,6 +25,7 @@ import { PaginationHelper } from 'src/common/helper';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
 import { BusinessService } from '../business/business.service';
+import { User } from '../user/entities/user.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
@@ -333,10 +334,7 @@ export class ReviewService {
     const review = await this.reviewRepository.findOneByCondition({
       _id: id,
       type: ReviewTypeEnum.REPLY,
-      user_id: userId,
     });
-
-    if (!review) {
       throw new ResponseNotFoundException(
         "Can't delete this response. Response not found or not belong to user or not a response.",
       );

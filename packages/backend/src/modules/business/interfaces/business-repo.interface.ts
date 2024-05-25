@@ -3,6 +3,7 @@ import { BaseRepositoryInterface } from 'src/cores/repository/base/repositoryInt
 
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { Business } from '../entities/business.entity';
+import { ReviewActionEnum } from 'src/common/enums';
 
 export interface BusinessRepositoryInterface
   extends BaseRepositoryInterface<Business> {
