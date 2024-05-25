@@ -4,8 +4,8 @@ import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
-import { StarSchema } from './star.entity';
 import { Image } from './image.entity';
+import { StarSchema } from './star.entity';
 
 const defaultStars: StarSchema[] = [
   {
