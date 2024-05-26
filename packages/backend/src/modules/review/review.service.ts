@@ -25,7 +25,6 @@ import { PaginationHelper } from 'src/common/helper';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
 import { BusinessService } from '../business/business.service';
-import { User } from '../user/entities/user.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
@@ -338,6 +337,19 @@ export class ReviewService {
       throw new ResponseNotFoundException(
         "Can't delete this response. Response not found or not belong to user or not a response.",
       );
+    }
+
+    return !!(await this.deleteWithChildren(id));
+  }
+
+  async deleteWithChildren(id: string) {
+    const children = await this.reviewRepository.findAll({
+      parent_id: id,
+    });
+
+    // Recursively delete each child review
+    for (const child of children.items) {
+      await this.deleteWithChildren(child.id);
     }
 
     return !!(await this.deleteWithChildren(id));
