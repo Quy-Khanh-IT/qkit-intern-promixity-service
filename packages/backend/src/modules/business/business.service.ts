@@ -9,7 +9,6 @@ import {
   BusinessStatusEnum,
   OrderNumberDay,
   ReviewActionEnum,
-  StarEnum,
   StatusActionsEnum,
 } from 'src/common/enums';
 import {
@@ -469,11 +468,13 @@ export class BusinessService {
     businessId: string,
     type: ReviewActionEnum,
     star: string,
+    oldStar?: string,
   ): Promise<Business> {
     const business = await this.businessRepository.updateRating(
       businessId,
       type,
       star,
+      oldStar,
     );
 
     return business;
