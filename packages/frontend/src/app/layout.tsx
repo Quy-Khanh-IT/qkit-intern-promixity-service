@@ -7,6 +7,7 @@ import Content from './components/layouts/Content'
 import './globals.scss'
 import { Suspense } from 'react'
 import LoaderArea from './components/LoaderArea/LoaderArea'
+import { AuthProvider } from '@/context/AuthContext'
 
 export const metadata: Metadata = {
   title: 'Proximity Service',

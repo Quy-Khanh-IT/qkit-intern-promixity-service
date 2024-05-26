@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { registerUser } from '../types/auth'
+import { ILoginPayload, ILoginResponse, IRegisterUser } from '../types/auth'
 import { API_ENDPOINT } from '@/constants'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
-      query: (body: { email: string; password: string }) => ({
+    loginUser: builder.mutation<ILoginResponse, ILoginPayload>({
+      query: (body) => ({
         url: '/auth/login',
         method: 'POST',
         body
@@ -20,7 +20,7 @@ export const authApi = createApi({
       })
     }),
     registerUser: builder.mutation({
-      query: (body: registerUser) => ({
+      query: (body: IRegisterUser) => ({
         url: '/auth/sign-up',
         method: 'POST',
         body

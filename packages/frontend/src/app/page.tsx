@@ -1,4 +1,3 @@
-'use client'
 import Footer from '@/app/components/Footer'
 import HeroSection from '@/app/components/HeroSection'
 import Header from '@/app/components/Header'

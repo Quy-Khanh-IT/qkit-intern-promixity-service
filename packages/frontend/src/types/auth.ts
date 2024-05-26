@@ -1,4 +1,4 @@
-export type registerUser = {
+export interface IRegisterUser {
   email: string
   password: string
   firstName: string
@@ -8,4 +8,14 @@ export type registerUser = {
   province: string
   country: string
   otp: string
+}
+
+export interface ILoginPayload {
+  email: string
+  password: string
+}
+
+export interface ILoginResponse {
+  accessToken: string
+  refreshToken: string
 }

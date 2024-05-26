@@ -17,4 +17,4 @@ export const MODAL_TEXT = {
   RESTORE_BUSINESS: 'Do you want to restore this business?'
 }
 
-export const API_ENDPOINT = process.env.BASE_URL
+export const API_ENDPOINT = process.env.NEXT_PUBLIC_BASE_URL
