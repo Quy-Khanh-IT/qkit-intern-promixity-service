@@ -213,13 +213,14 @@ export default function SignUp() {
               <img onClick={redirectHome} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper f-form'>
-              <h2>Welcome to Proximity Service</h2>
+             <div className="header-title">
+             <h2>Welcome to Proximity Service</h2>
               <div>Please Enter Information To Join With Us</div>
+             </div>
               <div className={`container ${!isGetOTP && 'fade-in'}`}>
                 {isGetOTP ? (
-                  <div className='row mt-5'>
-                    <div className='col-3' />
-                    <div className='col-6'>
+                  <div className='row'>
+                    <div className='col-12 col-md-6'>
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>Email address</label>
@@ -235,29 +236,6 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.email ? 'error-input' : ''}`}
                             placeholder='name@example.com'
                           />
-                        </div>
-                      </div>
-                    </div>
-                    <div className='col-3' />
-                  </div>
-                ) : (
-                  <div className='row'>
-                    <div className='col-6'>
-                      <div className='form'>
-                        <div className='mb-3'>
-                          <label className='form-label'>OTP</label>
-                          {registerDataErrors.otp && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.otp}</span>
-                            </div>
-                          )}
-                          <input
-                            value={registerData.otp}
-                            type='text'
-                            onChange={(e) => onChangeRegisterData(e.target.value, 'otp')}
-                            className={`form-control ${registerDataErrors.otp ? 'error-input' : ''}`}
-                            placeholder='Input OTP code with 6 digits'
-                          ></input>
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Password</label>
@@ -289,24 +267,9 @@ export default function SignUp() {
                             placeholder='********'
                           />
                         </div>
-                        <div className='mb-3'>
-                          <label className='form-label'>Phone Number</label>
-                          {registerDataErrors.phoneNumber && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.phoneNumber}</span>
-                            </div>
-                          )}
-                          <input
-                            type='text'
-                            className={`form-control ${registerDataErrors.phoneNumber ? 'error-input' : ''}`}
-                            placeholder='0123456789'
-                            value={registerData.phoneNumber}
-                            onChange={(e) => onChangeRegisterData(e.target.value, 'phoneNumber')}
-                          />
-                        </div>
                       </div>
                     </div>
-                    <div className='col-6'>
+                    <div className='col-12 col-md-6'>
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>First name</label>
@@ -339,44 +302,41 @@ export default function SignUp() {
                           />
                         </div>
                         <div className='mb-3'>
-                          <label className='form-label'>Province</label>
-                          {registerDataErrors.city && (
+                          <label className='form-label'>Phone Number</label>
+                          {registerDataErrors.phoneNumber && (
                             <div>
-                              <span className='error-message mb-2'> {registerDataErrors.city}</span>
+                              <span className='error-message mb-2'> {registerDataErrors.phoneNumber}</span>
                             </div>
                           )}
-                          <select
-                            value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}
-                            className={`form-control ${registerDataErrors.city ? 'error-input' : ''}`}
-                          >
-                            <option value=''>--Choose Province--</option>
-                            {provinces.map((province: Province) => (
-                              <option key={province.code} value={province.code}>
-                                {province.full_name}
-                              </option>
-                            ))}
-                          </select>
+                          <input
+                            type='text'
+                            className={`form-control ${registerDataErrors.phoneNumber ? 'error-input' : ''}`}
+                            placeholder='0123456789'
+                            value={registerData.phoneNumber}
+                            onChange={(e) => onChangeRegisterData(e.target.value, 'phoneNumber')}
+                          />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='row mt-5'>
+                    <div className='col-12'>
+                      <div className='form'>
                         <div className='mb-3'>
-                          <label className='form-label'>District</label>
-                          {registerDataErrors.province && (
+                          <label className='form-label'>OTP</label>
+                          {registerDataErrors.otp && (
                             <div>
-                              <span className='error-message mb-2'> {registerDataErrors.province}</span>
+                              <span className='error-message mb-2'> {registerDataErrors.otp}</span>
                             </div>
                           )}
-                          <select
-                            value={selectedDistrict}
-                            onChange={(e) => setSelectedDistrict(e.target.value)}
-                            className={`form-control ${registerDataErrors.province ? 'error-input' : ''}`}
-                          >
-                            <option value=''>--Choose District--</option>
-                            {districts.map((district: District) => (
-                              <option key={district.code} value={district.code}>
-                                {district.full_name}
-                              </option>
-                            ))}
-                          </select>
+                          <input
+                            value={registerData.otp}
+                            type='text'
+                            onChange={(e) => onChangeRegisterData(e.target.value, 'otp')}
+                            className={`form-control ${registerDataErrors.otp ? 'error-input' : ''}`}
+                            placeholder='Input OTP code with 6 digits'
+                          />
                         </div>
                       </div>
                     </div>
@@ -386,15 +346,15 @@ export default function SignUp() {
             </div>
             <div
               className='d-flex align-items-center justify-content-center'
-              style={{ padding: '0 72x', flexDirection: 'column' }}
+              style={{ padding: '0 72px', flexDirection: 'column' }}
             >
               {isGetOTP ? (
                 <button style={{ width: '200px' }} onClick={handleGetOTP} className='form-btn mt-3'>
-                  Get OTP
+                  Register
                 </button>
               ) : (
                 <button style={{ width: '200px' }} onClick={handleSignUp} className='form-btn'>
-                  Sign Up
+                  Confirm
                 </button>
               )}
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
