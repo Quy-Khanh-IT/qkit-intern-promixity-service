@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { ReviewTypeEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { Image } from 'src/modules/business/entities/image.entity';
 
 @Schema({
   timestamps: {
@@ -19,11 +19,8 @@ export class Review extends BaseEntity {
   @Prop({})
   star: number | null;
 
-  @Prop({ type: Image })
-  image: Image;
-
-  @Prop({ type: Types.ObjectId, ref: 'Review' })
-  replies: Types.ObjectId[];
+  @Prop({ enum: ReviewTypeEnum, required: true })
+  type: ReviewTypeEnum;
 
   @Prop({ type: Number, default: 0 })
   depth: number;
