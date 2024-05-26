@@ -2,8 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { ReviewConstant } from 'src/common/constants/review.constant';
-import { ReviewActionEnum, StarEnum, UserRole } from 'src/common/enums';
-import { BusinessNotFoundException } from 'src/common/exceptions/business.exception';
+import {
+  BusinessStatusEnum,
+  ReviewActionEnum,
+  ReviewTypeEnum,
+  StarEnum,
+} from 'src/common/enums';
+import {
+  BusinessNotFoundException,
+  BusinessStatusException,
+} from 'src/common/exceptions/business.exception';
 import {
   ResponseNotFoundException,
   ReviewDeleteException,
@@ -12,7 +20,6 @@ import {
 } from 'src/common/exceptions/review.exception';
 
 import { BusinessService } from '../business/business.service';
-import { User } from '../user/entities/user.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
@@ -41,6 +48,12 @@ export class ReviewService {
       throw new BusinessNotFoundException();
     }
 
+    if (business.status !== BusinessStatusEnum.APPROVED) {
+      throw new BusinessStatusException(
+        "Can't review this business. Business is not approved.",
+      );
+    }
+
     const transactionSession = await this.connection.startSession();
 
     try {
@@ -49,17 +62,19 @@ export class ReviewService {
       const review = await this.reviewRepository.create({
         comment: createReviewDto.comment,
         star: StarEnum[createReviewDto.star],
+        type: ReviewTypeEnum.REVIEW,
         business_id: business.id,
         user_id: userId,
       });
 
-      const updatedBusiness = await this.businessService.updateRating(
+      await this.businessService.updateRating(
         business.id,
         ReviewActionEnum.CREATE,
         createReviewDto.star,
       );
 
       await transactionSession.commitTransaction();
+      transactionSession.endSession();
 
       return review;
     } catch (err) {
@@ -84,7 +99,7 @@ export class ReviewService {
 
     const currentDepth = review.depth;
 
-    if (currentDepth === ReviewConstant.MAX_REVIEW_DEPTH) {
+    if (currentDepth === ReviewConstant.MAX_DEPTH) {
       parentReviewId = review.parent_id.toString();
     }
 
@@ -94,10 +109,11 @@ export class ReviewService {
       business_id: review.business_id,
       user_id: userId,
       parent_id: parentReviewId,
+      type: ReviewTypeEnum.REPLY,
       depth:
-        currentDepth < ReviewConstant.MAX_REVIEW_DEPTH
+        currentDepth < ReviewConstant.MAX_DEPTH
           ? currentDepth + 1
-          : ReviewConstant.MAX_REVIEW_DEPTH,
+          : ReviewConstant.MAX_DEPTH,
       // can_reply: currentDepth + 1 < 3,
       // is_business_owner_reply: business.user_id.toString() === userId,
     });
@@ -110,25 +126,47 @@ export class ReviewService {
     editReviewDto: EditReviewDto,
     userId: string,
   ): Promise<Review> {
-    const review = await this.reviewRepository.findOneByCondition({
+    const oldReview = await this.reviewRepository.findOneByCondition({
       _id: id,
       user_id: userId,
+      type: ReviewTypeEnum.REVIEW,
       parent_id: null, // ensure that this is a review, not a response
       deleted_at: null, // ensure that this review is not deleted
     });
 
-    if (!review) {
+    if (!oldReview) {
       throw new ReviewForbiddenException(
-        "Can't edit this review. Review not found or not belong to user or not a review.",
+        "Can't edit this review. Review not found or not belong to user or not a review or not a review.",
       );
     }
 
-    const editedReview = await this.reviewRepository.update(id, {
-      comment: editReviewDto.comment,
-      star: parseInt(editReviewDto.star),
-    });
+    const transactionSession = await this.connection.startSession();
 
-    return editedReview;
+    try {
+      transactionSession.startTransaction();
+
+      const editedReview = await this.reviewRepository.update(id, {
+        comment: editReviewDto.comment,
+        star: parseInt(editReviewDto.star),
+      });
+
+      await this.businessService.updateRating(
+        editedReview.business_id.toString(),
+        ReviewActionEnum.EDIT,
+        editedReview.star.toString(),
+        oldReview.star.toString(),
+      );
+
+      await transactionSession.commitTransaction();
+      transactionSession.endSession();
+
+      return editedReview;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      transactionSession.endSession();
+
+      throw new ReviewForbiddenException('Edit review failed.');
+    }
   }
 
   async editResponse(
@@ -139,11 +177,12 @@ export class ReviewService {
     const response = await this.reviewRepository.findOneByCondition({
       _id: id,
       user_id: userId,
+      type: ReviewTypeEnum.REPLY,
     });
 
     if (!response) {
       throw new ResponseNotFoundException(
-        "Can't edit this response. Response not found or not belong to user.",
+        "Can't edit this response. Response not found or not belong to user or not a response.",
       );
     }
 
@@ -158,28 +197,46 @@ export class ReviewService {
     const review = await this.reviewRepository.findOneByCondition({
       _id: id,
       user_id: userId,
+      type: ReviewTypeEnum.REVIEW,
       parent_id: null,
       deleted_at: null,
     });
 
     if (!review) {
       throw new ReviewDeleteException(
-        "Can't delete this review. Review not found or not belong to user or already deleted.",
+        "Can't delete this review. Review not found or not belong to user or already deleted or not a review.",
       );
     }
 
-    return !!(await this.reviewRepository.softDelete(id));
+    const transactionSession = await this.connection.startSession();
+
+    try {
+      transactionSession.startTransaction();
+
+      await this.businessService.updateRating(
+        review.business_id.toString(),
+        ReviewActionEnum.DELETE,
+        review.star.toString(),
+      );
+
+      const deletedReview = await this.reviewRepository.softDelete(id);
+
+      await transactionSession.commitTransaction();
+      transactionSession.endSession();
+
+      return !!deletedReview;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      transactionSession.endSession();
+
+      return false;
+    }
   }
 
-  async hardDelete(id: string, user: User): Promise<boolean> {
-    const { role } = user;
-
-    if (role !== UserRole.ADMIN) {
-      throw new ReviewDeleteException('Only admin can hard delete.');
-    }
-
+  async hardDelete(id: string): Promise<boolean> {
     const review = await this.reviewRepository.findOneByConditionWithDeleted({
       _id: id,
+      type: ReviewTypeEnum.REVIEW,
       parent_id: null, // ensure that this is a review, not a response
     });
 
@@ -189,19 +246,33 @@ export class ReviewService {
       );
     }
 
-    return !!(await this.reviewRepository.hardDelete(id));
+    return !!(await this.deleteWithChildren(id));
   }
 
   async deleteResponses(id: string, userId: string): Promise<boolean> {
     const review = await this.reviewRepository.findOneByCondition({
       _id: id,
+      type: ReviewTypeEnum.REPLY,
       user_id: userId,
     });
 
     if (!review) {
       throw new ResponseNotFoundException(
-        "Can't delete this response. Response not found or not belong to user.",
+        "Can't delete this response. Response not found or not belong to user or not a response.",
       );
+    }
+
+    return !!(await this.deleteWithChildren(id));
+  }
+
+  async deleteWithChildren(id: string) {
+    const children = await this.reviewRepository.findAll({
+      parent_id: id,
+    });
+
+    // Recursively delete each child review
+    for (const child of children.items) {
+      await this.deleteWithChildren(child.id);
     }
 
     return !!(await this.reviewRepository.hardDelete(id));

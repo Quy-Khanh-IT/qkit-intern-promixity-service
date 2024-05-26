@@ -12,12 +12,13 @@ export class BusinessNotFoundException extends BaseException {
 }
 
 export class BusinessStatusException extends BaseException {
-  constructor() {
-    super(
-      ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION,
-      ERROR_MESSAGES[ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION],
-      403,
-    );
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION;
+    const errorMessage =
+      message ||
+      ERROR_MESSAGES[ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION];
+
+    super(errorDictionary, errorMessage, 403);
   }
 }
 

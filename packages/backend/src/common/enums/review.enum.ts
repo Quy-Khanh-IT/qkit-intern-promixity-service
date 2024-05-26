@@ -9,4 +9,10 @@ export enum StarEnum {
 export enum ReviewActionEnum {
   CREATE = 'create',
   DELETE = 'delete',
+  EDIT = 'edit',
+}
+
+export enum ReviewTypeEnum {
+  REVIEW = 'review',
+  REPLY = 'reply',
 }

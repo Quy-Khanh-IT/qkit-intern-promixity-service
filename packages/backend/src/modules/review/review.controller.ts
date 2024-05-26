@@ -21,7 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
-import { DeleteActionEnum } from 'src/common/enums';
+import { DeleteActionEnum, UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { StarSerializeInterceptor } from 'src/cores/interceptors/star.interceptor';
 
@@ -140,8 +140,8 @@ export class ReviewController {
       return this.reviewService.softDelete(id, req.user.id);
     }
 
-    if (type === DeleteActionEnum.HARD) {
-      return this.reviewService.hardDelete(id, req.user);
+    if (type === DeleteActionEnum.HARD && req.user.role === UserRole.ADMIN) {
+      return this.reviewService.hardDelete(id);
     }
   }
 

@@ -24,18 +24,102 @@ export class BusinessRepository
     id: string,
     type: ReviewActionEnum,
     star: string,
+    oldStar?: string,
   ): Promise<Business> {
-    // update total_star, total_review, stars
-    const filters = {
-      _id: id,
-    };
+    if (parseInt(star)) {
+      switch (parseInt(star)) {
+        case 1:
+          star = 'ONE';
+          break;
+        case 2:
+          star = 'TWO';
+          break;
+        case 3:
+          star = 'THREE';
+          break;
+        case 4:
+          star = 'FOUR';
+          break;
+        case 5:
+          star = 'FIVE';
+          break;
+      }
+    }
 
-    const updates = {
-      $inc: {
-        total_star: type === ReviewActionEnum.CREATE ? 1 : -1,
-        total_review: type === ReviewActionEnum.CREATE ? 1 : -1,
-        'stars.$[element].count': type === ReviewActionEnum.CREATE ? 1 : -1,
-      },
+    if (oldStar && parseInt(oldStar)) {
+      switch (parseInt(oldStar)) {
+        case 1:
+          oldStar = 'ONE';
+          break;
+        case 2:
+          oldStar = 'TWO';
+          break;
+        case 3:
+          oldStar = 'THREE';
+          break;
+        case 4:
+          oldStar = 'FOUR';
+          break;
+        case 5:
+          oldStar = 'FIVE';
+          break;
+      }
+    }
+
+    // If "EDIT" action, we need to find the old star and decrease the count
+    if (type === ReviewActionEnum.EDIT && oldStar) {
+      const decreaseOldStar = {
+        $inc: {
+          'stars.$[element].count': -1,
+        },
+      };
+
+      const opts = {
+        arrayFilters: [{ 'element.star': StarEnum[oldStar] }],
+        new: true,
+      };
+
+      await this.businessModel.findOneAndUpdate(
+        {
+          _id: id,
+          'stars.star': StarEnum[oldStar],
+        },
+        decreaseOldStar,
+        opts,
+      );
+    }
+
+    // update total_star, total_review, stars
+    let updates = {};
+
+    switch (type) {
+      case ReviewActionEnum.CREATE:
+        updates = {
+          $inc: {
+            total_review: 1,
+            'stars.$[element].count': 1,
+          },
+        };
+        break;
+      case ReviewActionEnum.DELETE:
+        updates = {
+          $inc: {
+            total_review: -1,
+            'stars.$[element].count': -1,
+          },
+        };
+        break;
+      case ReviewActionEnum.EDIT:
+        updates = {
+          $inc: {
+            'stars.$[element].count': 1,
+          },
+        };
+        break;
+    }
+
+    const filters: any = {
+      _id: id,
     };
 
     const opts = {
@@ -55,21 +139,13 @@ export class BusinessRepository
       0,
     );
 
-    const totalReviews = result.stars.reduce(
-      (acc, star) => acc + star.count,
-      0,
-    );
-
-    const overallRating = totalReviews > 0 ? totalStars / totalReviews : 0;
-
-    const rating = Math.round(overallRating * 10) / 10; // round to 1 decimal place
+    const overallRating =
+      result.total_review > 0 ? totalStars / result.total_review : 0;
 
     return await this.businessModel.findByIdAndUpdate(id, {
-      overall_rating: rating,
+      overall_rating: overallRating.toFixed(2),
     });
   }
-
-  // async updateReview(id: string, type: string, star: string) {}
 
   async restoreBusiness(id: string): Promise<Business> {
     const result = await this.businessModel.findOneAndUpdate(
