@@ -1,11 +1,13 @@
-export type registerUser = {
+export interface RegisterData {
   email: string
   password: string
+  rePassword?: string
   firstName: string
   lastName: string
   phoneNumber: string
-  city: string
-  province: string
-  country: string
+}
+
+export interface VerifyEmail {
   otp: string
+  verifyTokenHeader: string
 }
