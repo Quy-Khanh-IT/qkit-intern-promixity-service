@@ -1,4 +1,3 @@
-import { fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { HttpStatusCode } from 'axios'
 import { API_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { getFromLocalStorage } from '@/utils/storage.util'
