@@ -1,10 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { ILoginPayload, ILoginResponse, IRegisterUser } from '../types/auth'
-import { API_ENDPOINT } from '@/constants'
+import { API_ENDPOINT, StorageKey } from '@/constants'
+import { getFromLocalStorage } from '@/utils/storage.util'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     loginUser: builder.mutation<ILoginResponse, ILoginPayload>({
       query: (body) => ({

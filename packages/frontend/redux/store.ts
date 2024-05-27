@@ -1,11 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-
 import reducers from './reducers'
-
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { authApi } from '@/services/auth.service'
 import { otpApi } from '@/services/otp.service'
 import { addressApi } from '@/services/address.service'
+import { rtkQueryErrorLogger } from '@/utils/catching-error-rtk-util'
 
 // const persistedReducer = storePersist(reducers);
 
@@ -17,7 +16,7 @@ export const store = configureStore({
   },
 
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, otpApi.middleware, addressApi.middleware)
+    getDefaultMiddleware().concat(authApi.middleware, otpApi.middleware, addressApi.middleware, rtkQueryErrorLogger)
 })
 
 setupListeners(store.dispatch)

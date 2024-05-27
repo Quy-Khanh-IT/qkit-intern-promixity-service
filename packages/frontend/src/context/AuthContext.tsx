@@ -15,7 +15,7 @@ import { ChildProps, UserContextType } from '@/types/context'
 import { IUserInformation } from '@/types/user'
 // import { getTimeUntilExpiry } from '@/utils'
 // import JWTManager from '@/utils/jwt.util'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }: ChildProps) => {
   // }, [accessToken, refreshToken])
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
-    console.log('da vao onLogin');
+    console.log('da vao onLogin')
     await login(loginPayload)
       .unwrap()
       .then((res) => {
@@ -117,10 +117,8 @@ export const AuthProvider = ({ children }: ChildProps) => {
         // return Promise<void>
       })
       .then(() => {
+        console.log('da toi login nay')
         router.push(ROUTE.MANAGE_USER)
-      })
-      .catch((err: any) => {
-        console.log(err)
       })
   }
 
