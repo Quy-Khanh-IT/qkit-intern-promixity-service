@@ -1,9 +1,6 @@
-import { RegisterData, VerifyEmail } from '@/types/auth'
-// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { ILoginPayload, ILoginResponse } from '../types/auth'
-import { API_ENDPOINT, StorageKey } from '@/constants'
-import { getFromLocalStorage } from '@/utils/storage.util'
 import { baseQueryWithAuth } from '@/constants/baseQuery'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { ILoginPayload, ILoginResponse, IRegisterUser } from '../types/auth'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -22,15 +19,15 @@ export const authApi = createApi({
         method: 'POST'
       })
     }),
-    registerUser: builder.mutation({
-      query: (body: RegisterData) => ({
-        url: 'sign-up',
+    registerUser: builder.mutation<void, IRegisterUser>({
+      query: (body) => ({
+        url: '/auth/sign-up',
         method: 'POST',
         body
       })
     }),
-    verifyEmail: builder.mutation({
-      query: (body: VerifyEmail) => ({
+    verifyEmail: builder.mutation<void, VerifyEmail>({
+      query: (body) => ({
         url: 'verify-email',
         method: 'POST',
         body,
