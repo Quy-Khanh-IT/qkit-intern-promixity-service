@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorResponse } from '@/types/error'
+import { saveToLocalStorage } from '@/utils/storage.util'
+import { access } from 'fs'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -17,13 +19,15 @@ export default function SignIn() {
     password: ''
   })
 
-  const [loginUser, { isSuccess: isLoginSuccess, isError: isLoginError, error: loginError }] = useLoginUserMutation()
+  const [loginUser, { data: dataLogin, isSuccess: isLoginSuccess, isError: isLoginError, error: loginError }] =
+    useLoginUserMutation()
 
   const router = useRouter()
 
   useEffect(() => {
     if (isLoginSuccess) {
       toastService.success('Login success')
+      saveToLocalStorage('auth', { accessToken: dataLogin.accessToken, refreshToken: dataLogin.refreshToken })
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse
