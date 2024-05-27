@@ -3,87 +3,71 @@ import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
 import { useRegistrationOTPMutation } from '@/services/otp.service'
-import { useGetDistrictByProvinceCodeQuery, useGetProvincesQuery } from '@/services/address.service'
 import { ToastService } from '@/services/toast.service'
-import { useRegisterUserMutation } from '@/services/auth.service'
-import { useRouter } from 'next/navigation'
-import { ErrorResponse, RegisterData, RegisterDataErrors } from '@/types/error'
-import { ProvincesQueryResponse, DistrictsQueryResponse, Province, District } from '@/types/address'
+import { useRegisterUserMutation, useVerifyEmailMutation } from '@/services/auth.service'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ErrorResponse, RegisterDataErrors } from '@/types/error'
+import { RegisterData, VerifyEmail } from '@/types/auth'
+import { Flex, Input, Typography } from 'antd'
+import { GetProp } from 'antd'
+import { OTPProps } from 'antd/es/input/OTP'
+const { Title } = Typography
 
-export default function SignUp() {
-  const [provinces, setProvinces] = useState<Province[]>([])
-  const [districts, setDistricts] = useState<District[]>([])
-  const [selectedProvince, setSelectedProvince] = useState<string>('')
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('')
+export default function SignUp({ searchParams }: any) {
+  useEffect(() => {
+    if (searchParams.token) {
+      setIsGetOTP(true)
+      setVerifyEmailData((prevData) => ({
+        ...prevData,
+        verifyTokenHeader: searchParams.token
+      }))
+    }
+  }, [searchParams])
 
   const [registerData, setRegisterData] = useState<RegisterData>({
     email: '',
     password: '',
     firstName: '',
     lastName: '',
-    phoneNumber: '',
-    city: '',
-    province: '',
-    country: 'Vietnam',
-    otp: ''
+    phoneNumber: ''
   })
 
   const [registerDataErrors, setRegisterDataErrors] = useState<RegisterDataErrors>({})
 
-  const [isGetOTP, setIsGetOTP] = useState(true)
+  const [verifyEmailData, setVerifyEmailData] = useState<VerifyEmail>({
+    otp: '',
+    verifyTokenHeader: ''
+  })
+
+  const [isGetOTP, setIsGetOTP] = useState(false)
   const toastService = useMemo(() => new ToastService(), [])
   const router = useRouter()
 
   const [registrationOTP, { isSuccess: isOTPSuccess, isError: isOTPError, error: otpError }] =
     useRegistrationOTPMutation()
 
-  const [registerUser, { isSuccess: isRegisterSuccess, isError: isRegisterError, error: registerError }] =
-    useRegisterUserMutation()
+  const [
+    registerUser,
+    { data: userData, isSuccess: isRegisterSuccess, isError: isRegisterError, error: registerError }
+  ] = useRegisterUserMutation()
 
-  const { data: provincesData, isSuccess: isProvincesSuccess } = useGetProvincesQuery<ProvincesQueryResponse>({})
-  const { data: districtData, isSuccess: isDistrictsSuccess } =
-    useGetDistrictByProvinceCodeQuery<DistrictsQueryResponse>(selectedProvince)
+  const [verifyEmail, { isSuccess: isVerifySuccess, isError: isVerifyError, error: verifyError }] =
+    useVerifyEmailMutation()
+
+  const [resendTimer, setResendTimer] = useState(0)
+  const [isResendDisabled, setIsResendDisabled] = useState(false)
 
   useEffect(() => {
-    if (isProvincesSuccess && provincesData) {
-      setProvinces(provincesData.items)
+    let interval: NodeJS.Timeout
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prevTime) => prevTime - 1)
+      }, 1000)
+    } else if (resendTimer === 0) {
+      setIsResendDisabled(false)
     }
-  }, [isProvincesSuccess, provincesData])
-
-  useEffect(() => {
-    if (isDistrictsSuccess && districtData) {
-      setDistricts(districtData.items)
-    }
-  }, [isDistrictsSuccess, districtData])
-
-  useEffect(() => {
-    setSelectedDistrict('')
-  }, [selectedProvince])
-
-  useEffect(() => {
-    if (selectedProvince && provincesData) {
-      const selectedProvinceData = provincesData.items.find((province: Province) => province.code === selectedProvince)
-      if (selectedProvinceData) {
-        setRegisterData((prevData) => ({
-          ...prevData,
-          city: selectedProvinceData.full_name,
-          province: ''
-        }))
-      }
-    }
-  }, [selectedProvince, provincesData])
-
-  useEffect(() => {
-    if (selectedDistrict && districtData) {
-      const selectedDistrictData = districtData.items.find((district: District) => district.code === selectedDistrict)
-      if (selectedDistrictData) {
-        setRegisterData((prevData) => ({
-          ...prevData,
-          province: selectedDistrictData.full_name
-        }))
-      }
-    }
-  }, [selectedDistrict, districtData])
+    return () => clearInterval(interval)
+  }, [resendTimer])
 
   const SignUp = async () => {
     if (registerData.password !== registerData.rePassword) {
@@ -96,17 +80,7 @@ export default function SignUp() {
       return
     }
 
-    await registerUser({
-      email: registerData.email,
-      password: registerData.password,
-      firstName: registerData.firstName,
-      lastName: registerData.lastName,
-      phoneNumber: registerData.phoneNumber,
-      city: registerData.city,
-      province: registerData.province,
-      country: registerData.country,
-      otp: registerData.otp
-    })
+    await registerUser(registerData)
   }
 
   const handleSignUp = () => {
@@ -129,30 +103,38 @@ export default function SignUp() {
   }
 
   const handleGetOTP = () => {
-    GetOTP()
-      .then(() => {})
-      .catch(() => {
-        toastService.error('Error to get OTP')
-      })
+    if (!isResendDisabled) {
+      GetOTP()
+        .then(() => {
+          setResendTimer(120) // Start countdown from 2 minutes
+          setIsResendDisabled(true)
+        })
+        .catch(() => {
+          toastService.error('Error to get OTP')
+        })
+    }
   }
 
   useEffect(() => {
     if (isOTPSuccess) {
       toastService.success('OTP sent to your email')
-      setIsGetOTP(false)
     }
     if (isOTPError) {
       const errorResponse = otpError as ErrorResponse
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOTPSuccess, isOTPError])
 
   useEffect(() => {
     if (isRegisterSuccess) {
       toastService.success('Registered successfully')
-      router.push('/signin')
+
+      setVerifyEmailData((prevData) => ({
+        ...prevData,
+        verifyTokenHeader: userData?.token
+      }))
+      setIsGetOTP(true)
     }
     if (isRegisterError) {
       const errorResponse = registerError as ErrorResponse
@@ -195,14 +177,44 @@ export default function SignUp() {
     })
 
     setRegisterDataErrors({
-      ...registerDataErrors,
-      [type]: ''
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      otp: ''
     })
   }
 
   const redirectHome = () => {
     router.push('/')
   }
+
+  const onChange: GetProp<typeof Input.OTP, 'onChange'> = (text) => {
+    setVerifyEmailData({
+      ...verifyEmailData,
+      otp: text
+    })
+  }
+
+  const sharedProps: OTPProps = {
+    onChange
+  }
+
+  const handleConfirm = () => {
+    verifyEmail(verifyEmailData)
+  }
+
+  useEffect(() => {
+    if (isVerifySuccess) {
+      toastService.success('Email verified')
+      router.push('/signin')
+    }
+    if (isVerifyError) {
+      const errorResponse = verifyError as ErrorResponse
+      toastService.showRestError(errorResponse)
+    }
+  }, [isVerifySuccess, isVerifyError])
 
   return (
     <div className='auth-container'>
@@ -213,22 +225,18 @@ export default function SignUp() {
               <img onClick={redirectHome} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper f-form'>
-             <div className="header-title">
-             <h2>Welcome to Proximity Service</h2>
-              <div>Please Enter Information To Join With Us</div>
-             </div>
+              <div className='header-title'>
+                <h2>Welcome to Proximity Service</h2>
+                <div>Please Enter Information To Join With Us</div>
+              </div>
               <div className={`container ${!isGetOTP && 'fade-in'}`}>
-                {isGetOTP ? (
+                {!isGetOTP ? (
                   <div className='row'>
                     <div className='col-12 col-md-6'>
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>Email address</label>
-                          {registerDataErrors.email && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.email}</span>
-                            </div>
-                          )}
+
                           <input
                             value={registerData.email}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'email')}
@@ -236,14 +244,15 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.email ? 'error-input' : ''}`}
                             placeholder='name@example.com'
                           />
+                          {registerDataErrors.email && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.email}</span>
+                            </div>
+                          )}
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Password</label>
-                          {registerDataErrors.password && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.password}</span>
-                            </div>
-                          )}
+
                           <input
                             value={registerData.password}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'password')}
@@ -251,14 +260,15 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.password ? 'error-input' : ''}`}
                             placeholder='********'
                           />
+                          {registerDataErrors.password && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.password}</span>
+                            </div>
+                          )}
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Re-Password</label>
-                          {registerDataErrors.rePassword && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.rePassword}</span>
-                            </div>
-                          )}
+
                           <input
                             value={registerData.rePassword || ''}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'rePassword')}
@@ -266,6 +276,11 @@ export default function SignUp() {
                             className={`form-control ${registerDataErrors.rePassword ? 'error-input' : ''}`}
                             placeholder='********'
                           />
+                          {registerDataErrors.rePassword && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.rePassword}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -273,11 +288,7 @@ export default function SignUp() {
                       <div className='form'>
                         <div className='mb-3'>
                           <label className='form-label'>First name</label>
-                          {registerDataErrors.firstName && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.firstName}</span>
-                            </div>
-                          )}
+
                           <input
                             type='text'
                             className={`form-control ${registerDataErrors.firstName ? 'error-input' : ''}`}
@@ -285,14 +296,15 @@ export default function SignUp() {
                             value={registerData.firstName}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'firstName')}
                           />
+                          {registerDataErrors.firstName && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.firstName}</span>
+                            </div>
+                          )}
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Last name</label>
-                          {registerDataErrors.lastName && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.lastName}</span>
-                            </div>
-                          )}
+
                           <input
                             type='text'
                             className={`form-control ${registerDataErrors.lastName ? 'error-input' : ''}`}
@@ -300,14 +312,15 @@ export default function SignUp() {
                             value={registerData.lastName}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'lastName')}
                           />
+                          {registerDataErrors.lastName && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.lastName}</span>
+                            </div>
+                          )}
                         </div>
                         <div className='mb-3'>
                           <label className='form-label'>Phone Number</label>
-                          {registerDataErrors.phoneNumber && (
-                            <div>
-                              <span className='error-message mb-2'> {registerDataErrors.phoneNumber}</span>
-                            </div>
-                          )}
+
                           <input
                             type='text'
                             className={`form-control ${registerDataErrors.phoneNumber ? 'error-input' : ''}`}
@@ -315,6 +328,11 @@ export default function SignUp() {
                             value={registerData.phoneNumber}
                             onChange={(e) => onChangeRegisterData(e.target.value, 'phoneNumber')}
                           />
+                          {registerDataErrors.phoneNumber && (
+                            <div>
+                              <span className='error-message mb-2'> {registerDataErrors.phoneNumber}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -323,20 +341,21 @@ export default function SignUp() {
                   <div className='row mt-5'>
                     <div className='col-12'>
                       <div className='form'>
-                        <div className='mb-3'>
-                          <label className='form-label'>OTP</label>
+                        <div className='mb-3 d-flex align-items-center justify-content-center flex-column'>
+                          <label className='form-label mb-4 text-center'>
+                            The confirmation code has been sent to your email. Includes 6 digits. Please enter here to
+                            confirm your account.
+                          </label>
+
+                          <div className='mb-4'>
+                            <Input.OTP mask='🔒' {...sharedProps} />
+                          </div>
+
                           {registerDataErrors.otp && (
                             <div>
                               <span className='error-message mb-2'> {registerDataErrors.otp}</span>
                             </div>
                           )}
-                          <input
-                            value={registerData.otp}
-                            type='text'
-                            onChange={(e) => onChangeRegisterData(e.target.value, 'otp')}
-                            className={`form-control ${registerDataErrors.otp ? 'error-input' : ''}`}
-                            placeholder='Input OTP code with 6 digits'
-                          />
                         </div>
                       </div>
                     </div>
@@ -348,14 +367,32 @@ export default function SignUp() {
               className='d-flex align-items-center justify-content-center'
               style={{ padding: '0 72px', flexDirection: 'column' }}
             >
-              {isGetOTP ? (
-                <button style={{ width: '200px' }} onClick={handleGetOTP} className='form-btn mt-3'>
+              {!isGetOTP ? (
+                <button style={{ width: '200px' }} onClick={handleSignUp} className='form-btn mt-3'>
                   Register
                 </button>
               ) : (
-                <button style={{ width: '200px' }} onClick={handleSignUp} className='form-btn'>
-                  Confirm
-                </button>
+                <div className='d-flex align-items-center justify-content-center flex-column'>
+                  <button style={{ width: '200px' }} onClick={handleConfirm} className='form-btn'>
+                    Confirm
+                  </button>
+                  {registerData.email ? (
+                    <span className='text-center mt-2 note-text'>
+                      Haven't received the mail yet?{' '}
+                      <strong
+                        onClick={handleGetOTP}
+                        style={{
+                          cursor: isResendDisabled ? 'not-allowed' : 'pointer',
+                          color: isResendDisabled ? 'gray' : '#ed1651'
+                        }}
+                      >
+                        Resend here {isResendDisabled && `(${resendTimer}s)`}
+                      </strong>
+                    </span>
+                  ) : (
+                    ''
+                  )}
+                </div>
               )}
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 Already have an account?{' '}

@@ -1,5 +1,5 @@
+import { RegisterData, VerifyEmail } from '@/types/auth'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { registerUser } from '../types/auth'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -19,13 +19,23 @@ export const authApi = createApi({
       })
     }),
     registerUser: builder.mutation({
-      query: (body: registerUser) => ({
+      query: (body: RegisterData) => ({
         url: 'sign-up',
         method: 'POST',
         body
+      })
+    }),
+    verifyEmail: builder.mutation({
+      query: (body: VerifyEmail) => ({
+        url: 'verify-email',
+        method: 'POST',
+        body,
+        headers: {
+          'verify-token-header': body.verifyTokenHeader
+        }
       })
     })
   })
 })
 
-export const { useLoginUserMutation, useRegisterUserMutation } = authApi
+export const { useLoginUserMutation, useRegisterUserMutation, useVerifyEmailMutation } = authApi
