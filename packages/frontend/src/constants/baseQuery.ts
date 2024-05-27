@@ -1,6 +1,7 @@
 import { HttpStatusCode } from 'axios'
 import { API_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { getFromLocalStorage } from '@/utils/storage.util'
+import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
