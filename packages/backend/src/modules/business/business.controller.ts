@@ -22,6 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
 import {
@@ -34,6 +35,7 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
+import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
@@ -44,27 +46,13 @@ import { Business } from './entities/business.entity';
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
-  @Get('nearby')
+  @Get()
+  @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
-  @ApiQuery({ name: 'longitude', required: true })
-  @ApiQuery({ name: 'latitude', required: true })
-  @ApiQuery({ name: 'maxDistance', required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business nearby.',
-  })
-  async getNearby(
-    @Query('longitude') longitude: string,
-    @Query('latitude') latitude: string,
-    @Query('maxDistance') maxDistance: string,
-  ) {
-    const result = await this.businessService.findNearBy(
-      longitude,
-      latitude,
-      maxDistance,
-    );
+  async findAllBusinesses(@Query() data: FindAllBusinessQuery) {
+    const transferData = plainToClass(FindAllBusinessQuery, data);
 
-    return result;
+    return await this.businessService.findAll(transferData);
   }
 
   @Get('status')

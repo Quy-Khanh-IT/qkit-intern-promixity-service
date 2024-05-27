@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { plainToClass } from 'class-transformer';
+import mongoose, { PipelineStage } from 'mongoose';
+import { ConfigKey } from 'src/common/constants';
 import { ReviewConstant } from 'src/common/constants/review.constant';
 import {
   BusinessStatusEnum,
@@ -18,11 +21,14 @@ import {
   ReviewForbiddenException,
   ReviewNotFoundException,
 } from 'src/common/exceptions/review.exception';
+import { PaginationHelper } from 'src/common/helper';
+import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
 import { BusinessService } from '../business/business.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
+import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { ReplyReviewDto } from './dto/reply-review.dto';
 import { Review } from './entities/review.entity';
 import { ReviewRepository } from './repository/review.repository';
@@ -32,8 +38,82 @@ export class ReviewService {
   constructor(
     private readonly businessService: BusinessService,
     private readonly reviewRepository: ReviewRepository,
+    private readonly configService: ConfigService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
+
+  async findAll(query: FindAllReviewQuery): Promise<PaginationResult<Review>> {
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/reviews`;
+
+    const aggregateResult = await PaginationHelper.paginate(
+      URL,
+      query,
+      this.reviewRepository,
+      this.configGetAllBusinessPipeLine,
+    );
+
+    const reviews = aggregateResult.data.map((review) =>
+      plainToClass(Review, review),
+    );
+
+    aggregateResult.data = reviews;
+
+    return aggregateResult;
+  }
+
+  async configGetAllBusinessPipeLine(
+    query: FindAllReviewQuery,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    if (query.comment) {
+      matchStage['comment'] = { $regex: query.comment, $options: 'i' };
+    }
+
+    if (query.type) {
+      matchStage['type'] = query.type;
+    }
+
+    if (query.fromStar && query.toStar) {
+      matchStage['star'] = {
+        $gte: parseInt(query.fromStar.toString()),
+        $lte: parseInt(query.toStar.toString()),
+      };
+    } else if (query.fromStar) {
+      matchStage['star'] = { $gte: parseInt(query.fromStar.toString()) };
+    } else {
+      matchStage['star'] = { $lte: parseInt(query.toStar.toString()) };
+    }
+
+    if (query.user_id) {
+      matchStage['user_id'] = query.user_id;
+    }
+
+    if (query.business_id) {
+      matchStage['business_id'] = query.business_id;
+    }
+
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
+  }
 
   async findById(id: string): Promise<Review> {
     return await this.reviewRepository.findOneById(id);
