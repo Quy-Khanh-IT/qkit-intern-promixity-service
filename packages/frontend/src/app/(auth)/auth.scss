@@ -3,13 +3,17 @@ $header-height: 48px;
 
 .auth-container {
   color: white;
-  height: 100vh;
+  height: 200vh;
   background-image: linear-gradient(to bottom right, #0d091a, #1c1230, #27183e, #9a0f34, #2f244e, #392959);
 
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+
+  @include md {
+    height: 100vh;
+  }
 
   .form-btn {
     width: 100%;
@@ -59,11 +63,15 @@ $header-height: 48px;
   }
 
   .auth-wrapper {
-    height: 88vh;
+    height: 180vh;
     width: 93%;
     background-color: rgba(6, 8, 23, 0.3);
     border-radius: 32px;
     padding: 48px;
+
+    @include md {
+      height: 88vh;
+    }
 
     .content-wrapper {
       display: flex;
@@ -78,6 +86,7 @@ $header-height: 48px;
             height: 40px;
           }
         }
+
         .f-form {
           padding: 20px 72px 0 72px !important;
 
@@ -85,6 +94,7 @@ $header-height: 48px;
             padding: 34px 0 0 0 !important;
           }
         }
+
         .form-wrapper {
           padding: 68px 72px 0 72px;
 
@@ -93,7 +103,11 @@ $header-height: 48px;
           }
 
           .form {
-            margin-top: 48px;
+            margin-top: 0px;
+
+            @include md {
+              margin-top: 48px;
+            }
 
             .otp-wrapper {
               display: flex;
@@ -112,6 +126,7 @@ $header-height: 48px;
                 font-weight: 500;
               }
             }
+
             .form-control {
               display: flex;
               justify-content: space-between;
@@ -123,6 +138,7 @@ $header-height: 48px;
               padding-left: 28px;
               border: 3px solid black;
               background-image: #e8f0fe;
+
               &::placeholder {
                 font-weight: 400;
                 color: rgb(104, 103, 103);
@@ -143,9 +159,21 @@ $header-height: 48px;
                 line-height: 1.9;
                 width: 100%;
                 color: black;
+
                 &::placeholder {
                   font-weight: 400;
                   color: grey;
+                }
+
+                &:autofill,
+                &:-webkit-autofill,
+                &:-moz-autofill,
+                &:-ms-autofill {
+                  background-color: transparent !important;
+                  color: black !important; // Đảm bảo màu chữ autofill là đen
+                  box-shadow: 0 0 0 1000px #e8f0fe inset !important; // Điều chỉnh màu nền của autofill
+                  -webkit-text-fill-color: black !important; // Đảm bảo màu chữ autofill là đen
+                  transition: background-color 5000s ease-in-out 0s !important; // Tránh việc nền bị thay đổi
                 }
               }
 
@@ -176,6 +204,7 @@ $header-height: 48px;
         @media (max-width: 1200px) {
           width: 100% !important;
         }
+
         .logo-wrapper {
           img {
             height: 40px;
@@ -201,6 +230,7 @@ $header-height: 48px;
               padding-left: 28px;
               border: 3px solid black;
               background-image: #e8f0fe;
+
               &::placeholder {
                 font-weight: 400;
                 color: rgb(104, 103, 103);
@@ -208,6 +238,17 @@ $header-height: 48px;
 
               &:focus {
                 outline: none !important;
+              }
+
+              &:autofill,
+              &:-webkit-autofill,
+              &:-moz-autofill,
+              &:-ms-autofill {
+                background-color: transparent !important;
+                color: black !important;
+                box-shadow: 0 0 0 1000px #e8f0fe inset !important;
+                -webkit-text-fill-color: black !important;
+                transition: background-color 5000s ease-in-out 0s !important;
               }
             }
           }
@@ -245,16 +286,20 @@ $header-height: 48px;
             bottom: 0;
             z-index: 99;
             transition: transform 0.3s ease;
+
             @media screen and (max-width: 1550px) {
               bottom: 0px;
               right: -120px;
+
               img {
                 max-width: 80%;
                 transform: scale(0.9);
               }
             }
+
             @media screen and (max-width: 1350px) {
               right: -200px;
+
               img {
                 max-width: 70%;
               }
@@ -277,6 +322,7 @@ $header-height: 48px;
               &:hover {
                 background-color: #ed1651;
               }
+
               i {
                 color: white;
                 font-size: 20px;
@@ -290,6 +336,7 @@ $header-height: 48px;
             font-weight: 300;
             color: #8892b0;
           }
+
           i {
             margin-top: 8px;
             font-size: 32px;
@@ -330,9 +377,25 @@ $header-height: 48px;
 
 .error-input {
   border: 3px solid $error !important;
+  margin-bottom: 0px !important;
 }
 
 .thumb img {
   max-width: 100%;
   height: auto;
+}
+
+.header-title {
+  margin-bottom: 48px;
+
+  @include md {
+    margin-bottom: 0px;
+  }
+}
+
+.note-text {
+  font-size: 14px;
+  strong {
+    color: #ed1651;
+  }
 }
