@@ -20,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { DeleteActionEnum, UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
@@ -28,6 +29,7 @@ import { StarSerializeInterceptor } from 'src/cores/interceptors/star.intercepto
 import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
+import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { ReplyReviewDto } from './dto/reply-review.dto';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
@@ -37,6 +39,15 @@ import { ReviewService } from './review.service';
 @ApiBearerAuth()
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
+
+  @Get()
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  async findAllBusinesses(@Query() data: FindAllReviewQuery) {
+    const transferData = plainToClass(FindAllReviewQuery, data);
+
+    return await this.reviewService.findAll(transferData);
+  }
 
   @Get(':id')
   @UseGuards(JwtAccessTokenGuard)
