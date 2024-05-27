@@ -52,11 +52,11 @@ export class Business extends BaseEntity {
   @Prop({ type: [Image], default: [] })
   images: Image[];
 
-  @Prop({ required: true, trim: true })
-  category: string;
+  @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
+  category_id: Types.ObjectId;
 
-  @Prop({ type: [String], default: [] })
-  services: string[];
+  @Prop({ type: [Types.ObjectId], ref: 'Service' })
+  services_id: Types.ObjectId[];
 
   @Prop({ default: 0 })
   overall_rating: number;
@@ -104,7 +104,7 @@ export class Business extends BaseEntity {
     enum: BusinessStatusEnum,
     default: BusinessStatusEnum.PENDING,
   })
-  status: string;
+  status: BusinessStatusEnum;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user_id: Types.ObjectId;

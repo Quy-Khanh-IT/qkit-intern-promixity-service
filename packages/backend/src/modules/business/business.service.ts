@@ -1,6 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Types } from 'mongoose';
-import { UploadFileConstraint } from 'src/common/constants';
+import { ConfigService } from '@nestjs/config';
+import { plainToClass } from 'class-transformer';
+import { PipelineStage, Types } from 'mongoose';
+import { ConfigKey, UploadFileConstraint } from 'src/common/constants';
 import {
   ERROR_CODES,
   ERRORS_DICTIONARY,
@@ -17,11 +19,14 @@ import {
   BusinessNotFoundException,
   BusinessStatusException,
 } from 'src/common/exceptions/business.exception';
+import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
+import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
@@ -34,7 +39,105 @@ export class BusinessService {
     private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
+    private readonly configService: ConfigService,
   ) {}
+
+  async findAll(
+    query: FindAllBusinessQuery,
+  ): Promise<PaginationResult<Business>> {
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/businesses`;
+
+    const aggregateResult = await PaginationHelper.paginate(
+      URL,
+      query,
+      this.businessRepository,
+      this.configGetAllBusinessPipeLine,
+    );
+
+    const businesses = aggregateResult.data.map((business) =>
+      plainToClass(Business, business),
+    );
+
+    aggregateResult.data = businesses;
+
+    return aggregateResult;
+  }
+
+  async configGetAllBusinessPipeLine(
+    query: FindAllBusinessQuery,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    if (query.name) {
+      matchStage['name'] = { $regex: query.name, $options: 'i' };
+    }
+
+    if (query.district) {
+      matchStage['district'] = query.district;
+    }
+
+    if (query.province) {
+      matchStage['province'] = query.district;
+    }
+
+    if (query.status) {
+      matchStage['status'] = query.status;
+    }
+
+    if (query.phoneNumber) {
+      matchStage['phone_number'] = query.phoneNumber;
+    }
+
+    if (query.category) {
+      matchStage['category'] = query.category;
+    }
+
+    if (query.startRating && query.endRating) {
+      matchStage['overall_rating'] = {
+        $gte: parseInt(query.startRating),
+        $lte: parseInt(query.endRating),
+      };
+    }
+
+    if (query.dayOfWeek && query.dayOfWeek.length > 0) {
+      const days = JSON.parse(query.dayOfWeek) as DayOpenCloseTime[];
+
+      days.forEach((day) => {
+        finalPipeline.push({
+          $match: {
+            day_of_week: {
+              $elemMatch: {
+                day: day.day.toLowerCase(),
+                openTime: day.openTime,
+                closeTime: day.closeTime,
+              },
+            },
+          },
+        });
+      });
+    }
+
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
+  }
 
   async getById(id: string): Promise<Business> {
     const business = await this.businessRepository.findOneById(id);
@@ -179,6 +282,8 @@ export class BusinessService {
 
     const business = await this.businessRepository.create({
       ...createBusinessDto,
+      phone_number: createBusinessDto.phoneNumber,
+      day_of_week: dayOfWeek,
       user_id: userId,
     });
 
@@ -206,10 +311,11 @@ export class BusinessService {
       throw new BusinessStatusException();
     }
 
-    return !!(await this.businessRepository.update(
-      businessId,
-      updateInformationDto,
-    ));
+    return !!(await this.businessRepository.update(businessId, {
+      ...updateInformationDto,
+      phone_number: updateInformationDto.phoneNumber,
+      day_of_week: updateInformationDto.dayOfWeek,
+    }));
   }
 
   async updateAddresses(
