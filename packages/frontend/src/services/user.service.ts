@@ -1,8 +1,9 @@
+import { API_ENDPOINT } from '@/constants'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (body: { email: string; password: string }) => ({

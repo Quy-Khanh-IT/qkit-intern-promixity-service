@@ -1,20 +1,24 @@
 import { RegisterData, VerifyEmail } from '@/types/auth'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { ILoginPayload, ILoginResponse } from '../types/auth'
+import { API_ENDPOINT, StorageKey } from '@/constants'
+import { getFromLocalStorage } from '@/utils/storage.util'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/auth' }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
-      query: (body: { email: string; password: string }) => ({
-        url: 'login',
+    loginUser: builder.mutation<ILoginResponse, ILoginPayload>({
+      query: (body) => ({
+        url: '/auth/login',
         method: 'POST',
         body
       })
     }),
     logoutUser: builder.mutation({
       query: () => ({
-        url: 'logout',
+        url: '/auth/logout',
         method: 'POST'
       })
     }),

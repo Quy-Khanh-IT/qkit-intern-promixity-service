@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import LoaderArea from '../LoaderArea/LoaderArea'
 import StoreProvider from '../StoreProvider'
+import { AuthProvider } from '../../../context/AuthContext'
 
 interface IContentLayout {
   children: React.ReactNode
@@ -38,7 +39,9 @@ const Content: React.FC<IContentLayout> = ({ children }) => {
       <ConfigProvider theme={themConfig}>
         <div className={`app-content blur`}>
           {/* <Suspense fallback={<LoaderArea />}> */}
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </StoreProvider>
           {/* </Suspense> */}
         </div>
         {loading ? <LoaderArea /> : null}

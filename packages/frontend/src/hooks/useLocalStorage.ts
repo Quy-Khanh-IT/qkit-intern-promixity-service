@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { getFromLocalStorage, removeFromLocalStorage, saveToLocalStorage } from '@/utils/storage.util'
+import { IUserInformation } from '@/types/user'
 
 export const useLocalStorage = (
   key: string,
-  initialValue: string | boolean
-): [unknown, (_value: string | boolean | number) => void, () => void] => {
+  initialValue: string | IUserInformation | boolean
+): [unknown, (_value: string | boolean | IUserInformation | number) => void, () => void] => {
   const [storedValue, setStoredValue] = useState(() => {
     try {
       return getFromLocalStorage(key)
@@ -13,7 +14,7 @@ export const useLocalStorage = (
     }
   })
 
-  const setValue = (value: string | boolean | number) => {
+  const setValue = (value: string | boolean | IUserInformation | number) => {
     try {
       saveToLocalStorage(key, value)
       setStoredValue(value)

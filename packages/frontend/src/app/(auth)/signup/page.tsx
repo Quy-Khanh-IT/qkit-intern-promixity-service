@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
@@ -141,7 +142,6 @@ export default function SignUp({ searchParams }: any) {
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRegisterSuccess, isRegisterError])
 
   const handleError = (error: ErrorResponse) => {

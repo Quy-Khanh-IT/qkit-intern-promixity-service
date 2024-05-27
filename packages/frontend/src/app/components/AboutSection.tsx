@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import './about-section.scss'
 import { Image } from 'antd'
