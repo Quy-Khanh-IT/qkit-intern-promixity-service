@@ -93,7 +93,7 @@ export default function SignIn() {
         <div className='content-wrapper'>
           <div className='content-left'>
             <div className='logo-wrapper'>
-              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' />
+              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' width={100} height={100} />
             </div>
             <div className='form-wrapper'>
               <h2>Welcome back</h2>
