@@ -10,13 +10,15 @@ export class ToastService {
 
     const startsWithAny = prefixes.some((prefix) => errorMessage?.startsWith(prefix))
 
-    if (errorMessage === 'USR_0011') {
-      this.router.push('/signup/?token=' + error?.data?.errors?.token)
+    const token: string[] | undefined = error?.data?.errors?.token
+
+    if (errorMessage === 'USR_0011' && token) {
+      this.router.push('/signup/?token=' + token[0])
     }
 
     if (startsWithAny) {
       errorMessage = Array.isArray(error?.data?.errors?.detail)
-        ? error?.data?.errors?.detail.join(', ')
+        ? (error?.data?.errors?.detail || []).join(', ')
         : error?.data?.errors?.detail || errorMessage
     }
     return errorMessage || ''
