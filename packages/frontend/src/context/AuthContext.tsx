@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import React, { createContext, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
@@ -13,9 +9,12 @@ import { useLoginUserMutation } from '@/services/auth.service'
 import { ILoginPayload } from '@/types/auth'
 import { ChildProps, UserContextType } from '@/types/context'
 import { IUserInformation } from '@/types/user'
+import { useRouter } from 'next/navigation'
+import { setCookieFromClient } from '@/utils/cookies.util'
+import { RoleEnum } from '@/types/enum'
+import { TOAST_MSG } from '../constants/common'
 // import { getTimeUntilExpiry } from '@/utils'
 // import JWTManager from '@/utils/jwt.util'
-import { redirect, useRouter } from 'next/navigation'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
@@ -36,13 +35,18 @@ export const AuthProvider = ({ children }: ChildProps) => {
   const [login] = useLoginUserMutation()
   // const [refreshTokenAPI] = useRefreshTokenMutation()
 
-  const fetchUserInformation = useCallback(async (): Promise<void> => {
-    // try {
-    //   const res: IUserInformation = await getMyProfile()
-    //   if (res) setUserInformation(res)
-    // } catch (err: any) {
-    //   // toast.error(err.response.data.message)
-    // }
+  // const fetchUserInformation = useCallback(async (): Promise<void> => {
+  //   // try {
+  //   //   const res: IUserInformation = await getMyProfile()
+  //   //   if (res) setUserInformation(res)
+  //   // } catch (err: any) {
+  //   //   // toast.error(err.response.data.message)
+  //   // }
+  // }, [])
+
+  const fetchUserInformation = useCallback(() => {
+    setCookieFromClient(StorageKey._ACCESS_TOKEN, 'token')
+    setCookieFromClient(StorageKey._USER, RoleEnum._ADMIN)
   }, [])
 
   // const fetchRefreshToken = async (): Promise<void> => {
@@ -61,11 +65,12 @@ export const AuthProvider = ({ children }: ChildProps) => {
   //     })
   // }
 
-  useEffect(() => {
-    if (authSession) {
-      fetchUserInformation()
-    }
-  }, [authSession, fetchUserInformation])
+  // useEffect(() => {
+  //   console.log('authSession', authSession);
+  //   if (authSession) {
+  //     fetchUserInformation()
+  //   }
+  // }, [authSession, fetchUserInformation])
 
   // useEffect(() => {
   //   const checkTokenValid = () => {
@@ -112,12 +117,12 @@ export const AuthProvider = ({ children }: ChildProps) => {
         setRefreshToken(res.refreshToken)
         setAuthSession(true)
         // decodedToken.current = JWTManager.decodedToken(res.accessToken)
-        // return fetchUserInformation()
-        console.log('login success')
+        return fetchUserInformation()
         // return Promise<void>
       })
       .then(() => {
         console.log('da toi login nay')
+        toast.success(TOAST_MSG.LOGIN_SUCCESS)
         router.push(ROUTE.MANAGE_USER)
       })
   }

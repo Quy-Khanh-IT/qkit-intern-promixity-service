@@ -55,9 +55,12 @@ export default function RootLayout({
         </Suspense>
 
         <script defer src='https://kit.fontawesome.com/03244eb91d.js' crossOrigin='anonymous'></script>
-        <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'
+        <script
+          src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'
           integrity='sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM'
-          crossOrigin='anonymous' defer />
+          crossOrigin='anonymous'
+          defer
+        ></script>
       </body>
     </html>
   )

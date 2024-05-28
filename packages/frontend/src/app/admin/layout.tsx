@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
-import { ROUTE } from '@/constants/route'
+import { ROUTE } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
@@ -151,7 +151,7 @@ export default function RootLayout({
               }}
               className='h-100'
             >
-              <Link href='/manage-user' onClick={() => setRouteValue(ROUTE.MANAGE_USER)}>
+              <Link href={ROUTE.MANAGE_USER} onClick={() => setRouteValue(ROUTE.MANAGE_USER)}>
                 <Image
                   src='/logo_light.png'
                   className='header-logo'
@@ -187,7 +187,7 @@ export default function RootLayout({
                 <BellOutlined style={{ fontSize: 24 }} className='action-button' />
               </Badge>
             </Tooltip>
-            <Link href='/profile'>
+            <Link href={ROUTE.ADMIN_PROFILE}>
               <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
             </Link>
           </Space>
