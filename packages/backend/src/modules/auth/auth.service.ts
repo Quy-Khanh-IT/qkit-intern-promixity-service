@@ -136,10 +136,11 @@ export class AuthService {
     return {
       accessToken: pairToken[0],
       refreshToken: pairToken[1],
+      userId: user.id,
     };
   }
 
-  async processLoginWithUnVerifiedUser(user: User) {
+  async processLoginWithUnVerifiedUser(user: User): Promise<void> {
     const jwt = await this.JWTTokenService.generateVerifyToken({
       action: 'verify',
       user_id: user.id,
