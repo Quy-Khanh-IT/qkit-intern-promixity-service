@@ -12,12 +12,17 @@ export interface VerifyEmail {
   verifyTokenHeader: string
 }
 
-export interface ILoginPayload {
+export interface ForgotPassword {
+  email: string
+}
+
+export interface LoginUser {
   email: string
   password: string
 }
 
-export interface ILoginResponse {
-  accessToken: string
-  refreshToken: string
+export interface ResetPassword {
+  newPassword: string
+  confirmPassword: string
+  requestTokenHeader: string
 }

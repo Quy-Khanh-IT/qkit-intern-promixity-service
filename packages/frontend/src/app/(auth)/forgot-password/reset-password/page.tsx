@@ -1,19 +1,74 @@
 'use client'
+import { useResetPasswordMutation } from '@/services/auth.service'
+import { ToastService } from '@/services/toast.service'
+import { ErrorResponse, ResetPasswordErrors } from '@/types/error'
 import Link from 'next/link'
-import { useState } from 'react'
-import Image from 'next/image'
+import { useSearchParams, useRouter } from 'next/navigation'
+
+import { useEffect, useMemo, useState } from 'react'
 
 export default function ResetPassword() {
-  const [resetPassworData, setResetPasswordData] = useState({
+  const [resetPasswordData, setResetPasswordData] = useState({
     newPassword: '',
     confirmPassword: ''
   })
+  const [resetPasswordInputError, setResetPasswordInputError] = useState<ResetPasswordErrors>({
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const router = useRouter()
 
+  const token = useSearchParams().get('token')
+  useEffect(() => {
+    if (!token) {
+      router.push('/signin')
+    }
+  })
+
+  const toastService = useMemo(() => new ToastService(), [])
   const onChangeInput = (value: string, type: string) => {
     setResetPasswordData({
-      ...resetPassworData,
+      ...resetPasswordData,
       [type]: value
     })
+    setResetPasswordInputError({
+      newPassword: '',
+      confirmPassword: ''
+    })
+  }
+
+  const [
+    resetPassword,
+    { isSuccess: isResetPassworSuccess, isError: isResetPasswordError, error: resetPasswordError }
+  ] = useResetPasswordMutation()
+
+  const handleResetPassword = () => {
+    if (token) {
+      resetPassword({
+        requestTokenHeader: token,
+        newPassword: resetPasswordData.newPassword,
+        confirmPassword: resetPasswordData.confirmPassword
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (isResetPassworSuccess) {
+      router.push('/signin')
+      toastService.success('Password has been changed')
+    }
+    if (isResetPasswordError) {
+      const errorResponse = resetPasswordError as ErrorResponse
+      handleError(errorResponse)
+      toastService.showRestError(errorResponse)
+    }
+  }, [isResetPassworSuccess, isResetPasswordError])
+
+  const handleError = (error: ErrorResponse) => {
+    if (error?.data?.errors) {
+      console.log(error.data.errors)
+      setResetPasswordInputError(error.data.errors)
+    }
   }
 
   return (
@@ -22,7 +77,7 @@ export default function ResetPassword() {
         <div className='content-wrapper'>
           <div className='content-full'>
             <div className='logo-wrapper'>
-              <Image src='/logo.png' alt='logo' />
+              <img src='/logo.png' alt='logo' />
             </div>
             <div className='reset-password-wrapper d-flex justify-content-center align-items-center flex-column'>
               <div className='icon-email-wrapper d-flex justify-content-center align-items-center'>
@@ -33,22 +88,31 @@ export default function ResetPassword() {
                 <label className='form-label'>New Password</label>
                 <div className='form-control rounded-pill'>
                   <input
-                    value={resetPassworData.newPassword}
+                    type='password'
+                    value={resetPasswordData.newPassword}
                     onChange={(e) => onChangeInput(e.target.value, 'newPassword')}
                     placeholder='Input new password'
                   ></input>
                 </div>
-
+                {resetPasswordInputError.newPassword && (
+                  <span className='error-message'> {resetPasswordInputError.newPassword}</span>
+                )}
                 <label className='form-label'>Re-Password</label>
                 <div className='form-control rounded-pill'>
                   <input
-                    value={resetPassworData.confirmPassword}
+                    type='password'
+                    value={resetPasswordData.confirmPassword}
                     onChange={(e) => onChangeInput(e.target.value, 'confirmPassword')}
                     placeholder='Confirm your password'
                   ></input>
                 </div>
+                {resetPasswordInputError.confirmPassword && (
+                  <span className='error-message'> {resetPasswordInputError.confirmPassword}</span>
+                )}
                 <button className='btn-send-link btn btn-primary btn-lg mt-3 d-flex justify-content-center align-items-center '>
-                  <div className='text-center'>Reset Password</div>
+                  <div onClick={handleResetPassword} className='text-center'>
+                    Reset Password
+                  </div>
                 </button>
 
                 <div className='mt-5 d-flex justify-content-center align-items-center back-to-login '>

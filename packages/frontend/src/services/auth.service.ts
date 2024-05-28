@@ -1,42 +1,64 @@
-import { baseQueryWithAuth } from '@/constants/baseQuery'
-import { createApi } from '@reduxjs/toolkit/query/react'
-import { ILoginPayload, ILoginResponse, RegisterData, VerifyEmail } from '@/types/auth'
+import { ForgotPassword, RegisterData, ResetPassword, VerifyEmail } from '@/types/auth'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: baseQueryWithAuth,
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/auth' }),
   endpoints: (builder) => ({
-    loginUser: builder.mutation<ILoginResponse, ILoginPayload>({
-      query: (body) => ({
-        url: '/login',
+    loginUser: builder.mutation({
+      query: (body: { email: string; password: string }) => ({
+        url: 'login',
         method: 'POST',
         body
       })
     }),
     logoutUser: builder.mutation({
       query: () => ({
-        url: '/logout',
+        url: 'logout',
         method: 'POST'
       })
     }),
-    registerUser: builder.mutation<void, RegisterData>({
-      query: (body) => ({
-        url: '/sign-up',
+    registerUser: builder.mutation({
+      query: (body: RegisterData) => ({
+        url: 'sign-up',
         method: 'POST',
         body
       })
     }),
-    verifyEmail: builder.mutation<void, VerifyEmail>({
-      query: (body) => ({
-        url: '/verify-email',
+    verifyEmail: builder.mutation({
+      query: (body: VerifyEmail) => ({
+        url: 'verify-email',
         method: 'POST',
         body,
         headers: {
           'verify-token-header': body.verifyTokenHeader
         }
       })
+    }),
+    resetPassword: builder.mutation({
+      query: (body: ResetPassword) => ({
+        url: 'reset-password',
+        method: 'POST',
+        body,
+        headers: {
+          'request-token-header': body.requestTokenHeader
+        }
+      })
+    }),
+    forgotPassword: builder.mutation({
+      query: (body: ForgotPassword) => ({
+        url: 'forgot-password',
+        method: 'POST',
+        body
+      })
     })
   })
 })
 
-export const { useLoginUserMutation, useRegisterUserMutation, useVerifyEmailMutation } = authApi
+export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+  useVerifyEmailMutation,
+  useResetPasswordMutation,
+  useForgotPasswordMutation
+} = authApi
