@@ -1,10 +1,9 @@
 'use client'
 
-import { useForgotPasswordMutation, useResetPasswordMutation } from '@/services/auth.service'
+import { useForgotPasswordMutation } from '@/services/auth.service'
 import { ToastService } from '@/services/toast.service'
-import { ErrorResponse, RegisterDataErrors } from '@/types/error'
-import { decodeString, encodeString } from '@/utils/jwt.utils'
-import { is } from '@react-three/fiber/dist/declarations/src/core/utils'
+import { ErrorResponse } from '@/types/error'
+import { encodeString } from '@/utils/jwt.utils'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
