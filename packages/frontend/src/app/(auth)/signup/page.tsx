@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
@@ -142,6 +141,7 @@ export default function SignUp({ searchParams }: any) {
       handleError(errorResponse)
       toastService.showRestError(errorResponse)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRegisterSuccess, isRegisterError])
 
   const handleError = (error: ErrorResponse) => {
@@ -378,7 +378,7 @@ export default function SignUp({ searchParams }: any) {
                   </button>
                   {registerData.email ? (
                     <span className='text-center mt-2 note-text'>
-                      Haven't received the mail yet?{' '}
+                      Haven&apos;t received the mail yet?{' '}
                       <strong
                         onClick={handleGetOTP}
                         style={{
