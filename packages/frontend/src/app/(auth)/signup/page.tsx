@@ -378,7 +378,7 @@ export default function SignUp({ searchParams }: any) {
                   </button>
                   {registerData.email ? (
                     <span className='text-center mt-2 note-text'>
-                      Haven't received the mail yet?{' '}
+                      Haven&apos;t received the mail yet?{' '}
                       <strong
                         onClick={handleGetOTP}
                         style={{

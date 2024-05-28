@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorResponse } from '@/types/error'
 import { saveToLocalStorage } from '@/utils/storage.util'
-import { access } from 'fs'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
@@ -27,7 +26,7 @@ export default function SignIn() {
   useEffect(() => {
     if (isLoginSuccess) {
       toastService.success('Login success')
-      saveToLocalStorage('auth', { accessToken: dataLogin.accessToken, refreshToken: dataLogin.refreshToken })
+      saveToLocalStorage('auth', { accessToken: dataLogin.accessToken!, refreshToken: dataLogin.refreshToken })
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse
@@ -94,7 +93,7 @@ export default function SignIn() {
         <div className='content-wrapper'>
           <div className='content-left'>
             <div className='logo-wrapper'>
-              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' width={100} height={100} />
+              <img onClick={() => router.push('/')} src='/logo.png' alt='logo' />
             </div>
             <div className='form-wrapper'>
               <h2>Welcome back</h2>
@@ -102,9 +101,6 @@ export default function SignIn() {
               <form>
                 <div className='mb-3'>
                   <label className='form-label'>Email address</label>
-                  <div>
-                    <span className='error-message'> {inputError.email}</span>
-                  </div>
                   <input
                     value={email}
                     onChange={(e) => onChangeData(e.target.value, 'email')}
@@ -112,12 +108,11 @@ export default function SignIn() {
                     className='form-control'
                     placeholder='name@example.com'
                   />
+                  {inputError.email && <span className='error-message'> {inputError.email}</span>}
                 </div>
                 <div className='mb-3'>
                   <label className='form-label'>Password</label>
-                  <div>
-                    <span className='error-message'>{inputError.password}</span>
-                  </div>
+
                   <input
                     value={password}
                     onChange={(e) => onChangeData(e.target.value, 'password')}
@@ -125,6 +120,7 @@ export default function SignIn() {
                     className='form-control'
                     placeholder='********'
                   />
+                  {inputError.password && <span className='error-message'> {inputError.password}</span>}
                 </div>
               </form>
               <div className='d-flex justify-content-between'>
@@ -139,6 +135,7 @@ export default function SignIn() {
                     cursor: 'pointer',
                     marginBottom: '24px'
                   }}
+                  onClick={() => router.push('/forgot-password')}
                 >
                   Forget Password
                 </div>
@@ -194,9 +191,6 @@ export default function SignIn() {
           </div>
         </div>
       </div>
-      {/* <div className="sub-quote d-none d-xl-block">
-        <div className="content"></div>
-      </div> */}
     </div>
   )
 }

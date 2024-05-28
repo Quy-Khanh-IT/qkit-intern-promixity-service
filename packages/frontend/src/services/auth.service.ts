@@ -1,4 +1,4 @@
-import { RegisterData, VerifyEmail } from '@/types/auth'
+import { ForgotPassword, RegisterData, ResetPassword, VerifyEmail } from '@/types/auth'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const authApi = createApi({
@@ -34,8 +34,31 @@ export const authApi = createApi({
           'verify-token-header': body.verifyTokenHeader
         }
       })
+    }),
+    resetPassword: builder.mutation({
+      query: (body: ResetPassword) => ({
+        url: 'reset-password',
+        method: 'POST',
+        body,
+        headers: {
+          'request-token-header': body.requestTokenHeader
+        }
+      })
+    }),
+    forgotPassword: builder.mutation({
+      query: (body: ForgotPassword) => ({
+        url: 'forgot-password',
+        method: 'POST',
+        body
+      })
     })
   })
 })
 
-export const { useLoginUserMutation, useRegisterUserMutation, useVerifyEmailMutation } = authApi
+export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+  useVerifyEmailMutation,
+  useResetPasswordMutation,
+  useForgotPasswordMutation
+} = authApi
