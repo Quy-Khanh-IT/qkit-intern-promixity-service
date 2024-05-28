@@ -5,7 +5,7 @@ export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
+    getProfile: builder.mutation({
       query: (body: { email: string; password: string }) => ({
         url: '/admin/users',
         method: 'GET',
@@ -15,4 +15,4 @@ export const userApi = createApi({
   })
 })
 
-export const { useLoginUserMutation } = userApi
+export const { useGetProfileMutation } = userApi
