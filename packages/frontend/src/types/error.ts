@@ -7,8 +7,6 @@ export interface ErrorResponse {
   }
 }
 
-
-
 export interface RegisterDataErrors {
   email?: string
   password?: string
@@ -20,4 +18,9 @@ export interface RegisterDataErrors {
   province?: string
   country?: string
   otp?: string
+}
+
+export interface ResetPasswordErrors {
+  newPassword?: string
+  confirmPassword?: string
 }
