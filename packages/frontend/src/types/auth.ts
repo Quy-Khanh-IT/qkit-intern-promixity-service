@@ -1,4 +1,4 @@
-export interface RegisterData {
+export interface IRegisterUserPayload {
   email: string
   password: string
   rePassword?: string
@@ -7,22 +7,33 @@ export interface RegisterData {
   phoneNumber: string
 }
 
-export interface VerifyEmail {
+export interface IRegisterUserResponse {
+  token: string
+  message: string
+}
+
+export interface IVerifyEmailPayload {
   otp: string
   verifyTokenHeader: string
 }
 
-export interface ForgotPassword {
+export interface IForgotPasswordPayload {
   email: string
 }
 
-export interface LoginUser {
+export interface IResetPasswordPayload {
+  newPassword: string
+  confirmPassword: string
+  requestTokenHeader: string
+}
+
+export interface ILoginPayload {
   email: string
   password: string
 }
 
-export interface ResetPassword {
-  newPassword: string
-  confirmPassword: string
-  requestTokenHeader: string
+export interface ILoginResponse {
+  accessToken: string
+  refreshToken: string
+  userId: string
 }

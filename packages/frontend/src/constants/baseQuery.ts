@@ -14,7 +14,7 @@ export const baseQueryWithAuth = fetchBaseQuery({
   },
   validateStatus(response: Response) {
     if (response.status === (HttpStatusCode.Unauthorized as number)) {
-      window.location.href = ROUTE.LOGIN
+      window.location.href = ROUTE.USER_LOGIN
       throw new Error('Token is required')
     }
     console.log('response', response)

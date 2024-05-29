@@ -1,17 +1,15 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { toast } from 'react-toastify'
-import Link from 'next/link'
+import { useRegisterUserMutation, useVerifyEmailMutation } from '@/services/auth.service'
 import { useRegistrationOTPMutation } from '@/services/otp.service'
 import { ToastService } from '@/services/toast.service'
-import { useRegisterUserMutation, useVerifyEmailMutation } from '@/services/auth.service'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { IRegisterUserPayload, IVerifyEmailPayload } from '@/types/auth'
 import { ErrorResponse, RegisterDataErrors } from '@/types/error'
-import { RegisterData, VerifyEmail } from '@/types/auth'
-import { Flex, Input, Typography } from 'antd'
-import { GetProp } from 'antd'
+import { GetProp, Input } from 'antd'
 import { OTPProps } from 'antd/es/input/OTP'
-const { Title } = Typography
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'react-toastify'
 
 export default function SignUp({ searchParams }: any) {
   useEffect(() => {
@@ -24,7 +22,7 @@ export default function SignUp({ searchParams }: any) {
     }
   }, [searchParams])
 
-  const [registerData, setRegisterData] = useState<RegisterData>({
+  const [registerData, setRegisterData] = useState<IRegisterUserPayload>({
     email: '',
     password: '',
     firstName: '',
@@ -34,7 +32,7 @@ export default function SignUp({ searchParams }: any) {
 
   const [registerDataErrors, setRegisterDataErrors] = useState<RegisterDataErrors>({})
 
-  const [verifyEmailData, setVerifyEmailData] = useState<VerifyEmail>({
+  const [verifyEmailData, setVerifyEmailData] = useState<IVerifyEmailPayload>({
     otp: '',
     verifyTokenHeader: ''
   })
@@ -132,7 +130,7 @@ export default function SignUp({ searchParams }: any) {
 
       setVerifyEmailData((prevData) => ({
         ...prevData,
-        verifyTokenHeader: userData?.token
+        verifyTokenHeader: userData.token
       }))
       setIsGetOTP(true)
     }
@@ -170,7 +168,7 @@ export default function SignUp({ searchParams }: any) {
     }
   }
 
-  const onChangeRegisterData = (value: string, type: keyof RegisterData) => {
+  const onChangeRegisterData = (value: string, type: keyof IRegisterUserPayload) => {
     setRegisterData({
       ...registerData,
       [type]: value

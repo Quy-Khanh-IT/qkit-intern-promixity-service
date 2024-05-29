@@ -1,33 +1,42 @@
-import { ForgotPassword, RegisterData, ResetPassword, VerifyEmail } from '@/types/auth'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
+import {
+  IForgotPasswordPayload,
+  ILoginPayload,
+  ILoginResponse,
+  IRegisterUserPayload,
+  IRegisterUserResponse,
+  IResetPasswordPayload,
+  IVerifyEmailPayload
+} from '@/types/auth'
+import { createApi } from '@reduxjs/toolkit/query/react'
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8080/auth' }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
-      query: (body: { email: string; password: string }) => ({
-        url: 'login',
+    loginUser: builder.mutation<ILoginResponse, ILoginPayload>({
+      query: (body) => ({
+        url: '/auth/login',
         method: 'POST',
         body
       })
     }),
     logoutUser: builder.mutation({
       query: () => ({
-        url: 'logout',
+        url: '/auth/logout',
         method: 'POST'
       })
     }),
-    registerUser: builder.mutation({
-      query: (body: RegisterData) => ({
-        url: 'sign-up',
+    registerUser: builder.mutation<IRegisterUserResponse, IRegisterUserPayload>({
+      query: (body) => ({
+        url: '/auth/sign-up',
         method: 'POST',
         body
       })
     }),
-    verifyEmail: builder.mutation({
-      query: (body: VerifyEmail) => ({
-        url: 'verify-email',
+    verifyEmail: builder.mutation<void, IVerifyEmailPayload>({
+      query: (body) => ({
+        url: '/auth/verify-email',
         method: 'POST',
         body,
         headers: {
@@ -35,9 +44,9 @@ export const authApi = createApi({
         }
       })
     }),
-    resetPassword: builder.mutation({
-      query: (body: ResetPassword) => ({
-        url: 'reset-password',
+    resetPassword: builder.mutation<void, IResetPasswordPayload>({
+      query: (body) => ({
+        url: '/auth/reset-password',
         method: 'POST',
         body,
         headers: {
@@ -45,9 +54,9 @@ export const authApi = createApi({
         }
       })
     }),
-    forgotPassword: builder.mutation({
-      query: (body: ForgotPassword) => ({
-        url: 'forgot-password',
+    forgotPassword: builder.mutation<void, IForgotPasswordPayload>({
+      query: (body) => ({
+        url: '/auth/forgot-password',
         method: 'POST',
         body
       })

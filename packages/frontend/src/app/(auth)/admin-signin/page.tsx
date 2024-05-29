@@ -1,8 +1,19 @@
-import { Col, Flex } from 'antd'
+'use client'
+import { VALIDATION } from '@/constants'
+import { ILoginPayload } from '@/types/auth'
+import { Col, Flex, Form, FormProps, Input } from 'antd'
 import React from 'react'
 import './admin-sign-in.scss'
+import { useAuth } from '@/context/AuthContext'
 
 const AdminLogin: React.FC = () => {
+  const { onLogin } = useAuth()
+
+  const handleLogin: FormProps<ILoginPayload>['onFinish'] = (values) => {
+    onLogin(values)
+    // loadingEvent()
+  }
+
   return (
     <div className='--admin-sign-in-wrapper'>
       <div className='container'>
@@ -18,16 +29,31 @@ const AdminLogin: React.FC = () => {
         <Flex vertical justify='center'>
           <Flex align='center' justify='center' gap='large'>
             <Col span={18} style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
-              <h3 className='title'>Admin Login</h3>
-              <div className='text-input w-100'>
-                <i className='ri-user-fill'></i>
-                <input type='text' placeholder='Username' />
-              </div>
-              <div className='text-input w-100'>
-                <i className='ri-lock-fill'></i>
-                <input type='password' placeholder='Password' />
-              </div>
-              <button className='login-btn w-100'>LOGIN</button>
+              <Form
+                name='login'
+                className='login-form w-100'
+                initialValues={{ remember: true }}
+                layout='vertical'
+                onFinish={handleLogin}
+              >
+                <h3 className='title' style={{ fontWeight: 700 }}>
+                  Admin Login
+                </h3>
+                <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} className='hide-required-mark'>
+                  <Input size='large' autoComplete='true' placeholder='user@gmail.com' className='input-email' />
+                </Form.Item>
+
+                <Form.Item
+                  name='password'
+                  label='Mật khẩu'
+                  className='hide-required-mark'
+                  rules={VALIDATION.PASSWORD}
+                  style={{ marginBottom: '0' }}
+                >
+                  <Input.Password size='large' autoComplete='true' placeholder='Mật khẩu' />
+                </Form.Item>
+                <button className='login-btn w-100 mt-4'>LOGIN</button>
+              </Form>
             </Col>
           </Flex>
         </Flex>
