@@ -1,5 +1,10 @@
 'use client'
+import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
+import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
+import { IModalMethods } from '@/app/components/admin/modal'
 import TableComponent from '@/app/components/admin/Table/Table'
+import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
+import { MODAL_TEXT } from '@/constants'
 import variables from '@/sass/common/_variables.module.scss'
 import { IBusiness } from '@/types/business'
 import { ColumnsType, SelectionOptions } from '@/types/common'
@@ -25,11 +30,6 @@ import { useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
 import businessData from './business-data.json'
 import './manage-business.scss'
-import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
-import { IModalMethods } from '@/app/components/admin/modal'
-import { MODAL_TEXT } from '@/constants'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -39,7 +39,7 @@ export interface IManageUserProps {}
 // For search
 type DataIndex = keyof IBusiness
 
-const ManageBusiness = () => {
+const ManageBusiness = (): React.ReactNode => {
   const [businessOption, setBusinessOption] = useState('1')
   const [businessOne, setBusinessOne] = useState<IBusiness>()
   const [searchText, setSearchText] = useState('')
@@ -57,7 +57,7 @@ const ManageBusiness = () => {
     { label: 'REJECTED', value: 'REJECTED' }
   ])
 
-  const handleModal = (selectedOpt: number) => {
+  const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
@@ -71,13 +71,17 @@ const ManageBusiness = () => {
     }
   }
 
-  const handleSearch = (selectedKeys: string[], confirm: FilterDropdownProps['confirm'], dataIndex: DataIndex) => {
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: FilterDropdownProps['confirm'],
+    dataIndex: DataIndex
+  ): void => {
     confirm()
     setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex)
   }
 
-  const handleReset = (clearFilters: () => void) => {
+  const handleReset = (clearFilters: () => void): void => {
     clearFilters()
     setSearchText('')
   }
@@ -131,7 +135,7 @@ const ManageBusiness = () => {
         .toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
+    onFilterDropdownOpenChange: (visible): void => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
       }
@@ -153,14 +157,14 @@ const ManageBusiness = () => {
     {
       width: 75,
       align: 'center',
-      onCell: (business: IBusiness) => {
+      onCell: (business: IBusiness): React.HTMLAttributes<HTMLElement> => {
         return {
-          onClick: () => {
+          onClick: (): void => {
             setBusinessOne(business)
           }
         }
       },
-      render: () => {
+      render: (): React.ReactNode => {
         const items: MenuProps['items'] = [
           {
             key: 'View Details',
@@ -182,7 +186,7 @@ const ManageBusiness = () => {
                   key: 'Restore',
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => {
+                  onClick: (): void => {
                     setDeleteModalTitle(MODAL_TEXT.RESTORE_BUSINESS_TITLE)
                     setDeleteModalContent(MODAL_TEXT.RESTORE_BUSINESS)
                     handleModal(2)
@@ -198,7 +202,7 @@ const ManageBusiness = () => {
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
-            onClick: () => {
+            onClick: (): void => {
               setDeleteModalTitle(MODAL_TEXT.DELETE_BUSINESS_TITLE)
               if (businessOption === '2') {
                 setDeleteModalContent(MODAL_TEXT.DELETE_BUSINESS_PERMANENT)
@@ -230,7 +234,7 @@ const ManageBusiness = () => {
       dataIndex: 'category',
       key: 'category',
       width: 200,
-      render: (category: string[]) => {
+      render: (category: string[]): React.ReactNode => {
         return category.join(', ')
       },
       filters: [
@@ -248,7 +252,7 @@ const ManageBusiness = () => {
         }
       ],
       filterMode: 'tree',
-      onFilter: (value, record: IBusiness) => {
+      onFilter: (value, record: IBusiness): boolean => {
         return record.category.includes(value as string)
       }
     },
@@ -310,10 +314,8 @@ const ManageBusiness = () => {
         }
       ],
       filterMode: 'tree',
-      onFilter: (value, record: IBusiness) => {
-        console.log(Math.floor(record.overallRating), value)
+      onFilter: (value, record: IBusiness): boolean => {
         const parseValue: number = parseInt(value as string)
-        console.log(Math.floor(record.overallRating), value, parseValue)
         return Math.floor(record.overallRating) == parseValue
       }
     },
@@ -323,7 +325,7 @@ const ManageBusiness = () => {
       align: 'center',
       key: 'status',
       width: 150,
-      render: (status: string) => {
+      render: (status: string): React.ReactNode => {
         const color = status == 'Accepted' ? 'green' : 'geekblue'
         return (
           <Tag color={color} key={status} className='me-0'>
@@ -346,7 +348,7 @@ const ManageBusiness = () => {
         }
       ],
       filterMode: 'tree',
-      onFilter: (value, record: IBusiness) => {
+      onFilter: (value, record: IBusiness): boolean => {
         return record.status.toLowerCase().includes((value as string).toLowerCase())
       }
     }
@@ -407,20 +409,15 @@ const ManageBusiness = () => {
     }
   ]
 
-  const onChangeSelection = (value: string) => {
-    // setInputFilter('')
+  const onChangeSelection = (value: string): void => {
     setBusinessOption(value)
   }
 
   const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
 
-  const handleModerate = () => {
-    console.log('Moderate')
-  }
+  const handleModerate = (): void => {}
 
-  const handleDeleteBusiness = () => {
-    console.log('Delete')
-  }
+  const handleDeleteBusiness = (): void => {}
 
   return (
     <div className='--manage-business'>

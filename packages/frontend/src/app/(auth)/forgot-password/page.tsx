@@ -27,7 +27,6 @@ export default function ForgotPassword() {
     if (isResetPasswordSuccess) {
       toastService.success('Email have sent to your email')
       const token = encodeString(email)
-      console.log('token', token)
       router.push(`/forgot-password/${token}`)
     }
     if (isResetPasswordError) {

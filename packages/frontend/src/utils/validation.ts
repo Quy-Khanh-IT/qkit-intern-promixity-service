@@ -1,5 +1,7 @@
-export const confirmPasswordValidation = (getFieldValue: (_: string) => string) => ({
-  validator(_: unknown, value: string) {
+import { Rule } from 'antd/es/form'
+
+export const confirmPasswordValidation = (getFieldValue: (_: string) => string): Rule => ({
+  validator(_: unknown, value: string): Promise<void> {
     if (!value || getFieldValue('newPassword') === value) {
       return Promise.resolve()
     }

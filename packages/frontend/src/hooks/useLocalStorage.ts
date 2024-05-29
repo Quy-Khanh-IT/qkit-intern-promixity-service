@@ -14,7 +14,7 @@ export const useLocalStorage = (
     }
   })
 
-  const setValue = (value: string | boolean | IUserInformation | number) => {
+  const setValue = (value: string | boolean | IUserInformation | number): void => {
     try {
       saveToLocalStorage(key, value)
       setStoredValue(value)
@@ -23,7 +23,7 @@ export const useLocalStorage = (
     }
   }
 
-  const removeValue = () => {
+  const removeValue = (): void => {
     try {
       removeFromLocalStorage(key)
       setStoredValue(initialValue)

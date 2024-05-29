@@ -27,37 +27,36 @@ import Highlighter from 'react-highlight-words'
 import './manage-user.scss'
 import userData from './user-data.json'
 import { ColumnsType, SelectionOptions } from '@/types/common'
-import { MODAL_TEXT } from '@/constants'
+import { MODAL_TEXT, ROLE_CONST } from '@/constants'
 
 export interface IManageUserProps {}
 
 const { Text } = Typography
+const ACTIVE_OPTION = '1'
+const DELETE_OPTION = '2'
 
 // For search
 type DataIndex = keyof IUserInformation
 
-const ManageUser = () => {
-  const [userOption, setUserOption] = useState('1')
+const ManageUser = (): React.ReactElement => {
+  const [userOption, setUserOption] = useState(ACTIVE_OPTION)
   const [userOne, setUserOne] = useState<IUserInformation>()
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([
-    { label: 'ADMIN', value: 'ADMIN' },
-    { label: 'USER', value: 'USER' }
-  ])
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_CONST)
 
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
 
-  const handleModal = (selectedOpt: number) => {
+  const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      if (userOption == '2') {
+      if (userOption == DELETE_OPTION) {
         refDeleteUserModal.current?.showModal()
       } else {
         refDecentralizeModal.current?.showModal()
@@ -67,13 +66,17 @@ const ManageUser = () => {
     }
   }
 
-  const handleSearch = (selectedKeys: string[], confirm: FilterDropdownProps['confirm'], dataIndex: DataIndex) => {
+  const handleSearch = (
+    selectedKeys: string[],
+    confirm: FilterDropdownProps['confirm'],
+    dataIndex: DataIndex
+  ): void => {
     confirm()
     setSearchText(selectedKeys[0])
     setSearchedColumn(dataIndex)
   }
 
-  const handleReset = (clearFilters: () => void) => {
+  const handleReset = (clearFilters: () => void): void => {
     clearFilters()
     setSearchText('')
   }
@@ -127,7 +130,7 @@ const ManageUser = () => {
         ?.toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()) || false,
-    onFilterDropdownOpenChange: (visible) => {
+    onFilterDropdownOpenChange: (visible): void => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
       }
@@ -149,16 +152,14 @@ const ManageUser = () => {
     {
       align: 'center',
       width: 75,
-      onCell: (user: IUserInformation) => {
+      onCell: (user: IUserInformation): React.HTMLAttributes<HTMLElement> => {
         return {
-          onClick: () => {
-            // if (typeof index === 'number') {
-            // }
+          onClick: (): void => {
             setUserOne(user)
           }
         }
       },
-      render: () => {
+      render: (): React.ReactNode => {
         const items: MenuProps['items'] = [
           {
             key: 'View Details',
@@ -166,7 +167,7 @@ const ManageUser = () => {
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
           },
-          ...(!(userOption === '2')
+          ...(!(userOption === DELETE_OPTION)
             ? [
                 {
                   key: 'Decentralize',
@@ -180,7 +181,7 @@ const ManageUser = () => {
                   key: 'Restore',
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => {
+                  onClick: (): void => {
                     setDeleteModalTitle(MODAL_TEXT.RESTORE_USER_TITLE)
                     setDeleteModalContent(MODAL_TEXT.RESTORE_USER)
                     handleModal(2)
@@ -196,7 +197,7 @@ const ManageUser = () => {
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
-            onClick: () => {
+            onClick: (): void => {
               setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TITLE)
               if (userOption === '2') {
                 setDeleteModalContent(MODAL_TEXT.DELETE_USER_PERMANENT)
@@ -238,10 +239,10 @@ const ManageUser = () => {
     },
     {
       title: 'Phone number',
-      dataIndex: 'phone',
-      key: 'phone',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
       width: 280,
-      ...getColumnSearchProps('phone')
+      ...getColumnSearchProps('phoneNumber')
     },
     {
       title: 'Role',
@@ -249,7 +250,7 @@ const ManageUser = () => {
       align: 'center',
       key: 'role',
       width: 250,
-      render: (role: string) => {
+      render: (role: string): React.ReactNode => {
         const color = role == 'ADMIN' ? 'green' : 'geekblue'
         return (
           <Tag color={color} key={role} className='me-0'>
@@ -272,7 +273,7 @@ const ManageUser = () => {
         }
       ],
       filterMode: 'tree',
-      onFilter: (value, record: IUserInformation) => {
+      onFilter: (value, record: IUserInformation): boolean => {
         return record.role.includes(value as string)
       }
     }
@@ -292,7 +293,7 @@ const ManageUser = () => {
     {
       label: 'Phone number',
       span: 4,
-      children: userOne?.phone
+      children: userOne?.phoneNumber
     },
     {
       label: 'Role',
@@ -323,16 +324,16 @@ const ManageUser = () => {
     }
   ]
 
-  const onChangeSelection = (value: string) => {
+  const onChangeSelection = (value: string): void => {
     // setInputFilter('')
     setUserOption(value)
   }
 
   const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
 
-  const handleDecentralizeRole = () => {}
+  const handleDecentralizeRole = (): void => {}
 
-  const handleDeleteUser = () => {}
+  const handleDeleteUser = (): void => {}
 
   return (
     <div className='--manage-user'>
@@ -341,33 +342,22 @@ const ManageUser = () => {
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
               onChange={onChangeSelection}
-              // style={{ marginTop: 16 }}
               optionFilterProp='children'
               filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
               className='filter-select w-100'
               value={userOption}
-              // defaultValue={options[0]}
               options={options}
             />
           </Col>
         </Col>
 
         <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* 'users?.itemCount' */}
           <span>
             Total: <strong>{'8'}</strong>
           </span>
         </Col>
       </Row>
-      {/* <Flex className='filter-section' align='center' style={{ margin: '8px 0 0' }} wrap='wrap'></Flex> */}
 
-      {/* <Flex align='center' justify='space-between' className='pagination-section' wrap='wrap'>
-        <Flex justify='end' className='total-text' style={{ marginTop: 16 }}>
-          <span>
-            Total: <strong>{16}</strong>
-          </span>
-        </Flex>
-      </Flex> */}
       <TableComponent
         isFetching={false}
         columns={listColumns}
