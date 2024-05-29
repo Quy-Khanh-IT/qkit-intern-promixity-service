@@ -4,10 +4,6 @@ import type { FormInstance } from 'antd'
 import { Avatar, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import './profile.scss'
-
-// import ChangePasswordModal, { IChangePasswordModalMethods } from '~/components/ManageUser/Profile/ChangePasswordModal'
-// import { getMyProfile } from '~/services/user.service'
-// import { useChangeProfileMutation } from '~/services/user.service'
 import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import { IUserInformation } from '@/types/user'
@@ -26,46 +22,13 @@ interface ProfileProps {
   isEditInfo: boolean
 }
 
-const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
-  // form,
-  children,
-  isEditInfo
-  // onChangeEditBtn
-}) => {
-  const [submittable, _setSubmittable] = useState<boolean>(true) // false (original)
-  // const { userInformation } = useAuth()
-  // const [changeProfile, { isLoading: confirmLoading }] = useChangeProfileMutation()
-  // const values = Form.useWatch([], form)
-
-  // useEffect(() => {
-  //   form
-  //     .validateFields({ validateOnly: true })
-  //     .then(() => {
-  //       setSubmittable(true)
-  //     })
-  //     .catch(() => setSubmittable(false))
-  // }, [form, values])
-
-  const _onEditProfile = async () => {
-    // changeProfile({ id: userInformation.id, userData: values })
-    //   .unwrap()
-    //   .then(() => {
-    //     onChangeEditBtn()
-    //     toast.success('Chỉnh sửa tài khoản thành công')
-    //   })
-    //   .catch((error) => {
-    //     toast.error(error.response.data.message)
-    //   })
-  }
+const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ children, isEditInfo }) => {
+  const [submittable, _setSubmittable] = useState<boolean>(true)
 
   return (
     <Button
       type='primary'
       htmlType='submit'
-      // disabled={!isEditInfo || !submittable}
-      // onClick={onEditProfile}
-      // loading={confirmLoading}
-      // className={`btn-primary`}
       className={`${submittable && isEditInfo ? 'btn-primary' : 'btn-negative'}`}
     >
       {children}
@@ -81,7 +44,7 @@ const Profile: React.FC = () => {
   const changePwModalRef = useRef<IModalMethods | null>(null)
   const [_open, _setOpen] = useState(false)
 
-  const onLoadingCallback = (loading: boolean) => {
+  const onLoadingCallback = (loading: boolean): void => {
     setConfirmLoading(loading)
   }
 
@@ -90,30 +53,15 @@ const Profile: React.FC = () => {
   }, [])
 
   // async
-  const fetchUser = () => {
-    // try {
-    //   // const response = await getMyProfile()
-    //   // form.setFieldsValue({
-    //   //   firstName: response.firstName,
-    //   //   lastName: response.lastName,
-    //   //   email: response.email,
-    //   //   phone: response.phone,
-    //   //   address: response.address
-    //   // })
-    //   // setUser(response)
-    // } catch (error: any) {
-    //   console.error('Error when get data in view user details:', error)
-    //   // toast.error(error.response.data.message)
-    // }
-  }
+  const fetchUser = (): void => {}
 
-  const onChangeEditBtn = () => {
+  const onChangeEditBtn = (): void => {
     setIsEditInfo((prev) => {
       return !prev
     })
   }
 
-  const openChangePwModal = () => {
+  const openChangePwModal = (): void => {
     changePwModalRef.current?.showModal()
   }
 
@@ -125,9 +73,6 @@ const Profile: React.FC = () => {
             <Flex justify='center' style={{ marginBottom: '8px' }}>
               <div className='avatar-cover'>
                 <Avatar size={128} icon={<UserOutlined />} />
-                {/* <Tag color={user?.role.value === 'ADMIN' ? 'green' : 'geekblue'} key={user?.role.value} className='role'>
-                {user?.role.value}
-              </Tag> */}
                 <Tag color='green' key='ADMIN' className='role'>
                   ADMIN
                 </Tag>
@@ -175,7 +120,7 @@ const Profile: React.FC = () => {
               </Form.Item>
               <Form.Item
                 name='phone'
-                initialValue={user?.phone}
+                initialValue={user?.phoneNumber}
                 label='Phone number'
                 rules={[{ required: true, message: 'Please enter your phone number' }]}
                 validateTrigger={['onBlur']}

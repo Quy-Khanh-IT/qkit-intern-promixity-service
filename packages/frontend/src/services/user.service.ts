@@ -1,18 +1,20 @@
-import { API_ENDPOINT } from '@/constants'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
+import { IUserInformation } from '@/types/user'
+import { createApi } from '@reduxjs/toolkit/query/react'
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
+  baseQuery: baseQueryWithAuth,
+  tagTypes: ['UserInfo'],
   endpoints: (builder) => ({
-    getProfile: builder.mutation({
-      query: (body: { email: string; password: string }) => ({
-        url: '/admin/users',
-        method: 'GET',
-        body
-      })
+    getProfile: builder.query<IUserInformation, string>({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        method: 'GET'
+      }),
+      providesTags: ['UserInfo']
     })
   })
 })
 
-export const { useGetProfileMutation } = userApi
+export const { useGetProfileQuery } = userApi

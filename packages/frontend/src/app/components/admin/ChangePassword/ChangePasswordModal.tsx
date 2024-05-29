@@ -17,11 +17,11 @@ const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChang
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
-    showModal: () => setOpen(true),
-    hideModal: () => setOpen(false)
+    showModal: (): void => setOpen(true),
+    hideModal: (): void => setOpen(false)
   }))
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpen(false)
     console.log('close modal')
   }
@@ -33,7 +33,6 @@ const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChang
         title='Change password'
         open={open}
         onCancel={handleCancel}
-        // transitionName='ant-move-up'
         centered={true}
         width={'400px'}
         footer={null}

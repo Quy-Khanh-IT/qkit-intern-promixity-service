@@ -11,30 +11,27 @@ const authRoutes = [ROUTE.USER_LOGIN, ROUTE.ADMIN_LOGIN]
 const adminRoutes = [ROUTE.MANAGE_USER, ROUTE.MANAGE_BUSINESS]
 const userRoutes = [ROUTE.ABOUT]
 
-export function middleware(req: NextRequest) {
+export function middleware(req: NextRequest): NextResponse {
   // Lấy token
   const token = cookies().get(StorageKey._ACCESS_TOKEN)
   const role = cookies().get(StorageKey._USER)
   const pathName = req.nextUrl.pathname
   const referer: string = getReferer()
 
-  // Kiểm tra nếu người dùng đang cố gắng truy cập vào route được bảo vệ mà không có token
+  // Access protected routes without token
   if (checkValidRoutes(req) && !token) {
-    // Chuyển hướng người dùng đến trang đăng nhập
     return NextResponse.redirect(new URL(ROUTE.USER_LOGIN, req.url))
   }
 
   if (token) {
     // Admin-specific route access
     if (adminRoutes.includes(pathName)) {
-      // Redirect to login if the user is not an admin
       if (role?.value === RoleEnum._ADMIN) {
         return NextResponse.next()
       }
     }
     // User-specific route access
     else if (userRoutes.includes(pathName)) {
-      // Redirect to login if the user is not logged in or does not have the appropriate role
       if (role?.value === RoleEnum._USER) {
         return NextResponse.next()
       } else {
@@ -52,27 +49,22 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  // Nếu có token hoặc route không được bảo vệ, cho phép tiếp tục
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/:path*'] // Định nghĩa các route mà middleware sẽ áp dụng
+  matcher: ['/:path*']
   // '/((?!api|public|login|signup|_next/static|_next/image|favicon.ico).*)',
 }
 
-const checkValidRoutes = (req: NextRequest) => {
-  if (
-    adminRoutes.includes(req.nextUrl.pathname) ||
-    userRoutes.includes(req.nextUrl.pathname)
-    // authRoutes.includes(req.nextUrl.pathname)
-  ) {
+const checkValidRoutes = (req: NextRequest): boolean => {
+  if (adminRoutes.includes(req.nextUrl.pathname) || userRoutes.includes(req.nextUrl.pathname)) {
     return true
   }
   return false
 }
 
-const getReferer = () => {
+const getReferer = (): string => {
   const referer = headers().get('referer')
   let refererSplit: string = ''
   if (referer) {

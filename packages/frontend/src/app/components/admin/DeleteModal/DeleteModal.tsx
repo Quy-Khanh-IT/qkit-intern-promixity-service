@@ -1,10 +1,6 @@
 import './delete-user.scss'
-
 import { Button, Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-
-// import { ManageUserReloadContext } from '~/context/ManageUserContext'
-// import { useDeleteUserMutation, useRestoreUserMutation } from '~/services/user.service'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './delete-user.scss'
@@ -20,48 +16,18 @@ const _DeleteModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserPro
   ref
 ) => {
   const [open, setOpen] = useState(false)
-  // const reloadContextUse = useContext(ManageUserReloadContext)
-
-  // const [deleteUser, { isLoading: confirmLoading }] = useDeleteUserMutation()
-  // const [restoreUser] = useRestoreUserMutation()
 
   useImperativeHandle(ref, () => ({
-    showModal: () => setOpen(true),
-    hideModal: () => setOpen(false)
+    showModal: (): void => setOpen(true),
+    hideModal: (): void => setOpen(false)
   }))
 
-  const handleCancelChild = () => {
+  const handleCancelChild = (): void => {
     setOpen(false)
   }
 
-  const handleConfirmChild = () => {
+  const handleConfirmChild = (): void => {
     handleConfirm()
-  }
-
-  const _handleDeleteUser = async () => {
-    // if (userOne) {
-    //   isDeleted
-    //     ? await restoreUser(userOne.id)
-    //         .unwrap()
-    //         .then(() => {
-    //           handleCancel()
-    //           reloadContextUse.handleReloadCurPage()
-    //           toast.success('Khôi phục tài khoản thành công')
-    //         })
-    //         .catch((error) => {
-    //           toast.error(error.data.message)
-    //         })
-    //     : await deleteUser(userOne.id)
-    //         .unwrap()
-    //         .then(() => {
-    //           handleCancel()
-    //           reloadContextUse.handleReloadCurPage()
-    //           toast.success('Xoá tài khoản thành công')
-    //         })
-    //         .catch((error) => {
-    //           toast.error(error.data.message)
-    //         })
-    // }
   }
 
   return (
