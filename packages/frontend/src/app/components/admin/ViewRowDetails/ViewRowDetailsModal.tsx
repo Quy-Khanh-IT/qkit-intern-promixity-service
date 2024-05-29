@@ -13,11 +13,11 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
   const [open, setOpen] = useState(false)
 
   useImperativeHandle(ref, () => ({
-    showModal: () => setOpen(true),
-    hideModal: () => setOpen(false)
+    showModal: (): void => setOpen(true),
+    hideModal: (): void => setOpen(false)
   }))
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     setOpen(false)
   }
 

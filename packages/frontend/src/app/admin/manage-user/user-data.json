@@ -1,242 +1,212 @@
 [
   {
-    "key": "1",
     "firstName": "John",
     "lastName": "Brown",
     "email": "abcjashfjlashdfasdhflskfdj@gmail.com",
-    "phone": "0923456543",
+    "phoneNumber": "0923456543",
     "role": "ADMIN"
   },
   {
-    "key": "2",
     "firstName": "Jane",
     "lastName": "Doe",
     "email": "janedoe@gmail.com",
-    "phone": "0987654321",
+    "phoneNumber": "0987654321",
     "role": "USER"
   },
   {
-    "key": "3",
     "firstName": "Alice",
     "lastName": "Smith",
     "email": "alicesmith@gmail.com",
-    "phone": "0912345678",
+    "phoneNumber": "0912345678",
     "role": "BUSINESS"
   },
   {
-    "key": "4",
     "firstName": "Bob",
     "lastName": "Johnson",
     "email": "bobjohnson@gmail.com",
-    "phone": "0876543210",
+    "phoneNumber": "0876543210",
     "role": "USER"
   },
   {
-    "key": "5",
     "firstName": "Emily",
     "lastName": "Davis",
     "email": "emilydavis@gmail.com",
-    "phone": "0898765432",
+    "phoneNumber": "0898765432",
     "role": "USER"
   },
   {
-    "key": "6",
     "firstName": "David",
     "lastName": "Lee",
     "email": "davidlee@gmail.com",
-    "phone": "0865432109",
+    "phoneNumber": "0865432109",
     "role": "USER"
   },
   {
-    "key": "7",
     "firstName": "Sarah",
     "lastName": "Wilson",
     "email": "sarahwilson@gmail.com",
-    "phone": "0843210987",
+    "phoneNumber": "0843210987",
     "role": "USER"
   },
   {
-    "key": "8",
     "firstName": "Michael",
     "lastName": "Johnson",
     "email": "michaeljohnson@gmail.com",
-    "phone": "0832109876",
+    "phoneNumber": "0832109876",
     "role": "USER"
   },
   {
-    "key": "9",
     "firstName": "Jessica",
     "lastName": "Smith",
     "email": "jessicasmith@gmail.com",
-    "phone": "0821098765",
+    "phoneNumber": "0821098765",
     "role": "USER"
   },
   {
-    "key": "10",
     "firstName": "Matthew",
     "lastName": "Davis",
     "email": "matthewdavis@gmail.com",
-    "phone": "0810987654",
+    "phoneNumber": "0810987654",
     "role": "USER"
   },
   {
-    "key": "11",
     "firstName": "Olivia",
     "lastName": "Lee",
     "email": "oliviale@gmail.com",
-    "phone": "0809876543",
+    "phoneNumber": "0809876543",
     "role": "USER"
   },
   {
-    "key": "12",
     "firstName": "Daniel",
     "lastName": "Wilson",
     "email": "danielwilson@gmail.com",
-    "phone": "0798765432",
+    "phoneNumber": "0798765432",
     "role": "USER"
   },
   {
-    "key": "13",
     "firstName": "Sophia",
     "lastName": "Brown",
     "email": "sophiabrown@gmail.com",
-    "phone": "0787654321",
+    "phoneNumber": "0787654321",
     "role": "USER"
   },
   {
-    "key": "14",
     "firstName": "Ethan",
     "lastName": "Johnson",
     "email": "ethanjohnson@gmail.com",
-    "phone": "0776543210",
+    "phoneNumber": "0776543210",
     "role": "USER"
   },
   {
-    "key": "15",
     "firstName": "Isabella",
     "lastName": "Davis",
     "email": "isabelladavis@gmail.com",
-    "phone": "0765432109",
+    "phoneNumber": "0765432109",
     "role": "USER"
   },
   {
-    "key": "16",
     "firstName": "Alexander",
     "lastName": "Smith",
     "email": "alexandersmith@gmail.com",
-    "phone": "0754321098",
+    "phoneNumber": "0754321098",
     "role": "USER"
   },
   {
-    "key": "17",
     "firstName": "Mia",
     "lastName": "Wilson",
     "email": "miawilson@gmail.com",
-    "phone": "0743210987",
+    "phoneNumber": "0743210987",
     "role": "USER"
   },
   {
-    "key": "18",
     "firstName": "William",
     "lastName": "Lee",
     "email": "williamlee@gmail.com",
-    "phone": "0732109876",
+    "phoneNumber": "0732109876",
     "role": "USER"
   },
   {
-    "key": "19",
     "firstName": "Ava",
     "lastName": "Johnson",
     "email": "avajohnson@gmail.com",
-    "phone": "0721098765",
+    "phoneNumber": "0721098765",
     "role": "USER"
   },
   {
-    "key": "20",
     "firstName": "James",
     "lastName": "Smith",
     "email": "jamessmith@gmail.com",
-    "phone": "0710987654",
+    "phoneNumber": "0710987654",
     "role": "USER"
   },
   {
-    "key": "21",
     "firstName": "Charlotte",
     "lastName": "Davis",
     "email": "charlottedavis@gmail.com",
-    "phone": "0709876543",
+    "phoneNumber": "0709876543",
     "role": "USER"
   },
   {
-    "key": "22",
     "firstName": "Benjamin",
     "lastName": "Lee",
     "email": "benjaminlee@gmail.com",
-    "phone": "0698765432",
+    "phoneNumber": "0698765432",
     "role": "USER"
   },
   {
-    "key": "23",
     "firstName": "Amelia",
     "lastName": "Wilson",
     "email": "ameliawilson@gmail.com",
-    "phone": "0687654321",
+    "phoneNumber": "0687654321",
     "role": "USER"
   },
   {
-    "key": "24",
     "firstName": "Liam",
     "lastName": "Johnson",
     "email": "liamjohnson@gmail.com",
-    "phone": "0676543210",
+    "phoneNumber": "0676543210",
     "role": "USER"
   },
   {
-    "key": "25",
     "firstName": "Harper",
     "lastName": "Davis",
     "email": "harperdavis@gmail.com",
-    "phone": "0665432109",
+    "phoneNumber": "0665432109",
     "role": "USER"
   },
   {
-    "key": "26",
     "firstName": "Lucas",
     "lastName": "Smith",
     "email": "lucassmith@gmail.com",
-    "phone": "0654321098",
+    "phoneNumber": "0654321098",
     "role": "USER"
   },
   {
-    "key": "27",
     "firstName": "Evelyn",
     "lastName": "Wilson",
     "email": "evelynwilson@gmail.com",
-    "phone": "0643210987",
+    "phoneNumber": "0643210987",
     "role": "USER"
   },
   {
-    "key": "28",
     "firstName": "Henry",
     "lastName": "Lee",
     "email": "henrylee@gmail.com",
-    "phone": "0632109876",
+    "phoneNumber": "0632109876",
     "role": "USER"
   },
   {
-    "key": "29",
     "firstName": "Victoria",
     "lastName": "Johnson",
     "email": "victoriajohnson@gmail.com",
-    "phone": "0621098765",
+    "phoneNumber": "0621098765",
     "role": "USER"
   },
   {
-    "key": "30",
     "firstName": "Jackson",
     "lastName": "Smith",
     "email": "jacksonsmith@gmail.com",
-    "phone": "0610987654",
+    "phoneNumber": "0610987654",
     "role": "USER"
   }
 ]

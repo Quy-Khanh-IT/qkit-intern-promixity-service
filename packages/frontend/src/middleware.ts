@@ -12,9 +12,13 @@ const userRoutes = [ROUTE.ABOUT]
 
 export function middleware(req: NextRequest): NextResponse {
   const token = cookies().get(StorageKey._ACCESS_TOKEN)
-  const role = cookies().get(StorageKey._USER)
+  const role = cookies().get(StorageKey._ROLE)
   const pathName = req.nextUrl.pathname
   const referer: string = getReferer()
+
+  const returnNextResponse = (routeDirect: string): NextResponse => {
+    return NextResponse.redirect(new URL(referer ? referer : routeDirect, req.url))
+  }
 
   // Access protected routes without token
   if (checkValidRoutes(req) && !token) {
@@ -26,23 +30,27 @@ export function middleware(req: NextRequest): NextResponse {
     if (adminRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._ADMIN) {
         return NextResponse.next()
+      } else {
+        toast.error(TOAST_MSG.NO_AUTHORIZATION)
+        return returnNextResponse(ROUTE.ADMIN_LOGIN)
       }
     }
+
     // User-specific route access
     else if (userRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._USER) {
         return NextResponse.next()
       } else {
         toast.error(TOAST_MSG.NO_AUTHORIZATION)
-        return NextResponse.redirect(new URL(referer ? referer : ROUTE.USER_LOGIN, req.url))
+        return returnNextResponse(ROUTE.USER_LOGIN)
       }
     }
 
     if (authRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._ADMIN) {
-        return NextResponse.redirect(new URL(referer ? referer : ROUTE.MANAGE_USER, req.url))
+        return returnNextResponse(ROUTE.MANAGE_USER)
       } else if (role?.value === RoleEnum._USER) {
-        return NextResponse.redirect(new URL(referer ? referer : ROUTE.ABOUT, req.url))
+        return returnNextResponse(ROUTE.ABOUT)
       }
     }
   }
@@ -52,7 +60,6 @@ export function middleware(req: NextRequest): NextResponse {
 
 export const config = {
   matcher: ['/:path*']
-  // '/((?!api|public|login|signup|_next/static|_next/image|favicon.ico).*)',
 }
 
 const checkValidRoutes = (req: NextRequest): boolean => {

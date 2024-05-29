@@ -17,7 +17,6 @@ export const baseQueryWithAuth = fetchBaseQuery({
       window.location.href = ROUTE.USER_LOGIN
       throw new Error('Token is required')
     }
-    console.log('response', response)
     return isSuccess(response)
   }
 })

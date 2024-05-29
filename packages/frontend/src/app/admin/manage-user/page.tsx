@@ -46,7 +46,7 @@ const ManageUser = (): React.ReactElement => {
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_CONST)
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_CONST) // as SelectionOptions[]
 
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
@@ -325,11 +325,10 @@ const ManageUser = (): React.ReactElement => {
   ]
 
   const onChangeSelection = (value: string): void => {
-    // setInputFilter('')
     setUserOption(value)
   }
 
-  const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
+  // const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
 
   const handleDecentralizeRole = (): void => {}
 
@@ -361,7 +360,7 @@ const ManageUser = (): React.ReactElement => {
       <TableComponent
         isFetching={false}
         columns={listColumns}
-        dataSource={usersWithKeys}
+        dataSource={userData as IUserInformation[]}
         className='--manage-user-table'
       />
       <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />

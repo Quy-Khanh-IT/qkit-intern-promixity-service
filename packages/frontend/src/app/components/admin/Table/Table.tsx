@@ -2,8 +2,6 @@ import { Pagination, Row, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import './table.scss'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type T = any
 export interface ITableProps<T> {
   isFetching: boolean
   columns: ColumnsType<T>
@@ -17,19 +15,23 @@ export interface ITableProps<T> {
   className: string
 }
 
-const TableComponent: React.FC<ITableProps<T>> = ({
+type DataWithKey<T> = T & { key: string }
+
+const TableComponent = <T,>({
   // isFetching,
   columns,
   dataSource,
   // pagination,
   className
-}) => {
+}: ITableProps<T>): React.ReactNode => {
+  const usersWithKeys: DataWithKey<T>[] = dataSource.map((item, index) => ({ ...item, key: index }) as DataWithKey<T>)
+
   return (
     <>
       <Table
-        columns={columns}
+        columns={columns as ColumnsType}
         pagination={false}
-        dataSource={dataSource}
+        dataSource={usersWithKeys}
         // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
         className={`scroll-bar-2 --manage-table ${className}`}
       />

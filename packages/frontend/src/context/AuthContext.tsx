@@ -1,43 +1,54 @@
 'use client'
-import React, { createContext, useCallback, useEffect, useRef } from 'react'
-import { toast } from 'react-toastify'
 import { ROUTE, StorageKey } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useLoginUserMutation } from '@/services/auth.service'
+import { getMyProfile } from '@/services/user.service'
 import { ILoginPayload } from '@/types/auth'
 import { ChildProps, UserContextType } from '@/types/context'
 import { RoleEnum } from '@/types/enum'
+import { ErrorResponse } from '@/types/error'
 import { IUserInformation } from '@/types/user'
 import { setCookieFromClient } from '@/utils/cookies.util'
+import Error from 'next/error'
 import { useRouter } from 'next/navigation'
-import { TOAST_MSG } from '../constants/common'
-import { useGetProfileQuery } from '@/services/user.service'
+import React, { createContext, useCallback, useRef } from 'react'
+import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
 export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const router = useRouter()
-  const [accessToken, setAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
+  const [_accessToken, setAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
   const [_refreshToken, setRefreshToken] = useLocalStorage(StorageKey._REFRESH_TOKEN, '')
   const [userInformation, setUserInformation] = useLocalStorage(StorageKey._USER, {} as IUserInformation)
-  const [_authSession, setAuthSession, _] = useLocalStorage(StorageKey._AUTHENTICATED, false)
+  const [_authSession, setAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
   const userId = useRef<string>('')
-  const { data: userData } = useGetProfileQuery(userId.current, { skip: !userId.current })
   const [login] = useLoginUserMutation()
 
-  const fetchUserInformation = useCallback(() => {
-    setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken as string)
-    setCookieFromClient(StorageKey._USER, userData?.role as RoleEnum)
-  }, [])
+  const fetchUserInformation = useCallback(async (accessToken: string, userId: string): Promise<void> => {
+    try {
+      const res: IUserInformation = await getMyProfile(userId)
+      if (res) {
+        setUserInformation(res)
+        setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken)
+        setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
 
-  useEffect(() => {
-    if (userData) {
-      setUserInformation(userData)
-      setTimeout(() => {
-        fetchUserInformation()
-      }, 1000)
+        if (res.role === (RoleEnum._ADMIN as string)) {
+          router.push(ROUTE.MANAGE_USER)
+        } else if (res.role === (RoleEnum._USER as string)) {
+          router.push(ROUTE.ABOUT)
+        }
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        const customError = err as ErrorResponse
+        const errorMessage = customError.data?.message
+        toast.error(errorMessage)
+      } else {
+        toast.error('An unknown error occurred')
+      }
     }
-  }, [userData])
+  }, [])
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
     await login(loginPayload)
@@ -48,13 +59,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setAuthSession(true)
         userId.current = res.userId
 
-        // fetchUserInformation()
-        setCookieFromClient(StorageKey._ACCESS_TOKEN, res.accessToken)
-        setCookieFromClient(StorageKey._USER, userData?.role as RoleEnum)
-      })
-      .then(() => {
-        toast.success(TOAST_MSG.LOGIN_SUCCESS)
-        router.push(ROUTE.MANAGE_USER)
+        fetchUserInformation(res.accessToken, res.userId)
       })
   }
 

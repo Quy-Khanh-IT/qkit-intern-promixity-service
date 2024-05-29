@@ -271,7 +271,7 @@ const ManageBusiness = (): React.ReactNode => {
       showSorterTooltip: false,
       sorter: {
         compare: (a, b) => a.totalReviews - b.totalReviews,
-        multiple: 2 // higher -> higher priority
+        multiple: 2 // higher priority
       }
     },
     {

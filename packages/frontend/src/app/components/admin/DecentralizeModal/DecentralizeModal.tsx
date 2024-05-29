@@ -1,11 +1,9 @@
 import { Button, Col, Modal, Row, Select, Space } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-// import { ManageUserReloadContext } from '@/context/ManageUserContext'
 import { SelectionOptions } from '@/types/common'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './decentralize-role-modal.scss'
-// import { useDecentralizeRoleMutation } from '@/services/user.service'
 
 export interface IDecentralizeRoleProps {
   title: string
@@ -28,17 +26,17 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
   const [open, setOpen] = useState(false)
 
   useImperativeHandle(ref, () => ({
-    showModal: () => setOpen(true),
-    hideModal: () => setOpen(false)
+    showModal: (): void => setOpen(true),
+    hideModal: (): void => setOpen(false)
   }))
 
-  const onChangeSelection = (_value: string) => {}
+  const onChangeSelection = (_value: string): void => {}
 
-  const handleCancelChild = () => {
+  const handleCancelChild = (): void => {
     setOpen(false)
   }
 
-  const handleConfirmChild = () => {
+  const handleConfirmChild = (): void => {
     handleConfirm()
   }
 
