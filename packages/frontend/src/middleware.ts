@@ -6,13 +6,11 @@ import { RoleEnum } from './types/enum'
 import { toast } from 'react-toastify'
 import { TOAST_MSG } from './constants/common'
 
-// Các route yêu cầu người dùng phải đăng nhập
 const authRoutes = [ROUTE.USER_LOGIN, ROUTE.ADMIN_LOGIN]
 const adminRoutes = [ROUTE.MANAGE_USER, ROUTE.MANAGE_BUSINESS]
 const userRoutes = [ROUTE.ABOUT]
 
 export function middleware(req: NextRequest): NextResponse {
-  // Lấy token
   const token = cookies().get(StorageKey._ACCESS_TOKEN)
   const role = cookies().get(StorageKey._USER)
   const pathName = req.nextUrl.pathname

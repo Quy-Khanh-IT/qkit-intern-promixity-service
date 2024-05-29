@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { ROUTE } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
@@ -19,49 +18,11 @@ const { useBreakpoint } = Grid
 const { subColor2 } = variables
 const headerHeight = 80
 
-const _containerVariants = {
-  close: {
-    x: -400,
-    transition: {
-      type: 'spring',
-      damping: 15,
-      duration: 0.5,
-      ease: 'easeInOut'
-    }
-  },
-  open: {
-    x: 0,
-    transition: {
-      // type: 'spring',
-      damping: 15,
-      duration: 0.3,
-      ease: 'easeInOut'
-    }
-  }
-}
-
-const _contentVariants = {
-  close: {
-    transition: {
-      type: 'spring',
-      damping: 15,
-      duration: 0.7
-    }
-  },
-  open: {
-    transition: {
-      type: 'spring',
-      damping: 15,
-      duration: 0.7
-    }
-  }
-}
-
 export default function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode
-}>) {
+}>): React.ReactNode {
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const containerControls = useAnimationControls()
@@ -100,7 +61,7 @@ export default function RootLayout({
   }, [screens])
 
   useEffect(() => {
-    const animate = async () => {
+    const animate = async (): Promise<void> => {
       if (collapsed) {
         await containerControls.start('close')
         await contentControls.start('open')
@@ -202,18 +163,9 @@ export default function RootLayout({
             xl={collapsed ? 0 : 4}
             className='sidebar-col h-100'
           >
-            {/* <motion.div
-              variants={containerVariants}
-              animate={containerControls}
-              className={`sidebar-col w-100 ${collapsed ? 'col-0' : 'col-6 col-sm-4 col-md-3 col-lg-2'}`}
-            >
-              
-            </motion.div> */}
             <Sider
               trigger={null}
               collapsible
-              // collapsed={collapsed}
-              // style={{ position: 'fixed', width: '100%', background: colorBgContainer }}
               className='vh-100 h-100 --sider-admin'
               style={{ background: colorBgContainer }}
             >
@@ -262,7 +214,6 @@ export default function RootLayout({
                 height: '1000px',
                 backgroundColor: subColor2
               }}
-              // className='h-100'
             >
               <div
                 style={{
@@ -277,13 +228,6 @@ export default function RootLayout({
               </div>
             </Content>
           </Col>
-          {/* <motion.div
-            variants={contentVariants}
-            animate={contentControls}
-            className={`col-12 ${collapsed ? 'col-12' : 'col-12 col-sm-12 col-md-9 col-lg-16'}`}
-          >
-            
-          </motion.div> */}
         </Row>
       </Col>
     </Row>
