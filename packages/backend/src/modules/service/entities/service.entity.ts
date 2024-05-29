@@ -9,8 +9,14 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
   },
 })
 export class Service extends BaseEntity {
-  @Prop({ required: true, trim: true, maxlength: 50 })
+  @Prop({ required: true, trim: true, unique: true, maxlength: 50 })
   name: string;
+
+  @Prop({ trim: true, maxlength: 255 })
+  description: string;
+
+  @Prop()
+  order: number;
 }
 export const ServiceSchema = SchemaFactory.createForClass(Service);
 export type ServiceDocument = HydratedDocument<Service>;
