@@ -2,7 +2,7 @@
 import { useRegisterUserMutation, useVerifyEmailMutation } from '@/services/auth.service'
 import { useRegistrationOTPMutation } from '@/services/otp.service'
 import { ToastService } from '@/services/toast.service'
-import { IRegisterUserPayload, IVerifyEmailPayload } from '@/types/auth'
+import { IRegisterUserPayload, IVerifyEmailPayload, ISignUpProps } from '@/types/auth'
 import { ErrorResponse, RegisterDataErrors } from '@/types/error'
 import { GetProp, Input } from 'antd'
 import { OTPProps } from 'antd/es/input/OTP'
@@ -11,16 +11,16 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
-export default function SignUp({ searchParams }: any) {
+export default function SignUp({ searchParams: { token } }: ISignUpProps) {
   useEffect(() => {
-    if (searchParams.token) {
+    if (token) {
       setIsGetOTP(true)
       setVerifyEmailData((prevData) => ({
         ...prevData,
-        verifyTokenHeader: searchParams.token
+        verifyTokenHeader: token
       }))
     }
-  }, [searchParams])
+  }, [])
 
   const [registerData, setRegisterData] = useState<IRegisterUserPayload>({
     email: '',

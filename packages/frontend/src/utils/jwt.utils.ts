@@ -1,10 +1,7 @@
-const jwt: any = require('jsonwebtoken')
+import { IDecodedData } from '@/types/common'
+import jwt from 'jsonwebtoken'
 
-const secretKey = 'your-secret-key'
-
-interface DecodedData {
-  data: string
-}
+const secretKey = process.env.SECREC_KEY || 'secretkey'
 
 export const encodeString = (str: string): string => {
   const token = jwt.sign({ data: str }, secretKey, { expiresIn: '1h' })
@@ -13,7 +10,7 @@ export const encodeString = (str: string): string => {
 
 export const decodeString = (token: string): string | null => {
   try {
-    const decoded = jwt.verify(token, secretKey) as DecodedData
+    const decoded = jwt.verify(token, secretKey) as IDecodedData
     return decoded.data
   } catch (err) {
     console.error('Error decoding token:', err)

@@ -37,3 +37,9 @@ export interface ILoginResponse {
   refreshToken: string
   userId: string
 }
+
+export interface ISignUpProps {
+  searchParams: {
+    token: string
+  }
+}
