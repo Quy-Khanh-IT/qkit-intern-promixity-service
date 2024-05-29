@@ -89,14 +89,14 @@ export class BusinessRepository
       );
     }
 
-    // update total_star, total_review, stars
+    // update  totalReview, stars
     let updates = {};
 
     switch (type) {
       case ReviewActionEnum.CREATE:
         updates = {
           $inc: {
-            total_review: 1,
+            totalReview: 1,
             'stars.$[element].count': 1,
           },
         };
@@ -104,7 +104,7 @@ export class BusinessRepository
       case ReviewActionEnum.DELETE:
         updates = {
           $inc: {
-            total_review: -1,
+            totalReview: -1,
             'stars.$[element].count': -1,
           },
         };
@@ -140,10 +140,10 @@ export class BusinessRepository
     );
 
     const overallRating =
-      result.total_review > 0 ? totalStars / result.total_review : 0;
+      result.totalReview > 0 ? totalStars / result.totalReview : 0;
 
     return await this.businessModel.findByIdAndUpdate(id, {
-      overall_rating: overallRating.toFixed(2),
+      overallRating: overallRating.toFixed(2),
     });
   }
 

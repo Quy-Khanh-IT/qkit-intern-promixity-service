@@ -116,7 +116,7 @@ export class ReviewController {
     return this.reviewService.editReview(id, editReviewDto, req.user.id);
   }
 
-  @Put(':id/responses')
+  @Put(':responseId/responses')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiBody({
@@ -127,7 +127,7 @@ export class ReviewController {
     description: 'OK.',
   })
   async editResponse(
-    @Param('id') id: string,
+    @Param('responseId') id: string,
     @Body() editResponseDto: EditResponseDto,
     @Req() req: Request,
   ) {
@@ -156,14 +156,14 @@ export class ReviewController {
     }
   }
 
-  @Delete(':id/responses')
+  @Delete(':responseId/responses')
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({
     status: 200,
     description: 'OK.',
   })
-  async deleteResponses(@Param('id') id: string, @Req() req: Request) {
+  async deleteResponses(@Param('responseId') id: string, @Req() req: Request) {
     return this.reviewService.deleteResponses(id, req.user.id);
   }
 }

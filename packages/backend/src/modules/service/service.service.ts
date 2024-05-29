@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+
 import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
-import { ServiceRepository } from './repository/service.repository';
 import { Service } from './entities/service.entity';
+import { ServiceRepository } from './repository/service.repository';
 
 @Injectable()
 export class ServiceService {
@@ -12,19 +13,9 @@ export class ServiceService {
     return await this.serviceRepository.create(createServiceDto);
   }
 
-  async findAll() {
-    return await this.serviceRepository.findAll({});
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} service`;
-  }
-
-  update(id: number, updateServiceDto: UpdateServiceDto) {
-    return `This action updates a #${id} service`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} service`;
+  async findServices(serviceIds: string[]): Promise<FindAllResponse<Service>> {
+    return await this.serviceRepository.findAll({
+      _id: { $in: serviceIds },
+    });
   }
 }

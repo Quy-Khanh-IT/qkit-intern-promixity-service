@@ -12,6 +12,7 @@ import {
   OrderNumberDay,
   ReviewActionEnum,
   StatusActionsEnum,
+  UserRole,
 } from 'src/common/enums';
 import {
   BusinessInvalidAddressException,
@@ -25,6 +26,8 @@ import { PaginationResult } from 'src/cores/pagination/base/pagination-result.ba
 
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -36,6 +39,8 @@ import { BusinessRepository } from './repository/business.repository';
 @Injectable()
 export class BusinessService {
   constructor(
+    private readonly userService: UserService,
+    private readonly ServiceService: ServiceService,
     private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
@@ -79,7 +84,7 @@ export class BusinessService {
     }
 
     if (query.province) {
-      matchStage['province'] = query.district;
+      matchStage['province'] = query.province;
     }
 
     if (query.status) {
@@ -87,7 +92,7 @@ export class BusinessService {
     }
 
     if (query.phoneNumber) {
-      matchStage['phone_number'] = query.phoneNumber;
+      matchStage['phoneNumber'] = query.phoneNumber;
     }
 
     if (query.category) {
@@ -95,7 +100,7 @@ export class BusinessService {
     }
 
     if (query.startRating && query.endRating) {
-      matchStage['overall_rating'] = {
+      matchStage['overallRating'] = {
         $gte: parseInt(query.startRating),
         $lte: parseInt(query.endRating),
       };
@@ -145,39 +150,9 @@ export class BusinessService {
     return business;
   }
 
-  async getBusinessesByStatus(
-    type: BusinessStatusEnum,
-  ): Promise<FindAllResponse<Business>> {
-    if (type === BusinessStatusEnum.DELETED) {
-      const businesses = await this.businessRepository.findAllWithDeleted({});
-
-      const availableActions: string[] = [];
-
-      const response: FindAllResponse<Business> = {
-        count: businesses.count,
-        items: businesses.items,
-      };
-
-      return response;
-    }
-
-    const businesses = await this.businessRepository.findAll({
-      status: type,
-    });
-
-    const availableActions: string[] = [];
-
-    const response: FindAllResponse<Business> = {
-      count: businesses.count,
-      items: businesses.items,
-    };
-
-    return response;
-  }
-
   async getAllByUser(userId: string): Promise<FindAllResponse<Business>> {
     const businesses = await this.businessRepository.findAll({
-      user_id: userId,
+      userId,
     });
 
     return businesses;
@@ -245,6 +220,22 @@ export class BusinessService {
         .join(':');
     });
 
+    // Validate address
+    const { country, province, district, addressLine, location } =
+      createBusinessDto;
+
+    const isValid = await this.validateAddress({
+      country,
+      province,
+      district,
+      addressLine,
+      location,
+    });
+
+    if (!isValid) {
+      throw new BusinessInvalidAddressException();
+    }
+
     // Assign order number for each day
     dayOfWeek = dayOfWeek.map((day) => {
       return {
@@ -258,33 +249,31 @@ export class BusinessService {
       (a, b) => a.order - b.order,
     ) as DayOpenCloseTime[];
 
-    // Assign day of week to createBusinessDto
-    createBusinessDto = {
-      ...createBusinessDto,
-      dayOfWeek,
-    };
+    // find and modify service
+    let modifiedService = [];
 
-    const { country, province, district, addressLine, location } =
-      createBusinessDto;
+    const services = await this.ServiceService.findServices(
+      createBusinessDto.serviceIds,
+    );
 
-    // Validate address
-    const isValid = await this.validateAddress({
-      country,
-      province,
-      district,
-      addressLine,
-      location,
-    });
-
-    if (!isValid) {
-      throw new BusinessInvalidAddressException();
+    if (services.items.length) {
+      modifiedService = services.items
+        .map((service) => {
+          return {
+            id: service.id,
+            name: service.name,
+            description: service.description,
+            order: service.order,
+          };
+        })
+        .sort((a, b) => a.order - b.order);
     }
 
     const business = await this.businessRepository.create({
       ...createBusinessDto,
-      phone_number: createBusinessDto.phoneNumber,
-      day_of_week: dayOfWeek,
-      user_id: userId,
+      services: modifiedService,
+      dayOfWeek,
+      userId,
     });
 
     return business;
@@ -296,14 +285,13 @@ export class BusinessService {
     updateInformationDto: UpdateInformationDto,
   ): Promise<boolean> {
     // check if business belongs to user
-
     const business = await this.businessRepository.findOneById(businessId);
 
     if (!business) {
       throw new BusinessNotFoundException();
     }
 
-    if (business.user_id.toString() !== userId) {
+    if (business.userId.toString() !== userId) {
       throw new BusinessNotBelongException();
     }
 
@@ -311,10 +299,28 @@ export class BusinessService {
       throw new BusinessStatusException();
     }
 
+    let responseService = [];
+
+    if (updateInformationDto.serviceIds.length) {
+      const services = await this.ServiceService.findServices(
+        updateInformationDto.serviceIds,
+      );
+
+      responseService = services.items
+        .map((service) => {
+          return {
+            id: service._id,
+            name: service.name,
+            description: service.description,
+            order: service.order,
+          };
+        })
+        .sort((a, b) => a.order - b.order);
+    }
+
     return !!(await this.businessRepository.update(businessId, {
       ...updateInformationDto,
-      phone_number: updateInformationDto.phoneNumber,
-      day_of_week: updateInformationDto.dayOfWeek,
+      services: responseService.length ? responseService : business.services,
     }));
   }
 
@@ -331,7 +337,7 @@ export class BusinessService {
     }
 
     // check if business belongs to user
-    if (found_business.user_id.toString() !== userId) {
+    if (found_business.userId.toString() !== userId) {
       throw new BusinessNotBelongException();
     }
 
@@ -361,7 +367,6 @@ export class BusinessService {
   async updateImages(
     businessId: string,
     userBusinesses: Types.ObjectId[],
-    updateAddressDto: UpdateAddressDto,
   ): Promise<Business> {
     // check if business belongs to user
     const found = userBusinesses.find((id) => id.toString() === businessId);
@@ -381,19 +386,29 @@ export class BusinessService {
     return business;
   }
 
-  async softDelete(businessId: string, userId: string): Promise<boolean> {
+  async softDelete(businessId: string, user: User): Promise<boolean> {
     const foundBusiness = await this.businessRepository.findOneById(businessId);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
-    if (foundBusiness.user_id.toString() !== userId) {
+    // Check business status
+    // If user is "ADMIN": business is approved, can't delete (only admin can delete with any business'status)
+    // If user is "BUSINESS": while business it not approved (pending), can delete
+
+    if (user.role === UserRole.ADMIN) {
+      return await this.businessRepository.softDelete(businessId);
+    }
+
+    if (foundBusiness.userId.toString() !== user.id) {
       throw new BusinessNotBelongException();
     }
 
-    if (foundBusiness.status !== BusinessStatusEnum.APPROVED) {
-      throw new BusinessStatusException();
+    if (foundBusiness.status !== BusinessStatusEnum.PENDING) {
+      throw new BusinessStatusException(
+        "Can't delete business, please send a request to admin to delete",
+      );
     }
 
     await this.businessRepository.update(businessId, {
@@ -405,15 +420,16 @@ export class BusinessService {
     return isDeleted;
   }
 
-  async hardDelete(businessId: string, userId: string): Promise<boolean> {
+  async hardDelete(businessId: string, user: User): Promise<boolean> {
     const foundBusiness = await this.businessRepository.findOneById(businessId);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
-    if (foundBusiness.user_id.toString() !== userId) {
-      throw new BusinessNotBelongException();
+    // check role if user is admin who can delete any business
+    if (user.role === UserRole.ADMIN) {
+      return await this.businessRepository.hardDelete(businessId);
     }
 
     // Check if business is already deleted
@@ -421,10 +437,10 @@ export class BusinessService {
       foundBusiness.deleted_at === null &&
       foundBusiness.status !== BusinessStatusEnum.DELETED
     ) {
-      throw new BusinessStatusException();
+      throw new BusinessStatusException('');
     }
 
-    return !!(await this.businessRepository.hardDelete(businessId));
+    return await this.businessRepository.hardDelete(businessId);
   }
 
   async restore(businessId: string): Promise<boolean> {
@@ -492,27 +508,6 @@ export class BusinessService {
     return false;
   }
 
-  async findNearBy(
-    longitude: string,
-    latitude: string,
-    maxDistance: string,
-  ): Promise<FindAllResponse<Business>> {
-    const businesses: FindAllResponse<Business> =
-      await this.businessRepository.findAll({
-        location: {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates: [longitude, latitude],
-            },
-            $maxDistance: maxDistance,
-          },
-        },
-      });
-
-    return businesses;
-  }
-
   async updateImage(
     businessId: string,
     userId: string,
@@ -524,7 +519,7 @@ export class BusinessService {
       throw new BusinessNotFoundException();
     }
 
-    if (business.user_id.toString() !== userId) {
+    if (business.userId.toString() !== userId) {
       throw new BusinessNotBelongException();
     }
 
@@ -598,18 +593,31 @@ export class BusinessService {
       longitude: longitude.toString(),
     });
 
-    if (
+    if (reverseData?.state === validateAddressDto.province) {
+      // is a province (example: tỉnh Bình Dương)
+      if (
+        !(reverseData?.address?.county && validateAddressDto.district) ===
+          reverseData?.address?.county &&
+        !(reverseData?.address?.city && validateAddressDto.district) ===
+          reverseData?.address?.city &&
+        !(reverseData?.address?.state && validateAddressDto.province) ===
+          reverseData?.address?.state
+      ) {
+        return false;
+      }
+    } else if (
+      // is a city (example: Thành phố Hồ Chí Minh)
       !(
         (reverseData?.address?.country && validateAddressDto.country) ===
         reverseData?.address?.country
       ) &&
       !(
-        (reverseData?.address?.city && validateAddressDto.province) ===
-        reverseData?.address?.city
-      ) &&
-      !(
         (reverseData?.address?.suburb && validateAddressDto.district) ===
         reverseData?.address?.suburb
+      ) &&
+      !(
+        (reverseData?.address?.city && validateAddressDto.province) ===
+        reverseData?.address?.city
       )
     ) {
       return false;
@@ -675,3 +683,28 @@ export class BusinessService {
     return true;
   }
 }
+
+// "address": {
+//   "amenity": "Trường Đại học Y Khoa Phạm Ngọc Thạch",
+//   "house_number": "2",
+//   "road": "Dương Quang Trung",
+//   "quarter": "Phường 12",
+//   "suburb": "Quận 10",
+//   "city": "Thành phố Hồ Chí Minh",
+//   "ISO3166-2-lvl4": "VN-SG",
+//   "postcode": "72000",
+//   "country": "Việt Nam",
+//   "country_code": "vn"
+// },
+
+// "address": {
+//   "road": "Đường Tô Vĩnh Diện",
+//   "suburb": "Phường Đông Hòa",
+//   "city": "Dĩ An",
+//   "county": "Dĩ An",
+//   "state": "Tỉnh Bình Dương",
+//   "ISO3166-2-lvl4": "VN-57",
+//   "postcode": "00848",
+//   "country": "Việt Nam",
+//   "country_code": "vn"
+// },

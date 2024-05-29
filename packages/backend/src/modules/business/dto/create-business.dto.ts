@@ -54,11 +54,11 @@ export class CreateBusinessDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
-  category_id: string;
+  categoryId: string;
 
   @IsArray()
   @ApiPropertyOptional({ example: ['66446c971b53183d5e868de4'] })
-  services_id: string[];
+  serviceIds: string[];
 
   @IsPhoneNumber('VN')
   @ApiPropertyOptional({ example: '0816429333' })
@@ -83,7 +83,7 @@ export class CreateBusinessDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: 'Hồ Chí Minh' })
+  @ApiProperty({ example: ' Thành phố Hồ Chí Minh' })
   province: string;
 
   @IsNotEmpty()

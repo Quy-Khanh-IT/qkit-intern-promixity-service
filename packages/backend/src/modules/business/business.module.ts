@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { AxiosModule } from '../axios/axios.module';
 import { NominatimOmsModule } from '../nominatim-osm/nominatim-osm.module';
+import { ServiceModule } from '../service/service.module';
 import { UploadFileModule } from '../upload-file/upload-file.module';
 import { UserModule } from '../user/user.module';
 import { BusinessController } from './business.controller';
@@ -24,6 +25,7 @@ import { BusinessRepository } from './repository/business.repository';
     HttpModule,
     NominatimOmsModule,
     UploadFileModule,
+    ServiceModule,
   ],
   controllers: [BusinessController],
   providers: [BusinessService, BusinessRepository],
