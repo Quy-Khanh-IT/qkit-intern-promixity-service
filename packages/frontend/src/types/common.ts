@@ -6,3 +6,7 @@ export interface SelectionOptions {
   label: string
   value: string
 }
+
+export interface IDecodedData {
+  data: string
+}

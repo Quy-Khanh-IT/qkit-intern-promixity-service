@@ -1,47 +1,20 @@
 'use client'
-import { MapContainer, TileLayer, Marker, CircleMarker, Popup, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import { useState } from 'react'
+import { IMapProps } from '@/types/map'
 
-function LocationMarker() {
-  const [position, setPosition] = useState<L.LatLngExpression | null>(null)
-  const map = useMapEvents({
-    click(e: any) {
-      ;(e.target as L.Map).locate()
-    },
-    locationfound(e: L.LocationEvent) {
-      setPosition(e.latlng)
-      ;(e.target as L.Map).flyTo(e.latlng, map.getZoom())
-    }
-  })
-
-  return position === null ? null : (
-    <Marker position={position}>
-      <Popup>You are here</Popup>
-    </Marker>
-  )
-}
-function Map() {
+const Map = ({ position }: IMapProps) => {
   return (
-    <MapContainer center={[40.609787846393196, 20.7890265133657]} zoom={5}>
+    <MapContainer center={position} zoom={15} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        attribution='© <a href="https://www.facebook.com/profile.php?id=100076370654780">QKIT Software</a>'
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-
-      <CircleMarker
-        className='n w-[150px] h-[150px]'
-        center={[40.609787846393196, 20.7890265133657]}
-        radius={10}
-        color='transparent'
-        fillColor='green'
-        fillOpacity={0.5}
-      >
-        <Popup className='w-[460px] h-[150px]'>
-          <p className='text-[25px]'>My Location </p>
+      <Marker position={position}>
+        <Popup>
+          A pretty CSS3 popup. <br /> Easily customizable.
         </Popup>
-      </CircleMarker>
-      <LocationMarker />
+      </Marker>
     </MapContainer>
   )
 }

@@ -11,7 +11,7 @@ export class ToastService {
     const startsWithAny = prefixes.some((prefix) => errorMessage?.startsWith(prefix))
 
     if (errorMessage === 'USR_0011') {
-      this.router.push('/signup/?token=' + error?.data?.errors?.token)
+      this.router.push(`/signup/?token=${error?.data?.errors?.token[0]}`)
     }
 
     if (startsWithAny) {

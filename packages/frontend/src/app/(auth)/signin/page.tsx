@@ -26,7 +26,7 @@ export default function SignIn() {
   useEffect(() => {
     if (isLoginSuccess) {
       toastService.success('Login success')
-      saveToLocalStorage('auth', { accessToken: dataLogin.accessToken!, refreshToken: dataLogin.refreshToken })
+      saveToLocalStorage('auth', { accessToken: dataLogin.accessToken, refreshToken: dataLogin.refreshToken })
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse

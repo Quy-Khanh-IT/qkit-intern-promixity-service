@@ -1,9 +1,7 @@
 'use client'
-
 import Map from './components'
 import type { MenuProps } from 'antd'
 import { Layout, Image, Input } from 'antd'
-
 import './map.scss'
 import { useState } from 'react'
 
@@ -51,7 +49,7 @@ export default function MapPage() {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <div className='h-100'>
-            <Map />
+            <Map position={[51.505, -0.09]} />
           </div>
         </Content>
       </Layout>
