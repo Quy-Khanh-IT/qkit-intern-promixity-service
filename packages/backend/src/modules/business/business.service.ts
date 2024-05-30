@@ -35,6 +35,7 @@ import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
+import { ServiceService } from '../service/service.service';
 
 @Injectable()
 export class BusinessService {
