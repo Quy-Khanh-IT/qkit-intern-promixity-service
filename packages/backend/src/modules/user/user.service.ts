@@ -136,7 +136,7 @@ export class UserService {
     let finalPipeline: PipelineStage[] = [];
 
     if (query.email) {
-      matchStage['email'] = { $regex: new RegExp(`^${query.email}$`, 'i') };
+      matchStage['email'] = { $regex: new RegExp(`^${query.email}`, 'i') };
     }
     if (query.firstName) {
       matchStage['firstName'] = {
@@ -152,7 +152,9 @@ export class UserService {
       };
     }
     if (query.phone) {
-      matchStage['phoneNumber'] = query.phone;
+      matchStage['phoneNumber'] = {
+        $regex: new RegExp(`^${query.phone}`, 'i'),
+      };
     }
 
     const result = PaginationHelper.configureBaseQueryFilter(

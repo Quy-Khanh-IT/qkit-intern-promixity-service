@@ -1,4 +1,4 @@
-import moment from 'moment';
+import * as moment from 'moment';
 import { PipelineStage } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
