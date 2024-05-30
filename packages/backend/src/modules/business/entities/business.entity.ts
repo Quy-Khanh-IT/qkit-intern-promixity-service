@@ -117,5 +117,6 @@ export class Business extends BaseEntity {
 export const BusinessSchema = SchemaFactory.createForClass(Business);
 
 BusinessSchema.index({ location: '2dsphere' });
+BusinessSchema.index({ name: 'text', description: 'text' });
 
 export type BusinessDocument = HydratedDocument<Business>;
