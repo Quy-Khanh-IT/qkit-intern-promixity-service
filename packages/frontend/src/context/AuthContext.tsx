@@ -1,5 +1,5 @@
 'use client'
-import { ROUTE, StorageKey } from '@/constants'
+import { ROUTE, StorageKey, TOAST_MSG } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useLoginUserMutation } from '@/services/auth.service'
 import { getMyProfile } from '@/services/user.service'
@@ -40,6 +40,9 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         } else if (res.role === (RoleEnum._USER as string)) {
           router.push(ROUTE.ABOUT)
         }
+        setTimeout(() => {
+          toast.success(TOAST_MSG.LOGIN_SUCCESS)
+        }, 1000)
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

@@ -41,6 +41,8 @@ const PAGE_SIZE = 20
 // For search
 type DataIndex = keyof IUserInformation
 
+type SearchIndex = keyof GetAllUsersQuery
+
 const ManageUser = (): React.ReactElement => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -60,18 +62,16 @@ const ManageUser = (): React.ReactElement => {
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_OPTIONS) // as SelectionOptions[]
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_OPTIONS)
 
   // Other
-  const [searchText, setSearchText] = useState('')
-  const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
 
   useEffect(() => {
     setQueryData(
-      (prevQueryData) =>
+      (prev) =>
         ({
-          ...prevQueryData,
+          ...prev,
           offset: currentPage
         }) as GetAllUsersQuery
     )
@@ -93,17 +93,22 @@ const ManageUser = (): React.ReactElement => {
 
   const handleSearch = (
     selectedKeys: string[],
-    confirm: FilterDropdownProps['confirm'],
+    _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
-    confirm()
-    setSearchText(selectedKeys[0])
-    setSearchedColumn(dataIndex)
+    if (selectedKeys.length === 0) {
+      setQueryData((prev) => {
+        const queryTemp: GetAllUsersQuery = { ...prev }
+        delete queryTemp[dataIndex as SearchIndex]
+        return { ...queryTemp } as GetAllUsersQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys[0] }) as GetAllUsersQuery)
+    }
   }
 
   const handleReset = (clearFilters: () => void): void => {
     clearFilters()
-    setSearchText('')
   }
 
   const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<IUserInformation> => ({
@@ -149,7 +154,7 @@ const ManageUser = (): React.ReactElement => {
         </Space>
       </div>
     ),
-    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#8fce00' : undefined }} />,
     onFilter: (value, record) =>
       record[dataIndex]
         ?.toString()
@@ -159,18 +164,7 @@ const ManageUser = (): React.ReactElement => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
       }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={(text || '') as string}
-        />
-      ) : (
-        <>{text}</>
-      )
+    }
   })
 
   const listColumns: ColumnsType<IUserInformation> = [
@@ -296,6 +290,7 @@ const ManageUser = (): React.ReactElement => {
       ],
       filterMode: 'tree',
       onFilter: (value, record: IUserInformation): boolean => {
+        console.log('value', value);
         return record.role.includes(value as string)
       }
     }
