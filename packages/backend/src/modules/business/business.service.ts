@@ -263,12 +263,13 @@ export class BusinessService {
           return {
             id: service.id,
             name: service.name,
-            description: service.description,
             order: service.order,
           };
         })
         .sort((a, b) => a.order - b.order);
     }
+
+    console.log('modifiedService: ', modifiedService);
 
     const business = await this.businessRepository.create({
       ...createBusinessDto,
@@ -312,7 +313,6 @@ export class BusinessService {
           return {
             id: service._id,
             name: service.name,
-            description: service.description,
             order: service.order,
           };
         })
