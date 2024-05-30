@@ -1,5 +1,5 @@
 'use client'
-import { ROUTE } from '@/constants'
+import { ROUTE, StorageKey } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
@@ -29,14 +29,14 @@ export default function RootLayout({
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
 
-  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage('routeValue', ROUTE.MANAGE_USER)
+  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.MANAGE_USER)
   const [selectedMenuKey, setSelectedMenuKey] = useState<string>('')
 
   useEffect(() => {
     if (routeValue) {
-      if (routeValue == ROUTE.MANAGE_USER) {
+      if (routeValue === ROUTE.MANAGE_USER) {
         setSelectedMenuKey('1')
-      } else if (routeValue == ROUTE.MANAGE_BUSINESS) {
+      } else if (routeValue === ROUTE.MANAGE_BUSINESS) {
         setSelectedMenuKey('2')
       } else {
         setSelectedMenuKey('1')

@@ -1,5 +1,29 @@
 @import "@/sass/common/common.scss";
 
+.--skeleton-custom{
+  .ant-skeleton-title{
+    display: none;
+  }
+  
+  .ant-skeleton-content{
+    li{
+      height: 40px !important;
+    }
+  }
+}
+
+.--table-cover{
+  overflow: hidden;
+
+  @include xs{
+    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+  }
+
+  @media screen and (min-width: 468px) {
+    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+  }
+}
+
 .--manage-table {
   overflow-y: auto;
   overflow-x: auto;

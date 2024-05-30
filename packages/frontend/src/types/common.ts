@@ -10,3 +10,9 @@ export interface SelectionOptions {
 export interface IDecodedData {
   data: string
 }
+
+export const ColorConstant = {
+  _GREEN: 'green',
+  _GEEK_BLUE: 'geekblue',
+  _VOLCANO: 'volcano'
+} as const

@@ -4,6 +4,10 @@ import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
+import { MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
+import { useGetAllUsersQuery } from '@/services/user.service'
+import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
+import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
@@ -14,6 +18,7 @@ import {
   Input,
   InputRef,
   MenuProps,
+  PaginationProps,
   Row,
   Select,
   Space,
@@ -22,41 +27,61 @@ import {
   Typography
 } from 'antd'
 import { FilterDropdownProps } from 'antd/es/table/interface'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Highlighter from 'react-highlight-words'
+import { ACTIVE_OPTION, DELETE_OPTION } from '../admin.constant'
 import './manage-user.scss'
-import userData from './user-data.json'
-import { ColumnsType, SelectionOptions } from '@/types/common'
-import { MODAL_TEXT, ROLE_CONST } from '@/constants'
+import { RoleEnum } from '@/types/enum'
 
 export interface IManageUserProps {}
 
 const { Text } = Typography
-const ACTIVE_OPTION = '1'
-const DELETE_OPTION = '2'
+const PAGE_SIZE = 20
 
 // For search
 type DataIndex = keyof IUserInformation
 
 const ManageUser = (): React.ReactElement => {
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // User data
+  const [queryData, setQueryData] = useState<GetAllUsersQuery>({
+    offset: currentPage,
+    limit: PAGE_SIZE
+  } as GetAllUsersQuery)
+  const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
   const [userOption, setUserOption] = useState(ACTIVE_OPTION)
   const [userOne, setUserOne] = useState<IUserInformation>()
+
+  // Modal
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_CONST) // as SelectionOptions[]
+  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_OPTIONS) // as SelectionOptions[]
 
+  // Other
   const [searchText, setSearchText] = useState('')
   const [searchedColumn, setSearchedColumn] = useState('')
   const searchInput = useRef<InputRef>(null)
+
+  useEffect(() => {
+    setQueryData(
+      (prevQueryData) =>
+        ({
+          ...prevQueryData,
+          offset: currentPage
+        }) as GetAllUsersQuery
+    )
+  }, [currentPage])
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      if (userOption == DELETE_OPTION) {
+      if (userOption === DELETE_OPTION) {
         refDeleteUserModal.current?.showModal()
       } else {
         refDecentralizeModal.current?.showModal()
@@ -190,10 +215,10 @@ const ManageUser = (): React.ReactElement => {
               ]),
           {
             key: 'Delete ',
-            label: <span className={userOption == '2' ? 'error-modal-title' : ''}>Delete</span>,
+            label: <span className={userOption === '2' ? 'error-modal-title' : ''}>Delete</span>,
             icon: (
               <i
-                className={`fa-regular fa-trash ${userOption == '2' ? 'error-modal-title' : 'delete-icon'}`}
+                className={`fa-regular fa-trash ${userOption === '2' ? 'error-modal-title' : 'delete-icon'}`}
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
@@ -250,14 +275,11 @@ const ManageUser = (): React.ReactElement => {
       align: 'center',
       key: 'role',
       width: 250,
-      render: (role: string): React.ReactNode => {
-        const color = role == 'ADMIN' ? 'green' : 'geekblue'
-        return (
-          <Tag color={color} key={role} className='me-0'>
-            {role}
-          </Tag>
-        )
-      },
+      render: (role: string): React.ReactNode => (
+        <Tag color={generateRoleColor(role)} key={role} className='me-0'>
+          {role.toUpperCase()}
+        </Tag>
+      ),
       filters: [
         {
           text: 'ADMIN',
@@ -299,16 +321,9 @@ const ManageUser = (): React.ReactElement => {
       label: 'Role',
       span: 4,
       children: (
-        <>
-          {[userOne?.role].map((role, index) => {
-            const color = role === 'ADMIN' ? 'green' : 'geekblue'
-            return (
-              <Tag color={color} key={`${role}-${index}`}>
-                {role}
-              </Tag>
-            )
-          })}
-        </>
+        <Tag color={generateRoleColor(userOne?.role || '')} key={userOne?.role} className='me-0'>
+          {userOne?.role.toUpperCase()}
+        </Tag>
       )
     }
   ]
@@ -328,11 +343,13 @@ const ManageUser = (): React.ReactElement => {
     setUserOption(value)
   }
 
-  // const usersWithKeys = userData.map((item, index) => ({ ...item, key: index }))
-
   const handleDecentralizeRole = (): void => {}
 
   const handleDeleteUser = (): void => {}
+
+  const onChangePagination: PaginationProps['onChange'] = (page) => {
+    setCurrentPage(page)
+  }
 
   return (
     <div className='--manage-user'>
@@ -352,15 +369,21 @@ const ManageUser = (): React.ReactElement => {
 
         <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span>
-            Total: <strong>{'8'}</strong>
+            Total: <strong>{usersData?.totalRecords}</strong>
           </span>
         </Col>
       </Row>
 
       <TableComponent
-        isFetching={false}
+        isFetching={isLoadingUsers}
         columns={listColumns}
-        dataSource={userData as IUserInformation[]}
+        dataSource={usersData?.data ?? []}
+        pagination={{
+          current: currentPage,
+          pageSize: PAGE_SIZE,
+          total: usersData?.totalRecords ?? 0,
+          onChange: onChangePagination
+        }}
         className='--manage-user-table'
       />
       <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
@@ -384,7 +407,7 @@ const ManageUser = (): React.ReactElement => {
           <>
             <span
               className={
-                userOption == '2' && deleteModalContent == MODAL_TEXT.DELETE_USER_PERMANENT ? 'error-modal-title' : ''
+                userOption === '2' && deleteModalContent === MODAL_TEXT.DELETE_USER_PERMANENT ? 'error-modal-title' : ''
               }
             >
               {deleteModalContent}
@@ -401,3 +424,17 @@ const ManageUser = (): React.ReactElement => {
 }
 
 export default ManageUser
+
+const generateRoleColor = (role: string): string => {
+  let color: string = ''
+
+  if (role === (RoleEnum._ADMIN as string)) {
+    color = ColorConstant._GREEN
+  } else if (role === (RoleEnum._USER as string)) {
+    color = ColorConstant._GEEK_BLUE
+  } else if (role === (RoleEnum._BUSINESS as string)) {
+    color = ColorConstant._VOLCANO
+  }
+
+  return color
+}

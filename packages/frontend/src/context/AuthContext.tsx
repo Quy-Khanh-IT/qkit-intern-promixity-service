@@ -9,6 +9,7 @@ import { RoleEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
 import { IUserInformation } from '@/types/user'
 import { setCookieFromClient } from '@/utils/cookies.util'
+import { saveToLocalStorage } from '@/utils/storage.util'
 import Error from 'next/error'
 import { useRouter } from 'next/navigation'
 import React, { createContext, useCallback, useRef } from 'react'
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setUserInformation(res)
         setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken)
         setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
+        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.MANAGE_USER)
 
         if (res.role === (RoleEnum._ADMIN as string)) {
           router.push(ROUTE.MANAGE_USER)

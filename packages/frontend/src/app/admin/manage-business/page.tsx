@@ -61,7 +61,7 @@ const ManageBusiness = (): React.ReactNode => {
     if (selectedOpt === 1) {
       refViewDetailsModal.current?.showModal()
     } else if (selectedOpt === 2) {
-      if (businessOption == '2') {
+      if (businessOption === '2') {
         refDeleteBusinessModal.current?.showModal()
       } else {
         refModerateModal.current?.showModal()
@@ -195,10 +195,10 @@ const ManageBusiness = (): React.ReactNode => {
               ]),
           {
             key: 'Delete ',
-            label: <span className={businessOption == '2' ? 'error-modal-title' : ''}>Delete</span>,
+            label: <span className={businessOption === '2' ? 'error-modal-title' : ''}>Delete</span>,
             icon: (
               <i
-                className={`fa-regular fa-trash ${businessOption == '2' ? 'error-modal-title' : 'delete-icon'}`}
+                className={`fa-regular fa-trash ${businessOption === '2' ? 'error-modal-title' : 'delete-icon'}`}
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
@@ -316,7 +316,7 @@ const ManageBusiness = (): React.ReactNode => {
       filterMode: 'tree',
       onFilter: (value, record: IBusiness): boolean => {
         const parseValue: number = parseInt(value as string)
-        return Math.floor(record.overallRating) == parseValue
+        return Math.floor(record.overallRating) === parseValue
       }
     },
     {
@@ -326,7 +326,7 @@ const ManageBusiness = (): React.ReactNode => {
       key: 'status',
       width: 150,
       render: (status: string): React.ReactNode => {
-        const color = status == 'Accepted' ? 'green' : 'geekblue'
+        const color = status === 'Accepted' ? 'green' : 'geekblue'
         return (
           <Tag color={color} key={status} className='me-0'>
             {status.toUpperCase()}
@@ -472,7 +472,7 @@ const ManageBusiness = (): React.ReactNode => {
           <>
             <span
               className={
-                businessOption == '2' && deleteModalContent == MODAL_TEXT.DELETE_BUSINESS_PERMANENT
+                businessOption === '2' && deleteModalContent === MODAL_TEXT.DELETE_BUSINESS_PERMANENT
                   ? 'error-modal-title'
                   : ''
               }
