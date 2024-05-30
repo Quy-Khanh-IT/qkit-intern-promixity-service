@@ -448,35 +448,21 @@ export class UserService {
     return user;
   }
 
-  async addBusiness(userId: string, businessId: string): Promise<User> {
-    const update = {
-      $addToSet: { businesses: businessId },
-    } as Partial<User>;
-
-    const user = await this.userRepository.update(userId, update);
-
-    if (!user) {
-      throw new InternalServerErrorException('Update business failed');
-    }
-    return user;
-  }
-
-  async removeBusiness(userId: string, businessId: string): Promise<User> {
-    const update = {
-      $pull: { businesses: businessId },
-    } as Partial<User>;
-
-    const user = await this.userRepository.update(userId, update);
-
-    if (!user) {
-      throw new InternalServerErrorException('Remove business failed');
-    }
-    return user;
-  }
-
-  async getAllByUser(userId: string): Promise<FindAllResponse<Business> | []> {
+  async getAllBusiness(
+    userId: string,
+  ): Promise<FindAllResponse<Business> | []> {
     const businesses = await this.BusinessService.getAllByUser(userId);
 
     return businesses;
+  }
+
+  async UpdateDate(userId: string) {
+    const user = await this.userRepository.findOneById(userId);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    await this.userRepository.update(userId, { role: UserRole.BUSINESS });
   }
 }

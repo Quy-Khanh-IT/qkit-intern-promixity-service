@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -7,47 +7,48 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 import { DayOpenCloseTime } from './create-business.dto';
 
 export class UpdateInformationDto {
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'JangNam' })
+  @ApiPropertyOptional({ example: 'JangNam' })
   name?: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'This is a business' })
+  @ApiPropertyOptional({ example: 'This is a business' })
   description?: string;
 
   @IsOptional()
   @IsString()
   @IsPhoneNumber('VN')
-  @ApiProperty({ example: '0816429494' })
+  @ApiPropertyOptional({ example: '0816429494' })
   phoneNumber?: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'https://qkit.vn/company-profile' })
+  @ApiPropertyOptional({ example: 'https://qkit.vn/company-profile' })
   website?: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
-  category?: string;
+  @ApiPropertyOptional({ example: '66446d345c9bc4899106d4a6' })
+  categoryId?: Types.ObjectId;
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @ApiProperty({ example: '["66446c971b53183d5e868de4"]' })
-  services?: string[];
+  @ApiPropertyOptional({ example: '["66446c971b53183d5e868de4"]' })
+  serviceIds?: string[];
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DayOpenCloseTime)
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: [
       { day: 'thursday', openTime: '08:00', closeTime: '12:00' },
       { day: 'friday', openTime: '10:00', closeTime: '12:00' },

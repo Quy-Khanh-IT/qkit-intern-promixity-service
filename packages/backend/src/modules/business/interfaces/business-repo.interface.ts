@@ -1,3 +1,4 @@
+import { ReviewActionEnum } from 'src/common/enums';
 import { BaseRepositoryInterface } from 'src/cores/repository/base/repositoryInterface.base';
 
 import { UpdateAddressDto } from '../dto/update-address.dto';
@@ -11,4 +12,11 @@ export interface BusinessRepositoryInterface
   ): Promise<Business | null>;
 
   restoreBusiness(id: string): Promise<Business | null>;
+
+  updateRating(
+    id: string,
+    type: ReviewActionEnum,
+    star: string,
+    oldStar?: string,
+  ): Promise<Business | null>;
 }

@@ -9,11 +9,11 @@ import {
   Post,
   Query,
   Req,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
-  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -22,22 +22,25 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
+import { UploadFileConstraint } from 'src/common/constants';
+import { Roles } from 'src/common/decorators/role.decorator';
 import {
-  BusinessStatusEnum,
   DeleteActionEnum,
   StatusActionsEnum,
+  UserRole,
 } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { RoleGuard } from 'src/cores/guard/role.guard';
 
+import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
+import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { UploadFileConstraint } from 'src/common/constants';
-import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
@@ -45,41 +48,14 @@ import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
-  @Get('nearby')
+  @Get()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(200)
-  @ApiQuery({ name: 'longitude', required: true })
-  @ApiQuery({ name: 'latitude', required: true })
-  @ApiQuery({ name: 'maxDistance', required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business nearby.',
-  })
-  async getNearby(
-    @Query('longitude') longitude: string,
-    @Query('latitude') latitude: string,
-    @Query('maxDistance') maxDistance: string,
-  ) {
-    const result = await this.businessService.findNearBy(
-      longitude,
-      latitude,
-      maxDistance,
-    );
+  async findAllBusinesses(@Query() data: FindAllBusinessQuery) {
+    const transferData = plainToClass(FindAllBusinessQuery, data);
 
-    return result;
-  }
-
-  @Get('status')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiQuery({ name: 'type', enum: BusinessStatusEnum, required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully modify status business',
-  })
-  async getBusinessesByStatus(@Query('type') type: BusinessStatusEnum) {
-    const result = await this.businessService.getBusinessesByStatus(type);
-
-    return result;
+    return await this.businessService.findAll(transferData);
   }
 
   @Get(':id')
@@ -95,7 +71,8 @@ export class BusinessController {
   }
 
   @Post('')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   @HttpCode(201)
   @ApiBody({
     type: CreateBusinessDto,
@@ -118,7 +95,8 @@ export class BusinessController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
   @ApiResponse({
@@ -133,7 +111,7 @@ export class BusinessController {
     if (type === DeleteActionEnum.SOFT) {
       const result: boolean = await this.businessService.softDelete(
         id,
-        req.user.id,
+        req.user,
       );
 
       return result;
@@ -142,7 +120,7 @@ export class BusinessController {
     if (type === DeleteActionEnum.HARD) {
       const result: boolean = await this.businessService.hardDelete(
         id,
-        req.user.id,
+        req.user,
       );
 
       return result;
@@ -152,7 +130,8 @@ export class BusinessController {
   }
 
   @Patch(':id/information')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiBody({ type: UpdateInformationDto })
   @ApiResponse({
@@ -175,7 +154,8 @@ export class BusinessController {
   }
 
   @Patch(':id/addresses')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiBody({ type: UpdateAddressDto })
   @ApiResponse({
@@ -198,7 +178,8 @@ export class BusinessController {
   }
 
   @Patch(':id/images')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @ApiBody({
     schema: {
       type: 'object',
@@ -239,7 +220,8 @@ export class BusinessController {
   }
 
   @Patch(':id/restore')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiResponse({
     status: 200,
@@ -253,7 +235,8 @@ export class BusinessController {
 
   // ADMIN
   @Patch(':id/status')
-  @UseGuards(JwtAccessTokenGuard)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: StatusActionsEnum, required: true })
   @ApiResponse({

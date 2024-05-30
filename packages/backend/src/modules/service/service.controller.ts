@@ -1,16 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { ServiceService } from './service.service';
-import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { CreateServiceDto } from './dto/create-service.dto';
+import { ServiceService } from './service.service';
 
 @Controller('services')
 @ApiTags('services')
@@ -21,10 +13,5 @@ export class ServiceController {
   @Post()
   create(@Body() createServiceDto: CreateServiceDto) {
     return this.serviceService.create(createServiceDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.serviceService.findAll();
   }
 }

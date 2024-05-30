@@ -32,6 +32,9 @@ import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { UserRole } from 'src/common/enums';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { RoleGuard } from 'src/cores/guard/role.guard';
 
 @Controller('users')
 @ApiTags('User')
@@ -43,6 +46,20 @@ export class UserController {
   async findUserById(@Param('userId') userId: string) {
     const user = await this.userService.findOneById(userId);
     return plainToClass(User, user);
+  }
+
+  @Get('/businesses')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.BUSINESS)
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business.',
+  })
+  async getAllBusiness(@Req() req: Request) {
+    const result = await this.userService.getAllBusiness(req.user.id);
+    return result;
   }
 
   @UseGuards(JwtAccessTokenGuard)
@@ -153,17 +170,5 @@ export class UserController {
     return {
       isSuccess: await this.userService.resetEmail(JWTtoken, req.user, id),
     };
-  }
-
-  @Get('/businesses')
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getAllBusiness(@Req() req: Request) {
-    const result = await this.userService.getAllByUser(req.user.id);
-    return result;
   }
 }

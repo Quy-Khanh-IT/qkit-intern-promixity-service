@@ -4,8 +4,9 @@ import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
-import { StarSchema } from './star.entity';
 import { Image } from './image.entity';
+import { ServiceSchema } from './service.entity';
+import { StarSchema } from './star.entity';
 
 const defaultStars: StarSchema[] = [
   {
@@ -44,7 +45,7 @@ export class Business extends BaseEntity {
   description: string;
 
   @Prop({ default: '', trim: true })
-  phone_number: string;
+  phoneNumber: string;
 
   @Prop({ default: '', trim: true })
   website: string;
@@ -52,26 +53,26 @@ export class Business extends BaseEntity {
   @Prop({ type: [Image], default: [] })
   images: Image[];
 
-  @Prop({ required: true, trim: true })
-  category: string;
+  @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
+  categoryId: Types.ObjectId;
 
-  @Prop({ type: [String], default: [] })
-  services: string[];
-
-  @Prop({ default: 0 })
-  overall_rating: number;
+  @Prop({ type: [ServiceSchema] })
+  services: ServiceSchema[];
 
   @Prop({ default: 0 })
-  total_review: number;
+  overallRating: number;
+
+  @Prop({ default: 0 })
+  totalReview: number;
 
   @Prop({ type: [StarSchema], default: defaultStars })
   stars: StarSchema[];
 
   @Prop({ trim: true })
-  address_line: string;
+  addressLine: string;
 
   @Prop({ trim: true })
-  full_address: string;
+  fullAddress: string;
 
   @Prop({ required: true })
   province: string;
@@ -83,7 +84,7 @@ export class Business extends BaseEntity {
   country: string;
 
   @Prop([DayOpenCloseTimeSchema])
-  day_of_week: DayOpenCloseTimeSchema[];
+  dayOfWeek: DayOpenCloseTimeSchema[];
 
   @Prop({
     type: {
@@ -104,10 +105,10 @@ export class Business extends BaseEntity {
     enum: BusinessStatusEnum,
     default: BusinessStatusEnum.PENDING,
   })
-  status: string;
+  status: BusinessStatusEnum;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  user_id: Types.ObjectId;
+  userId: Types.ObjectId;
 
   @Prop({ default: null })
   deleted_at: MongooseSchema.Types.Date;

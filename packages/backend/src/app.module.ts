@@ -20,6 +20,8 @@ import { CategoryModule } from './modules/category/category.module';
 import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';
 import { ServiceModule } from './modules/service/service.module';
 import { SeedService } from './seeds/seed.service';
+import { ReviewModule } from './modules/review/review.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -31,7 +33,6 @@ import { SeedService } from './seeds/seed.service';
       envFilePath: [`.env`],
     }),
     UploadFileModule,
-
     DatabaseModule,
     UserModule,
     OtpModule,
@@ -45,6 +46,8 @@ import { SeedService } from './seeds/seed.service';
     DistrictModule,
     ProvinceModule,
     AddressModule,
+    ReviewModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

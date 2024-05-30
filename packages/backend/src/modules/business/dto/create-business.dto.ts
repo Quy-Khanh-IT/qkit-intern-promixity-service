@@ -39,7 +39,7 @@ export class DayOpenCloseTime {
   @IsNumber()
   @Min(1)
   @Max(7)
-  @ApiProperty({ example: 1 })
+  @ApiPropertyOptional()
   order: number;
 }
 
@@ -54,11 +54,11 @@ export class CreateBusinessDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
-  category: string;
+  categoryId: string;
 
   @IsArray()
   @ApiPropertyOptional({ example: ['66446c971b53183d5e868de4'] })
-  services: string[];
+  serviceIds: string[];
 
   @IsPhoneNumber('VN')
   @ApiPropertyOptional({ example: '0816429333' })
@@ -83,7 +83,7 @@ export class CreateBusinessDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: 'Hồ Chí Minh' })
+  @ApiProperty({ example: ' Thành phố Hồ Chí Minh' })
   province: string;
 
   @IsNotEmpty()
