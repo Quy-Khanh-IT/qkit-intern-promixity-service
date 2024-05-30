@@ -334,22 +334,11 @@ export class ReviewService {
       _id: id,
       type: ReviewTypeEnum.REPLY,
     });
+
+    if (!review) {
       throw new ResponseNotFoundException(
         "Can't delete this response. Response not found or not belong to user or not a response.",
       );
-    }
-
-    return !!(await this.deleteWithChildren(id));
-  }
-
-  async deleteWithChildren(id: string) {
-    const children = await this.reviewRepository.findAll({
-      parent_id: id,
-    });
-
-    // Recursively delete each child review
-    for (const child of children.items) {
-      await this.deleteWithChildren(child.id);
     }
 
     return !!(await this.deleteWithChildren(id));
