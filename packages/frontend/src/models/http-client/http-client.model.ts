@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance, AxiosResponse, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
 import qs from 'qs'
 
@@ -7,6 +6,7 @@ import { generateError } from '@/utils/catching-error.util'
 import { getFromLocalStorage } from '@/utils/storage.util'
 
 import { HttpClientInterface } from './http-client.interface'
+import { ErrorResponse } from '@/types/error'
 type HttpClientOption = CreateAxiosDefaults
 
 export class HttpClientModel implements HttpClientInterface {
@@ -29,7 +29,7 @@ export class HttpClientModel implements HttpClientInterface {
 
     this.axios.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        if (config.requiresToken) {
+        if (config.headers) {
           const token = this.getToken()
           if (token) {
             config.headers.Authorization = `Bearer ${token}`
@@ -53,11 +53,14 @@ export class HttpClientModel implements HttpClientInterface {
         .then((response: AxiosResponse) => {
           resolve(response.data as T)
         })
-        .catch((error: AxiosResponse | any) => {
+        .catch((error: AxiosResponse) => {
           reject(error)
 
-          if (error.response?.data) {
-            generateError(error.response.data)
+          if (error instanceof Error) {
+            const customError = error as ErrorResponse
+            if (customError) {
+              generateError(customError)
+            }
           }
         })
     })

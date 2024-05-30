@@ -1,13 +1,7 @@
-export interface ResponseError {
-  errors?: Record<string, unknown>
-  status: number
-  title: string
-  traceId: string
-  type: string
-}
+import { ErrorResponse } from '@/types/error'
 
-export function generateError(response: ResponseError): void {
-  const { errors } = response
+export function generateError(response: ErrorResponse): void {
+  const errors = response.data?.errors
   if (errors) {
     const afterProcess = Object.keys(errors).map((key: string) => errors[key])
     afterProcess.forEach((err) => {
