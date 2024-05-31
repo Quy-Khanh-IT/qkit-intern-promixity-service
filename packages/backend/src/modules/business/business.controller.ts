@@ -44,11 +44,22 @@ import { Business } from './entities/business.entity';
 
 @Controller('businesses')
 @ApiTags('businesses')
-@ApiBearerAuth()
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
+  @Get(':id')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business.',
+  })
+  async getById(@Param('id') id: string) {
+    const result: Business = await this.businessService.findOneById(id);
+
+    return result;
+  }
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(200)
@@ -58,19 +69,8 @@ export class BusinessController {
     return await this.businessService.findAll(transferData);
   }
 
-  @Get(':id')
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getById(@Param('id') id: string) {
-    const result: Business = await this.businessService.getById(id);
-
-    return result;
-  }
-
   @Post('')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   @HttpCode(201)
@@ -88,48 +88,14 @@ export class BusinessController {
   ) {
     const result: Business = await this.businessService.create(
       createBusinessDto,
-      req.user.id,
+      req.user,
     );
 
     return result;
   }
 
-  @Delete(':id')
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
-  @HttpCode(200)
-  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully deleted business.',
-  })
-  async delete(
-    @Param('id') id: string,
-    @Query('type') type: string,
-    @Req() req: Request,
-  ) {
-    if (type === DeleteActionEnum.SOFT) {
-      const result: boolean = await this.businessService.softDelete(
-        id,
-        req.user,
-      );
-
-      return result;
-    }
-
-    if (type === DeleteActionEnum.HARD) {
-      const result: boolean = await this.businessService.hardDelete(
-        id,
-        req.user,
-      );
-
-      return result;
-    }
-
-    return false;
-  }
-
   @Patch(':id/information')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
@@ -154,6 +120,7 @@ export class BusinessController {
   }
 
   @Patch(':id/addresses')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
@@ -178,6 +145,7 @@ export class BusinessController {
   }
 
   @Patch(':id/images')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @ApiBody({
@@ -220,6 +188,7 @@ export class BusinessController {
   }
 
   @Patch(':id/restore')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
@@ -233,8 +202,8 @@ export class BusinessController {
     return result;
   }
 
-  // ADMIN
   @Patch(':id/status')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(200)
@@ -250,5 +219,41 @@ export class BusinessController {
     const result: boolean = await this.businessService.handleStatus(id, type);
 
     return result;
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
+  @HttpCode(200)
+  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully deleted business.',
+  })
+  async delete(
+    @Param('id') id: string,
+    @Query('type') type: string,
+    @Req() req: Request,
+  ) {
+    if (type === DeleteActionEnum.SOFT) {
+      const result: boolean = await this.businessService.softDelete(
+        id,
+        req.user,
+      );
+
+      return result;
+    }
+
+    if (type === DeleteActionEnum.HARD) {
+      const result: boolean = await this.businessService.hardDelete(
+        id,
+        req.user,
+      );
+
+      return result;
+    }
+
+    return false;
   }
 }

@@ -465,4 +465,10 @@ export class UserService {
 
     await this.userRepository.update(userId, { role: UserRole.BUSINESS });
   }
+
+  async findAdmin(): Promise<User> {
+    return await this.userRepository.findOneByCondition({
+      role: UserRole.ADMIN,
+    });
+  }
 }

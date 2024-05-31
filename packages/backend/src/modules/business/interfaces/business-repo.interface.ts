@@ -19,4 +19,6 @@ export interface BusinessRepositoryInterface
     star: string,
     oldStar?: string,
   ): Promise<Business | null>;
+
+  softDeleteBusiness(id: string): Promise<boolean>;
 }
