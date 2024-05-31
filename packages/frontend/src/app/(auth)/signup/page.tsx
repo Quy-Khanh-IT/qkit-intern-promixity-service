@@ -175,7 +175,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
     })
 
     setRegisterDataErrors({
-      email: '',
+      email: 'must be ok',
       password: '',
       firstName: '',
       lastName: '',
