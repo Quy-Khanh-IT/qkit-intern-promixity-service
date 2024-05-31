@@ -17,7 +17,7 @@ export default function NotFound(): React.ReactNode {
     <div className='vh-100 main-container '>
       <Header />
       <div className='h-100 w-100 d-flex flex-column justify-content-center align-items-center not-found-wrapper'>
-        <Image src='./images/404-not-found.png' alt='404' preview={false} />
+        <Image className='image-float' src='./images/404-not-found.png' alt='404' preview={false} />
         <div className='not-fount-content d-flex flex-column justify-content-center align-items-center'>
           <h2 className='text-center'>Oh Man, Error 404</h2>
           <span>Sorry, the page you looking for is in hiding.</span>

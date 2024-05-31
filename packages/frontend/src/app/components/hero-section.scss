@@ -124,10 +124,22 @@ $hightlight_color: white;
       padding-bottom: 20px !important;
     }
 
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-50px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
     .planet {
       flex-grow: 1;
       height: auto;
-
+      animation: float 3s ease-in-out infinite;
       @media (min-width: 768px) {
         height: 550px;
       }

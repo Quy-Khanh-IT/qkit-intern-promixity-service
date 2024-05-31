@@ -21,3 +21,19 @@
 .btn-home {
   z-index: 9;
 }
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.image-float {
+  animation: float 3s ease-in-out infinite;
+}
