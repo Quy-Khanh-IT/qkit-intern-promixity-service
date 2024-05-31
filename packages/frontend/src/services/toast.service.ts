@@ -22,19 +22,19 @@ export class ToastService {
     return errorMessage || ''
   }
 
-  showRestError(error: ErrorResponse) {
+  showRestError(error: ErrorResponse): void {
     toast.error(this.handleError(error))
   }
 
-  success(message: string) {
+  success(message: string): void {
     toast.success(message)
   }
 
-  error(message: string) {
+  error(message: string): void {
     toast.error(message)
   }
 
-  warning(message: string) {
+  warning(message: string): void {
     toast.warning(message)
   }
 }

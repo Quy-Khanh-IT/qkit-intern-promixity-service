@@ -6,10 +6,13 @@ import './hero-section.scss'
 import { Cursor, useTypewriter } from 'react-simple-typewriter'
 import { useRouter } from 'next/navigation'
 
-export default function HeroSection() {
+export default function HeroSection(): React.ReactNode {
+  const teamMembers: string[] = ['Chính', 'Bách', 'Ngọc', 'Tuấn', 'Khánh', 'QKIT Intern Team']
+  const typeSpeedTransform: number = 120
+
   const [text] = useTypewriter({
-    words: ['Chính', 'Bách', 'Ngọc', 'Tuấn', 'Khánh', 'QKIT Intern Team'],
-    typeSpeed: 120
+    words: teamMembers,
+    typeSpeed: typeSpeedTransform
   })
 
   const router = useRouter()
@@ -19,10 +22,10 @@ export default function HeroSection() {
       <div className='hero-content'>
         <div>
           <h1>PROXIMITY SERVICE</h1>
-          <div className={text === 'QKIT Intern Team' ? 'subtitle done' : 'subtitle'}>
+          <div className={text === teamMembers[teamMembers.length - 1] ? 'subtitle done' : 'subtitle'}>
             Created by: {text}
             <span style={{ color: 'white' }}>
-              <Cursor cursorStyle={text === 'QKIT Intern Team' ? '🔥' : '|'} />
+              <Cursor cursorStyle={text === teamMembers[teamMembers.length - 1] ? '🔥' : '|'} />
             </span>
           </div>
           <div

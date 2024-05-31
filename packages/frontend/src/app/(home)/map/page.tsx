@@ -5,7 +5,7 @@ import { Layout, Image, Input } from 'antd'
 import './map.scss'
 import { useState } from 'react'
 
-export default function MapPage() {
+export default function MapPage(): React.ReactNode {
   const { Header, Content, Sider } = Layout
   const { Search } = Input
   const [collapsed, setCollapsed] = useState(false)

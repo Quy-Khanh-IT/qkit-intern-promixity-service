@@ -4,13 +4,13 @@ import { Canvas } from '@react-three/fiber'
 
 import CanvasLoader from '../Loader'
 
-const Earth = () => {
+const Earth = (): React.ReactNode => {
   const earth = useGLTF('./planet/scene.gltf')
 
   return <primitive object={earth.scene} scale={3.5} position-y={0} rotation-y={0} />
 }
 
-const EarthCanvas = () => {
+const EarthCanvas = (): React.ReactNode => {
   return (
     <Canvas
       shadows

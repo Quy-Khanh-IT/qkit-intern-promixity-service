@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react'
 import './scroll-to-top.scss'
 
-const ScrollToTopButton = () => {
+const ScrollToTopButton = (): React.ReactNode => {
   const [isVisible, setIsVisible] = useState(false)
 
-  const handleScroll = () => {
+  const handleScroll = (): void => {
     if (window.scrollY > 200) {
       setIsVisible(true)
     } else {
@@ -13,7 +13,7 @@ const ScrollToTopButton = () => {
     }
   }
 
-  const scrollToTop = () => {
+  const scrollToTop = (): void => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -23,7 +23,7 @@ const ScrollToTopButton = () => {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
 
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])

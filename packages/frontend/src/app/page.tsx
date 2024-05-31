@@ -8,7 +8,7 @@ import CredibilitySection from './components/CredibilitySection'
 import ProcessBar from './components/ProcessBar'
 import AboutSection from './components/AboutSection'
 
-export default function Home() {
+export default function Home(): React.ReactNode {
   return (
     <main>
       <ProcessBar />

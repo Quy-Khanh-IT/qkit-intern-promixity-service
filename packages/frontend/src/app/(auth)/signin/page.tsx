@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ErrorResponse } from '@/types/error'
 import { saveToLocalStorage } from '@/utils/storage.util'
 
-export default function SignIn() {
+export default function SignIn(): React.ReactNode {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -35,7 +35,7 @@ export default function SignIn() {
     }
   }, [isLoginSuccess, isLoginError, loginError, toastService])
 
-  const handleError = (error: ErrorResponse) => {
+  const handleError = (error: ErrorResponse): void => {
     if (error?.data?.errors) {
       setInputError((prevInputError) => {
         const newInputError: { email: string; password: string } = { ...prevInputError }
@@ -52,14 +52,14 @@ export default function SignIn() {
     }
   }
 
-  const SignIn = async () => {
+  const SignIn = async (): Promise<void> => {
     await loginUser({
       email,
       password
     })
   }
 
-  const handleSignIn = () => {
+  const handleSignIn = (): void => {
     SignIn()
       .then(() => {})
       .catch(() => {
@@ -67,7 +67,7 @@ export default function SignIn() {
       })
   }
 
-  const onChangeData = (value: string, type: string) => {
+  const onChangeData = (value: string, type: string): void => {
     if (type === 'email') {
       setEmail(value)
     }
@@ -80,7 +80,7 @@ export default function SignIn() {
     })
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
     if (e.key === 'Enter') {
       e.preventDefault()
       SignIn()

@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { IMapProps } from '@/types/map'
 
-const Map = ({ position }: IMapProps) => {
+const Map = ({ position }: IMapProps): React.ReactNode => {
   return (
     <MapContainer center={position} zoom={15} style={{ height: '100vh', width: '100%' }}>
       <TileLayer

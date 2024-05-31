@@ -12,18 +12,18 @@ interface IContentLayout {
   children: React.ReactNode
 }
 
-const Content: React.FC<IContentLayout> = ({ children }) => {
+const Content: React.FC<IContentLayout> = ({ children }): React.ReactNode => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [_blur, setBlur] = useState(false)
 
-  const startLoading = () => {
+  const startLoading = (): void => {
     setLoading(true)
     setBlur(true)
   }
 
-  const stopLoading = () => {
+  const stopLoading = (): void => {
     setBlur(false)
     setLoading(false)
   }
@@ -31,7 +31,7 @@ const Content: React.FC<IContentLayout> = ({ children }) => {
   useEffect(() => {
     startLoading()
     const timer = setTimeout(stopLoading, 500)
-    return () => clearTimeout(timer)
+    return (): void => clearTimeout(timer)
   }, [pathname, searchParams])
 
   return (
