@@ -99,16 +99,6 @@ export default function AboutSection(): React.ReactNode {
           <Image className='thumb-1' src='./images/earth-about-us.svg' alt='thumb' />
         </div>
       </div>
-      <div className='about-us-section-bottom'>
-        <ul className='bento-wrapper'>
-          <li className='data-item primary-item'>
-            <h2>300k+ Users</h2>
-          </li>
-          <li className='data-item'>2</li>
-          <li className='data-item'>3</li>
-          <li className='data-item'>4</li>
-        </ul>
-      </div>
     </div>
   )
 }
