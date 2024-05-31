@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import './signup.scss'
 
 export default function SignUp({ searchParams: { token } }: ISignUpProps): React.ReactNode {
   useEffect(() => {
