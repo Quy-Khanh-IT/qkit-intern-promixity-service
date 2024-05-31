@@ -22,6 +22,7 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 export interface IManageUserProps {}
 
 const { Text } = Typography
+const ORIGIN_PAGE = 1
 const PAGE_SIZE = 20
 
 const ACTIVE_FETCH = '1'
@@ -39,15 +40,17 @@ type SearchIndex = keyof GetAllUsersQuery
 
 const ManageUser = (): React.ReactElement => {
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(ORIGIN_PAGE)
 
   // User data
+  const [userOption, setUserOption] = useState(ACTIVE_FETCH)
+  const userOptionBoolean: boolean = userOption === DELETED_FETCH
   const [queryData, setQueryData] = useState<GetAllUsersQuery>({
     offset: currentPage,
-    limit: PAGE_SIZE
+    limit: PAGE_SIZE,
+    isDeleted: userOptionBoolean
   } as GetAllUsersQuery)
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
-  const [userOption, setUserOption] = useState(ACTIVE_FETCH)
   const [userOne, setUserOne] = useState<IUserInformation>()
 
   // Modal
@@ -63,21 +66,27 @@ const ManageUser = (): React.ReactElement => {
       (prev) =>
         ({
           ...prev,
-          offset: currentPage
+          offset: currentPage,
+          isDeleted: userOption === DELETED_FETCH
         }) as GetAllUsersQuery
     )
-  }, [currentPage])
+  }, [currentPage, userOption])
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
       refViewDetailsModal.current?.showModal()
-    } else if (selectedOpt === DECENTRALIZE_OPTION && userOption === ACTIVE_FETCH) {
+    } else if (selectedOpt === DECENTRALIZE_OPTION && userOptionBoolean === false) {
       refDecentralizeModal.current?.showModal()
-    } else if (selectedOpt === RESTORE_OPTION && userOption === DELETED_FETCH) {
+    } else if (selectedOpt === RESTORE_OPTION && userOptionBoolean === true) {
       refDeleteUserModal.current?.showModal()
     } else if (selectedOpt === DELETE_OPTION) {
       refDeleteUserModal.current?.showModal()
     }
+  }
+
+  const onChangeSelection = (value: string): void => {
+    setUserOption(value)
+    setCurrentPage(ORIGIN_PAGE)
   }
 
   const handleSearch = (
@@ -264,10 +273,6 @@ const ManageUser = (): React.ReactElement => {
       label: 'Deleted users'
     }
   ]
-
-  const onChangeSelection = (value: string): void => {
-    setUserOption(value)
-  }
 
   const handleDecentralizeRole = (): void => {}
 
