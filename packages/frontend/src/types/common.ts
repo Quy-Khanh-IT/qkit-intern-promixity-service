@@ -16,3 +16,9 @@ export const ColorConstant = {
   _GEEK_BLUE: 'geekblue',
   _VOLCANO: 'volcano'
 } as const
+
+export interface IQuotes {
+  content: string
+  owner: string
+  position: string
+}
