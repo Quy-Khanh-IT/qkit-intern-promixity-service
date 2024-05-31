@@ -11,5 +11,5 @@ export interface GetAllUsersQuery {
   firstName: string
   lastName: string
   phone: string
-  role: RoleEnum
+  role: RoleEnum[]
 }

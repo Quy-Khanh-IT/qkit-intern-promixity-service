@@ -14,12 +14,6 @@ export interface IDecentralizeRoleProps {
   children: React.ReactNode
 }
 
-export interface IDecentralizeOptions {
-  id: string
-  value: string
-  description: string
-}
-
 const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentralizeRoleProps> = (
   { title, specificInfo, handleConfirm, presentOption, selectionOptions, children },
   ref

@@ -1,12 +1,14 @@
-import { API_ENDPOINT } from '@/constants'
+import { API_ENDPOINT, ROLE_OPTIONS } from '@/constants'
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { HttpClient } from '@/models/http-client/http-client'
 import { HttpRequestParamsInterface } from '@/models/http-client/http-request-params.interface'
+import { SelectionOptions } from '@/types/common'
 import { IPaginationResponse } from '@/types/pagination'
 import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { omit } from 'lodash-es'
+import qs from 'qs'
 
 export const getMyProfile = (userId: string): Promise<IUserInformation> => {
   const params: HttpRequestParamsInterface = {
@@ -20,7 +22,7 @@ export const getMyProfile = (userId: string): Promise<IUserInformation> => {
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['UserInfo', 'UserList'],
+  tagTypes: ['UserInfo', 'UserList', 'Roles'],
   endpoints: (builder) => ({
     // /user
     getProfile: builder.query<IUserInformation, string>({
@@ -33,18 +35,41 @@ export const userApi = createApi({
 
     // /admin
     getAllUsers: builder.query<IPaginationResponse<IUserInformation>, GetAllUsersQuery>({
-      query: (params) => ({
-        url: `/admin/users`,
-        method: 'GET',
-        params
-      }),
+      query: (params) => {
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' })
+        return {
+          url: `/admin/users?${queryString}`,
+          method: 'GET'
+        }
+      },
       providesTags: ['UserList']
+    }),
+    getAllRoles: builder.query<SelectionOptions[], void>({
+      query: () => ({
+        url: `/admin/roles`,
+        method: 'GET'
+      }),
+      transformResponse: (response: string[]): SelectionOptions[] => {
+        const tempData: SelectionOptions[] = response?.map((role: string) => {
+          const matchedRole = ROLE_OPTIONS.find((roleOption) => roleOption.value === role)
+          return matchedRole || { label: role.toUpperCase(), value: role }
+        })
+        return tempData
+      },
+      providesTags: ['Roles']
     }),
     updateUserRole: builder.mutation<void, { role: string; id: string }>({
       query: (payload) => ({
         url: `/admin/users/${payload.id}/role`,
         method: 'PATCH',
         body: omit(payload, 'id')
+      }),
+      invalidatesTags: ['UserList']
+    }),
+    restoreDeletedUser: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/admin/users/${id}/restore`,
+        method: 'PATCH'
       }),
       invalidatesTags: ['UserList']
     }),
@@ -59,4 +84,11 @@ export const userApi = createApi({
   })
 })
 
-export const { useGetProfileQuery, useGetAllUsersQuery, useDeleteUserMutation, useUpdateUserRoleMutation } = userApi
+export const {
+  useGetProfileQuery,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+  useUpdateUserRoleMutation,
+  useRestoreDeletedUserMutation,
+  useGetAllRolesQuery
+} = userApi

@@ -1,14 +1,19 @@
 'use client'
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
-import RestoreModal from '@/app/components/admin/DeleteModal/DeleteModal'
+import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
-import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } from '@/services/user.service'
+import {
+  useDeleteUserMutation,
+  useGetAllRolesQuery,
+  useGetAllUsersQuery,
+  useRestoreDeletedUserMutation,
+  useUpdateUserRoleMutation
+} from '@/services/user.service'
 import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
 import { RoleEnum } from '@/types/enum'
 import { GetAllUsersQuery } from '@/types/query'
@@ -79,6 +84,8 @@ const ManageUser = (): React.ReactElement => {
   // Other
   const [deleteUserMutation] = useDeleteUserMutation()
   const [updateUserRoleMutation] = useUpdateUserRoleMutation()
+  const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
+  const { data: rolesData } = useGetAllRolesQuery()
 
   useEffect(() => {
     setQueryData(
@@ -108,6 +115,14 @@ const ManageUser = (): React.ReactElement => {
     setCurrentPage(ORIGIN_PAGE)
   }
 
+  const mapQueryData = (_queryData: GetAllUsersQuery, dataIndex: DataIndex, value: string): GetAllUsersQuery => {
+    const queryDataTemp =
+      (dataIndex as string) === 'phoneNumber'
+        ? ({ ..._queryData, phone: value } as GetAllUsersQuery)
+        : ({ ..._queryData, [dataIndex]: value } as GetAllUsersQuery)
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
     _confirm: FilterDropdownProps['confirm'],
@@ -120,7 +135,7 @@ const ManageUser = (): React.ReactElement => {
         return { ...queryTemp } as GetAllUsersQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys[0] }) as GetAllUsersQuery)
+      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys[0]))
     }
   }
 
@@ -130,6 +145,15 @@ const ManageUser = (): React.ReactElement => {
     dataIndex: DataIndex
   ): void => {
     console.log('selectedKeys', selectedKeys)
+    if (selectedKeys.length === 0) {
+      setQueryData((prev) => {
+        const queryTemp: GetAllUsersQuery = { ...prev }
+        delete queryTemp[dataIndex as SearchIndex]
+        return { ...queryTemp } as GetAllUsersQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as GetAllUsersQuery)
+    }
   }
 
   const listColumns: ColumnsType<IUserInformation> = [
@@ -307,7 +331,10 @@ const ManageUser = (): React.ReactElement => {
     refDeleteUserModal.current?.hideModal()
   }
 
-  const handleRestoreUser = (): void => {}
+  const handleRestoreUser = (): void => {
+    restoreDeletedUserMutation(selectedUser?.id ?? '')
+    refRestoreModal.current?.hideModal()
+  }
 
   const onChangePagination: PaginationProps['onChange'] = (page) => {
     setCurrentPage(page)
@@ -367,7 +394,7 @@ const ManageUser = (): React.ReactElement => {
       />
       <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
       <DecentralizeModal
-        selectionOptions={ROLE_OPTIONS}
+        selectionOptions={rolesData as SelectionOptions[]}
         presentOption={selectedUser?.role || ''}
         ref={refDecentralizeModal}
         title={'Decentralize'}
