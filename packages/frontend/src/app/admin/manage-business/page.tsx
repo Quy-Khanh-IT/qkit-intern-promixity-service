@@ -454,6 +454,7 @@ const ManageBusiness = (): React.ReactNode => {
       <ViewRowDetailsModal title='Business details' data={detailedItems} ref={refViewDetailsModal} />
       <DecentralizeModal
         selectionOptions={decentralizeOpts}
+        presentOption=''
         ref={refModerateModal}
         title={'Moderate business'}
         specificInfo={
