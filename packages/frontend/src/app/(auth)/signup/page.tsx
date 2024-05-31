@@ -233,7 +233,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                     <div className='col-12 col-md-6'>
                       <div className='form'>
                         <div className='mb-3'>
-                          <label className='form-label'>Email address</label>
+                          <label className='form-label'>
+                            Email address<strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             value={registerData.email}
@@ -249,7 +251,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                           )}
                         </div>
                         <div className='mb-3'>
-                          <label className='form-label'>Password</label>
+                          <label className='form-label'>
+                            Passwords <strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             value={registerData.password}
@@ -265,7 +269,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                           )}
                         </div>
                         <div className='mb-3'>
-                          <label className='form-label'>Re-Password</label>
+                          <label className='form-label'>
+                            Re-Passwords <strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             value={registerData.rePassword || ''}
@@ -285,7 +291,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                     <div className='col-12 col-md-6'>
                       <div className='form'>
                         <div className='mb-3'>
-                          <label className='form-label'>First name</label>
+                          <label className='form-label'>
+                            First names <strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             type='text'
@@ -301,7 +309,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                           )}
                         </div>
                         <div className='mb-3'>
-                          <label className='form-label'>Last name</label>
+                          <label className='form-label'>
+                            Last names <strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             type='text'
@@ -317,7 +327,9 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                           )}
                         </div>
                         <div className='mb-3'>
-                          <label className='form-label'>Phone Number</label>
+                          <label className='form-label'>
+                            Phone Numbers <strong className='text-danger'>*</strong>
+                          </label>
 
                           <input
                             type='text'
@@ -342,7 +354,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
                         <div className='mb-3 d-flex align-items-center justify-content-center flex-column'>
                           <label className='form-label mb-4 text-center'>
                             The confirmation code has been sent to your email. Includes 6 digits. Please enter here to
-                            confirm your account.
+                            confirm your account. s <strong className='text-danger'>*</strong>
                           </label>
 
                           <div className='mb-4'>
