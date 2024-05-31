@@ -19,7 +19,7 @@ export default function NavProcessBar(): React.ReactNode {
           <button onClick={() => navClick('cred')} className='nav-item-button'>
             <span className='nav-item-button-inner'></span>
           </button>
-          <button onClick={() => navClick('aboutus')} className='nav-item-button'>
+          <button onClick={() => navClick('about-us')} className='nav-item-button'>
             <span className='nav-item-button-inner'></span>
           </button>
           <button className='nav-item-button'>

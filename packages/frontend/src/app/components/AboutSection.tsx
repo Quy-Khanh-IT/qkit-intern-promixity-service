@@ -3,7 +3,7 @@ import { useState } from 'react'
 import './about-section.scss'
 import { Image } from 'antd'
 
-export default function AboutUsSection(): React.ReactNode {
+export default function AboutSection(): React.ReactNode {
   const [tabs, setTabs] = useState<number>(0)
 
   const handleTabs = (index: number): void => {
@@ -11,9 +11,9 @@ export default function AboutUsSection(): React.ReactNode {
   }
 
   return (
-    <div id='aboutus' className='aboutus-section-container container'>
-      <div className='aboutus-section-top'>
-        <div className='aboutus-content'>
+    <div id='about-us' className='about-us-section-container container'>
+      <div className='about-us-section-top'>
+        <div className='about-us-content'>
           <div className='sub-title'>ABOUT US</div>
           <div className='title'>
             <h1>
@@ -44,12 +44,12 @@ export default function AboutUsSection(): React.ReactNode {
                   providing an easy and meaningful connection experience, we built proximity service to help people
                   connect with each other and the world around them in a smart and convenient way.
                 </div>
-                <ul className='critia-list'>
-                  <li className='critia-item'>
+                <ul className='criteria-list'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     <div> Smart and convenient community connection.</div>
                   </li>
-                  <li className='critia-item'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     The team is passionate about technology and connection.
                   </li>
@@ -62,12 +62,12 @@ export default function AboutUsSection(): React.ReactNode {
                   experience meaningfully. We are committed to providing a reliable and easy-to-use proximity service
                   that helps people connect with each other more naturally and closely.
                 </div>
-                <ul className='critia-list'>
-                  <li className='critia-item'>
+                <ul className='criteria-list'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     <div> Provide a reliable and easy-to-use connection platform.</div>
                   </li>
-                  <li className='critia-item'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     Build a strong and meaningful community of connections.
                   </li>
@@ -80,12 +80,12 @@ export default function AboutUsSection(): React.ReactNode {
                   convenient connectivity platform. We hope to create a strong community where people can enjoy
                   memorable relationships and experiences in everyday life.
                 </div>
-                <ul className='critia-list'>
-                  <li className='critia-item'>
+                <ul className='criteria-list'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     <div>Become an indispensable part of daily life.</div>
                   </li>
-                  <li className='critia-item'>
+                  <li className='criteria-item'>
                     <i className='fa-solid fa-check'></i>
                     Build a strong community, enjoy relationships and memorable experiences.
                   </li>
@@ -95,11 +95,11 @@ export default function AboutUsSection(): React.ReactNode {
           </div>
         </div>
 
-        <div className='aboutus-thumb'>
-          <Image className='thumb-1' src='./images/earth-aboutus.svg' alt='thumb' />
+        <div className='about-us-thumb'>
+          <Image className='thumb-1' src='./images/earth-about-us.svg' alt='thumb' />
         </div>
       </div>
-      <div className='aboutus-section-bottom'>
+      <div className='about-us-section-bottom'>
         <ul className='bento-wrapper'>
           <li className='data-item primary-item'>
             <h2>300k+ Users</h2>
