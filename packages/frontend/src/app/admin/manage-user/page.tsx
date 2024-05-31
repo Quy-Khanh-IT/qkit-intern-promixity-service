@@ -15,15 +15,22 @@ import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } f
 import { Col, DescriptionsProps, Dropdown, MenuProps, PaginationProps, Row, Select, Tag, Typography } from 'antd'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useRef, useState } from 'react'
-import { ACTIVE_OPTION, DELETE_OPTION } from '../admin.constant'
 import './manage-user.scss'
-import { MANAGE_USER_FIELDS, MANAGE_USER_ROLE_PROPS } from './manage-user.const'
+import { MANAGE_USER_FIELDS } from './manage-user.const'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 
 export interface IManageUserProps {}
 
 const { Text } = Typography
 const PAGE_SIZE = 20
+
+const ACTIVE_FETCH = '1'
+const DELETED_FETCH = '2'
+
+const VIEW_DETAILS_OPTION = 1
+const DECENTRALIZE_OPTION = 2
+const RESTORE_OPTION = 2
+const DELETE_OPTION = 3
 
 // For search
 type DataIndex = keyof IUserInformation
@@ -40,7 +47,7 @@ const ManageUser = (): React.ReactElement => {
     limit: PAGE_SIZE
   } as GetAllUsersQuery)
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
-  const [userOption, setUserOption] = useState(ACTIVE_OPTION)
+  const [userOption, setUserOption] = useState(ACTIVE_FETCH)
   const [userOne, setUserOne] = useState<IUserInformation>()
 
   // Modal
@@ -62,15 +69,13 @@ const ManageUser = (): React.ReactElement => {
   }, [currentPage])
 
   const handleModal = (selectedOpt: number): void => {
-    if (selectedOpt === 1) {
+    if (selectedOpt === VIEW_DETAILS_OPTION) {
       refViewDetailsModal.current?.showModal()
-    } else if (selectedOpt === 2) {
-      if (userOption === DELETE_OPTION) {
-        refDeleteUserModal.current?.showModal()
-      } else {
-        refDecentralizeModal.current?.showModal()
-      }
-    } else if (selectedOpt === 3) {
+    } else if (selectedOpt === DECENTRALIZE_OPTION && userOption === ACTIVE_FETCH) {
+      refDecentralizeModal.current?.showModal()
+    } else if (selectedOpt === RESTORE_OPTION && userOption === DELETED_FETCH) {
+      refDeleteUserModal.current?.showModal()
+    } else if (selectedOpt === DELETE_OPTION) {
       refDeleteUserModal.current?.showModal()
     }
   }
@@ -118,7 +123,7 @@ const ManageUser = (): React.ReactElement => {
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
           },
-          ...(!(userOption === DELETE_OPTION)
+          ...(userOption === ACTIVE_FETCH
             ? [
                 {
                   key: 'Decentralize',
@@ -141,16 +146,16 @@ const ManageUser = (): React.ReactElement => {
               ]),
           {
             key: 'Delete ',
-            label: <span className={userOption === '2' ? 'error-modal-title' : ''}>Delete</span>,
+            label: <span className={userOption === DELETED_FETCH ? 'error-modal-title' : ''}>Delete</span>,
             icon: (
               <i
-                className={`fa-regular fa-trash ${userOption === '2' ? 'error-modal-title' : 'delete-icon'}`}
+                className={`fa-regular fa-trash ${userOption === DELETED_FETCH ? 'error-modal-title' : 'delete-icon'}`}
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
             onClick: (): void => {
               setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TITLE)
-              if (userOption === '2') {
+              if (userOption === DELETED_FETCH) {
                 setDeleteModalContent(MODAL_TEXT.DELETE_USER_PERMANENT)
               } else {
                 setDeleteModalContent(MODAL_TEXT.DELETE_USER_TEMPORARY)
@@ -218,11 +223,6 @@ const ManageUser = (): React.ReactElement => {
           {role.toUpperCase()}
         </Tag>
       ),
-      // onFilter: (value, record: IUserInformation): boolean => {
-      //   console.log('value', value)
-      //   // return record.role.includes((value as string).toLowerCase())
-      //   return record.role === (value as string).toLowerCase()
-      // }
       ...FilterPopupProps<IUserInformation, keyof IUserInformation>({ dataIndex: 'role', _handleFilter: handleFilter })
     }
   ]
@@ -256,11 +256,11 @@ const ManageUser = (): React.ReactElement => {
 
   const options = [
     {
-      value: '1',
+      value: ACTIVE_FETCH,
       label: 'Active users'
     },
     {
-      value: '2',
+      value: DELETED_FETCH,
       label: 'Deleted users'
     }
   ]
@@ -333,7 +333,9 @@ const ManageUser = (): React.ReactElement => {
           <>
             <span
               className={
-                userOption === '2' && deleteModalContent === MODAL_TEXT.DELETE_USER_PERMANENT ? 'error-modal-title' : ''
+                userOption === DELETED_FETCH && deleteModalContent === MODAL_TEXT.DELETE_USER_PERMANENT
+                  ? 'error-modal-title'
+                  : ''
               }
             >
               {deleteModalContent}

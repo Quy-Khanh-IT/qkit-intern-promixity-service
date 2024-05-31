@@ -23,16 +23,15 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
   const checkAll = plainOptions.length === checkedList.length
   const indeterminate = checkedList.length > 0 && checkedList.length < plainOptions.length
 
-  // const onCheckAllChange = (e: CheckboxChangeEvent, selectedKeys: (keys: React.Key[]) => void): void => {
-  //   // setCheckedList(e.target.checked ? plainOptions.map((roleGroup): string => roleGroup.value) : [])
-  //   selectedKeys(e.target.checked ? plainOptions.map((roleGroup): string => roleGroup.value) : [])
-  // }
   const onCheckAllChange = (e: CheckboxChangeEvent, setSelectedKeys: (_keys: React.Key[]) => void): void => {
-    setSelectedKeys(e.target.checked ? plainOptions.map((roleGroup): string => roleGroup.value) : [])
+    const checkedTempList = e.target.checked ? plainOptions.map((roleGroup) => roleGroup.value) : []
+    setCheckedList(checkedTempList)
+    setSelectedKeys(checkedTempList)
   }
 
-  const handleReset = (clearFilters: () => void): void => {
+  const handleReset = (clearFilters: () => void, setSelectedKeys: (_keys: React.Key[]) => void): void => {
     setCheckedList([])
+    setSelectedKeys([])
     clearFilters()
   }
 
@@ -49,13 +48,17 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
         </Checkbox>
         <CheckboxGroup
           options={plainOptions}
-          value={checkedList}
-          onChange={(list: string[]) => setSelectedKeys(list)}
+          value={selectedKeys as string[]}
+          onChange={(list: string[]) => {
+            console.log('list 1', list)
+            setCheckedList(list)
+            setSelectedKeys(list)
+          }}
           className='flex-column ps-4 gap-2'
         />
         <Space className='mt-2'>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters, setSelectedKeys)}
             size='small'
             style={{ width: 90 }}
             className='btn-negative-small'
