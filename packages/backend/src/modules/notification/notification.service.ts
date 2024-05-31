@@ -71,7 +71,6 @@ export class NotificationService {
     );
 
     if (query.isRead) {
-      console.log('query.isRead: ', query.isRead);
       matchStage['isRead'] = {
         $eq: query.isRead === 'true' ? true : false,
       };

@@ -461,7 +461,7 @@ export class BusinessService {
 
     // Check if business is already soft deleted
     if (
-      foundBusiness.deletedAt === null &&
+      foundBusiness.deleted_at === null &&
       foundBusiness.status !== BusinessStatusEnum.DELETED
     ) {
       throw new BusinessStatusException(
