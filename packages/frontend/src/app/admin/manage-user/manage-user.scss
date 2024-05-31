@@ -13,5 +13,29 @@
     tr > th:nth-last-child(2){
       min-width: 180px !important;
     }
+
+    tr > th:nth-child(1){
+      max-width: 160px;
+    }
+
+    tr > th:nth-child(2){
+      max-width: 160px;
+    }
+
+    tr > th:nth-child(3){
+      max-width: 300px;
+    }
+
+    tr > th:nth-child(4){
+      max-width: 200px;
+    }
+
+    tr > th:nth-child(5){
+      max-width: 200px;
+    }
+
+    tr > th:nth-child(6){
+      max-width: 250px;
+    }
   }
 }

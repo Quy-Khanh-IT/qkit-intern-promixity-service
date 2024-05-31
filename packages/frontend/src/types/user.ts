@@ -7,6 +7,7 @@ export interface IUserInformation {
   phoneNumber: string
   isVerified: boolean
   role: string
+  created_at: string
 }
 
 export interface RoleFiltered {

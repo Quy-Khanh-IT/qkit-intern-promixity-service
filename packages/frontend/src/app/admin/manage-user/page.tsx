@@ -2,26 +2,42 @@
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
 import { useGetAllUsersQuery } from '@/services/user.service'
 import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
 import { RoleEnum } from '@/types/enum'
 import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
+import { formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import { Col, DescriptionsProps, Dropdown, MenuProps, PaginationProps, Row, Select, Tag, Typography } from 'antd'
+import {
+  Col,
+  DatePicker,
+  DescriptionsProps,
+  Dropdown,
+  MenuProps,
+  PaginationProps,
+  Row,
+  Select,
+  Tag,
+  Typography
+} from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useRef, useState } from 'react'
-import './manage-user.scss'
+import { compareDates } from '../../../utils/helpers.util'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
-import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
+import './manage-user.scss'
 
 export interface IManageUserProps {}
 
 const { Text } = Typography
+const { RangePicker } = DatePicker
+
 const ORIGIN_PAGE = 1
 const PAGE_SIZE = 20
 
@@ -186,7 +202,7 @@ const ManageUser = (): React.ReactElement => {
       title: MANAGE_USER_FIELDS.firstName,
       dataIndex: 'firstName',
       key: 'firstName',
-      width: 120,
+      width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'firstName',
         _handleSearch: handleSearch
@@ -196,7 +212,7 @@ const ManageUser = (): React.ReactElement => {
       title: MANAGE_USER_FIELDS.lastName,
       dataIndex: 'lastName',
       key: 'lastName',
-      width: 120,
+      width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'lastName',
         _handleSearch: handleSearch
@@ -215,11 +231,24 @@ const ManageUser = (): React.ReactElement => {
       title: MANAGE_USER_FIELDS.phoneNumber,
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      width: 280,
+      width: 200,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'phoneNumber',
         _handleSearch: handleSearch
       })
+    },
+    {
+      title: MANAGE_USER_FIELDS.created_at,
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 200,
+      render: (createdDate: string): React.ReactNode => {
+        return <Text>{formatDate(createdDate)}</Text>
+      },
+      showSorterTooltip: false,
+      sorter: {
+        compare: (userA: IUserInformation, userB: IUserInformation) => compareDates(userA.created_at, userB.created_at)
+      }
     },
     {
       title: MANAGE_USER_FIELDS.role,
@@ -282,10 +311,23 @@ const ManageUser = (): React.ReactElement => {
     setCurrentPage(page)
   }
 
+  const onChangeDatePicker: RangePickerProps['onChange'] = (dates: unknown, dateStrings: [string, string]) => {
+    if (dateStrings[0] === '' || dateStrings[1] === '') {
+      setQueryData((prev) => {
+        const queryTemp: GetAllUsersQuery = { ...prev }
+        delete queryTemp.startDate
+        delete queryTemp.endDate
+        return { ...queryTemp } as GetAllUsersQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as GetAllUsersQuery)
+    }
+  }
+
   return (
     <div className='--manage-user'>
       <Row className='pb-3'>
-        <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
               onChange={onChangeSelection}
@@ -298,10 +340,14 @@ const ManageUser = (): React.ReactElement => {
           </Col>
         </Col>
 
-        <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Col span={6} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span>
             Total: <strong>{usersData?.totalRecords}</strong>
           </span>
+        </Col>
+
+        <Col span={6} className='d-flex justify-content-end'>
+          <RangePicker format={DEFAULT_DATE_FORMAT} onChange={onChangeDatePicker} />
         </Col>
       </Row>
 

@@ -64,6 +64,12 @@ body {
   }
 }
 
+.ant-picker-cell-inner{
+  min-width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+}
+
 .--loader-wrapper {
   position: fixed;
   top: 0;
