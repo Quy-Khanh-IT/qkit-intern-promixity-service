@@ -40,11 +40,11 @@ const _DeleteModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserPro
         width={'600px'}
         onCancel={handleCancelChild}
         footer={[
-          <Button className='btn-cancel' onClick={handleCancelChild} type='primary' key='cancel'>
+          <Button className='btn-cancel mt-1' onClick={handleCancelChild} type='primary' key='cancel'>
             Close
           </Button>,
           <Button
-            className='btn-primary'
+            className='btn-primary mt-1'
             onClick={handleConfirmChild}
             type='primary'
             key='ok'

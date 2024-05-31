@@ -1,42 +1,54 @@
 'use client'
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
+import RestoreModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
+import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
-import { useGetAllUsersQuery } from '@/services/user.service'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
+import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } from '@/services/user.service'
 import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
+import { RoleEnum } from '@/types/enum'
 import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
+import { formatDate } from '@/utils/helpers.util'
+import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
-  Button,
   Col,
+  DatePicker,
   DescriptionsProps,
   Dropdown,
-  Input,
-  InputRef,
   MenuProps,
   PaginationProps,
   Row,
   Select,
-  Space,
-  TableColumnType,
   Tag,
   Typography
 } from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
-import { useEffect, useRef, useState } from 'react'
-import Highlighter from 'react-highlight-words'
-import { ACTIVE_OPTION, DELETE_OPTION } from '../admin.constant'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { compareDates } from '../../../utils/helpers.util'
+import { DELETE_USER_OPTIONS, MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
-import { RoleEnum } from '@/types/enum'
 
 export interface IManageUserProps {}
 
 const { Text } = Typography
+const { RangePicker } = DatePicker
+
+const ORIGIN_PAGE = 1
 const PAGE_SIZE = 20
+
+const ACTIVE_FETCH = '1'
+const DELETED_FETCH = '2'
+
+const VIEW_DETAILS_OPTION = 1
+const DECENTRALIZE_OPTION = 2
+const RESTORE_OPTION = 2
+const DELETE_OPTION = 3
 
 // For search
 type DataIndex = keyof IUserInformation
@@ -45,50 +57,55 @@ type SearchIndex = keyof GetAllUsersQuery
 
 const ManageUser = (): React.ReactElement => {
   // Pagination
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(ORIGIN_PAGE)
 
   // User data
+  const [userOption, setUserOption] = useState(ACTIVE_FETCH)
+  const userOptionBoolean: boolean = useMemo(() => userOption === DELETED_FETCH, [userOption])
   const [queryData, setQueryData] = useState<GetAllUsersQuery>({
     offset: currentPage,
-    limit: PAGE_SIZE
+    limit: PAGE_SIZE,
+    isDeleted: userOptionBoolean
   } as GetAllUsersQuery)
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
-  const [userOption, setUserOption] = useState(ACTIVE_OPTION)
-  const [userOne, setUserOne] = useState<IUserInformation>()
+  const [selectedUser, setSelectedUser] = useState<IUserInformation>()
 
   // Modal
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refDecentralizeModal = useRef<IModalMethods | null>(null)
+  const refRestoreModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
-  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
-  const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_OPTIONS)
 
   // Other
-  const searchInput = useRef<InputRef>(null)
+  const [deleteUserMutation] = useDeleteUserMutation()
+  const [updateUserRoleMutation] = useUpdateUserRoleMutation()
 
   useEffect(() => {
     setQueryData(
       (prev) =>
         ({
           ...prev,
-          offset: currentPage
+          offset: currentPage,
+          isDeleted: userOptionBoolean
         }) as GetAllUsersQuery
     )
-  }, [currentPage])
+  }, [currentPage, userOptionBoolean])
 
   const handleModal = (selectedOpt: number): void => {
-    if (selectedOpt === 1) {
+    if (selectedOpt === VIEW_DETAILS_OPTION) {
       refViewDetailsModal.current?.showModal()
-    } else if (selectedOpt === 2) {
-      if (userOption === DELETE_OPTION) {
-        refDeleteUserModal.current?.showModal()
-      } else {
-        refDecentralizeModal.current?.showModal()
-      }
-    } else if (selectedOpt === 3) {
+    } else if (selectedOpt === DECENTRALIZE_OPTION && userOptionBoolean === false) {
+      refDecentralizeModal.current?.showModal()
+    } else if (selectedOpt === RESTORE_OPTION && userOptionBoolean === true) {
+      refRestoreModal.current?.showModal()
+    } else if (selectedOpt === DELETE_OPTION) {
       refDeleteUserModal.current?.showModal()
     }
+  }
+
+  const onChangeSelection = (value: string): void => {
+    setUserOption(value)
+    setCurrentPage(ORIGIN_PAGE)
   }
 
   const handleSearch = (
@@ -107,65 +124,13 @@ const ManageUser = (): React.ReactElement => {
     }
   }
 
-  const handleReset = (clearFilters: () => void): void => {
-    clearFilters()
+  const handleFilter = (
+    selectedKeys: string[],
+    _confirm: FilterDropdownProps['confirm'],
+    dataIndex: DataIndex
+  ): void => {
+    console.log('selectedKeys', selectedKeys)
   }
-
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<IUserInformation> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type='primary'
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-primary-small'
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-negative-small'
-          >
-            Reset
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            className='btn-cancel-small'
-            onClick={() => {
-              close()
-            }}
-          >
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#8fce00' : undefined }} />,
-    onFilter: (value, record) =>
-      record[dataIndex]
-        ?.toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()) || false,
-    onFilterDropdownOpenChange: (visible): void => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
-      }
-    }
-  })
 
   const listColumns: ColumnsType<IUserInformation> = [
     {
@@ -174,7 +139,7 @@ const ManageUser = (): React.ReactElement => {
       onCell: (user: IUserInformation): React.HTMLAttributes<HTMLElement> => {
         return {
           onClick: (): void => {
-            setUserOne(user)
+            setSelectedUser(user)
           }
         }
       },
@@ -186,7 +151,7 @@ const ManageUser = (): React.ReactElement => {
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
           },
-          ...(!(userOption === DELETE_OPTION)
+          ...(userOption === ACTIVE_FETCH
             ? [
                 {
                   key: 'Decentralize',
@@ -200,31 +165,19 @@ const ManageUser = (): React.ReactElement => {
                   key: 'Restore',
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: (): void => {
-                    setDeleteModalTitle(MODAL_TEXT.RESTORE_USER_TITLE)
-                    setDeleteModalContent(MODAL_TEXT.RESTORE_USER)
-                    handleModal(2)
-                  }
+                  onClick: (): void => handleModal(2)
                 }
               ]),
           {
             key: 'Delete ',
-            label: <span className={userOption === '2' ? 'error-modal-title' : ''}>Delete</span>,
+            label: <span className={userOptionBoolean ? 'error-modal-title' : ''}>Delete</span>,
             icon: (
               <i
-                className={`fa-regular fa-trash ${userOption === '2' ? 'error-modal-title' : 'delete-icon'}`}
+                className={`fa-regular fa-trash ${userOptionBoolean ? 'error-modal-title' : 'delete-icon'}`}
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
-            onClick: (): void => {
-              setDeleteModalTitle(MODAL_TEXT.DELETE_USER_TITLE)
-              if (userOption === '2') {
-                setDeleteModalContent(MODAL_TEXT.DELETE_USER_PERMANENT)
-              } else {
-                setDeleteModalContent(MODAL_TEXT.DELETE_USER_TEMPORARY)
-              }
-              handleModal(3)
-            }
+            onClick: (): void => handleModal(3)
           }
         ]
         return (
@@ -237,34 +190,59 @@ const ManageUser = (): React.ReactElement => {
       }
     },
     {
-      title: 'First name',
+      title: MANAGE_USER_FIELDS.firstName,
       dataIndex: 'firstName',
       key: 'firstName',
-      width: 120,
-      ...getColumnSearchProps('firstName')
+      width: 160,
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'firstName',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Last name',
+      title: MANAGE_USER_FIELDS.lastName,
       dataIndex: 'lastName',
       key: 'lastName',
-      width: 120,
-      ...getColumnSearchProps('lastName')
+      width: 160,
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'lastName',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Email',
+      title: MANAGE_USER_FIELDS.email,
       dataIndex: 'email',
       key: 'email',
-      ...getColumnSearchProps('email')
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'email',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Phone number',
+      title: MANAGE_USER_FIELDS.phoneNumber,
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      width: 280,
-      ...getColumnSearchProps('phoneNumber')
+      width: 200,
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'phoneNumber',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Role',
+      title: MANAGE_USER_FIELDS.created_at,
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 200,
+      render: (createdDate: string): React.ReactNode => {
+        return <Text>{formatDate(createdDate)}</Text>
+      },
+      showSorterTooltip: false,
+      sorter: {
+        compare: (userA: IUserInformation, userB: IUserInformation) => compareDates(userA.created_at, userB.created_at)
+      }
+    },
+    {
+      title: MANAGE_USER_FIELDS.role,
       dataIndex: 'role',
       align: 'center',
       key: 'role',
@@ -274,50 +252,32 @@ const ManageUser = (): React.ReactElement => {
           {role.toUpperCase()}
         </Tag>
       ),
-      filters: [
-        {
-          text: 'ADMIN',
-          value: 'ADMIN'
-        },
-        {
-          text: 'USER',
-          value: 'USER'
-        },
-        {
-          text: 'BUSINESS',
-          value: 'BUSINESS'
-        }
-      ],
-      filterMode: 'tree',
-      onFilter: (value, record: IUserInformation): boolean => {
-        console.log('value', value);
-        return record.role.includes(value as string)
-      }
+      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({ dataIndex: 'role', _handleFilter: handleFilter })
     }
   ]
 
   const detailedItems: DescriptionsProps['items'] = [
     {
-      label: 'First name',
+      label: MANAGE_USER_FIELDS.firstName,
       span: 2,
-      children: userOne?.firstName
+      children: selectedUser?.firstName
     },
     {
-      label: 'Last name',
+      label: MANAGE_USER_FIELDS.lastName,
       span: 2,
-      children: userOne?.lastName
+      children: selectedUser?.lastName
     },
     {
-      label: 'Phone number',
+      label: MANAGE_USER_FIELDS.phoneNumber,
       span: 4,
-      children: userOne?.phoneNumber
+      children: selectedUser?.phoneNumber
     },
     {
-      label: 'Role',
+      label: MANAGE_USER_FIELDS.role,
       span: 4,
       children: (
-        <Tag color={generateRoleColor(userOne?.role || '')} key={userOne?.role} className='me-0'>
-          {userOne?.role.toUpperCase()}
+        <Tag color={generateRoleColor(selectedUser?.role || '')} key={selectedUser?.role} className='me-0'>
+          {selectedUser?.role.toUpperCase()}
         </Tag>
       )
     }
@@ -325,31 +285,51 @@ const ManageUser = (): React.ReactElement => {
 
   const options = [
     {
-      value: '1',
+      value: ACTIVE_FETCH,
       label: 'Active users'
     },
     {
-      value: '2',
+      value: DELETED_FETCH,
       label: 'Deleted users'
     }
   ]
 
-  const onChangeSelection = (value: string): void => {
-    setUserOption(value)
+  const handleDecentralizeRole = (role: string): void => {
+    updateUserRoleMutation({ role, id: selectedUser?.id ?? '' })
+    refDecentralizeModal.current?.hideModal()
   }
 
-  const handleDecentralizeRole = (): void => {}
+  const handleDeleteUser = (): void => {
+    deleteUserMutation({
+      deleteType: userOptionBoolean ? DELETE_USER_OPTIONS.HARD : DELETE_USER_OPTIONS.SOFT,
+      id: selectedUser?.id ?? ''
+    })
+    refDeleteUserModal.current?.hideModal()
+  }
 
-  const handleDeleteUser = (): void => {}
+  const handleRestoreUser = (): void => {}
 
   const onChangePagination: PaginationProps['onChange'] = (page) => {
     setCurrentPage(page)
   }
 
+  const onChangeDatePicker: RangePickerProps['onChange'] = (_dates: unknown, dateStrings: [string, string]) => {
+    if (dateStrings[0] === '' || dateStrings[1] === '') {
+      setQueryData((prev) => {
+        const queryTemp: GetAllUsersQuery = { ...prev }
+        delete queryTemp.startDate
+        delete queryTemp.endDate
+        return { ...queryTemp } as GetAllUsersQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as GetAllUsersQuery)
+    }
+  }
+
   return (
     <div className='--manage-user'>
       <Row className='pb-3'>
-        <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
               onChange={onChangeSelection}
@@ -362,10 +342,14 @@ const ManageUser = (): React.ReactElement => {
           </Col>
         </Col>
 
-        <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Col span={6} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span>
             Total: <strong>{usersData?.totalRecords}</strong>
           </span>
+        </Col>
+
+        <Col span={6} className='d-flex justify-content-end'>
+          <RangePicker format={DEFAULT_DATE_FORMAT} onChange={onChangeDatePicker} />
         </Col>
       </Row>
 
@@ -383,12 +367,13 @@ const ManageUser = (): React.ReactElement => {
       />
       <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
       <DecentralizeModal
-        selectionOptions={decentralizeOpts}
+        selectionOptions={ROLE_OPTIONS}
+        presentOption={selectedUser?.role || ''}
         ref={refDecentralizeModal}
         title={'Decentralize'}
         specificInfo={
           <>
-            <Text>{userOne?.email}</Text>
+            <Text>{selectedUser?.email}</Text>
           </>
         }
         handleConfirm={handleDecentralizeRole}
@@ -396,19 +381,35 @@ const ManageUser = (): React.ReactElement => {
         <Text>Email:</Text>
         <Text>Role:</Text>
       </DecentralizeModal>
-      <DeleteModal
-        title={deleteModalTitle}
+
+      <RestoreModal
+        title={MODAL_TEXT.RESTORE_USER_TITLE}
         content={
           <>
-            <span
-              className={
-                userOption === '2' && deleteModalContent === MODAL_TEXT.DELETE_USER_PERMANENT ? 'error-modal-title' : ''
-              }
-            >
-              {deleteModalContent}
-            </span>
-            {'('}
-            <strong>{userOne?.email}</strong> {')'}
+            <Text className='d-inline'>{MODAL_TEXT.RESTORE_USER}</Text>
+            {' ('}
+            <Text className='d-inline' strong>
+              {selectedUser?.email}
+            </Text>{' '}
+            {')'}
+          </>
+        }
+        handleConfirm={handleRestoreUser}
+        ref={refRestoreModal}
+      />
+
+      <DeleteModal
+        title={MODAL_TEXT.DELETE_USER_TITLE}
+        content={
+          <>
+            <Text className='d-inline' strong type={userOptionBoolean ? 'danger' : undefined}>
+              {userOptionBoolean ? MODAL_TEXT.DELETE_USER_PERMANENT : MODAL_TEXT.DELETE_USER_TEMPORARY}
+            </Text>
+            {' ('}
+            <Text className='d-inline' strong>
+              {selectedUser?.email}
+            </Text>{' '}
+            {')'}
           </>
         }
         handleConfirm={handleDeleteUser}

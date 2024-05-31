@@ -64,6 +64,12 @@ body {
   }
 }
 
+.ant-picker-cell-inner{
+  min-width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+}
+
 .--loader-wrapper {
   position: fixed;
   top: 0;
@@ -106,4 +112,24 @@ body {
 
     }
   }
+}
+
+.gap-1 {
+  gap: 0.25rem; /* 4px */
+}
+
+.gap-2 {
+  gap: 0.5rem; /* 8px */
+}
+
+.gap-3 {
+  gap: 1rem; /* 16px */
+}
+
+.gap-4 {
+  gap: 1.5rem; /* 24px */
+}
+
+.gap-5 {
+  gap: 3rem; /* 48px */
 }
