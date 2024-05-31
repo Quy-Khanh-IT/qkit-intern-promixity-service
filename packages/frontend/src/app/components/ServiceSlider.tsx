@@ -1,7 +1,7 @@
 import Slider from 'react-slick'
 import ServiceSlick from './ServiceSlick'
 
-export default function ServiceSlider() {
+export default function ServiceSlider(): React.ReactNode {
   const settings = {
     pauseOnHover: true,
     infinite: true,

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
-export default function ResetPassword({ params }: { params: { code: string } }) {
+export default function ResetPassword({ params }: { params: { code: string } }): React.ReactNode {
   const router = useRouter()
   const token = params.code
   const toastService = useMemo(() => new ToastService(), [])
@@ -29,7 +29,7 @@ export default function ResetPassword({ params }: { params: { code: string } }) 
     } else if (resendTimer === 0) {
       setIsResendDisabled(false)
     }
-    return () => clearInterval(interval)
+    return (): void => clearInterval(interval)
   }, [resendTimer])
 
   const isValidEmail = (email: string | null): boolean => {
@@ -44,7 +44,7 @@ export default function ResetPassword({ params }: { params: { code: string } }) 
     }
   }, [email])
 
-  const handleResendOTP = () => {
+  const handleResendOTP = (): void => {
     if (email && !isResendDisabled) {
       forgetPassword({ email })
         .then(() => {

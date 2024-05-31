@@ -3,11 +3,11 @@ import Link from 'next/link'
 import './header.scss'
 import { useEffect, useState } from 'react'
 
-export default function Header() {
+export default function Header(): React.ReactNode {
   const [toggle, setToggle] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = (): void => {
       const navbar = document.querySelector('.navbar')
       if (navbar) {
         if (window.scrollY > 0) {
@@ -18,11 +18,9 @@ export default function Header() {
       }
     }
 
-    // Thêm sự kiện lắng nghe cuộn trang
     window.addEventListener('scroll', handleScroll)
 
-    // Xóa sự kiện khi component unmount
-    return () => {
+    return (): void => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])

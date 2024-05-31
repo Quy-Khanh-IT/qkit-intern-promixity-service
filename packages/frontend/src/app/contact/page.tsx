@@ -1,4 +1,4 @@
-export default function ContactPage() {
+export default function ContactPage(): React.ReactNode {
   return (
     <div>
       <h1>Contact Page</h1>

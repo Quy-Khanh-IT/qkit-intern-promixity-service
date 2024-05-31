@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
-export default function SignUp({ searchParams: { token } }: ISignUpProps) {
+export default function SignUp({ searchParams: { token } }: ISignUpProps): React.ReactNode {
   useEffect(() => {
     if (token) {
       setIsGetOTP(true)
@@ -64,10 +64,10 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     } else if (resendTimer === 0) {
       setIsResendDisabled(false)
     }
-    return () => clearInterval(interval)
+    return (): void => clearInterval(interval)
   }, [resendTimer])
 
-  const SignUp = async () => {
+  const SignUp = async (): Promise<void> => {
     if (registerData.password !== registerData.rePassword) {
       toast.error('Password and re-password do not match')
       setRegisterDataErrors((prevData) => ({
@@ -81,7 +81,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     await registerUser(registerData)
   }
 
-  const handleSignUp = () => {
+  const handleSignUp = (): void => {
     SignUp()
       .then(() => {})
       .catch(() => {
@@ -89,7 +89,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
       })
   }
 
-  const GetOTP = async () => {
+  const GetOTP = async (): Promise<void> => {
     if (!registerData.email) {
       toastService.error('Please input email')
       return
@@ -100,7 +100,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     })
   }
 
-  const handleGetOTP = () => {
+  const handleGetOTP = (): void => {
     if (!isResendDisabled) {
       GetOTP()
         .then(() => {
@@ -142,7 +142,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRegisterSuccess, isRegisterError])
 
-  const handleError = (error: ErrorResponse) => {
+  const handleError = (error: ErrorResponse): void => {
     if (error?.data?.errors) {
       setRegisterDataErrors((prevInputError) => {
         const newInputError: RegisterDataErrors = { ...prevInputError }
@@ -168,7 +168,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     }
   }
 
-  const onChangeRegisterData = (value: string, type: keyof IRegisterUserPayload) => {
+  const onChangeRegisterData = (value: string, type: keyof IRegisterUserPayload): void => {
     setRegisterData({
       ...registerData,
       [type]: value
@@ -184,7 +184,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     })
   }
 
-  const redirectHome = () => {
+  const redirectHome = (): void => {
     router.push('/')
   }
 
@@ -199,7 +199,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps) {
     onChange
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = (): void => {
     verifyEmail(verifyEmailData)
   }
 

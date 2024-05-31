@@ -1,6 +1,6 @@
 import './footer.scss'
 
-export default function Footer() {
+export default function Footer(): React.ReactNode {
   return (
     <footer>
       <div className='footer-container container'>

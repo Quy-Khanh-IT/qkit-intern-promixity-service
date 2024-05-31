@@ -6,10 +6,10 @@ import { Image } from 'antd'
 import StarsCanvas from './components/canvas/Star'
 import './not-found.scss'
 
-export default function NotFound() {
+export default function NotFound(): React.ReactNode {
   const router = useRouter()
 
-  const handleBackToHome = () => {
+  const handleBackToHome = (): void => {
     router.push('/')
   }
 

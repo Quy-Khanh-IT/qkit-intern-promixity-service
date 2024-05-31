@@ -1,7 +1,7 @@
 'use client'
 import './creadibility-section.scss'
 
-export default function AboutUsSection() {
+export default function AboutUsSection(): React.ReactNode {
   return (
     <div id='cred' className='cred-section-container container'>
       <div className='cred-section-header'>

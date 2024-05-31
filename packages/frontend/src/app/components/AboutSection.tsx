@@ -3,10 +3,10 @@ import { useState } from 'react'
 import './about-section.scss'
 import { Image } from 'antd'
 
-export default function AboutUsSection() {
+export default function AboutUsSection(): React.ReactNode {
   const [tabs, setTabs] = useState<number>(0)
 
-  const handleTabs = (index: number) => {
+  const handleTabs = (index: number): void => {
     setTabs(index)
   }
 

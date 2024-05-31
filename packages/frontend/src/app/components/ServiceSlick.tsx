@@ -1,6 +1,6 @@
 import './service-slick.scss'
 
-export default function ServiceSlick(service: { service: { image: string; name: string } }) {
+export default function ServiceSlick(service: { service: { image: string; name: string } }): React.ReactNode {
   return (
     <div className='service-slick'>
       <div className='slick-container'>

@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
-export default function ForgotPassword() {
+export default function ForgotPassword(): React.ReactNode {
   const [email, setEmail] = useState<string>('')
   const [emailError, setEmailError] = useState('')
   const toastService = useMemo(() => new ToastService(), [])
@@ -19,7 +19,7 @@ export default function ForgotPassword() {
     { isSuccess: isResetPasswordSuccess, isError: isResetPasswordError, error: resetPasswordError }
   ] = useForgotPasswordMutation()
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = (): void => {
     resetPassword({ email })
   }
 
@@ -36,7 +36,7 @@ export default function ForgotPassword() {
     }
   }, [isResetPasswordSuccess, isResetPasswordError])
 
-  const handleError = (error: ErrorResponse) => {
+  const handleError = (error: ErrorResponse): void => {
     if (error?.data?.errors) {
       setEmailError(error.data.errors?.email?.[0] || '')
     }

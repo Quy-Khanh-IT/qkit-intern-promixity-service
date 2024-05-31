@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 
 import { useEffect, useMemo, useState } from 'react'
 
-export default function ResetPassword() {
+export default function ResetPassword(): React.ReactNode {
   const [resetPasswordData, setResetPasswordData] = useState({
     newPassword: '',
     confirmPassword: ''
@@ -26,7 +26,7 @@ export default function ResetPassword() {
   })
 
   const toastService = useMemo(() => new ToastService(), [])
-  const onChangeInput = (value: string, type: string) => {
+  const onChangeInput = (value: string, type: string): void => {
     setResetPasswordData({
       ...resetPasswordData,
       [type]: value
@@ -42,7 +42,7 @@ export default function ResetPassword() {
     { isSuccess: isResetPassworSuccess, isError: isResetPasswordError, error: resetPasswordError }
   ] = useResetPasswordMutation()
 
-  const handleResetPassword = () => {
+  const handleResetPassword = (): void => {
     if (token) {
       resetPassword({
         requestTokenHeader: token,
@@ -64,7 +64,7 @@ export default function ResetPassword() {
     }
   }, [isResetPassworSuccess, isResetPasswordError])
 
-  const handleError = (error: ErrorResponse) => {
+  const handleError = (error: ErrorResponse): void => {
     if (error?.data?.errors) {
       console.log(error.data.errors)
       setResetPasswordInputError(error.data.errors)

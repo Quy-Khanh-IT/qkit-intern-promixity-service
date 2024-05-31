@@ -1,7 +1,7 @@
 'use client'
 import './process-bar.scss'
-export default function NavProcessBar() {
-  const navClick = (name: string) => {
+export default function NavProcessBar(): React.ReactNode {
+  const navClick = (name: string): void => {
     const element = document.getElementById(name)
 
     if (element) {
