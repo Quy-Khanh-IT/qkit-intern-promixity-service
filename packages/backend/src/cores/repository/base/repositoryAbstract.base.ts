@@ -2,8 +2,8 @@ import * as dayjs from 'dayjs';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
-import { BaseRepositoryInterface } from './repositoryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { BaseRepositoryInterface } from './repositoryInterface.base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -13,7 +13,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   }
 
   async restore(id: string): Promise<T> {
-    this.model.aggregate();
     const result = await this.model.findOneAndUpdate(
       {
         _id: transStringToObjectId(id),
@@ -74,7 +73,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
       result.id = transObjectIdToString(result._id);
     }
 
-    return result.deletedAt ? null : result;
+    return result.deleted_at ? null : result;
   }
 
   async findOneByCondition(condition = {}): Promise<T | null> {

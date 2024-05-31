@@ -23,7 +23,10 @@ export class FindAllUserQuery extends QueryFilterBase {
   @IsOptional()
   phone: string;
 
-  @ApiPropertyOptional({ enum: UserRole, example: UserRole.ADMIN })
+  @ApiPropertyOptional({
+    type: 'array',
+    example: [UserRole.ADMIN, UserRole.USER],
+  })
   @IsOptional()
-  role: UserRole;
+  role: string[];
 }

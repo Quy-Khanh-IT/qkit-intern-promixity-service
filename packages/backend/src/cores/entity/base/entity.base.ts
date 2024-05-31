@@ -11,11 +11,11 @@ export class BaseEntity {
   id?: string;
 
   @Prop({ default: null, name: 'deleted_at' })
-  deletedAt?: Date;
+  deleted_at?: Date;
 
-  createdAt?: Date;
+  created_at?: Date;
 
-  updatedAt?: Date;
+  updated_at?: Date;
 
   __v?: number;
 }

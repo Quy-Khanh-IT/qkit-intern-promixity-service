@@ -68,6 +68,13 @@ export class UserService {
     return await this.userRepository.findAll({});
   }
 
+  getAllRoles(): UserRole[] {
+    const allRoles: string[] = Object.values(UserRole).map((element) => {
+      return element.toString();
+    });
+    return allRoles as UserRole[];
+  }
+
   async updateVerifiedStatusByEmail(id: string, status: boolean) {
     return await this.userRepository.update(id, { isVerified: status });
   }
@@ -143,8 +150,8 @@ export class UserService {
         $regex: new RegExp(`${query.firstName}`, 'i'),
       };
     }
-    if (query.role) {
-      matchStage['role'] = query.role;
+    if (query.role?.length > 0) {
+      matchStage['role'] = { $in: query.role };
     }
     if (query.lastName) {
       matchStage['lastName'] = {
@@ -153,7 +160,7 @@ export class UserService {
     }
     if (query.phone) {
       matchStage['phoneNumber'] = {
-        $regex: new RegExp(`^${query.phone}`, 'i'),
+        $regex: new RegExp(`${query.phone}`),
       };
     }
 

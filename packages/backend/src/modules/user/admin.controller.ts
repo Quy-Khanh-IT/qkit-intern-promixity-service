@@ -56,6 +56,12 @@ export class AdminController {
     };
   }
 
+  @Get('roles')
+  @HttpCode(200)
+  async getAllRoles(): Promise<UserRole[]> {
+    return this.userService.getAllRoles();
+  }
+
   @Get('users')
   @HttpCode(200)
   async findAllUser(@Query() data: FindAllUserQuery) {

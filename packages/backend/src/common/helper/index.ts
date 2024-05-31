@@ -50,15 +50,11 @@ export class PaginationHelper {
       };
     }
     if (data.sortBy) {
-      sortStage = {
-        created_at: data.sortBy === 'asc' ? 1 : -1,
-      };
+      sortStage['created_at'] = data.sortBy === 'asc' ? 1 : -1;
     }
 
     if (data.isDeleted) {
-      matchStage = {
-        deleted_at: data.isDeleted === true ? { $ne: null } : null,
-      };
+      matchStage['deleted_at'] = data.isDeleted === true ? { $ne: null } : null;
     }
     return { matchStage, sortStage };
   }
