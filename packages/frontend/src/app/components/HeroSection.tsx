@@ -18,7 +18,7 @@ export default function HeroSection(): React.ReactNode {
   const router = useRouter()
 
   return (
-    <div id='hero' className='hero-wrap container d-flex align-items-center justify-content-center vh-100 pb-3'>
+    <div id='hero' className='hero-wrap container d-flex align-items-center justify-content-center  pb-3'>
       <div className='row w-100'>
         <div className='hero-content col-lg-6 d-flex flex-column align-items-center justify-content-center mb-5 mb-lg-0'>
           <div>
@@ -34,7 +34,7 @@ export default function HeroSection(): React.ReactNode {
                 JOIN NOW
               </button>
             </div>
-            <div className='text-justify' style={{ maxWidth: '700px' }}>
+            <div className='content-detail'>
               <span>
                 Welcome to <strong style={{ color: '#64ffda', fontWeight: '500' }}> Proximity Service</strong> !
                 We`&apos;re a platform dedicated to providing exceptional location-based experiences with unique

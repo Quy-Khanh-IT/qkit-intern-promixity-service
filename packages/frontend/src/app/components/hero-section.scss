@@ -1,9 +1,11 @@
+@import '@/sass/common/common.scss';
 $hidden_color: #aaa6c3;
 $hightlight_color: white;
 
 .hero-wrap {
-  @media (max-width: 767px) {
-    height: 155vh !important;
+  height: 155vh !important;
+  @include lg {
+    height: 100vh !important;
   }
   .hero-content {
     color: $hightlight_color !important;
@@ -137,4 +139,9 @@ $hightlight_color: white;
 
 .hero-content-wrapper {
   margin: 16px 0 24px 24px;
+}
+
+.content-detail {
+  max-width: 700px !important;
+  text-align: justify;
 }

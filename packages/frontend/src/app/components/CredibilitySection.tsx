@@ -11,43 +11,49 @@ export default function AboutUsSection(): React.ReactNode {
         <h1>leading organization</h1>
       </div>
 
-      <div className='list-card'>
-        <div className='ts-card'>
-          <div className='ts-card-content'>
-            <div className='ts-card-title'>OBSERVE</div>
-            <div className='ts-card-description'>
-              <div className='title'>{`> 100M`}</div>
-              <div className='subtitle'>views</div>
-            </div>
-            <div className='ts-card-detail'>
-              <div className='detail-content'>view more </div>
-              <i className='fa-solid fa-arrow-right-long'></i>
-            </div>
-          </div>
-        </div>
-        <div className='ts-card'>
-          <div className='ts-card-content'>
-            <div className='ts-card-title'>RESPONSE SPEED</div>
-            <div className='ts-card-description'>
-              <div className='title'>{`4X`}</div>
-              <div className='subtitle'>faster speed to market</div>
-            </div>
-            <div className='ts-card-detail'>
-              <div className='detail-content'>view more </div>
-              <i className='fa-solid fa-arrow-right-long'></i>
+      <div className='row list-card container d-flex justify-content-center align-items-center'>
+        <div className='col-lg-4 col-md-6 col-sm-12 card-wrapper'>
+          <div className='ts-card first-card'>
+            <div className='ts-card-content'>
+              <div className='ts-card-title'>OBSERVE</div>
+              <div className='ts-card-description'>
+                <div className='title'>{`> 100M`}</div>
+                <div className='subtitle'>views</div>
+              </div>
+              <div className='ts-card-detail'>
+                <div className='detail-content'>view more </div>
+                <i className='fa-solid fa-arrow-right-long'></i>
+              </div>
             </div>
           </div>
         </div>
-        <div className='ts-card'>
-          <div className='ts-card-content'>
-            <div className='ts-card-title'>OBSERVE</div>
-            <div className='ts-card-description'>
-              <div className='title'>{`37 %`}</div>
-              <div className='subtitle'>traffic increase one week post-launch</div>
+        <div className='col-lg-4 col-md-6 col-sm-12'>
+          <div className='ts-card'>
+            <div className='ts-card-content'>
+              <div className='ts-card-title'>RESPONSE SPEED</div>
+              <div className='ts-card-description'>
+                <div className='title'>{`4X`}</div>
+                <div className='subtitle'>faster speed to market</div>
+              </div>
+              <div className='ts-card-detail'>
+                <div className='detail-content'>view more </div>
+                <i className='fa-solid fa-arrow-right-long'></i>
+              </div>
             </div>
-            <div className='ts-card-detail'>
-              <div className='detail-content'>view more </div>
-              <i className='fa-solid fa-arrow-right-long'></i>
+          </div>
+        </div>
+        <div className='col-lg-4 col-md-6 col-sm-12'>
+          <div className='ts-card last-card'>
+            <div className='ts-card-content'>
+              <div className='ts-card-title'>OBSERVE</div>
+              <div className='ts-card-description'>
+                <div className='title'>{`37 %`}</div>
+                <div className='subtitle'>traffic increase one week post-launch</div>
+              </div>
+              <div className='ts-card-detail'>
+                <div className='detail-content'>view more </div>
+                <i className='fa-solid fa-arrow-right-long'></i>
+              </div>
             </div>
           </div>
         </div>
