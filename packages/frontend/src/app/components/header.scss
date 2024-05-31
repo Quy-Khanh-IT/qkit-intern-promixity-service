@@ -5,7 +5,7 @@ $hightlight_color: white;
   width: 100%;
   display: flex;
   background-color: transparent;
-  position: fixed;
+  position: fixed !important;
   z-index: 99;
 
   padding-top: 1.25rem;
@@ -13,9 +13,6 @@ $hightlight_color: white;
   align-items: center;
   text-decoration: none;
   .navbar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     .navbar-brand {
       .navbar-logo {
         height: 56px;

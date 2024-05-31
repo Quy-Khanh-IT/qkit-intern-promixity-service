@@ -1,13 +1,26 @@
-.aboutus-section-container {
+@import '@/sass/common/common.scss';
+.about-us-section-container {
   // border-top: #64ffda 1px solid;
-  height: 100vh;
+  height: 100% !important;
   padding-top: 112px;
   color: white;
 
-  .aboutus-section-top {
+  @include lg {
+    height: 100vh !important;
+  }
+
+  .about-us-section-top {
     display: flex;
-    .aboutus-content {
-      width: 50%;
+    flex-direction: column;
+
+    @include lg {
+      flex-direction: row;
+    }
+    .about-us-content {
+      width: 100%;
+      @include lg {
+        width: 50%;
+      }
 
       .nav-tabs {
         border: none;
@@ -46,14 +59,15 @@
 
         .content {
           font-size: 14px;
+          text-align: justify;
         }
         .tab-item {
-          .critia-list {
+          .criteria-list {
             list-style: none;
             margin-top: 8px;
             padding: 0;
 
-            .critia-item {
+            .criteria-item {
               font-size: 16px;
               color: white;
               display: flex;
@@ -91,8 +105,12 @@
         }
       }
     }
-    .aboutus-thumb {
-      width: 50%;
+    .about-us-thumb {
+      width: 100%;
+      margin-top: 12px;
+      @include lg {
+        width: 50%;
+      }
       padding: 0 80px;
       display: flex;
       justify-content: center;
@@ -104,7 +122,7 @@
     }
   }
 
-  .aboutus-section-bottom {
+  .about-us-section-bottom {
     margin-top: 130px;
     width: 100%;
     max-width: 1920px;

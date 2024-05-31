@@ -8,54 +8,39 @@ export default function ServiceSlider(): React.ReactNode {
     autoplay: true,
     cssEase: 'linear',
     autoplaySpeed: 3000,
-    speed: 10000,
-    slidesToShow: 7,
-    slidesToScroll: 7,
+    speed: 1500,
+    slidesToShow: 6,
+    slidesToScroll: 1,
     responsive: [
       {
-        breakpoint: 1600,
+        breakpoint: 1400,
         settings: {
-          slidesToShow: 6,
-          slidesToScroll: 6,
-          autoplaySpeed: 2500,
-          speed: 7000
+          slidesToShow: 5
         }
       },
       {
-        breakpoint: 1300,
+        breakpoint: 1200,
         settings: {
-          slidesToShow: 5,
-          slidesToScroll: 5,
-          autoplaySpeed: 2000,
-          speed: 6000
+          slidesToShow: 4
         }
       },
       {
-        breakpoint: 1024,
+        breakpoint: 922,
         settings: {
-          slidesToShow: 4,
-          slidesToScroll: 4,
-          autoplaySpeed: 1500,
-          speed: 5000
+          slidesToShow: 3
         }
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-          autoplaySpeed: 1000,
-          speed: 4000
+          slidesToShow: 2
         }
       },
       {
-        breakpoint: 480,
+        breakpoint: 576,
 
         settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-          autoplaySpeed: 500,
-          speed: 3000
+          slidesToShow: 1
         }
       }
     ]
@@ -101,7 +86,7 @@ export default function ServiceSlider(): React.ReactNode {
   ]
 
   return (
-    <Slider {...settings}>
+    <Slider className='mt-5' {...settings}>
       {services.map((service) => {
         return <ServiceSlick key={service.name} service={service} />
       })}
