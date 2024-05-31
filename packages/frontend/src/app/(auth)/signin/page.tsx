@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ErrorResponse } from '@/types/error'
 import { saveToLocalStorage } from '@/utils/storage.util'
 import DevQuote from '../components/DevQuote'
+import './signin.scss'
 
 export default function SignIn(): React.ReactNode {
   const [email, setEmail] = useState('')

@@ -1,0 +1,15 @@
+@import '@/sass/common/common.scss';
+.auth-container {
+  height: 190vh !important;
+
+  @include md {
+    height: 100vh !important;
+  }
+}
+
+.auth-wrapper {
+  height: 170vh !important;
+  @include md {
+    height: 88vh !important;
+  }
+}
