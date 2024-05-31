@@ -2,36 +2,23 @@
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
 import { useGetAllUsersQuery } from '@/services/user.service'
 import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
+import { RoleEnum } from '@/types/enum'
 import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import {
-  Button,
-  Col,
-  DescriptionsProps,
-  Dropdown,
-  Input,
-  InputRef,
-  MenuProps,
-  PaginationProps,
-  Row,
-  Select,
-  Space,
-  TableColumnType,
-  Tag,
-  Typography
-} from 'antd'
+import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
+import { Col, DescriptionsProps, Dropdown, MenuProps, PaginationProps, Row, Select, Tag, Typography } from 'antd'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useRef, useState } from 'react'
-import Highlighter from 'react-highlight-words'
 import { ACTIVE_OPTION, DELETE_OPTION } from '../admin.constant'
 import './manage-user.scss'
-import { RoleEnum } from '@/types/enum'
+import { MANAGE_USER_FIELDS, MANAGE_USER_ROLE_PROPS } from './manage-user.const'
+import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 
 export interface IManageUserProps {}
 
@@ -63,9 +50,6 @@ const ManageUser = (): React.ReactElement => {
   const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_USER_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_USER_TEMPORARY)
   const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>(ROLE_OPTIONS)
-
-  // Other
-  const searchInput = useRef<InputRef>(null)
 
   useEffect(() => {
     setQueryData(
@@ -107,65 +91,13 @@ const ManageUser = (): React.ReactElement => {
     }
   }
 
-  const handleReset = (clearFilters: () => void): void => {
-    clearFilters()
+  const handleFilter = (
+    selectedKeys: string[],
+    _confirm: FilterDropdownProps['confirm'],
+    dataIndex: DataIndex
+  ): void => {
+    console.log('selectedKeys', selectedKeys)
   }
-
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<IUserInformation> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type='primary'
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-primary-small'
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-negative-small'
-          >
-            Reset
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            className='btn-cancel-small'
-            onClick={() => {
-              close()
-            }}
-          >
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#8fce00' : undefined }} />,
-    onFilter: (value, record) =>
-      record[dataIndex]
-        ?.toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()) || false,
-    onFilterDropdownOpenChange: (visible): void => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
-      }
-    }
-  })
 
   const listColumns: ColumnsType<IUserInformation> = [
     {
@@ -237,34 +169,46 @@ const ManageUser = (): React.ReactElement => {
       }
     },
     {
-      title: 'First name',
+      title: MANAGE_USER_FIELDS.firstName,
       dataIndex: 'firstName',
       key: 'firstName',
       width: 120,
-      ...getColumnSearchProps('firstName')
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'firstName',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Last name',
+      title: MANAGE_USER_FIELDS.lastName,
       dataIndex: 'lastName',
       key: 'lastName',
       width: 120,
-      ...getColumnSearchProps('lastName')
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'lastName',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Email',
+      title: MANAGE_USER_FIELDS.email,
       dataIndex: 'email',
       key: 'email',
-      ...getColumnSearchProps('email')
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'email',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Phone number',
+      title: MANAGE_USER_FIELDS.phoneNumber,
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       width: 280,
-      ...getColumnSearchProps('phoneNumber')
+      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'phoneNumber',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Role',
+      title: MANAGE_USER_FIELDS.role,
       dataIndex: 'role',
       align: 'center',
       key: 'role',
@@ -274,46 +218,33 @@ const ManageUser = (): React.ReactElement => {
           {role.toUpperCase()}
         </Tag>
       ),
-      filters: [
-        {
-          text: 'ADMIN',
-          value: 'ADMIN'
-        },
-        {
-          text: 'USER',
-          value: 'USER'
-        },
-        {
-          text: 'BUSINESS',
-          value: 'BUSINESS'
-        }
-      ],
-      filterMode: 'tree',
-      onFilter: (value, record: IUserInformation): boolean => {
-        console.log('value', value);
-        return record.role.includes(value as string)
-      }
+      // onFilter: (value, record: IUserInformation): boolean => {
+      //   console.log('value', value)
+      //   // return record.role.includes((value as string).toLowerCase())
+      //   return record.role === (value as string).toLowerCase()
+      // }
+      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({ dataIndex: 'role', _handleFilter: handleFilter })
     }
   ]
 
   const detailedItems: DescriptionsProps['items'] = [
     {
-      label: 'First name',
+      label: MANAGE_USER_FIELDS.firstName,
       span: 2,
       children: userOne?.firstName
     },
     {
-      label: 'Last name',
+      label: MANAGE_USER_FIELDS.lastName,
       span: 2,
       children: userOne?.lastName
     },
     {
-      label: 'Phone number',
+      label: MANAGE_USER_FIELDS.phoneNumber,
       span: 4,
       children: userOne?.phoneNumber
     },
     {
-      label: 'Role',
+      label: MANAGE_USER_FIELDS.role,
       span: 4,
       children: (
         <Tag color={generateRoleColor(userOne?.role || '')} key={userOne?.role} className='me-0'>
