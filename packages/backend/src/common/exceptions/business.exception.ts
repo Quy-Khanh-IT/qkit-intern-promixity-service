@@ -11,6 +11,16 @@ export class BusinessNotFoundException extends BaseException {
   }
 }
 
+export class BusinessUnauthorizedException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.BUSINESS_UNAUTHORIZED;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.BUSINESS_UNAUTHORIZED];
+
+    super(errorDictionary, errorMessage, 401);
+  }
+}
+
 export class BusinessStatusException extends BaseException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION;

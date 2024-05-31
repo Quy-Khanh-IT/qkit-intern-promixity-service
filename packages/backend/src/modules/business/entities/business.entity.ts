@@ -5,8 +5,8 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { Image } from './image.entity';
-import { ServiceSchema } from './service.entity';
 import { StarSchema } from './star.entity';
+import { ServiceSchema } from './service.entity';
 
 const defaultStars: StarSchema[] = [
   {

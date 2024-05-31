@@ -10,6 +10,7 @@ import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositor
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { Business } from '../entities/business.entity';
 import { BusinessRepositoryInterface } from '../interfaces/business-repo.interface';
+import dayjs from 'dayjs';
 
 export class BusinessRepository
   extends BaseRepositoryAbstract<Business>
@@ -20,6 +21,15 @@ export class BusinessRepository
   ) {
     super(businessModel);
   }
+  async softDeleteBusiness(id: string): Promise<boolean> {
+    return !!(await this.businessModel
+      .findByIdAndUpdate<Business>(id, {
+        deleted_at: dayjs(),
+        status: BusinessStatusEnum.DELETED,
+      })
+      .exec());
+  }
+
   async updateRating(
     id: string,
     type: ReviewActionEnum,
