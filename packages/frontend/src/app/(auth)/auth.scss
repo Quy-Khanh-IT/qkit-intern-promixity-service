@@ -269,6 +269,9 @@ $header-height: 48px;
   font-size: 12px;
   margin-left: 8px;
   font-weight: 600;
+  &::first-letter {
+    text-transform: uppercase !important;
+  }
 }
 
 @keyframes fadeIn {
