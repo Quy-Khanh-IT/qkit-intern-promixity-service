@@ -3,17 +3,13 @@ $header-height: 48px;
 
 .auth-container {
   color: white;
-  height: 200vh;
+  height: 100vh;
   background-image: linear-gradient(to bottom right, #0d091a, #1c1230, #27183e, #9a0f34, #2f244e, #392959);
 
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-
-  @include md {
-    height: 100vh;
-  }
 
   .form-btn {
     width: 100%;
@@ -63,7 +59,7 @@ $header-height: 48px;
   }
 
   .auth-wrapper {
-    height: 180vh;
+    height: 98vh;
     width: 93%;
     background-color: rgba(6, 8, 23, 0.3);
     border-radius: 32px;
@@ -269,7 +265,6 @@ $header-height: 48px;
   font-size: 12px;
   margin-left: 8px;
   font-weight: 600;
-
   &::first-letter {
     text-transform: uppercase !important;
   }
