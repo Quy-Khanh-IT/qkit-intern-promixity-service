@@ -1,5 +1,5 @@
 import { Button, Col, Modal, Row, Select, Space } from 'antd'
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { SelectionOptions } from '@/types/common'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
@@ -8,7 +8,8 @@ import './decentralize-role-modal.scss'
 export interface IDecentralizeRoleProps {
   title: string
   specificInfo: React.ReactNode
-  handleConfirm: () => void
+  handleConfirm: (_role: string) => void
+  presentOption: string
   selectionOptions: SelectionOptions[]
   children: React.ReactNode
 }
@@ -20,24 +21,33 @@ export interface IDecentralizeOptions {
 }
 
 const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentralizeRoleProps> = (
-  { title, specificInfo, handleConfirm, selectionOptions, children },
+  { title, specificInfo, handleConfirm, presentOption, selectionOptions, children },
   ref
 ) => {
-  const [open, setOpen] = useState(false)
-
-  useImperativeHandle(ref, () => ({
-    showModal: (): void => setOpen(true),
-    hideModal: (): void => setOpen(false)
-  }))
-
-  const onChangeSelection = (_value: string): void => {}
+  const [open, setOpen] = useState<boolean>(false)
+  const [selectOption, setSelectOption] = useState<string>(presentOption)
+  const confirmBoolean: boolean = useMemo(() => selectOption === presentOption, [selectOption, presentOption])
 
   const handleCancelChild = (): void => {
+    setSelectOption(presentOption)
     setOpen(false)
   }
 
+  useImperativeHandle(ref, () => ({
+    showModal: (): void => setOpen(true),
+    hideModal: (): void => handleCancelChild()
+  }))
+
+  useEffect(() => {
+    setSelectOption(presentOption)
+  }, [presentOption])
+
+  const onChangeSelection = (value: string): void => {
+    setSelectOption(value)
+  }
+
   const handleConfirmChild = (): void => {
-    handleConfirm()
+    handleConfirm(selectOption)
   }
 
   return (
@@ -59,7 +69,7 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
             onClick={handleConfirmChild}
             type='primary'
             key='ok'
-            // disabled={!isConfirm}
+            disabled={confirmBoolean}
             // loading={confirmLoading}
           >
             Confirm
@@ -90,7 +100,7 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
                       .toLowerCase()
                       .localeCompare(((optionB as { label: string }).label ?? '').toLowerCase())
                   }
-                  // value={selectionOptions}
+                  value={selectOption}
                   options={selectionOptions}
                 />
               </Space>

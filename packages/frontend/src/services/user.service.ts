@@ -6,6 +6,7 @@ import { IPaginationResponse } from '@/types/pagination'
 import { GetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { createApi } from '@reduxjs/toolkit/query/react'
+import { omit } from 'lodash-es'
 
 export const getMyProfile = (userId: string): Promise<IUserInformation> => {
   const params: HttpRequestParamsInterface = {
@@ -38,8 +39,24 @@ export const userApi = createApi({
         params
       }),
       providesTags: ['UserList']
+    }),
+    updateUserRole: builder.mutation<void, { role: string; id: string }>({
+      query: (payload) => ({
+        url: `/admin/users/${payload.id}/role`,
+        method: 'PATCH',
+        body: omit(payload, 'id')
+      }),
+      invalidatesTags: ['UserList']
+    }),
+    deleteUser: builder.mutation<void, { deleteType: string; id: string }>({
+      query: (payload) => ({
+        url: `/admin/users/${payload.id}`,
+        method: 'DELETE',
+        params: { deleteType: payload.deleteType }
+      }),
+      invalidatesTags: ['UserList']
     })
   })
 })
 
-export const { useGetProfileQuery, useGetAllUsersQuery } = userApi
+export const { useGetProfileQuery, useGetAllUsersQuery, useDeleteUserMutation, useUpdateUserRoleMutation } = userApi

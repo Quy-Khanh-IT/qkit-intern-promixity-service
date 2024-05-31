@@ -15,7 +15,6 @@ interface IChangePassword {
 const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChangePassword> = ({ id: _id }, ref) => {
   const [open, setOpen] = useState(false)
 
-  // Expose methods via ref
   useImperativeHandle(ref, () => ({
     showModal: (): void => setOpen(true),
     hideModal: (): void => setOpen(false)
@@ -23,7 +22,6 @@ const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChang
 
   const handleCancel = (): void => {
     setOpen(false)
-    console.log('close modal')
   }
 
   return (

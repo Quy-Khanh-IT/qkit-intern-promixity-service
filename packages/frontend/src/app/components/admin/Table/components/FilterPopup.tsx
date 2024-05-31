@@ -50,7 +50,6 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
           options={plainOptions}
           value={selectedKeys as string[]}
           onChange={(list: string[]) => {
-            console.log('list 1', list)
             setCheckedList(list)
             setSelectedKeys(list)
           }}
@@ -78,7 +77,6 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
       </div>
     ),
     onFilter: (value, record: T): boolean => {
-      console.log('value', value)
       return record[dataIndex] === (value as string).toLowerCase()
     },
     onFilterDropdownOpenChange: (visible): void => {

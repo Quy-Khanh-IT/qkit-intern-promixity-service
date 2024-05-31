@@ -21,3 +21,8 @@ export const MANAGE_USER_ROLE_PROPS = [
     value: 'business'
   }
 ]
+
+export const DELETE_USER_OPTIONS = {
+  SOFT: 'soft',
+  HARD: 'hard'
+}
