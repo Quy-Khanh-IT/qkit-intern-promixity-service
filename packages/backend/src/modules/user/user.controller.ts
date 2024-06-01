@@ -22,6 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -67,7 +68,8 @@ export class UserController {
       data.userStatus,
       req.user,
     );
-    return result;
+
+    return plainToClass(User, result);
   }
 
   @Get(':userId/profile')
