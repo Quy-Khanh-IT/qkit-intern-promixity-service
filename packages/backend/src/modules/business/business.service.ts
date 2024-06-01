@@ -39,8 +39,8 @@ import { BusinessRepository } from './repository/business.repository';
 import { ServiceService } from '../service/service.service';
 import { Service } from '../service/entities/service.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventConstant } from 'src/common/constants/event.constant';
-import { RegisterBusinessEvent } from './events/register-business.event';
+import { EventDispatcherEnum } from 'src/common/constants/event.constant';
+import { CreateBusinessEvent } from './events/create-business.event';
 import {
   NotificationTypeEnum,
   ResourceEnum,
@@ -175,9 +175,13 @@ export class BusinessService {
     return business;
   }
 
+  getStatus(): BusinessStatusEnum[] {
+    return Object.values(BusinessStatusEnum);
+  }
+
   async getAllByUser(userId: string): Promise<FindAllResponse<Business>> {
     const businesses = await this.businessRepository.findAll({
-      userId,
+      userId: transStringToObjectId(userId),
     });
 
     return businesses;
@@ -292,11 +296,8 @@ export class BusinessService {
 
     if (business) {
       this.eventEmitter.emit(
-        EventConstant.REGISTER_BUSINESS,
-        new RegisterBusinessEvent({
-          title: 'Business registration',
-          content: 'Business registration is pending approval',
-          type: NotificationTypeEnum.CREATE_BUSINESS,
+        EventDispatcherEnum.CREATE_BUSINESS,
+        new CreateBusinessEvent({
           senderId: user.id,
           receiverId: null, // "null" to send to admin
         }),
@@ -426,10 +427,8 @@ export class BusinessService {
   // case 2:
   // when business is approved, user can't delete, only admin can delete (user can send a request to admin to delete)
   async softDelete(businessId: string, user: User): Promise<boolean> {
-    console.log('businessId: ', businessId);
+    console.log('softDelete businessId: ', businessId);
     const foundBusiness = await this.businessRepository.findOneById(businessId);
-
-    console.log('foundBusiness', foundBusiness);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
@@ -438,7 +437,7 @@ export class BusinessService {
     // Check business status
     // case 1: If user is "ADMIN": can force delete any business
     if (user.role === UserRole.ADMIN) {
-      return await this.businessRepository.softDelete(businessId);
+      return await this.businessRepository.softDeleteBusiness(businessId);
     }
 
     // case 2: If user is "BUSINESS": request to delete business
@@ -447,13 +446,15 @@ export class BusinessService {
       throw new BusinessNotBelongException();
     }
 
-    if (foundBusiness.status !== BusinessStatusEnum.PENDING) {
-      throw new BusinessStatusException(
-        "Can't delete business, please send a request to admin to delete",
-      );
+    if (foundBusiness.status === BusinessStatusEnum.PENDING) {
+      return await this.businessRepository.softDeleteBusiness(businessId);
     }
 
-    return await this.businessRepository.softDeleteBusiness(businessId);
+    if (foundBusiness.status === BusinessStatusEnum.APPROVED) {
+      throw new BusinessStatusException(
+        'Can not delete business. Please contact admin to close business',
+      );
+    }
   }
 
   // Only admin can hard delete
@@ -464,17 +465,17 @@ export class BusinessService {
       throw new BusinessUnauthorizedException();
     }
 
-    const foundBusiness = await this.businessRepository.findOneById(businessId);
+    const foundBusiness =
+      await this.businessRepository.findOneByConditionWithDeleted({
+        _id: transStringToObjectId(businessId),
+      });
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
     // Check if business is already soft deleted
-    if (
-      foundBusiness.deleted_at === null &&
-      foundBusiness.status !== BusinessStatusEnum.DELETED
-    ) {
+    if (foundBusiness.status !== BusinessStatusEnum.CLOSED) {
       throw new BusinessStatusException(
         "Can't hard delete business. Must be soft deleted first.",
       );
@@ -483,18 +484,32 @@ export class BusinessService {
     return await this.businessRepository.hardDelete(businessId);
   }
 
-  async restore(businessId: string): Promise<boolean> {
-    const business = await this.businessRepository.findOneById(businessId);
+  async restore(businessId: string, user: User): Promise<boolean> {
+    const business =
+      await this.businessRepository.findOneByConditionWithDeleted({
+        _id: transStringToObjectId(businessId),
+      });
 
-    if (business.status !== BusinessStatusEnum.DELETED) {
-      throw new BusinessStatusException();
+    if (business.status !== BusinessStatusEnum.CLOSED) {
+      throw new BusinessStatusException('Business must be closed first.');
+    }
+
+    if (user.role === UserRole.ADMIN) {
+      return !!(await this.businessRepository.restoreBusiness(businessId));
+    }
+
+    if (business.userId.toString() !== user.id) {
+      throw new BusinessNotBelongException();
     }
 
     return !!(await this.businessRepository.restoreBusiness(businessId));
   }
 
+  async restoreRequest(businessId: string): Promise<boolean> {
+    return true;
+  }
+
   async handleStatus(id: string, type: StatusActionsEnum): Promise<boolean> {
-    // Check exist business
     const business = await this.businessRepository.findOneById(id);
 
     if (!business) {
@@ -504,7 +519,9 @@ export class BusinessService {
     // handle APPROVE
     if (type === StatusActionsEnum.APPROVED) {
       if (business.status !== BusinessStatusEnum.PENDING) {
-        throw new BusinessStatusException();
+        throw new BusinessStatusException(
+          "Can't approve business. Must be pending first.",
+        );
       }
 
       return !!(await this.businessRepository.update(id, {
@@ -524,11 +541,8 @@ export class BusinessService {
     }
 
     // handle BANNED
+    // BANNED business with any business status
     if (type === StatusActionsEnum.BANNED) {
-      if (business.status !== BusinessStatusEnum.APPROVED) {
-        throw new BusinessStatusException();
-      }
-
       return !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.BANNED,
       }));
@@ -537,7 +551,9 @@ export class BusinessService {
     // handle PENDING
     if (type === StatusActionsEnum.PENDING) {
       if (business.status !== BusinessStatusEnum.REJECTED) {
-        throw new BusinessStatusException();
+        throw new BusinessStatusException(
+          'This action is only for rejected business, user has already updated and want to register again.',
+        );
       }
 
       return !!(await this.businessRepository.update(id, {

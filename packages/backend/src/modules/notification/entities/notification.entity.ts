@@ -12,6 +12,7 @@ import { ReceiverSchema } from './receiver.entity';
 @Schema({
   timestamps: {
     createdAt: 'created_at',
+    updatedAt: 'updated_at',
   },
 })
 export class Notification extends BaseEntity {
