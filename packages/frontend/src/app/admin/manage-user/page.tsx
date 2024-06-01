@@ -146,7 +146,6 @@ const ManageUser = (): React.ReactNode => {
     _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
-    console.log('selectedKeys', selectedKeys)
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
         const queryTemp: GetAllUsersQuery = { ...prev }

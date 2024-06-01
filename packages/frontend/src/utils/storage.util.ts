@@ -1,7 +1,6 @@
 export const saveToLocalStorage = (key: string, data: unknown): void => {
   if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
     try {
-      // console.log('Saving to local storage:', key, data)
       localStorage.setItem(key, JSON.stringify(data))
     } catch (error) {
       console.error('Error saving to local storage:', error)

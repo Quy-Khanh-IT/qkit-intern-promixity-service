@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
 
   const fetchUserInformation = useCallback(async (accessToken: string, userId: string): Promise<void> => {
     try {
-      console.log('userID', userId)
       const res: IUserInformation = await getMyProfile(userId)
       if (res) {
         setUserInformation(res)

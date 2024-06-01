@@ -47,19 +47,12 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
         ]}
       >
         <div className='content-box d-flex flex-column gap-3'>
-          {/* {typeof imageData === 'string' ? (
-            
-          ) : (
-            <></>
-          )} */}
           <Image
             width={200}
             height={200}
             src={src}
             alt={PLACEHOLDER.ALT_IMAGE}
             className='--avatar-details align-self-center'
-            // onLoadedData={() => setSrc(imageData)}
-            // onError={() => setSrc(PLACEHOLDER.ERROR_IMAGE)}
             placeholder={
               <Image preview={false} src={PLACEHOLDER.LOADING_IMAGE} width={200} alt={PLACEHOLDER.ALT_IMAGE} />
             }
