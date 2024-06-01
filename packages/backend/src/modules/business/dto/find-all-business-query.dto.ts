@@ -11,12 +11,12 @@ export class FindAllBusinessQuery extends QueryFilterBase {
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: '0816429***' })
+  @ApiPropertyOptional({ example: '0453 502 258' })
   phoneNumber: string;
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: '66446d345c9bc4899106d4a6' })
+  @ApiPropertyOptional({ example: '6654531573a483ab7bf58949' })
   categoryId: string;
 
   @IsOptional()
@@ -30,7 +30,7 @@ export class FindAllBusinessQuery extends QueryFilterBase {
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: 'TP Hồ Chí Minh' })
+  @ApiPropertyOptional({ example: 'Thành phố Hồ Chí Minh' })
   province: string;
 
   @ApiPropertyOptional({
@@ -41,8 +41,10 @@ export class FindAllBusinessQuery extends QueryFilterBase {
 
   @IsOptional()
   @ApiPropertyOptional({
-    example:
-      "[{'day':'monday','openTime':'08:00','closeTime':'12:00'}, {'day':'tuesday','openTime':'10:00','closeTime':'12:00'}]",
+    example: JSON.stringify([
+      { day: 'monday', openTime: '06:00', closeTime: '23:00' },
+      { day: 'tuesday', openTime: '06:00', closeTime: '23:00' },
+    ]),
   })
   dayOfWeek: string;
 }
