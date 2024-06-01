@@ -22,7 +22,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -52,6 +51,23 @@ export class UserController {
     @Param('userId') userId: string,
   ): Promise<GetPublicProfileResponeDto> {
     return await this.userService.getPublicProfile(userId);
+  }
+
+  @Get(':userId/profile')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  async getProfileUser(
+    @Param('userId') id: string,
+    @Req() req: Request,
+    @Query() data: GetUserProfileForAdminDto,
+  ): Promise<User> {
+    const result = await this.userService.getDetailProfile(
+      id,
+      data.userStatus,
+      req.user,
+    );
+    return result;
   }
 
   @Get(':userId/profile')
