@@ -15,14 +15,14 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
   { title, data, imageData },
   ref
 ) => {
-  const [open, setOpen] = useState(false)
-  const [src, setSrc] = useState(imageData)
+  const [open, setOpen] = useState<boolean>(false)
+  const [src, setSrc] = useState<string | undefined>(imageData)
 
   useEffect(() => {
     setSrc(imageData)
   }, [imageData])
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle<IModalMethods, IModalMethods>(ref, () => ({
     showModal: (): void => setOpen(true),
     hideModal: (): void => setOpen(false)
   }))

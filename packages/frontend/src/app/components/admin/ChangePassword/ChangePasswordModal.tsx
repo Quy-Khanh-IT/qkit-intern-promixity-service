@@ -13,9 +13,9 @@ interface IChangePassword {
 }
 
 const _ChangePasswordModal: React.ForwardRefRenderFunction<IModalMethods, IChangePassword> = ({ id: _id }, ref) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle<IModalMethods, IModalMethods>(ref, () => ({
     showModal: (): void => setOpen(true),
     hideModal: (): void => setOpen(false)
   }))

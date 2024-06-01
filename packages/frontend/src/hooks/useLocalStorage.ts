@@ -6,7 +6,7 @@ export const useLocalStorage = (
   key: string,
   initialValue: string | IUserInformation | boolean
 ): [unknown, (_value: string | boolean | IUserInformation | number) => void, () => void] => {
-  const [storedValue, setStoredValue] = useState(() => {
+  const [storedValue, setStoredValue] = useState<unknown>(() => {
     try {
       return getFromLocalStorage(key)
     } catch (error) {

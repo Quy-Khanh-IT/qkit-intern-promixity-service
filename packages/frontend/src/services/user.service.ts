@@ -13,7 +13,7 @@ import qs from 'qs'
 export const getMyProfile = (userId: string): Promise<IUserInformation> => {
   const params: HttpRequestParamsInterface = {
     requiresToken: true,
-    url: `${API_ENDPOINT}/users/${userId}`
+    url: `${API_ENDPOINT}/users/${userId}/profile`
   }
 
   return HttpClient.get(params)
@@ -25,9 +25,9 @@ export const userApi = createApi({
   tagTypes: ['UserInfo', 'UserList', 'Roles'],
   endpoints: (builder) => ({
     // /user
-    getProfile: builder.query<IUserInformation, string>({
-      query: (userId) => ({
-        url: `/users/${userId}`,
+    getPrivateProfile: builder.query<IUserInformation, { userId: string; userStatus: string }>({
+      query: (payload) => ({
+        url: `/users/${payload.userId}/profile?userStatus=${payload.userStatus}`,
         method: 'GET'
       }),
       providesTags: ['UserInfo']
@@ -85,7 +85,7 @@ export const userApi = createApi({
 })
 
 export const {
-  useGetProfileQuery,
+  useGetPrivateProfileQuery,
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useUpdateUserRoleMutation,

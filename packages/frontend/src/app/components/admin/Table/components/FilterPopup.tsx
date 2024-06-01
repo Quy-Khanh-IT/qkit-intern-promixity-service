@@ -1,63 +1,89 @@
 import { MANAGE_USER_ROLE_PROPS } from '@/app/admin/manage-user/manage-user.const'
-import { ROLE_OPTIONS } from '@/constants'
-import { Button, Checkbox, InputRef, Space } from 'antd'
+import { SelectionOptions } from '@/types/common'
+import { Button, Checkbox, Space } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import type { ColumnType } from 'antd/es/table'
 import { FilterDropdownProps } from 'antd/es/table/interface'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface IFilterPopupProps<K> {
   dataIndex: K
+  optionsData: SelectionOptions[]
   _handleFilter: (_selectedKeys: string[], _confirm: FilterDropdownProps['confirm'], _dataIndex: K) => void
 }
 
 const CheckboxGroup = Checkbox.Group
 
-const plainOptions = ROLE_OPTIONS
+const FilterPopupProps = <T, K extends keyof T>({
+  dataIndex,
+  optionsData,
+  _handleFilter
+}: IFilterPopupProps<K>): ColumnType<T> => {
+  const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
+  const checkedList = useRef<string[]>([])
 
-const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IFilterPopupProps<K>): ColumnType<T> => {
-  const searchInput = useRef<InputRef>(null)
+  const checkAll = useRef<boolean>(optionsData?.length === checkedList.current.length)
+  const indeterminate = useRef<boolean>(
+    checkedList.current.length > 0 && checkedList.current.length < optionsData.length
+  )
 
-  const [checkedList, setCheckedList] = useState<string[]>([])
-
-  const checkAll = plainOptions.length === checkedList.length
-  const indeterminate = checkedList.length > 0 && checkedList.length < plainOptions.length
+  useEffect(() => {
+    if (optionsData) {
+      setOptionsDataValue(optionsData.map((option) => option.value))
+    }
+  }, [optionsData])
 
   const onCheckAllChange = (e: CheckboxChangeEvent, setSelectedKeys: (_keys: React.Key[]) => void): void => {
-    const checkedTempList = e.target.checked ? plainOptions.map((roleGroup) => roleGroup.value) : []
-    setCheckedList(checkedTempList)
+    const checkedTempList = e.target.checked ? optionsDataValue : []
     setSelectedKeys(checkedTempList)
+    if (e.target.checked) {
+      checkAll.current = true
+      checkedList.current = checkedTempList
+    } else {
+      checkAll.current = false
+      checkedList.current = []
+    }
+    indeterminate.current = false
   }
 
-  const handleReset = (clearFilters: () => void, setSelectedKeys: (_keys: React.Key[]) => void): void => {
-    setCheckedList([])
-    setSelectedKeys([])
+  const handleReset = (clearFilters: () => void): void => {
+    checkAll.current = false
+    indeterminate.current = false
+    checkedList.current = []
     clearFilters()
   }
 
   return {
     filters: MANAGE_USER_ROLE_PROPS,
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close: _close }): React.ReactNode => (
+    filterDropdown: ({ setSelectedKeys, confirm, clearFilters }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()} className='d-flex flex-column gap-2'>
         <Checkbox
-          indeterminate={indeterminate}
+          indeterminate={indeterminate.current}
           onChange={(e) => onCheckAllChange(e, setSelectedKeys)}
-          checked={checkAll}
+          checked={checkAll.current}
         >
           Check all
         </Checkbox>
         <CheckboxGroup
-          options={plainOptions}
-          value={selectedKeys as string[]}
+          options={optionsData}
+          value={checkedList.current}
           onChange={(list: string[]) => {
-            setCheckedList(list)
+            checkedList.current = list
             setSelectedKeys(list)
+            if (list.length === 0) {
+              checkAll.current = false
+              indeterminate.current = false
+            } else {
+              const checkSelectedBoolean: boolean = list.length === optionsDataValue.length
+              checkAll.current = checkSelectedBoolean
+              indeterminate.current = !checkSelectedBoolean
+            }
           }}
           className='flex-column ps-4 gap-2'
         />
         <Space className='mt-2'>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters, setSelectedKeys)}
+            onClick={() => clearFilters && handleReset(clearFilters)}
             size='small'
             style={{ width: 90 }}
             className='btn-negative-small'
@@ -66,7 +92,7 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
           </Button>
           <Button
             type='primary'
-            onClick={() => _handleFilter(selectedKeys as string[], confirm, dataIndex)}
+            onClick={() => _handleFilter(checkedList.current, confirm, dataIndex)}
             size='small'
             style={{ width: 90 }}
             className='btn-primary-small'
@@ -78,11 +104,6 @@ const FilterPopupProps = <T, K extends keyof T>({ dataIndex, _handleFilter }: IF
     ),
     onFilter: (value, record: T): boolean => {
       return record[dataIndex] === (value as string).toLowerCase()
-    },
-    onFilterDropdownOpenChange: (visible): void => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
-      }
     }
   }
 }

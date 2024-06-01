@@ -3,7 +3,7 @@ import { ROUTE, StorageKey, TOAST_MSG } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useLoginUserMutation } from '@/services/auth.service'
 import { getMyProfile } from '@/services/user.service'
-import { ILoginPayload } from '@/types/auth'
+import { ILoginPayload, ILoginResponse } from '@/types/auth'
 import { ChildProps, UserContextType } from '@/types/context'
 import { RoleEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
@@ -26,34 +26,37 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const userId = useRef<string>('')
   const [login] = useLoginUserMutation()
 
-  const fetchUserInformation = useCallback(async (accessToken: string, userId: string): Promise<void> => {
-    try {
-      const res: IUserInformation = await getMyProfile(userId)
-      if (res) {
-        setUserInformation(res)
-        setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken)
-        setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
-        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
+  const fetchUserInformation = useCallback<(_: Omit<ILoginResponse, 'refreshToken'>) => Promise<void>>(
+    async (response: Omit<ILoginResponse, 'refreshToken'>): Promise<void> => {
+      try {
+        const res: IUserInformation = await getMyProfile(response.userId)
+        if (res) {
+          setUserInformation(res)
+          setCookieFromClient(StorageKey._ACCESS_TOKEN, response.accessToken)
+          setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
+          saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
 
-        if (res.role === (RoleEnum._ADMIN as string)) {
-          router.push(ROUTE.MANAGE_USER)
-        } else if (res.role === (RoleEnum._USER as string)) {
-          router.push(ROUTE.ABOUT)
+          if (res.role === (RoleEnum._ADMIN as string)) {
+            router.push(ROUTE.DASHBOARD)
+          } else {
+            router.push(ROUTE.ABOUT)
+          }
+          setTimeout(() => {
+            toast.success(TOAST_MSG.LOGIN_SUCCESS)
+          }, 1000)
         }
-        setTimeout(() => {
-          toast.success(TOAST_MSG.LOGIN_SUCCESS)
-        }, 1000)
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          const customError = err as ErrorResponse
+          const errorMessage = customError.data?.message
+          toast.error(errorMessage)
+        } else {
+          toast.error('An unknown error occurred')
+        }
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        const customError = err as ErrorResponse
-        const errorMessage = customError.data?.message
-        toast.error(errorMessage)
-      } else {
-        toast.error('An unknown error occurred')
-      }
-    }
-  }, [])
+    },
+    []
+  )
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
     await login(loginPayload)
@@ -64,7 +67,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setAuthSession(true)
         userId.current = res.userId
 
-        fetchUserInformation(res.accessToken, res.userId)
+        fetchUserInformation(res)
       })
   }
 
@@ -79,4 +82,4 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   )
 }
 
-export const useAuth = (): UserContextType => React.useContext(AuthContext)
+export const useAuth = (): UserContextType => React.useContext<UserContextType>(AuthContext)

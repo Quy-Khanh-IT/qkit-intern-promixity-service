@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>): React.ReactNode {
   const router = useRouter()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState<boolean>(false)
   const containerControls = useAnimationControls()
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()

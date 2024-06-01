@@ -24,7 +24,8 @@
   // all plugins (eslint-plugin-xxx) go here:
   "plugins": [
     "@typescript-eslint",
-    "prettier"
+    "prettier",
+    "require-explicit-generics"
     // "@next/eslint-plugin-next" // https://github.com/vercel/next.js/blob/canary/packages/eslint-plugin-next/lib/index.js
   ],
 
@@ -58,6 +59,19 @@
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/rules-of-hooks": "warn",
     "@typescript-eslint/explicit-function-return-type": "error",
+    "require-explicit-generics/require-explicit-generics": [
+      "error",
+      [
+        "useState",
+        "useReducer",
+        "useContext",
+        "useRef",
+        "useMemo",
+        "useCallback",
+        "useImperativeHandle"
+        // useEffect and useLayoutEffect do not take generics, so they are not included
+      ]
+    ],
 
     // "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
     "prettier/prettier": [
