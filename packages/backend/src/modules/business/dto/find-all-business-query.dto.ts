@@ -17,15 +17,11 @@ export class FindAllBusinessQuery extends QueryFilterBase {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({ example: '66446d345c9bc4899106d4a6' })
-  category: string;
+  categoryId: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ required: false, example: 3 })
-  startRating: string;
-
-  @IsOptional()
-  @ApiPropertyOptional({ required: false, example: 5 })
-  endRating: string;
+  @ApiPropertyOptional({ required: false, example: ['3', '5'] })
+  starsRating: string[];
 
   @IsString()
   @IsOptional()

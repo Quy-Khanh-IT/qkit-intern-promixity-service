@@ -26,11 +26,13 @@ export class CreateBusinessDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
+  @ApiProperty({ example: '6654531573a483ab7bf58949' })
   categoryId: string;
 
   @IsArray()
-  @ApiPropertyOptional({ example: ['66446c971b53183d5e868de4'] })
+  @ApiPropertyOptional({
+    example: ['665459a2a6b9b5c51c63efa9', '665459e2a6b9b5c51c63efab'],
+  })
   serviceIds: string[];
 
   @IsPhoneNumber('VN')

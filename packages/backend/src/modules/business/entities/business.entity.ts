@@ -75,13 +75,13 @@ export class Business extends BaseEntity {
   @Prop({ trim: true })
   fullAddress: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   province: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   district: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   country: string;
 
   @Prop([DayOpenCloseTimeSchema])
@@ -116,5 +116,6 @@ export const BusinessSchema = SchemaFactory.createForClass(Business);
 
 BusinessSchema.index({ location: '2dsphere' });
 BusinessSchema.index({ name: 'text', description: 'text' });
+BusinessSchema.index({ userId: 1 });
 
 export type BusinessDocument = HydratedDocument<Business>;
