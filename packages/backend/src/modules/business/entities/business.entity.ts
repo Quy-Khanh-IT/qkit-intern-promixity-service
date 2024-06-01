@@ -7,6 +7,7 @@ import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { Image } from './image.entity';
 import { StarSchema } from './star.entity';
 import { ServiceSchema } from './service.entity';
+import { CategorySchema } from './category.entity';
 
 const defaultStars: StarSchema[] = [
   {
@@ -53,8 +54,8 @@ export class Business extends BaseEntity {
   @Prop({ type: [Image], default: [] })
   images: Image[];
 
-  @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
-  categoryId: Types.ObjectId;
+  @Prop({ type: CategorySchema, required: true })
+  category: CategorySchema;
 
   @Prop({ type: [ServiceSchema] })
   services: ServiceSchema[];

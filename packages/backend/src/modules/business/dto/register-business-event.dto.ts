@@ -9,13 +9,7 @@ export class RegisterBusinessEventDto {
     public title: string,
     public content: string,
     public type: NotificationTypeEnum.CREATE_BUSINESS,
-    public sendBy: {
-      id: string;
-      name: string;
-    },
-    public receiveBy: {
-      id: string;
-      name: string;
-    },
+    public senderId: string,
+    public receiverId: string,
   ) {}
 }

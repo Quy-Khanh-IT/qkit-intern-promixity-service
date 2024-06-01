@@ -26,17 +26,11 @@ export class Notification extends BaseEntity {
   })
   type: NotificationTypeEnum;
 
-  @Prop({ type: Object })
-  sendBy: {
-    id: string;
-    name: string;
-  };
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  senderId: Types.ObjectId;
 
-  @Prop({ type: Object })
-  receiveBy: {
-    id: string;
-    name: string;
-  };
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  receiverId: Types.ObjectId;
 
   @Prop({ default: false })
   isRead: boolean;

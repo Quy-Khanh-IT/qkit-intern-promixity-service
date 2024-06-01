@@ -37,9 +37,7 @@ export class FindAllBusinessQuery extends QueryFilterBase {
   @ApiPropertyOptional({ example: 'TP Hồ Chí Minh' })
   province: string;
 
-  @IsString()
   @ApiPropertyOptional({
-    required: false,
     example: 'approved',
     enum: BusinessStatusEnum,
   })

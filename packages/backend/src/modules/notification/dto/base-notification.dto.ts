@@ -14,13 +14,7 @@ export class BaseNotificationDto {
   @IsEnum({ enum: NotificationTypeEnum })
   type: NotificationTypeEnum;
 
-  sendBy: {
-    id: string;
-    name: string;
-  };
+  senderId: string;
 
-  receiveBy: {
-    id: string;
-    name: string;
-  };
+  receiverId: string;
 }

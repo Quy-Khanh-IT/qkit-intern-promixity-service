@@ -16,6 +16,10 @@ export class CategoryService {
     return await this.categoryRepository.findAll({});
   }
 
+  async findOneById(id: string) {
+    return await this.categoryRepository.findOneById(id);
+  }
+
   // findOne(id: number) {
   //   return `This action returns a #${id} category`;
   // }

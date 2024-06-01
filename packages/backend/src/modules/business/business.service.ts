@@ -46,12 +46,14 @@ import {
   ResourceEnum,
 } from 'src/common/enums/notification.enum';
 import { transObjectIdToString } from 'src/common/utils';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly userService: UserService,
     private readonly ServiceService: ServiceService,
+    private readonly categoryService: CategoryService,
     private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
@@ -265,9 +267,14 @@ export class BusinessService {
       createBusinessDto.serviceIds,
     );
 
+    let category = await this.categoryService.findOneById(
+      createBusinessDto.categoryId,
+    );
+
     const business = await this.businessRepository.create({
       ...createBusinessDto,
       services: services.items.sort((a, b) => a.order - b.order),
+      category,
       dayOfWeek,
       userId: user.id,
     });
@@ -279,11 +286,8 @@ export class BusinessService {
           title: 'Business registration',
           content: 'Business registration is pending approval',
           type: NotificationTypeEnum.CREATE_BUSINESS,
-          sendBy: {
-            id: user.id,
-            name: user.firstName,
-          },
-          receiveBy: null, // "null" to send to admin
+          senderId: user.id,
+          receiverId: null, // "null" to send to admin
         }),
       );
     }
@@ -329,9 +333,18 @@ export class BusinessService {
         .sort((a, b) => a.order - b.order);
     }
 
+    let category = null;
+
+    if (updateInformationDto.categoryId) {
+      category = await this.categoryService.findOneById(
+        updateInformationDto.categoryId,
+      );
+    }
+
     return !!(await this.businessRepository.update(businessId, {
       ...updateInformationDto,
       services: responseService.length ? responseService : business.services,
+      category: category ? category : business.category,
     }));
   }
 
@@ -402,7 +415,10 @@ export class BusinessService {
   // case 2:
   // when business is approved, user can't delete, only admin can delete (user can send a request to admin to delete)
   async softDelete(businessId: string, user: User): Promise<boolean> {
+    console.log('businessId: ', businessId);
     const foundBusiness = await this.businessRepository.findOneById(businessId);
+
+    console.log('foundBusiness', foundBusiness);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
@@ -445,7 +461,7 @@ export class BusinessService {
 
     // Check if business is already soft deleted
     if (
-      foundBusiness.deleted_at === null &&
+      foundBusiness.deletedAt === null &&
       foundBusiness.status !== BusinessStatusEnum.DELETED
     ) {
       throw new BusinessStatusException(

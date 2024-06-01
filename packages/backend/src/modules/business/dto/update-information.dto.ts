@@ -36,7 +36,7 @@ export class UpdateInformationDto {
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({ example: '66446d345c9bc4899106d4a6' })
-  categoryId?: Types.ObjectId;
+  categoryId?: string;
 
   @IsOptional()
   @IsArray()
