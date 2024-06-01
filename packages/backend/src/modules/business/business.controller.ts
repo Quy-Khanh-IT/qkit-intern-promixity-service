@@ -46,17 +46,6 @@ import { Business } from './entities/business.entity';
 @ApiTags('businesses')
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
-  @Get(':id')
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getById(@Param('id') id: string) {
-    const result: Business = await this.businessService.findOneById(id);
-
-    return result;
-  }
 
   @Get()
   @ApiBearerAuth()
@@ -67,6 +56,27 @@ export class BusinessController {
     const transferData = plainToClass(FindAllBusinessQuery, data);
 
     return await this.businessService.findAll(transferData);
+  }
+
+  @Get('status')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @HttpCode(200)
+  getStatus() {
+    return this.businessService.getStatus();
+  }
+
+  @Get(':id')
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully get business.',
+  })
+  async getById(@Param('id') id: string) {
+    const result: Business = await this.businessService.findOneById(id);
+
+    return result;
   }
 
   @Post('')
@@ -196,8 +206,19 @@ export class BusinessController {
     status: 200,
     description: 'User successfully restore business.',
   })
-  async restore(@Param('id') id: string) {
-    const result: boolean = await this.businessService.restore(id);
+  async restore(@Param('id') id: string, @Req() req: Request) {
+    const result: boolean = await this.businessService.restore(id, req.user);
+
+    return result;
+  }
+
+  @Get('restore/request')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
+  @HttpCode(200)
+  async restoreRequest(@Query('businessId') id: string) {
+    const result: boolean = await this.businessService.restoreRequest(id);
 
     return result;
   }
@@ -237,19 +258,13 @@ export class BusinessController {
     @Req() req: Request,
   ) {
     if (type === DeleteActionEnum.SOFT) {
-      const result: boolean = await this.businessService.softDelete(
-        id,
-        req.user,
-      );
+      const result = await this.businessService.softDelete(id, req.user);
 
       return result;
     }
 
     if (type === DeleteActionEnum.HARD) {
-      const result: boolean = await this.businessService.hardDelete(
-        id,
-        req.user,
-      );
+      const result = await this.businessService.hardDelete(id, req.user);
 
       return result;
     }

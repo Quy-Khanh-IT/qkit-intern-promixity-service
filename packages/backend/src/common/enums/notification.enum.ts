@@ -4,7 +4,9 @@ export enum ResourceEnum {
 }
 
 export enum NotificationTypeEnum {
-  CREATE_USER = 'create_user',
   CREATE_BUSINESS = 'create_business',
-  REPORT = 'report',
+  CLOSE_BUSINESS = 'close_business',
+  RESTORE_BUSINESS = 'restore_business',
+  REPORT_BUSINESS = 'report_business',
+  CREATE_USER = 'create_user',
 }

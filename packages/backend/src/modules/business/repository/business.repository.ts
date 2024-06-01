@@ -10,7 +10,7 @@ import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositor
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { Business } from '../entities/business.entity';
 import { BusinessRepositoryInterface } from '../interfaces/business-repo.interface';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 export class BusinessRepository
   extends BaseRepositoryAbstract<Business>
@@ -25,7 +25,7 @@ export class BusinessRepository
     return !!(await this.businessModel
       .findByIdAndUpdate<Business>(id, {
         deleted_at: dayjs(),
-        status: BusinessStatusEnum.DELETED,
+        status: BusinessStatusEnum.CLOSED,
       })
       .exec());
   }

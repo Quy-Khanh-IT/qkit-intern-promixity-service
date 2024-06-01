@@ -4,17 +4,17 @@ import {
   ResourceEnum,
 } from 'src/common/enums/notification.enum';
 
-export class BaseNotificationDto {
+export class BaseEventDto {
   @IsString()
-  title: string;
+  title?: string;
 
   @IsString()
-  content: string;
+  content?: string;
 
   @IsEnum({ enum: NotificationTypeEnum })
   type: NotificationTypeEnum;
 
   senderId: string;
 
-  receiverId: string;
+  receiverId: string | null; // set null if send to admin
 }

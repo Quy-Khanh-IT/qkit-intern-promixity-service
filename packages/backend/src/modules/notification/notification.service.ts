@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { RegisterBusinessEvent } from '../business/events/register-business.event';
+import { CreateBusinessEvent } from '../business/events/create-business.event';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { EventConstant } from 'src/common/constants/event.constant';
+import { EventDispatcherEnum } from 'src/common/constants/event.constant';
 import { UserService } from '../user/user.service';
 import { UserRole } from 'src/common/enums';
 import { NotificationRepository } from './repository/notification.repository';
-import { BaseNotificationDto } from './dto/base-notification.dto';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 import { ConfigKey } from 'src/common/constants';
 import { ConfigService } from '@nestjs/config';
@@ -15,6 +14,7 @@ import { PipelineStage } from 'mongoose';
 import { Notification } from './entities/notification.entity';
 import { NoDateQueryFilterBase } from 'src/cores/pagination/base/no-date-query-filter.base';
 import { FindAllNotificationQuery } from './dto/find-all-notification-query';
+import { createNotificationDto } from './dto/create-notification.dto';
 
 @Injectable()
 export class NotificationService {
@@ -24,7 +24,7 @@ export class NotificationService {
     private readonly configService: ConfigService,
   ) {}
 
-  async create(payload: BaseNotificationDto) {
+  async create(payload: createNotificationDto) {
     await this.notificationRepository.create(payload);
   }
 
@@ -90,8 +90,9 @@ export class NotificationService {
     return finalPipeline;
   }
 
-  @OnEvent(EventConstant.REGISTER_BUSINESS)
-  handleRegisterBusinessEvent(registerBusinessEvent: RegisterBusinessEvent) {
-    this.create(registerBusinessEvent.payload);
+  @OnEvent(EventDispatcherEnum.CREATE_BUSINESS)
+  async handleRegisterBusinessEvent(createBusinessEvent: CreateBusinessEvent) {
+    console.log('createBusinessEvent: ', createBusinessEvent);
+    // return this.create(registerBusinessEvent.payload);
   }
 }

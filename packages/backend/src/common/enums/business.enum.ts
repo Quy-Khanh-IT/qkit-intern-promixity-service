@@ -14,11 +14,11 @@ export enum DeleteActionEnum {
 }
 
 export enum BusinessStatusEnum {
-  PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
   BANNED = 'banned',
-  DELETED = 'deleted',
+  CLOSED = 'closed',
+  PENDING = 'pending',
 }
 
 export enum StatusActionsEnum {
