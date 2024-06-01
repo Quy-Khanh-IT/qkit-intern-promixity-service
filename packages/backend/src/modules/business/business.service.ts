@@ -45,7 +45,7 @@ import {
   NotificationTypeEnum,
   ResourceEnum,
 } from 'src/common/enums/notification.enum';
-import { transObjectIdToString } from 'src/common/utils';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import { CategoryService } from '../category/category.service';
 
 @Injectable()
@@ -94,11 +94,11 @@ export class BusinessService {
     }
 
     if (query.district) {
-      matchStage['district'] = query.district;
+      matchStage['district'] = { $regex: query.district, $options: 'i' };
     }
 
     if (query.province) {
-      matchStage['province'] = query.province;
+      matchStage['province'] = { $regex: query.province, $options: 'i' };
     }
 
     if (query.status) {
@@ -109,15 +109,26 @@ export class BusinessService {
       matchStage['phoneNumber'] = { $regex: query.phoneNumber, $options: 'i' };
     }
 
-    if (query.category) {
-      matchStage['category'] = query.category;
+    if (query.categoryId) {
+      matchStage['category._id'] = transStringToObjectId(query.categoryId);
     }
 
-    if (query.startRating && query.endRating) {
-      matchStage['overallRating'] = {
-        $gte: parseInt(query.startRating),
-        $lte: parseInt(query.endRating),
-      };
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arrFilter = [];
+      Array.from(query.starsRating).forEach((star) => {
+        arrFilter.push({
+          overallRating: {
+            $gte: parseInt(star),
+            $lte: parseInt(star) + 0.9,
+          },
+        });
+      });
+
+      finalPipeline.push({
+        $match: {
+          $or: [...arrFilter],
+        },
+      });
     }
 
     if (query.dayOfWeek && query.dayOfWeek.length > 0) {
@@ -126,7 +137,7 @@ export class BusinessService {
       days.forEach((day) => {
         finalPipeline.push({
           $match: {
-            day_of_week: {
+            dayOfWeek: {
               $elemMatch: {
                 day: day.day.toLowerCase(),
                 openTime: day.openTime,
@@ -276,7 +287,7 @@ export class BusinessService {
       services: services.items.sort((a, b) => a.order - b.order),
       category,
       dayOfWeek,
-      userId: user.id,
+      userId: user._id,
     });
 
     if (business) {
