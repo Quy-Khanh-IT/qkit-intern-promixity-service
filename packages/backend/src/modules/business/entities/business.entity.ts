@@ -5,8 +5,9 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { Image } from './image.entity';
-import { ServiceSchema } from './service.entity';
 import { StarSchema } from './star.entity';
+import { ServiceSchema } from './service.entity';
+import { CategorySchema } from './category.entity';
 
 const defaultStars: StarSchema[] = [
   {
@@ -53,8 +54,8 @@ export class Business extends BaseEntity {
   @Prop({ type: [Image], default: [] })
   images: Image[];
 
-  @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
-  categoryId: Types.ObjectId;
+  @Prop({ type: CategorySchema, required: true })
+  category: CategorySchema;
 
   @Prop({ type: [ServiceSchema] })
   services: ServiceSchema[];
@@ -74,13 +75,13 @@ export class Business extends BaseEntity {
   @Prop({ trim: true })
   fullAddress: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   province: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   district: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   country: string;
 
   @Prop([DayOpenCloseTimeSchema])
@@ -115,5 +116,6 @@ export const BusinessSchema = SchemaFactory.createForClass(Business);
 
 BusinessSchema.index({ location: '2dsphere' });
 BusinessSchema.index({ name: 'text', description: 'text' });
+BusinessSchema.index({ userId: 1 });
 
 export type BusinessDocument = HydratedDocument<Business>;

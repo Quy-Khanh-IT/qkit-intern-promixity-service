@@ -12,6 +12,7 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AddressModule } from './modules/address/address.module';
 import { DistrictModule } from './modules/address/district.module';
@@ -48,6 +49,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     AddressModule,
     ReviewModule,
     NotificationModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

@@ -120,7 +120,7 @@ export class ReviewService {
   }
 
   async create(createReviewDto: CreateReviewDto, userId: string) {
-    const business = await this.businessService.getById(
+    const business = await this.businessService.findOneById(
       createReviewDto.businessId,
     );
 

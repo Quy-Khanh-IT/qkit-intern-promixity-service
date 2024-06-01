@@ -69,6 +69,7 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
   async findOneById(id: string): Promise<T> {
     const result = (await this.model.findById(id).lean().exec()) as T;
+
     if (result) {
       result.id = transObjectIdToString(result._id);
     }

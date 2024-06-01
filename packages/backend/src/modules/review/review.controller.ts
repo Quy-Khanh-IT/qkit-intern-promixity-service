@@ -36,20 +36,19 @@ import { ReviewService } from './review.service';
 
 @Controller('reviews')
 @ApiTags('reviews')
-@ApiBearerAuth()
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Get()
-  @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
-  async findAllBusinesses(@Query() data: FindAllReviewQuery) {
+  async findAllReview(@Query() data: FindAllReviewQuery) {
     const transferData = plainToClass(FindAllReviewQuery, data);
 
     return await this.reviewService.findAll(transferData);
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({
@@ -62,6 +61,7 @@ export class ReviewController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @UseInterceptors(StarSerializeInterceptor)
   @HttpCode(201)
@@ -81,6 +81,7 @@ export class ReviewController {
   }
 
   @Post(':id/responses')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(201)
   @ApiBody({
@@ -99,6 +100,7 @@ export class ReviewController {
   }
 
   @Put(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiBody({
@@ -117,6 +119,7 @@ export class ReviewController {
   }
 
   @Put(':responseId/responses')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiBody({
@@ -135,6 +138,7 @@ export class ReviewController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
@@ -157,6 +161,7 @@ export class ReviewController {
   }
 
   @Delete(':responseId/responses')
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard)
   @HttpCode(200)
   @ApiResponse({

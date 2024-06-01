@@ -1,12 +1,9 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 
 @Schema({})
-export class ServiceSchema {
+export class CategorySchema {
   @Prop()
   name: string;
-
-  @Prop()
-  description: string;
 
   @Prop()
   order: number;

@@ -1,3 +1,3 @@
 export class ReviewConstant {
-  static MAX_DEPTH = 3;
+  static readonly MAX_DEPTH = 3;
 }

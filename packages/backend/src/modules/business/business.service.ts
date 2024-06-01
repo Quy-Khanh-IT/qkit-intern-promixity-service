@@ -19,6 +19,7 @@ import {
   BusinessNotBelongException,
   BusinessNotFoundException,
   BusinessStatusException,
+  BusinessUnauthorizedException,
 } from 'src/common/exceptions/business.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
@@ -36,16 +37,28 @@ import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
 import { ServiceService } from '../service/service.service';
+import { Service } from '../service/entities/service.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventConstant } from 'src/common/constants/event.constant';
+import { RegisterBusinessEvent } from './events/register-business.event';
+import {
+  NotificationTypeEnum,
+  ResourceEnum,
+} from 'src/common/enums/notification.enum';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class BusinessService {
   constructor(
     private readonly userService: UserService,
     private readonly ServiceService: ServiceService,
+    private readonly categoryService: CategoryService,
     private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(
@@ -81,11 +94,11 @@ export class BusinessService {
     }
 
     if (query.district) {
-      matchStage['district'] = query.district;
+      matchStage['district'] = { $regex: query.district, $options: 'i' };
     }
 
     if (query.province) {
-      matchStage['province'] = query.province;
+      matchStage['province'] = { $regex: query.province, $options: 'i' };
     }
 
     if (query.status) {
@@ -93,18 +106,29 @@ export class BusinessService {
     }
 
     if (query.phoneNumber) {
-      matchStage['phoneNumber'] = query.phoneNumber;
+      matchStage['phoneNumber'] = { $regex: query.phoneNumber, $options: 'i' };
     }
 
-    if (query.category) {
-      matchStage['category'] = query.category;
+    if (query.categoryId) {
+      matchStage['category._id'] = transStringToObjectId(query.categoryId);
     }
 
-    if (query.startRating && query.endRating) {
-      matchStage['overallRating'] = {
-        $gte: parseInt(query.startRating),
-        $lte: parseInt(query.endRating),
-      };
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arrFilter = [];
+      Array.from(query.starsRating).forEach((star) => {
+        arrFilter.push({
+          overallRating: {
+            $gte: parseInt(star),
+            $lte: parseInt(star) + 0.9,
+          },
+        });
+      });
+
+      finalPipeline.push({
+        $match: {
+          $or: [...arrFilter],
+        },
+      });
     }
 
     if (query.dayOfWeek && query.dayOfWeek.length > 0) {
@@ -113,7 +137,7 @@ export class BusinessService {
       days.forEach((day) => {
         finalPipeline.push({
           $match: {
-            day_of_week: {
+            dayOfWeek: {
               $elemMatch: {
                 day: day.day.toLowerCase(),
                 openTime: day.openTime,
@@ -145,7 +169,7 @@ export class BusinessService {
     return finalPipeline;
   }
 
-  async getById(id: string): Promise<Business> {
+  async findOneById(id: string): Promise<Business> {
     const business = await this.businessRepository.findOneById(id);
 
     return business;
@@ -161,7 +185,7 @@ export class BusinessService {
 
   async create(
     createBusinessDto: CreateBusinessDto,
-    userId: string,
+    user: User,
   ): Promise<Business> {
     // Validate open time and close time
     let { dayOfWeek } = createBusinessDto;
@@ -250,33 +274,34 @@ export class BusinessService {
       (a, b) => a.order - b.order,
     ) as DayOpenCloseTime[];
 
-    // find and modify service
-    let modifiedService = [];
-
-    const services = await this.ServiceService.findServices(
+    let services = await this.ServiceService.findServices(
       createBusinessDto.serviceIds,
     );
 
-    if (services.items.length) {
-      modifiedService = services.items
-        .map((service) => {
-          return {
-            id: service.id,
-            name: service.name,
-            order: service.order,
-          };
-        })
-        .sort((a, b) => a.order - b.order);
-    }
-
-    console.log('modifiedService: ', modifiedService);
+    let category = await this.categoryService.findOneById(
+      createBusinessDto.categoryId,
+    );
 
     const business = await this.businessRepository.create({
       ...createBusinessDto,
-      services: modifiedService,
+      services: services.items.sort((a, b) => a.order - b.order),
+      category,
       dayOfWeek,
-      userId,
+      userId: user._id,
     });
+
+    if (business) {
+      this.eventEmitter.emit(
+        EventConstant.REGISTER_BUSINESS,
+        new RegisterBusinessEvent({
+          title: 'Business registration',
+          content: 'Business registration is pending approval',
+          type: NotificationTypeEnum.CREATE_BUSINESS,
+          senderId: user.id,
+          receiverId: null, // "null" to send to admin
+        }),
+      );
+    }
 
     return business;
   }
@@ -319,9 +344,18 @@ export class BusinessService {
         .sort((a, b) => a.order - b.order);
     }
 
+    let category = null;
+
+    if (updateInformationDto.categoryId) {
+      category = await this.categoryService.findOneById(
+        updateInformationDto.categoryId,
+      );
+    }
+
     return !!(await this.businessRepository.update(businessId, {
       ...updateInformationDto,
       services: responseService.length ? responseService : business.services,
+      category: category ? category : business.category,
     }));
   }
 
@@ -387,21 +421,28 @@ export class BusinessService {
     return business;
   }
 
+  // case 1:
+  // when user create business, while business is pending, user can delete
+  // case 2:
+  // when business is approved, user can't delete, only admin can delete (user can send a request to admin to delete)
   async softDelete(businessId: string, user: User): Promise<boolean> {
+    console.log('businessId: ', businessId);
     const foundBusiness = await this.businessRepository.findOneById(businessId);
+
+    console.log('foundBusiness', foundBusiness);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
     // Check business status
-    // If user is "ADMIN": business is approved, can't delete (only admin can delete with any business'status)
-    // If user is "BUSINESS": while business it not approved (pending), can delete
-
+    // case 1: If user is "ADMIN": can force delete any business
     if (user.role === UserRole.ADMIN) {
       return await this.businessRepository.softDelete(businessId);
     }
 
+    // case 2: If user is "BUSINESS": request to delete business
+    // check if business belongs to user
     if (foundBusiness.userId.toString() !== user.id) {
       throw new BusinessNotBelongException();
     }
@@ -412,33 +453,31 @@ export class BusinessService {
       );
     }
 
-    await this.businessRepository.update(businessId, {
-      status: BusinessStatusEnum.DELETED,
-    });
-
-    const isDeleted = await this.businessRepository.softDelete(businessId);
-
-    return isDeleted;
+    return await this.businessRepository.softDeleteBusiness(businessId);
   }
 
+  // Only admin can hard delete
   async hardDelete(businessId: string, user: User): Promise<boolean> {
+    const role = user.role;
+
+    if (role !== UserRole.ADMIN) {
+      throw new BusinessUnauthorizedException();
+    }
+
     const foundBusiness = await this.businessRepository.findOneById(businessId);
 
     if (!foundBusiness) {
       throw new BusinessNotFoundException();
     }
 
-    // check role if user is admin who can delete any business
-    if (user.role === UserRole.ADMIN) {
-      return await this.businessRepository.hardDelete(businessId);
-    }
-
-    // Check if business is already deleted
+    // Check if business is already soft deleted
     if (
       foundBusiness.deleted_at === null &&
       foundBusiness.status !== BusinessStatusEnum.DELETED
     ) {
-      throw new BusinessStatusException('');
+      throw new BusinessStatusException(
+        "Can't hard delete business. Must be soft deleted first.",
+      );
     }
 
     return await this.businessRepository.hardDelete(businessId);

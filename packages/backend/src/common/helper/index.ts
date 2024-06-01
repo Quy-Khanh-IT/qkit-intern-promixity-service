@@ -1,6 +1,7 @@
 import * as moment from 'moment';
 import { PipelineStage } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { NoDateQueryFilterBase } from 'src/cores/pagination/base/no-date-query-filter.base';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 import { BaseRepositoryAbstract } from 'src/cores/repository/base/repositoryAbstract.base';
@@ -36,9 +37,9 @@ export class PaginationHelper {
   public static configureBaseQueryFilter(
     matchStage: Record<string, any>,
     sortStage: Record<string, any>,
-    data: QueryFilterBase,
+    data: QueryFilterBase | NoDateQueryFilterBase,
   ): { matchStage: Record<string, any>; sortStage: Record<string, any> } {
-    if (data.startDate) {
+    if (data?.startDate) {
       matchStage['created_at'] = {
         $gte: moment(data.startDate, 'DD/MM/YYYY').toDate(),
       };
@@ -70,7 +71,10 @@ export class PaginationHelper {
     return queryParams ? `${queryParams}` : '';
   }
 
-  static async paginate<T extends BaseEntity, V extends QueryFilterBase>(
+  static async paginate<
+    T extends BaseEntity,
+    V extends QueryFilterBase | NoDateQueryFilterBase,
+  >(
     URL: string,
     queryData: V,
     repository: BaseRepositoryAbstract<T>,

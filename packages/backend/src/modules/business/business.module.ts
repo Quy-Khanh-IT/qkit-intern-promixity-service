@@ -11,6 +11,7 @@ import { BusinessController } from './business.controller';
 import { BusinessService } from './business.service';
 import { Business, BusinessSchema } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BusinessRepository } from './repository/business.repository';
     NominatimOmsModule,
     UploadFileModule,
     ServiceModule,
+    CategoryModule,
   ],
   controllers: [BusinessController],
   providers: [BusinessService, BusinessRepository],
