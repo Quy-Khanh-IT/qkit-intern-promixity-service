@@ -48,10 +48,10 @@ export class UserController {
     return plainToClass(User, user);
   }
 
-  @Get('/businesses')
+  @Get('/all/businesses')
   @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.BUSINESS)
+  @Roles(UserRole.BUSINESS, UserRole.ADMIN)
   @HttpCode(200)
   @ApiResponse({
     status: 200,

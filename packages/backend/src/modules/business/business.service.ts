@@ -177,7 +177,7 @@ export class BusinessService {
 
   async getAllByUser(userId: string): Promise<FindAllResponse<Business>> {
     const businesses = await this.businessRepository.findAll({
-      userId,
+      userId: transStringToObjectId(userId),
     });
 
     return businesses;
