@@ -3,20 +3,20 @@ import { ROUTE, StorageKey } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
-import { BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Badge, Button, Col, Flex, Grid, Image, Menu, MenuProps, Row, Space, theme, Tooltip } from 'antd'
-import { Content, Header } from 'antd/es/layout/layout'
-import Sider from 'antd/es/layout/Sider'
+import { Col, Grid, MenuProps, Row, theme } from 'antd'
+import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import './admin.scss'
+import AdminHeader from './layouts/AdminHeader'
+import AdminSidebar from './layouts/AdminSidebar'
+import { SIDEBAR_MENU_OPTIONS } from './admin.constant'
 
 const { useBreakpoint } = Grid
-
 const { subColor2 } = variables
-const headerHeight = 80
+
+const HEADER_HEIGHT = 80
 
 export default function RootLayout({
   children
@@ -29,17 +29,21 @@ export default function RootLayout({
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
 
-  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.MANAGE_USER)
+  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
   const [selectedMenuKey, setSelectedMenuKey] = useState<string>('')
 
   useEffect(() => {
     if (routeValue) {
-      if (routeValue === ROUTE.MANAGE_USER) {
-        setSelectedMenuKey('1')
+      if (routeValue === ROUTE.DASHBOARD) {
+        setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.DASHBOARD.key)
+      } else if (routeValue === ROUTE.MANAGE_USER) {
+        setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.MANAGE_USER.key)
       } else if (routeValue === ROUTE.MANAGE_BUSINESS) {
-        setSelectedMenuKey('2')
+        setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.MANAGE_BUSINESS.key)
+      } else if (routeValue === ROUTE.MANAGE_REVIEW) {
+        setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.MANAGE_REVIEW.key)
       } else {
-        setSelectedMenuKey('1')
+        setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.DASHBOARD.key)
       }
     }
   }, [routeValue])
@@ -75,12 +79,18 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
-    if (e.key === '1') {
+    if (e.key === SIDEBAR_MENU_OPTIONS.DASHBOARD.key) {
+      router.push(ROUTE.DASHBOARD)
+      setRouteValue(ROUTE.DASHBOARD)
+    } else if (e.key === SIDEBAR_MENU_OPTIONS.MANAGE_USER.key) {
       router.push(ROUTE.MANAGE_USER)
       setRouteValue(ROUTE.MANAGE_USER)
-    } else if (e.key === '2') {
+    } else if (e.key === SIDEBAR_MENU_OPTIONS.MANAGE_BUSINESS.key) {
       router.push(ROUTE.MANAGE_BUSINESS)
       setRouteValue(ROUTE.MANAGE_BUSINESS)
+    } else if (e.key === SIDEBAR_MENU_OPTIONS.MANAGE_REVIEW.key) {
+      router.push(ROUTE.MANAGE_REVIEW)
+      setRouteValue(ROUTE.MANAGE_REVIEW)
     }
     setSelectedMenuKey(e.key)
   }
@@ -99,63 +109,13 @@ export default function RootLayout({
           right: 0,
           top: 0,
           zIndex: 99,
-          height: headerHeight
+          height: HEADER_HEIGHT
         }}
       >
-        <Col xs={12} md={6} lg={5} xl={4} className='h-100 --admin-header'>
-          <Header style={{ backgroundColor: colorBgContainer, padding: 0 }} className='h-100'>
-            <Flex
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-              className='h-100'
-            >
-              <Link href={ROUTE.MANAGE_USER} onClick={() => setRouteValue(ROUTE.MANAGE_USER)}>
-                <Image
-                  src='/logo_light.png'
-                  className='header-logo'
-                  preview={false}
-                  alt='error'
-                  style={{ paddingLeft: 24 }}
-                />
-              </Link>
-              <Button
-                type='text'
-                icon={
-                  collapsed ? (
-                    <MenuUnfoldOutlined style={{ fontSize: 20 }} />
-                  ) : (
-                    <MenuFoldOutlined style={{ fontSize: 20 }} />
-                  )
-                }
-                onClick={() => setCollapsed(!collapsed)}
-                style={{
-                  width: 40,
-                  height: 40,
-                  marginRight: 16
-                }}
-              />
-            </Flex>
-          </Header>
-        </Col>
-
-        <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
-          <Space className='me-4' size='large'>
-            <Tooltip title='Notifications'>
-              <Badge count={5} offset={[-6, 6]}>
-                <BellOutlined style={{ fontSize: 24 }} className='action-button' />
-              </Badge>
-            </Tooltip>
-            <Link href={ROUTE.ADMIN_PROFILE}>
-              <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
-            </Link>
-          </Space>
-        </Col>
+        <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed} setRouteValue={setRouteValue} />
       </Col>
-      <Col span={24} style={{ paddingTop: headerHeight }}>
-        <Row style={{ position: 'fixed', left: 0, right: 0, top: headerHeight, zIndex: 99 }}>
+      <Col span={24} style={{ paddingTop: HEADER_HEIGHT }}>
+        <Row style={{ position: 'fixed', left: 0, right: 0, top: HEADER_HEIGHT, zIndex: 99 }}>
           <Col
             xs={collapsed ? 0 : 12}
             md={collapsed ? 0 : 6}
@@ -163,42 +123,7 @@ export default function RootLayout({
             xl={collapsed ? 0 : 4}
             className='sidebar-col h-100'
           >
-            <Sider
-              trigger={null}
-              collapsible
-              className='vh-100 h-100 --sider-admin'
-              style={{ background: colorBgContainer }}
-            >
-              <Menu
-                theme='light'
-                onClick={onMenuClick}
-                mode='inline'
-                defaultSelectedKeys={['1']}
-                selectedKeys={[selectedMenuKey]}
-                className='h-100'
-                items={[
-                  {
-                    key: '1',
-                    icon: <UserOutlined />,
-                    label: 'Manage user'
-                  },
-                  {
-                    key: '2',
-                    icon: (
-                      <Flex style={{ width: 14, height: 16 }} justify='center'>
-                        <i className='fa-light fa-building'></i>
-                      </Flex>
-                    ),
-                    label: 'Manage business'
-                  },
-                  {
-                    key: '3',
-                    icon: <SettingOutlined />,
-                    label: 'Setting'
-                  }
-                ]}
-              />
-            </Sider>
+            <AdminSidebar selectedMenuKey={selectedMenuKey} handleMenuClick={onMenuClick} />
           </Col>
           <Col
             xs={collapsed ? 24 : 24}
@@ -210,7 +135,7 @@ export default function RootLayout({
             <Content
               style={{
                 padding: 24,
-                minHeight: `calc(100vh - ${headerHeight}px)`,
+                minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
                 height: '1000px',
                 backgroundColor: subColor2
               }}

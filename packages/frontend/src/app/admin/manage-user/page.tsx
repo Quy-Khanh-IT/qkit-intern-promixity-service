@@ -6,11 +6,12 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, ROLE_OPTIONS } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
   useGetAllUsersQuery,
+  useGetProfileQuery,
   useRestoreDeletedUserMutation,
   useUpdateUserRoleMutation
 } from '@/services/user.service'
@@ -60,7 +61,7 @@ type DataIndex = keyof IUserInformation
 
 type SearchIndex = keyof GetAllUsersQuery
 
-const ManageUser = (): React.ReactElement => {
+const ManageUser = (): React.ReactNode => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(ORIGIN_PAGE)
 
@@ -73,7 +74,7 @@ const ManageUser = (): React.ReactElement => {
     isDeleted: userOptionBoolean
   } as GetAllUsersQuery)
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
-  const [selectedUser, setSelectedUser] = useState<IUserInformation>()
+  const [selectedUser, setSelectedUser] = useState<IUserInformation | null>(null)
 
   // Modal
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
@@ -85,6 +86,7 @@ const ManageUser = (): React.ReactElement => {
   const [deleteUserMutation] = useDeleteUserMutation()
   const [updateUserRoleMutation] = useUpdateUserRoleMutation()
   const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
+  const { data: profileData } = useGetProfileQuery(selectedUser?.id || '', { skip: !selectedUser })
   const { data: rolesData } = useGetAllRolesQuery()
 
   useEffect(() => {
@@ -144,7 +146,6 @@ const ManageUser = (): React.ReactElement => {
     _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
-    console.log('selectedKeys', selectedKeys)
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
         const queryTemp: GetAllUsersQuery = { ...prev }
@@ -284,26 +285,36 @@ const ManageUser = (): React.ReactElement => {
     {
       label: MANAGE_USER_FIELDS.firstName,
       span: 2,
-      children: selectedUser?.firstName
+      children: profileData?.firstName
     },
     {
       label: MANAGE_USER_FIELDS.lastName,
       span: 2,
-      children: selectedUser?.lastName
+      children: profileData?.lastName
+    },
+    {
+      label: MANAGE_USER_FIELDS.email,
+      span: 4,
+      children: profileData?.email
     },
     {
       label: MANAGE_USER_FIELDS.phoneNumber,
       span: 4,
-      children: selectedUser?.phoneNumber
+      children: profileData?.phoneNumber
     },
     {
       label: MANAGE_USER_FIELDS.role,
-      span: 4,
+      span: 2,
       children: (
-        <Tag color={generateRoleColor(selectedUser?.role || '')} key={selectedUser?.role} className='me-0'>
-          {selectedUser?.role.toUpperCase()}
+        <Tag color={generateRoleColor(profileData?.role || '')} key={profileData?.role} className='me-0'>
+          {profileData?.role.toUpperCase()}
         </Tag>
       )
+    },
+    {
+      label: MANAGE_USER_FIELDS.created_at,
+      span: 2,
+      children: formatDate(profileData?.created_at || '')
     }
   ]
 
@@ -392,7 +403,12 @@ const ManageUser = (): React.ReactElement => {
         }}
         className='--manage-user-table'
       />
-      <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
+      <ViewRowDetailsModal
+        title='User details'
+        imageData={profileData?.image}
+        data={detailedItems}
+        ref={refViewDetailsModal}
+      />
       <DecentralizeModal
         selectionOptions={rolesData as SelectionOptions[]}
         presentOption={selectedUser?.role || ''}

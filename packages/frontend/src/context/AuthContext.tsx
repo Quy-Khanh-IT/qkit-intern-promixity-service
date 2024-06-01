@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setUserInformation(res)
         setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken)
         setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
-        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.MANAGE_USER)
+        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
 
         if (res.role === (RoleEnum._ADMIN as string)) {
           router.push(ROUTE.MANAGE_USER)
