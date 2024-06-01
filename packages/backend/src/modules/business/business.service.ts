@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { plainToClass } from 'class-transformer';
 import { PipelineStage, Types } from 'mongoose';
 import { ConfigKey, UploadFileConstraint } from 'src/common/constants';
@@ -7,6 +8,7 @@ import {
   ERROR_CODES,
   ERRORS_DICTIONARY,
 } from 'src/common/constants/error.constant';
+import { EventDispatcherEnum } from 'src/common/constants/event.constant';
 import {
   BusinessStatusEnum,
   OrderNumberDay,
@@ -23,8 +25,10 @@ import {
 } from 'src/common/exceptions/business.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
+import { transStringToObjectId } from 'src/common/utils';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
+import { CategoryService } from '../category/category.service';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { User } from '../user/entities/user.entity';
@@ -35,18 +39,8 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
-import { BusinessRepository } from './repository/business.repository';
-import { ServiceService } from '../service/service.service';
-import { Service } from '../service/entities/service.entity';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventDispatcherEnum } from 'src/common/constants/event.constant';
 import { CreateBusinessEvent } from './events/create-business.event';
-import {
-  NotificationTypeEnum,
-  ResourceEnum,
-} from 'src/common/enums/notification.enum';
-import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
-import { CategoryService } from '../category/category.service';
+import { BusinessRepository } from './repository/business.repository';
 
 @Injectable()
 export class BusinessService {
@@ -114,7 +108,7 @@ export class BusinessService {
     }
 
     if (query.starsRating && query.starsRating.length > 0) {
-      let arrFilter = [];
+      const arrFilter = [];
       Array.from(query.starsRating).forEach((star) => {
         arrFilter.push({
           overallRating: {
@@ -278,11 +272,11 @@ export class BusinessService {
       (a, b) => a.order - b.order,
     ) as DayOpenCloseTime[];
 
-    let services = await this.ServiceService.findServices(
+    const services = await this.ServiceService.findServices(
       createBusinessDto.serviceIds,
     );
 
-    let category = await this.categoryService.findOneById(
+    const category = await this.categoryService.findOneById(
       createBusinessDto.categoryId,
     );
 

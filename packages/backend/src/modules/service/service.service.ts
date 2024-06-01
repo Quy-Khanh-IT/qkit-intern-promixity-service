@@ -9,6 +9,10 @@ import { ServiceRepository } from './repository/service.repository';
 export class ServiceService {
   constructor(private readonly serviceRepository: ServiceRepository) {}
 
+  async getAll(): Promise<FindAllResponse<Service>> {
+    return await this.serviceRepository.findAll({});
+  }
+
   async create(createServiceDto: CreateServiceDto): Promise<Service> {
     return await this.serviceRepository.create(createServiceDto);
   }

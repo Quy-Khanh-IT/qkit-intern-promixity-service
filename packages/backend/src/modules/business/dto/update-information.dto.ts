@@ -7,7 +7,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Types } from 'mongoose';
 
 import { DayOpenCloseTime } from './create-business.dto';
 
