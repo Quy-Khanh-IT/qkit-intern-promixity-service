@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -17,24 +18,26 @@ import {
   ApiBody,
   ApiConsumes,
   ApiHeader,
+  ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { UploadFileConstraint } from 'src/common/constants';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
+import { RoleGuard } from 'src/cores/guard/role.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { NoContentResponseDto } from './dto/change-password.response.dto';
+import { GetPublicProfileResponeDto } from './dto/get-public-profile.dto';
+import { GetUserProfileForAdminDto } from './dto/get-user-profile-for-admin.dto';
 import { RequesUpdateEmail } from './dto/request-update-email.dto';
 import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
-import { UserRole } from 'src/common/enums';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { RoleGuard } from 'src/cores/guard/role.guard';
 
 @Controller('users')
 @ApiTags('User')
@@ -42,10 +45,29 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':userId')
+  @ApiOperation({ summary: 'Get public profile for everyone' })
   @HttpCode(200)
-  async findUserById(@Param('userId') userId: string) {
-    const user = await this.userService.findOneById(userId);
-    return plainToClass(User, user);
+  async findUserById(
+    @Param('userId') userId: string,
+  ): Promise<GetPublicProfileResponeDto> {
+    return await this.userService.getPublicProfile(userId);
+  }
+
+  @Get(':userId/profile')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(200)
+  async getProfileUser(
+    @Param('userId') id: string,
+    @Req() req: Request,
+    @Query() data: GetUserProfileForAdminDto,
+  ): Promise<User> {
+    const result = await this.userService.getDetailProfile(
+      id,
+      data.userStatus,
+      req.user,
+    );
+    return result;
   }
 
   @Get('/businesses')

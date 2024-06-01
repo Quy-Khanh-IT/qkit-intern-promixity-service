@@ -10,7 +10,12 @@ import { plainToClass } from 'class-transformer';
 import * as Dayjs from 'dayjs';
 import { PipelineStage } from 'mongoose';
 import { ConfigKey, UserConstant } from 'src/common/constants';
-import { DeleteType, TypeRequests, UserRole } from 'src/common/enums';
+import {
+  DeleteType,
+  TypeRequests,
+  UserRole,
+  UserStatus,
+} from 'src/common/enums';
 import {
   InvalidTokenException,
   OTPNotMatchException,
@@ -48,6 +53,7 @@ import { BusinessService } from '../business/business.service';
 import { Business } from '../business/entities/business.entity';
 import { OtpService } from '../otp/otp.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetPublicProfileResponeDto } from './dto/get-public-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -66,6 +72,51 @@ export class UserService {
 
   async findAll(): Promise<FindAllResponse<User>> {
     return await this.userRepository.findAll({});
+  }
+
+  async getPublicProfile(userId: string): Promise<GetPublicProfileResponeDto> {
+    let user = await this.findVerifiedOneWithId(userId);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+    return {
+      email: user.email,
+      firstName: user.firstName,
+      id: user.id,
+      image: user.image,
+      lastName: user.lastName,
+    };
+  }
+
+  async getDetailProfile(
+    requestedUserId: string,
+    status: UserStatus,
+    requestUser: User,
+  ): Promise<User> {
+    if (requestUser.role === UserRole.ADMIN) {
+      return await this.getDetailProfileForAdmin(requestedUserId, status);
+    }
+    return await this.getDetailProfileForUser(requestedUserId, requestUser);
+  }
+
+  async getDetailProfileForAdmin(
+    userId: string,
+    status: UserStatus,
+  ): Promise<User> {
+    if (status === UserStatus.DELETED) {
+      return await this.findOneDeleteById(userId);
+    }
+    return await this.findOneById(userId);
+  }
+
+  async getDetailProfileForUser(
+    requestedUserId: string,
+    userRequest: User,
+  ): Promise<User> {
+    if (requestedUserId !== userRequest.id) {
+      throw new UnauthorizedException();
+    }
+    return userRequest;
   }
 
   getAllRoles(): UserRole[] {
@@ -103,23 +154,35 @@ export class UserService {
     }
   }
 
+  async findOneDeleteById(userId: string): Promise<User> {
+    return await this.userRepository.findOneByConditionWithDeleted({
+      _id: userId,
+    });
+  }
+
   async restore(
     restoreUserId: string,
     adminId: string,
   ): Promise<RestoreResponseDto> {
-    await this.checkCRUDConditionForAdmin(restoreUserId, adminId);
+    const user = await this.findOneDeleteById(restoreUserId);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+    if (adminId === restoreUserId) {
+      throw new UserConflictAdminException();
+    }
     const result = await this.userRepository.restore(restoreUserId);
     if (!result) {
       throw new InternalServerErrorException();
     }
 
     return {
-      id: result.id,
-      email: result.email,
-      firstName: result.firstName,
-      lastName: result.lastName,
-      image: result.image,
-      phoneNumber: result.phoneNumber,
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      image: user.image,
+      phoneNumber: user.phoneNumber,
     };
   }
 
@@ -284,14 +347,14 @@ export class UserService {
       used: false,
       expiredTime: expiredTime,
       token: newJWTToken,
-      metaData: { newEmail: data.email },
+      metaData: { newEmail: data.newEmail },
       userId: userFromToken._id,
       type: TypeRequests.RESET_EMAIL,
     });
 
     const resetlink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}/reset-email?token=${newJWTToken}`;
     this.mailService.sendResetEmailMail(
-      data.email,
+      data.newEmail,
       'Reset email link',
       resetlink,
     );
@@ -317,7 +380,7 @@ export class UserService {
     }
 
     const isExistingEmail = await this.userRepository.findOneByCondition({
-      email: data.email,
+      email: data.newEmail,
     });
 
     if (isExistingEmail) {
@@ -437,17 +500,44 @@ export class UserService {
     return await this.userRepository.findOneById(id);
   }
 
+  async findVerifiedOneWithId(id: string): Promise<User> {
+    return await this.userRepository.findOneByCondition({
+      _id: id,
+      isVerified: true,
+    });
+  }
+
   async delete(
     query: DeleteUserQueryDto,
     adminId: string,
     deleteUserId: string,
   ): Promise<boolean> {
-    await this.checkCRUDConditionForAdmin(deleteUserId, adminId);
-
     if (query.deleteType === DeleteType.SOFT_DELETE) {
-      return this.softDeleteById(deleteUserId);
+      return await this.processSoftDelete(adminId, deleteUserId);
     }
-    return this.userRepository.hardDelete(deleteUserId);
+    return await this.processHardDelete(adminId, deleteUserId);
+  }
+
+  async processSoftDelete(adminId: string, deleteUserId: string) {
+    const user = await this.userRepository.findOneById(deleteUserId);
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+    if (adminId === deleteUserId) {
+      throw new UserConflictAdminException();
+    }
+    return this.softDeleteById(deleteUserId);
+  }
+
+  async processHardDelete(adminId: string, deleteUserId: string) {
+    const user = await this.findOneDeleteById(deleteUserId);
+    if (!user) {
+      throw new UserNotFoundException(); //
+    }
+    if (adminId === deleteUserId) {
+      throw new UserConflictAdminException();
+    }
+    return this.hardDeleteById(deleteUserId);
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

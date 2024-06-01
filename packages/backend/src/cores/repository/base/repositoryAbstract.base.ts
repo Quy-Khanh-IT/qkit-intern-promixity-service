@@ -67,12 +67,12 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     return await this.model.aggregate(pipeline).exec();
   }
 
-  async findOneById(id: string): Promise<T> {
-    const result = (await this.model.findById(id).lean().exec()) as T;
-    if (result) {
-      result.id = transObjectIdToString(result._id);
+  async findOneById(id: string): Promise<T | null> {
+    const result = (await this.model.findById(id).lean().exec()) as T | null;
+    if (!result) {
+      return null;
     }
-
+    result.id = transObjectIdToString(result._id);
     return result.deleted_at ? null : result;
   }
 
@@ -84,9 +84,10 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
       })
       .lean()
       .exec()) as T;
-    if (result) {
-      result.id = transObjectIdToString(result._id);
+    if (!result) {
+      return null;
     }
+    result.id = transObjectIdToString(result._id);
     return result;
   }
 
