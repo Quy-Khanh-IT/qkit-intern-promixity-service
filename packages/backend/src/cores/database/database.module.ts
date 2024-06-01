@@ -18,14 +18,12 @@ import { DatabaseService } from './database.service';
         // const urlConnection = `mongodb://${host}:${port}/${database}`;
         //CLOUD
         const userName = configService.get(ConfigKey.MONGO_USER_NAME);
-
         const password = configService.get(ConfigKey.MONGO_PASSWORD);
         const urlConnection = configService
           .get(ConfigKey.MONGO_CLOUD_CONNECTION_STRING)
           .replace('<username>', userName)
           .replace('<password>', password);
         const database = configService.get(ConfigKey.MONGO_NAME);
-
         return {
           uri: `${urlConnection}`,
           dbName: database,
