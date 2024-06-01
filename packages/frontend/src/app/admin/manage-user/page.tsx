@@ -6,7 +6,7 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -404,7 +404,12 @@ const ManageUser = (): React.ReactNode => {
         }}
         className='--manage-user-table'
       />
-      <ViewRowDetailsModal title='User details' data={detailedItems} ref={refViewDetailsModal} />
+      <ViewRowDetailsModal
+        title='User details'
+        imageData={profileData?.image}
+        data={detailedItems}
+        ref={refViewDetailsModal}
+      />
       <DecentralizeModal
         selectionOptions={rolesData as SelectionOptions[]}
         presentOption={selectedUser?.role || ''}

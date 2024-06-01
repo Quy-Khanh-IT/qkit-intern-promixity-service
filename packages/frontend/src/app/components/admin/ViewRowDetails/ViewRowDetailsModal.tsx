@@ -1,5 +1,5 @@
 import { Button, Descriptions, DescriptionsProps, Modal, Image } from 'antd'
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
@@ -7,11 +7,20 @@ import { PLACEHOLDER } from '@/constants'
 
 export interface ViewRowDetailsProps {
   title: string
+  imageData?: string
   data: DescriptionsProps['items']
 }
 
-const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDetailsProps> = ({ title, data }, ref) => {
+const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDetailsProps> = (
+  { title, data, imageData },
+  ref
+) => {
   const [open, setOpen] = useState(false)
+  const [src, setSrc] = useState(imageData)
+
+  useEffect(() => {
+    setSrc(imageData)
+  }, [imageData])
 
   useImperativeHandle(ref, () => ({
     showModal: (): void => setOpen(true),
@@ -38,21 +47,23 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
         ]}
       >
         <div className='content-box d-flex flex-column gap-3'>
+          {/* {typeof imageData === 'string' ? (
+            
+          ) : (
+            <></>
+          )} */}
           <Image
             width={200}
             height={200}
-            src='https://picsum.photos/id/237/200/300'
-            alt={PLACEHOLDER.ERROR_IMAGE}
+            src={src}
+            alt={PLACEHOLDER.ALT_IMAGE}
             className='--avatar-details align-self-center'
+            // onLoadedData={() => setSrc(imageData)}
+            // onError={() => setSrc(PLACEHOLDER.ERROR_IMAGE)}
             placeholder={
-              <Image
-                preview={false}
-                // src='https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_200,w_200'
-                src={PLACEHOLDER.ERROR_IMAGE}
-                width={200}
-                alt='error'
-              />
+              <Image preview={false} src={PLACEHOLDER.LOADING_IMAGE} width={200} alt={PLACEHOLDER.ALT_IMAGE} />
             }
+            fallback={PLACEHOLDER.ERROR_IMAGE}
           />
           <Descriptions bordered items={data} size='small' layout='vertical' />
         </div>

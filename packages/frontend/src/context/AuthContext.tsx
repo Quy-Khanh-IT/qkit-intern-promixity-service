@@ -57,39 +57,16 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   }, [])
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
-    // const error = await login(loginPayload)
-    //   .unwrap()
-    //   .then((res) => {
-    //     setAccessToken(res.accessToken)
-    //     setRefreshToken(res.refreshToken)
-    //     setAuthSession(true)
-    //     userId.current = res.userId
+    await login(loginPayload)
+      .unwrap()
+      .then((res) => {
+        setAccessToken(res.accessToken)
+        setRefreshToken(res.refreshToken)
+        setAuthSession(true)
+        userId.current = res.userId
 
-    //     fetchUserInformation(res.accessToken, res.userId)
-    //   })
-    //   .catch((err: ErrorResponse) => {
-    //     console.log(err.data?.message);
-    //     toast.error(err.data?.message)
-    //   })
-
-    // toast.error(JSON.stringify(error))
-
-    try {
-      const res = await login(loginPayload).unwrap();
-      setAccessToken(res.accessToken);
-      setRefreshToken(res.refreshToken);
-      setAuthSession(true);
-      userId.current = res.userId;
-  
-      await fetchUserInformation(res.accessToken, res.userId);
-    } catch (error) {
-      if (error instanceof Error) {
-        // const errorMessage = error.;
-        toast.error(JSON.stringify(error));
-      } else {
-        toast.error('An unknown error occurred');
-      }
-    }
+        fetchUserInformation(res.accessToken, res.userId)
+      })
   }
 
   const logout = (): void => {

@@ -5,10 +5,7 @@ import { cookies, headers } from 'next/headers'
 import { RoleEnum } from './types/enum'
 import { toast } from 'react-toastify'
 import { TOAST_MSG } from './constants/common'
-
-const authRoutes = [ROUTE.USER_LOGIN, ROUTE.ADMIN_LOGIN]
-const adminRoutes = [ROUTE.MANAGE_USER, ROUTE.MANAGE_BUSINESS]
-const userRoutes = [ROUTE.ABOUT]
+import { adminRoutes, authRoutes, checkValidRoutes, userRoutes } from './middleware/middleware.util'
 
 export function middleware(req: NextRequest): NextResponse {
   const token = cookies().get(StorageKey._ACCESS_TOKEN)
@@ -21,7 +18,7 @@ export function middleware(req: NextRequest): NextResponse {
   }
 
   // Access protected routes without token
-  if (checkValidRoutes(req) && !token) {
+  if (checkValidRoutes(pathName) && !token) {
     return NextResponse.redirect(new URL(ROUTE.USER_LOGIN, req.url))
   }
 
@@ -60,13 +57,6 @@ export function middleware(req: NextRequest): NextResponse {
 
 export const config = {
   matcher: ['/:path*']
-}
-
-const checkValidRoutes = (req: NextRequest): boolean => {
-  if (adminRoutes.includes(req.nextUrl.pathname) || userRoutes.includes(req.nextUrl.pathname)) {
-    return true
-  }
-  return false
 }
 
 const getReferer = (): string => {

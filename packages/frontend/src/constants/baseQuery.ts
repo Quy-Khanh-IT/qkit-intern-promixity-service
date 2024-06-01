@@ -1,7 +1,8 @@
 import { HttpStatusCode } from 'axios'
-import { API_ENDPOINT, ROUTE, StorageKey } from '@/constants'
+import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { getFromLocalStorage } from '@/utils/storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
+import { checkValidRoutes } from '@/middleware/middleware.util'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
@@ -13,10 +14,17 @@ export const baseQueryWithAuth = fetchBaseQuery({
     return headers
   },
   validateStatus(response: Response) {
+    const currentUrl = window.location.href
+    const coreUrl = currentUrl && currentUrl.split(LOCAL_ENDPOINT || '')[1]
+    const checkProtectedRoute: boolean = checkValidRoutes(coreUrl)
+
     if (response.status === (HttpStatusCode.Unauthorized as number)) {
-      window.location.href = ROUTE.USER_LOGIN
-      throw new Error('Token is required')
+      if (checkProtectedRoute) {
+        window.location.href = ROUTE.USER_LOGIN
+        throw new Error('Token is required')
+      }
     }
+
     return isSuccess(response)
   }
 })
