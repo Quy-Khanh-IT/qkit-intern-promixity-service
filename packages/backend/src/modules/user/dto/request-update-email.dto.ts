@@ -17,7 +17,7 @@ export class RequesUpdateEmail {
     description: 'Email',
     example: 'example123@gmail.com',
   })
-  email: string;
+  newEmail: string;
 
   @IsString()
   @IsNotEmpty()
