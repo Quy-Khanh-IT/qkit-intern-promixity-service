@@ -26,8 +26,8 @@ export default function Header(): React.ReactNode {
   }, [])
 
   return (
-    <nav className='navbar container'>
-      <div className='navbar-container d-flex justify-content-between align-items-center w-100'>
+    <nav className='navbar vw-100'>
+      <div className='navbar-container container d-flex justify-content-between align-items-center w-100'>
         <div className='navbar-brand'>
           <Link href={'/'}>
             <img src='/logo.png' alt='Proximity Service' className='navbar-logo' />
