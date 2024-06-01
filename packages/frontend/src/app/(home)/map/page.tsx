@@ -8,7 +8,7 @@ import { useState } from 'react'
 export default function MapPage(): React.ReactNode {
   const { Header, Content, Sider } = Layout
   const { Search } = Input
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   type MenuItem = Required<MenuProps>['items'][number]
 
@@ -44,7 +44,13 @@ export default function MapPage(): React.ReactNode {
             <Image src='/logo.png' preview={false} height={40} alt='logo' />
           </div>
           <div className='search-wrapper d-flex justify-content-center align-items-center'>
-            <Search placeholder='input search text' enterButton='Search' size='large' loading={false} />
+            <Search
+              className='ml-2'
+              placeholder='input search text'
+              enterButton='Search'
+              size='large'
+              loading={false}
+            />
           </div>
         </Header>
         <Content style={{ margin: '0 16px' }}>
