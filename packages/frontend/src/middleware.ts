@@ -37,7 +37,7 @@ export function middleware(req: NextRequest): NextResponse {
     }
 
     // User-specific route access
-    else if (userRoutes.includes(pathName)) {
+    if (userRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._USER) {
         return NextResponse.next()
       } else {

@@ -28,12 +28,13 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
 
   const fetchUserInformation = useCallback(async (accessToken: string, userId: string): Promise<void> => {
     try {
+      console.log('userID', userId)
       const res: IUserInformation = await getMyProfile(userId)
       if (res) {
         setUserInformation(res)
         setCookieFromClient(StorageKey._ACCESS_TOKEN, accessToken)
         setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
-        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.MANAGE_USER)
+        saveToLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
 
         if (res.role === (RoleEnum._ADMIN as string)) {
           router.push(ROUTE.MANAGE_USER)
@@ -56,16 +57,39 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   }, [])
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
-    await login(loginPayload)
-      .unwrap()
-      .then((res) => {
-        setAccessToken(res.accessToken)
-        setRefreshToken(res.refreshToken)
-        setAuthSession(true)
-        userId.current = res.userId
+    // const error = await login(loginPayload)
+    //   .unwrap()
+    //   .then((res) => {
+    //     setAccessToken(res.accessToken)
+    //     setRefreshToken(res.refreshToken)
+    //     setAuthSession(true)
+    //     userId.current = res.userId
 
-        fetchUserInformation(res.accessToken, res.userId)
-      })
+    //     fetchUserInformation(res.accessToken, res.userId)
+    //   })
+    //   .catch((err: ErrorResponse) => {
+    //     console.log(err.data?.message);
+    //     toast.error(err.data?.message)
+    //   })
+
+    // toast.error(JSON.stringify(error))
+
+    try {
+      const res = await login(loginPayload).unwrap();
+      setAccessToken(res.accessToken);
+      setRefreshToken(res.refreshToken);
+      setAuthSession(true);
+      userId.current = res.userId;
+  
+      await fetchUserInformation(res.accessToken, res.userId);
+    } catch (error) {
+      if (error instanceof Error) {
+        // const errorMessage = error.;
+        toast.error(JSON.stringify(error));
+      } else {
+        toast.error('An unknown error occurred');
+      }
+    }
   }
 
   const logout = (): void => {

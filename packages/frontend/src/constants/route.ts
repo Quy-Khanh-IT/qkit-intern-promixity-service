@@ -9,7 +9,9 @@ export const ROUTE = {
 
   // User
   // Admin
+  DASHBOARD: '/admin/dashboard',
   MANAGE_USER: '/admin/manage-user',
   MANAGE_BUSINESS: '/admin/manage-business',
+  MANAGE_REVIEW: '/admin/manage-review',
   ADMIN_PROFILE: '/admin/profile'
 }

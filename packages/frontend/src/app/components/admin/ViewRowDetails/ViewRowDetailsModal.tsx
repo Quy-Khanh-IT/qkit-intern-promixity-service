@@ -1,8 +1,9 @@
-import { Button, Descriptions, DescriptionsProps, Modal } from 'antd'
+import { Button, Descriptions, DescriptionsProps, Modal, Image } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
+import { PLACEHOLDER } from '@/constants'
 
 export interface ViewRowDetailsProps {
   title: string
@@ -36,7 +37,23 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
           </Button>
         ]}
       >
-        <div className='content-box'>
+        <div className='content-box d-flex flex-column gap-3'>
+          <Image
+            width={200}
+            height={200}
+            src='https://picsum.photos/id/237/200/300'
+            alt={PLACEHOLDER.ERROR_IMAGE}
+            className='--avatar-details align-self-center'
+            placeholder={
+              <Image
+                preview={false}
+                // src='https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_200,w_200'
+                src={PLACEHOLDER.ERROR_IMAGE}
+                width={200}
+                alt='error'
+              />
+            }
+          />
           <Descriptions bordered items={data} size='small' layout='vertical' />
         </div>
       </Modal>
