@@ -40,16 +40,16 @@ export interface IManageUserProps {}
 type DataIndex = keyof IBusiness
 
 const ManageBusiness = (): React.ReactNode => {
-  const [businessOption, setBusinessOption] = useState('1')
+  const [businessOption, setBusinessOption] = useState<string>('1')
   const [businessOne, setBusinessOne] = useState<IBusiness>()
-  const [searchText, setSearchText] = useState('')
-  const [searchedColumn, setSearchedColumn] = useState('')
+  const [searchText, setSearchText] = useState<string>('')
+  const [searchedColumn, setSearchedColumn] = useState<string>('')
   const searchInput = useRef<InputRef>(null)
 
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refModerateModal = useRef<IModalMethods | null>(null)
   const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
-  const [deleteModalTitle, setDeleteModalTitle] = useState(MODAL_TEXT.DELETE_BUSINESS_TITLE)
+  const [deleteModalTitle, setDeleteModalTitle] = useState<string>(MODAL_TEXT.DELETE_BUSINESS_TITLE)
   const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_BUSINESS_TEMPORARY)
   const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([
     { label: 'ACCEPTED', value: 'ACCEPTED' },

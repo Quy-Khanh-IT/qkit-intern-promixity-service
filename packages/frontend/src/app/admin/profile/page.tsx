@@ -38,11 +38,11 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 
 const Profile: React.FC = () => {
   const [user, _setUser] = useState<IUserInformation>()
-  const [confirmLoading, setConfirmLoading] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
   const changePwModalRef = useRef<IModalMethods | null>(null)
-  const [_open, _setOpen] = useState(false)
+  const [_open, _setOpen] = useState<boolean>(false)
 
   const onLoadingCallback = (loading: boolean): void => {
     setConfirmLoading(loading)

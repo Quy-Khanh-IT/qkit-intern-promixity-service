@@ -8,6 +8,9 @@ export interface IUserInformation {
   isVerified: boolean
   role: string
   created_at: string
+  updated_at: string
+  deleted_at: string
+  _id: Buffer
 }
 
 export interface RoleFiltered {

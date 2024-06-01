@@ -4,7 +4,7 @@ import './header.scss'
 import { useEffect, useState } from 'react'
 
 export default function Header(): React.ReactNode {
-  const [toggle, setToggle] = useState(false)
+  const [toggle, setToggle] = useState<boolean>(false)
 
   useEffect(() => {
     const handleScroll = (): void => {

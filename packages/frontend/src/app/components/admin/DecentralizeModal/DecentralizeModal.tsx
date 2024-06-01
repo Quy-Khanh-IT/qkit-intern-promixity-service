@@ -20,14 +20,14 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
 ) => {
   const [open, setOpen] = useState<boolean>(false)
   const [selectOption, setSelectOption] = useState<string>(presentOption)
-  const confirmBoolean: boolean = useMemo(() => selectOption === presentOption, [selectOption, presentOption])
+  const confirmBoolean: boolean = useMemo<boolean>(() => selectOption === presentOption, [selectOption, presentOption])
 
   const handleCancelChild = (): void => {
     setSelectOption(presentOption)
     setOpen(false)
   }
 
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle<IModalMethods, IModalMethods>(ref, () => ({
     showModal: (): void => setOpen(true),
     hideModal: (): void => handleCancelChild()
   }))

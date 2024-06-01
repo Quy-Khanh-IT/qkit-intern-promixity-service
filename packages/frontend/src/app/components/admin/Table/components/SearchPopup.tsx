@@ -1,8 +1,8 @@
-import { Input, Button, Space, InputRef } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
+import { Button, Input, InputRef, Space } from 'antd'
 import type { ColumnType } from 'antd/es/table'
-import React, { useRef } from 'react'
 import { FilterDropdownProps } from 'antd/es/table/interface'
+import React, { useRef } from 'react'
 
 interface ISearchPopupProps<K> {
   dataIndex: K
@@ -10,7 +10,8 @@ interface ISearchPopupProps<K> {
 }
 
 const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: ISearchPopupProps<K>): ColumnType<T> => {
-  const searchInput = useRef<InputRef>(null)
+  const searchRef = useRef<InputRef>(null)
+  const searchValueRef = useRef<string[]>([])
 
   const handleReset = (clearFilters: () => void): void => {
     clearFilters()
@@ -20,10 +21,14 @@ const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: IS
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
-          ref={searchInput}
+          ref={searchRef}
           placeholder={`Search ${String(dataIndex)}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          value={searchValueRef.current[0]}
+          onChange={(e) => {
+            const value = e.target.value ? [e.target.value] : []
+            setSelectedKeys(value)
+            searchValueRef.current = value
+          }}
           onPressEnter={() => _handleSearch(selectedKeys as string[], confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
         />
@@ -60,7 +65,7 @@ const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: IS
         .includes((value as string).toLowerCase()) || false,
     onFilterDropdownOpenChange: (visible): void => {
       if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
+        setTimeout(() => searchRef.current?.select(), 100)
       }
     }
   }

@@ -6,12 +6,13 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT } from '@/constants'
+import { GET_PROFILE_OPTIONS } from '@/constants/baseQuery'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
   useGetAllUsersQuery,
-  useGetProfileQuery,
+  useGetPrivateProfileQuery,
   useRestoreDeletedUserMutation,
   useUpdateUserRoleMutation
 } from '@/services/user.service'
@@ -63,11 +64,11 @@ type SearchIndex = keyof GetAllUsersQuery
 
 const ManageUser = (): React.ReactNode => {
   // Pagination
-  const [currentPage, setCurrentPage] = useState(ORIGIN_PAGE)
+  const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
   // User data
-  const [userOption, setUserOption] = useState(ACTIVE_FETCH)
-  const userOptionBoolean: boolean = useMemo(() => userOption === DELETED_FETCH, [userOption])
+  const [userOption, setUserOption] = useState<string>(ACTIVE_FETCH)
+  const userOptionBoolean: boolean = useMemo<boolean>(() => userOption === DELETED_FETCH, [userOption])
   const [queryData, setQueryData] = useState<GetAllUsersQuery>({
     offset: currentPage,
     limit: PAGE_SIZE,
@@ -86,7 +87,13 @@ const ManageUser = (): React.ReactNode => {
   const [deleteUserMutation] = useDeleteUserMutation()
   const [updateUserRoleMutation] = useUpdateUserRoleMutation()
   const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
-  const { data: profileData } = useGetProfileQuery(selectedUser?.id || '', { skip: !selectedUser })
+  const { data: privateProfileData } = useGetPrivateProfileQuery(
+    {
+      userId: selectedUser?.id || '',
+      userStatus: userOptionBoolean ? GET_PROFILE_OPTIONS.DELETED : GET_PROFILE_OPTIONS.ACTIVE
+    },
+    { skip: !selectedUser }
+  )
   const { data: rolesData } = useGetAllRolesQuery()
 
   useEffect(() => {
@@ -277,7 +284,11 @@ const ManageUser = (): React.ReactNode => {
           {role.toUpperCase()}
         </Tag>
       ),
-      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({ dataIndex: 'role', _handleFilter: handleFilter })
+      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
+        dataIndex: 'role',
+        optionsData: rolesData as SelectionOptions[],
+        _handleFilter: handleFilter
+      })
     }
   ]
 
@@ -285,36 +296,36 @@ const ManageUser = (): React.ReactNode => {
     {
       label: MANAGE_USER_FIELDS.firstName,
       span: 2,
-      children: profileData?.firstName
+      children: privateProfileData?.firstName
     },
     {
       label: MANAGE_USER_FIELDS.lastName,
       span: 2,
-      children: profileData?.lastName
+      children: privateProfileData?.lastName
     },
     {
       label: MANAGE_USER_FIELDS.email,
       span: 4,
-      children: profileData?.email
+      children: privateProfileData?.email
     },
     {
       label: MANAGE_USER_FIELDS.phoneNumber,
       span: 4,
-      children: profileData?.phoneNumber
+      children: privateProfileData?.phoneNumber
     },
     {
       label: MANAGE_USER_FIELDS.role,
       span: 2,
       children: (
-        <Tag color={generateRoleColor(profileData?.role || '')} key={profileData?.role} className='me-0'>
-          {profileData?.role.toUpperCase()}
+        <Tag color={generateRoleColor(privateProfileData?.role || '')} key={privateProfileData?.role} className='me-0'>
+          {privateProfileData?.role && privateProfileData?.role.toUpperCase()}
         </Tag>
       )
     },
     {
       label: MANAGE_USER_FIELDS.created_at,
       span: 2,
-      children: formatDate(profileData?.created_at || '')
+      children: formatDate(privateProfileData?.created_at || '')
     }
   ]
 
@@ -405,7 +416,7 @@ const ManageUser = (): React.ReactNode => {
       />
       <ViewRowDetailsModal
         title='User details'
-        imageData={profileData?.image}
+        imageData={privateProfileData?.image}
         data={detailedItems}
         ref={refViewDetailsModal}
       />

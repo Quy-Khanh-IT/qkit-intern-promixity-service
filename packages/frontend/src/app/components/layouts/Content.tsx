@@ -15,8 +15,8 @@ interface IContentLayout {
 const Content: React.FC<IContentLayout> = ({ children }): React.ReactNode => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [loading, setLoading] = useState(true)
-  const [_blur, setBlur] = useState(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [_blur, setBlur] = useState<boolean>(false)
 
   const startLoading = (): void => {
     setLoading(true)
