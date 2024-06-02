@@ -59,6 +59,8 @@
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/rules-of-hooks": "warn",
     "@typescript-eslint/explicit-function-return-type": "error",
+    // "@typescript-eslint/explicit-parameter-types": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "error",
     "require-explicit-generics/require-explicit-generics": [
       "error",
       [
