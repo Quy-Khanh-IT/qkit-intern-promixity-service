@@ -1,7 +1,9 @@
 /* eslint-disable */
 'use client'
 import React, { useEffect, useMemo } from 'react'
-// import './chart.scss'
+import './chart.scss'
+import $ from 'jquery'
+import { subFrontFamily } from '@/configs/themes/light'
 
 declare const CanvasJS: any
 
@@ -10,7 +12,10 @@ const generateChartFormat = () => ({
   exportEnabled: true,
   animationEnabled: true,
   title: {
-    text: 'Units Sold VS Profit'
+    text: 'Units Sold VS Profit',
+    fontFamily: subFrontFamily,
+    fontSize: 32,
+    fontWeight: 600
   },
   subtitles: [
     {
@@ -89,16 +94,16 @@ const generateChartFormat = () => ({
 })
 
 const SplineChart: React.FC = () => {
-  const chartFormat = useMemo(() => generateChartFormat(), []);
+  const chartFormat = useMemo(() => generateChartFormat(), [])
 
   useEffect(() => {
-    const _splineChart = new CanvasJS.Chart('dashboard-spline-chart', chartFormat);
-    _splineChart.render();
-  }, [chartFormat]);
+    $(() => {
+      const _splineChart = new CanvasJS.Chart('dashboard-spline-chart', chartFormat)
+      _splineChart.render()
+    })
+  }, [chartFormat])
 
-  return (
-    <div id='dashboard-spline-chart' style={{ height: '400px', width: '100%' }}></div>
-  );
-};
+  return <div id='dashboard-spline-chart' className='chart' style={{ height: '400px', width: '100%' }}></div>
+}
 
-export default SplineChart;
+export default SplineChart
