@@ -18,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -49,6 +50,7 @@ export class BusinessController {
 
   @Get()
   @ApiBearerAuth()
+  @ApiOperation({ summary: '[ADMIN]: get all businesses with query filter' })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(200)
@@ -60,6 +62,7 @@ export class BusinessController {
 
   @Get('status')
   @ApiBearerAuth()
+  @ApiOperation({ summary: '[ADMIN]: get business status' })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(200)
@@ -69,27 +72,21 @@ export class BusinessController {
 
   @Get(':id')
   @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
+  @ApiOperation({ summary: '[ALL]: get detail business by id' })
   async getById(@Param('id') id: string) {
     const result: Business = await this.businessService.findOneById(id);
 
     return result;
   }
 
-  @Post('')
+  @Post()
   @ApiBearerAuth()
+  @ApiOperation({ summary: '[ADMIN, USER, BUSINESS]: create new business' })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   @HttpCode(201)
   @ApiBody({
     type: CreateBusinessDto,
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'User successfully create business.',
   })
   async create(
     @Body()
@@ -104,16 +101,47 @@ export class BusinessController {
     return result;
   }
 
+  @Post(':id/restore-request')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[BUSINESS]: restore business which was soft deleted(closed status)',
+  })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
+  @HttpCode(200)
+  async restoreRequest(@Query('id') id: string) {
+    const result: boolean = await this.businessService.restoreRequest(id);
+
+    return result;
+  }
+
+  @Post(':id/close-request')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[BUSINESS]: if business is approved, "BUSINESS" must be request to delete(close business)',
+  })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
+  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  async requestDelete(@Param('id') id: string, @Req() req: Request) {
+    await this.businessService.requestDelete(id, req.user);
+
+    return true;
+  }
+
   @Patch(':id/information')
   @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[ADMIN, BUSINESS]: update business information (name, description, phoneNumber,...)',
+  })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiBody({ type: UpdateInformationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
   async updateInformation(
     @Param('id') id: string,
     @Body()
@@ -131,14 +159,14 @@ export class BusinessController {
 
   @Patch(':id/addresses')
   @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[ADMIN, BUSINESS]: update business address(province, district, address)',
+  })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
   @ApiBody({ type: UpdateAddressDto })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
   async updateAddresses(
     @Param('id') id: string,
     @Body()
@@ -155,7 +183,11 @@ export class BusinessController {
   }
 
   @Patch(':id/images')
+  @HttpCode(200)
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: '[ADMIN, BUSINESS]: update business images (maximum 4)',
+  })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @ApiBody({
@@ -176,11 +208,6 @@ export class BusinessController {
   @UseInterceptors(
     FilesInterceptor('images', 4, UploadFileConstraint.MULTER_OPTION),
   )
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully update business information.',
-  })
   async updateImages(
     @UploadedFiles() images: Express.Multer.File[],
     @Param('id') id: string,
@@ -199,40 +226,27 @@ export class BusinessController {
 
   @Patch(':id/restore')
   @ApiBearerAuth()
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully restore business.',
+  @ApiOperation({
+    summary: '[ADMIN]: restore business which was soft deleted(closed status)',
   })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @HttpCode(200)
   async restore(@Param('id') id: string, @Req() req: Request) {
     const result: boolean = await this.businessService.restore(id, req.user);
 
     return result;
   }
 
-  @Get('restore/request')
-  @ApiBearerAuth()
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.BUSINESS)
-  @HttpCode(200)
-  async restoreRequest(@Query('businessId') id: string) {
-    const result: boolean = await this.businessService.restoreRequest(id);
-
-    return result;
-  }
-
   @Patch(':id/status')
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: '[ADMIN]: update business status',
+  })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(200)
   @ApiQuery({ name: 'type', enum: StatusActionsEnum, required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully modify status business',
-  })
   async handleStatus(
     @Param('id') id: string,
     @Query('type') type: StatusActionsEnum,
@@ -243,15 +257,15 @@ export class BusinessController {
   }
 
   @Delete(':id')
+  @HttpCode(200)
   @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[ADMIN, BUSINESS]: "ADMIN" can delete immediately, "BUSINESS" can delete while their business is "pending"',
+  })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
-  @HttpCode(200)
   @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully deleted business.',
-  })
   async delete(
     @Param('id') id: string,
     @Query('type') type: string,

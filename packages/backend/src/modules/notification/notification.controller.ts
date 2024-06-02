@@ -19,7 +19,7 @@ import { plainToClass } from 'class-transformer';
 import { FindAllNotificationQuery } from './dto/find-all-notification-query';
 import { Request } from 'express';
 
-@Controller('notification')
+@Controller('notifications')
 @ApiTags('notification')
 @ApiBearerAuth()
 export class NotificationController {
@@ -42,10 +42,16 @@ export class NotificationController {
   @HttpCode(200)
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS, UserRole.USER)
-  async findAllNotification(@Query() data: FindAllNotificationQuery) {
+  async findAllNotification(
+    @Query() data: FindAllNotificationQuery,
+    @Req() req: Request,
+  ) {
     const transferData = plainToClass(FindAllNotificationQuery, data);
 
-    return await this.notificationService.findAllNotification(transferData);
+    return await this.notificationService.findAllNotification(
+      transferData,
+      req.user,
+    );
   }
 
   @Patch('all/read')
@@ -53,6 +59,14 @@ export class NotificationController {
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS, UserRole.USER)
   async markAllAsRead(@Req() req: Request) {
-    return await this.notificationService.markAllAsRead(req.user.id);
+    return await this.notificationService.markAllAsRead(req.user);
+  }
+
+  @Patch(':id/read')
+  @HttpCode(200)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS, UserRole.USER)
+  async markAsRead(@Param('id') id: string, @Req() req: Request) {
+    return await this.notificationService.markAsRead(id, req.user);
   }
 }

@@ -14,10 +14,11 @@ export class FindAllBusinessQuery extends QueryFilterBase {
   @ApiPropertyOptional({ example: '0453 502 258' })
   phoneNumber: string;
 
-  @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: '6654531573a483ab7bf58949' })
-  categoryId: string;
+  @ApiPropertyOptional({
+    example: ['6654531573a483ab7bf58949', '6654535673a483ab7bf5894b'],
+  })
+  categoryIds: string[];
 
   @IsOptional()
   @ApiPropertyOptional({ required: false, example: ['3', '5'] })
@@ -34,10 +35,9 @@ export class FindAllBusinessQuery extends QueryFilterBase {
   province: string;
 
   @ApiPropertyOptional({
-    example: 'approved',
-    enum: BusinessStatusEnum,
+    example: ['approved', 'pending'],
   })
-  status: BusinessStatusEnum;
+  status: BusinessStatusEnum[];
 
   @IsOptional()
   @ApiPropertyOptional({

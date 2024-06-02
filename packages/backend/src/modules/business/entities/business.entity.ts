@@ -3,11 +3,12 @@ import { HydratedDocument, Types } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
+import { CategorySchema } from './category.entity';
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { Image } from './image.entity';
-import { StarSchema } from './star.entity';
 import { ServiceSchema } from './service.entity';
-import { CategorySchema } from './category.entity';
+import { StarSchema } from './star.entity';
+import { Type } from 'class-transformer';
 
 const defaultStars: StarSchema[] = [
   {
@@ -55,9 +56,11 @@ export class Business extends BaseEntity {
   images: Image[];
 
   @Prop({ type: CategorySchema, required: true })
+  @Type(() => CategorySchema)
   category: CategorySchema;
 
   @Prop({ type: [ServiceSchema] })
+  @Type(() => ServiceSchema)
   services: ServiceSchema[];
 
   @Prop({ default: 0 })

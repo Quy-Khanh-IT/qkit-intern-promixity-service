@@ -1,4 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
+import * as dayjs from 'dayjs';
 import { Model } from 'mongoose';
 import {
   BusinessStatusEnum,
@@ -10,7 +11,6 @@ import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositor
 import { UpdateAddressDto } from '../dto/update-address.dto';
 import { Business } from '../entities/business.entity';
 import { BusinessRepositoryInterface } from '../interfaces/business-repo.interface';
-import * as dayjs from 'dayjs';
 
 export class BusinessRepository
   extends BaseRepositoryAbstract<Business>

@@ -7,6 +7,8 @@ import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 
 export class FindAllNotificationQuery extends NoDateQueryFilterBase {
   @IsOptional()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: ['true', 'false'] })
   isRead: string;
+
+  userId: string;
 }
