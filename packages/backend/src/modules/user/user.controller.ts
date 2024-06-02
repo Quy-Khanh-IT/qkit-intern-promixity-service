@@ -72,24 +72,6 @@ export class UserController {
     return plainToClass(User, result);
   }
 
-  @Get(':userId/profile')
-  @ApiBearerAuth()
-  @UseGuards(JwtAccessTokenGuard)
-  @HttpCode(200)
-  async getProfileUser(
-    @Param('userId') id: string,
-    @Req() req: Request,
-    @Query() data: GetUserProfileForAdminDto,
-  ): Promise<User> {
-    const result = await this.userService.getDetailProfile(
-      id,
-      data.userStatus,
-      req.user,
-    );
-
-    return plainToClass(User, result);
-  }
-
   @Get('/all/businesses')
   @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
