@@ -41,7 +41,6 @@ const LineChart: React.FC = () => {
   return (
     <>
       <div id='chartContainer1' style={{ height: '300px', width: '100%' }}></div>
-      <script src='https://cdn.canvasjs.com/canvasjs.min.js' defer></script>
     </>
   )
 }
