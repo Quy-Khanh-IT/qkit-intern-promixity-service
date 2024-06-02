@@ -8,7 +8,7 @@ import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
 import { Image } from './image.entity';
 import { ServiceSchema } from './service.entity';
 import { StarSchema } from './star.entity';
-import { Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 
 const defaultStars: StarSchema[] = [
   {
@@ -112,7 +112,12 @@ export class Business extends BaseEntity {
   status: BusinessStatusEnum;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Exclude()
   userId: Types.ObjectId;
+
+  @Transform((value) => value.obj?.userId?.toString(), { toClassOnly: true })
+  @Expose()
+  user_id?: string;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
