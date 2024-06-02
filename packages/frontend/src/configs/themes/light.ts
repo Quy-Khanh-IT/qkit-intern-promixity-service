@@ -2,13 +2,16 @@ import variables from '@/sass/common/_variables.module.scss'
 import { ThemeConfig } from 'antd'
 const { mainColor, light, dark, subColor, subColor2, grayRowHover, errorColor } = variables
 
+const mainFontFamily = 'Nunito, sans-serif'
+export const subFrontFamily = 'Jost, sans-serif'
+
 export const themConfig: ThemeConfig = {
   token: {
     colorPrimary: mainColor,
     colorText: dark,
     colorError: errorColor,
     fontSize: 16,
-    fontFamily: 'Nunito, sans-serif',
+    fontFamily: mainFontFamily,
 
     colorBgContainer: light
   },

@@ -1,12 +1,20 @@
 'use client'
 import React from 'react'
-import LineChart from './components/LineChart'
+import PieChart from './components/PieChart'
+import SplineChart from './components/SplineChart'
+import { Col, Row } from 'antd'
 
 const Dashboard: React.FC = () => {
   return (
     <>
-      <LineChart />
-      <div>hello world</div>
+      {/* <PieChart /> */}
+      <Row>
+        <Col span={24} className='d-flex justify-content-center'>
+          <Col span={16}>
+            <SplineChart />
+          </Col>
+        </Col>
+      </Row>
     </>
   )
 }
