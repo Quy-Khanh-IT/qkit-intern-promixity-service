@@ -130,11 +130,11 @@ const ManageBusiness = (): React.ReactNode => {
       </div>
     ),
     filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()),
+    // onFilter: (value, record: IBusiness) =>
+    //   record[dataIndex as keyof IBusiness]
+    //     .toString()
+    //     .toLowerCase()
+    //     .includes((value as string).toLowerCase()),
     onFilterDropdownOpenChange: (visible): void => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100)
