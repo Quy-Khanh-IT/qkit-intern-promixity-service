@@ -1,25 +1,28 @@
 'use client'
 import Map from './components'
-import type { MenuProps } from 'antd'
 import { Layout, Image, Input } from 'antd'
 import './map.scss'
 import { useState } from 'react'
+import { useFindNearByQuery } from '@/services/near-by.service'
+import { IFindNearByPayLoad, IFindNearByResponse } from '@/types/near-by'
 
 export default function MapPage(): React.ReactNode {
   const { Header, Content, Sider } = Layout
   const { Search } = Input
   const [collapsed, setCollapsed] = useState(true)
 
-  type MenuItem = Required<MenuProps>['items'][number]
+  const [searchText, setSearchText] = useState('')
 
-  function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[]): MenuItem {
-    return {
-      key,
-      icon,
-      children,
-      label
-    } as MenuItem
+  const data: IFindNearByPayLoad = {
+    latitude: 10.78,
+    longitude: 106.78,
+    radius: 10
   }
+
+  // Use the query hook here
+  const { data: response, error, isLoading } = useFindNearByQuery(data)
+
+  const handleOnSearch = (): void => {}
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -45,11 +48,15 @@ export default function MapPage(): React.ReactNode {
           </div>
           <div className='search-wrapper d-flex justify-content-center align-items-center'>
             <Search
+              allowClear
               className='ml-2'
               placeholder='input search text'
+              size='middle'
               enterButton='Search'
-              size='large'
               loading={false}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onSearch={handleOnSearch}
             />
           </div>
         </Header>

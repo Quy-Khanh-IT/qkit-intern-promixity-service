@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
  */
 
 const clarifyError = (error: ErrorResponse): string => {
+  debugger
   const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
   let errorMessage: string | undefined = error?.data?.message || 'Something wrong on server!'
 

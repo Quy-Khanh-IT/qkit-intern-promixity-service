@@ -13,7 +13,7 @@ export interface IBusiness {
   district: string
   country: string
   dayOfWeek: IDayOfWeek[]
-  userId: string
+  userId: Buffer
   images: IBusinessImage[]
   stars: IStar[]
   created_at: string
@@ -31,7 +31,7 @@ export interface IStar {
 
 export interface ICategory {
   name: string
-  id: string
+  id: Buffer
 }
 
 export interface IBusinessImage {
@@ -50,11 +50,11 @@ export interface IDayOfWeek {
 
 export interface IBusinessCategory {
   name: string
-  id: string
+  id: Buffer
 }
 
 export interface IService {
   name: string
-  id: string
+  id: Buffer
   order: number
 }
