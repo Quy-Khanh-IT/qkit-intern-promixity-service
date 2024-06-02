@@ -70,6 +70,16 @@ export class BusinessController {
     return this.businessService.getStatus();
   }
 
+  @Get('actions')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[ADMIN]: get actions' })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @HttpCode(200)
+  getActions() {
+    return this.businessService.getActions();
+  }
+
   @Get(':id')
   @HttpCode(200)
   @ApiOperation({ summary: '[ALL]: get detail business by id' })

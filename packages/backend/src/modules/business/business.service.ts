@@ -189,11 +189,15 @@ export class BusinessService {
   async findOneById(id: string): Promise<Business> {
     const business = await this.businessRepository.findOneById(id);
 
-    return business;
+    return plainToClass(Business, business);
   }
 
   getStatus(): BusinessStatusEnum[] {
     return Object.values(BusinessStatusEnum);
+  }
+
+  getActions(): StatusActionsEnum[] {
+    return Object.values(StatusActionsEnum);
   }
 
   async getAllByUser(userId: string): Promise<FindAllResponse<Business>> {
