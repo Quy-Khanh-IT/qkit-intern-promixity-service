@@ -1,13 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import {
-  NotificationTypeEnum,
-  ResourceEnum,
-} from 'src/common/enums/notification.enum';
+import { NotificationTypeEnum } from 'src/common/enums/notification.enum';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { SenderSchema } from './sender.entity';
-import { ReceiverSchema } from './receiver.entity';
-// import { Option } from './option.entity';
 
 @Schema({
   timestamps: {
@@ -16,10 +10,10 @@ import { ReceiverSchema } from './receiver.entity';
   },
 })
 export class Notification extends BaseEntity {
-  @Prop()
+  @Prop({ trim: true })
   title: string;
 
-  @Prop()
+  @Prop({ trim: true })
   content: string;
 
   @Prop({

@@ -14,9 +14,10 @@ export class NotificationRepository
   ) {
     super(notificationModel);
   }
+
   async markAllAsRead(userId: string): Promise<boolean> {
     const result = await this.notificationModel.updateMany(
-      { senderId: userId },
+      { receiverId: userId },
       { isRead: true },
     );
 

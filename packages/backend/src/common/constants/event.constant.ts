@@ -1,22 +1,12 @@
-export enum EventDispatcherEnum {
-  CREATE_BUSINESS = 'create.business',
-  CLOSE_BUSINESS = 'close.business',
-  RESTORE_BUSINESS = 'restore.business',
-  REPORT_BUSINESS = 'report.business',
-}
-
-export enum NotificationTypeEnum {
-  CREATE_BUSINESS = 'create_business',
-  CLOSE_BUSINESS = 'close_business',
-  RESTORE_BUSINESS = 'restore_business',
-  REPORT_BUSINESS = 'report_business',
-}
+import { NotificationTypeEnum } from '../enums/notification.enum';
 
 export const NOTIFICATION_TITLES = {
   [NotificationTypeEnum.CREATE_BUSINESS]: 'Business registered',
   [NotificationTypeEnum.CLOSE_BUSINESS]: 'Business closed',
   [NotificationTypeEnum.RESTORE_BUSINESS]: 'Business restored',
   [NotificationTypeEnum.REPORT_BUSINESS]: 'Business reported',
+  [NotificationTypeEnum.REJECT_BUSINESS]: 'Business rejected',
+  [NotificationTypeEnum.BANNED_BUSINESS]: 'Business banned',
 };
 
 export const NOTIFICATION_CONTENTS = {
@@ -25,4 +15,6 @@ export const NOTIFICATION_CONTENTS = {
   [NotificationTypeEnum.CLOSE_BUSINESS]: 'Business has been closed',
   [NotificationTypeEnum.RESTORE_BUSINESS]: 'Business has been restored',
   [NotificationTypeEnum.REPORT_BUSINESS]: 'Business has been reported',
+  [NotificationTypeEnum.REJECT_BUSINESS]: 'Business has been rejected',
+  [NotificationTypeEnum.BANNED_BUSINESS]: 'Business has been banned',
 };

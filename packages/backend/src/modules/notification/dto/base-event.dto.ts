@@ -1,8 +1,5 @@
 import { IsEnum, IsString } from 'class-validator';
-import {
-  NotificationTypeEnum,
-  ResourceEnum,
-} from 'src/common/enums/notification.enum';
+import { NotificationTypeEnum } from 'src/common/enums/notification.enum';
 
 export class BaseEventDto {
   @IsString()

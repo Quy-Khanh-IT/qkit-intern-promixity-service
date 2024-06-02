@@ -8,7 +8,6 @@ import {
   ERROR_CODES,
   ERRORS_DICTIONARY,
 } from 'src/common/constants/error.constant';
-import { EventDispatcherEnum } from 'src/common/constants/event.constant';
 import {
   BusinessStatusEnum,
   OrderNumberDay,
@@ -32,7 +31,6 @@ import { CategoryService } from '../category/category.service';
 import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -41,11 +39,16 @@ import { ValidateAddressDto } from './dto/validate-address.dto';
 import { Business } from './entities/business.entity';
 import { CreateBusinessEvent } from './events/create-business.event';
 import { BusinessRepository } from './repository/business.repository';
+import { ServiceService } from '../service/service.service';
+import { RejectBusinessEvent } from './events/reject-business.event';
+import { BannedBusinessEvent } from './events/banned-business.event';
+import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
+import { CloseBusinessEvent } from './events/close-business.event';
+import { RestoreBusinessEvent } from './events/restore-business.event';
 
 @Injectable()
 export class BusinessService {
   constructor(
-    private readonly userService: UserService,
     private readonly ServiceService: ServiceService,
     private readonly categoryService: CategoryService,
     private readonly uploadFileService: UploadFileService,
@@ -95,16 +98,36 @@ export class BusinessService {
       matchStage['province'] = { $regex: query.province, $options: 'i' };
     }
 
-    if (query.status) {
-      matchStage['status'] = query.status;
+    if (query.status && query.status.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.status)) {
+        arr.push(query.status);
+      } else {
+        arr = query.status;
+      }
+
+      matchStage['status'] = {
+        $in: arr,
+      };
     }
 
     if (query.phoneNumber) {
       matchStage['phoneNumber'] = { $regex: query.phoneNumber, $options: 'i' };
     }
 
-    if (query.categoryId) {
-      matchStage['category._id'] = transStringToObjectId(query.categoryId);
+    if (query.categoryIds && query.categoryIds.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.categoryIds)) {
+        arr.push(query.categoryIds);
+      } else {
+        arr = query.categoryIds;
+      }
+
+      matchStage['category._id'] = {
+        $in: arr.map((id) => transStringToObjectId(id)),
+      };
     }
 
     if (query.starsRating && query.starsRating.length > 0) {
@@ -292,6 +315,7 @@ export class BusinessService {
       this.eventEmitter.emit(
         EventDispatcherEnum.CREATE_BUSINESS,
         new CreateBusinessEvent({
+          content: `User '${user.firstName} ${user.lastName}' has registered a new business '${business.name}' (id: ${business._id}). Please check and approve it.`,
           senderId: user.id,
           receiverId: null, // "null" to send to admin
         }),
@@ -421,7 +445,6 @@ export class BusinessService {
   // case 2:
   // when business is approved, user can't delete, only admin can delete (user can send a request to admin to delete)
   async softDelete(businessId: string, user: User): Promise<boolean> {
-    console.log('softDelete businessId: ', businessId);
     const foundBusiness = await this.businessRepository.findOneById(businessId);
 
     if (!foundBusiness) {
@@ -431,7 +454,7 @@ export class BusinessService {
     // Check business status
     // case 1: If user is "ADMIN": can force delete any business
     if (user.role === UserRole.ADMIN) {
-      return await this.businessRepository.softDeleteBusiness(businessId);
+      return await this.businessRepository.softDelete(businessId);
     }
 
     // case 2: If user is "BUSINESS": request to delete business
@@ -440,13 +463,14 @@ export class BusinessService {
       throw new BusinessNotBelongException();
     }
 
+    // check status of business
     if (foundBusiness.status === BusinessStatusEnum.PENDING) {
-      return await this.businessRepository.softDeleteBusiness(businessId);
+      return await this.businessRepository.softDelete(businessId);
     }
 
     if (foundBusiness.status === BusinessStatusEnum.APPROVED) {
       throw new BusinessStatusException(
-        'Can not delete business. Please contact admin to close business',
+        'Can not delete business. Please contact admin to delete business',
       );
     }
   }
@@ -469,13 +493,40 @@ export class BusinessService {
     }
 
     // Check if business is already soft deleted
-    if (foundBusiness.status !== BusinessStatusEnum.CLOSED) {
+    if (foundBusiness.deleted_at === null) {
       throw new BusinessStatusException(
         "Can't hard delete business. Must be soft deleted first.",
       );
     }
 
     return await this.businessRepository.hardDelete(businessId);
+  }
+
+  async requestDelete(businessId: string, user: User) {
+    const business = await this.businessRepository.findOneById(businessId);
+
+    if (!business) {
+      throw new BusinessNotFoundException();
+    }
+
+    if (user.id !== business.userId.toString()) {
+      throw new BusinessNotBelongException();
+    }
+
+    if (business.status !== BusinessStatusEnum.APPROVED) {
+      throw new BusinessStatusException();
+    }
+
+    this.eventEmitter.emit(
+      EventDispatcherEnum.CLOSE_BUSINESS,
+      new CloseBusinessEvent({
+        content: `User has requested to delete business '${business.name}' (id: ${business.id}). Please check and approve it.`,
+        senderId: user.id,
+        receiverId: null,
+      }),
+    );
+
+    return true;
   }
 
   async restore(businessId: string, user: User): Promise<boolean> {
@@ -500,6 +551,25 @@ export class BusinessService {
   }
 
   async restoreRequest(businessId: string): Promise<boolean> {
+    const business = await this.businessRepository.findOneById(businessId);
+
+    if (!business) {
+      throw new BusinessNotFoundException();
+    }
+
+    if (business.deleted_at === null) {
+      throw new BusinessStatusException('Business is not deleted');
+    }
+
+    this.eventEmitter.emit(
+      EventDispatcherEnum.RESTORE_BUSINESS,
+      new RestoreBusinessEvent({
+        content: `User has requested to restore business '${business.name}' (id: ${business.id}). Please check and approve it.`,
+        senderId: business.userId.toString(),
+        receiverId: null,
+      }),
+    );
+
     return true;
   }
 
@@ -518,9 +588,21 @@ export class BusinessService {
         );
       }
 
-      return !!(await this.businessRepository.update(id, {
+      const result: boolean = !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.APPROVED,
       }));
+
+      this.eventEmitter.emit(
+        EventDispatcherEnum.CREATE_BUSINESS,
+        new CreateBusinessEvent({
+          title: 'Business Approved',
+          content: `Your business '${business.name}' has been approved. Congratulations!`,
+          senderId: null,
+          receiverId: business.userId.toString(),
+        }),
+      );
+
+      return result;
     }
 
     // handle REJECT
@@ -529,31 +611,77 @@ export class BusinessService {
         throw new BusinessStatusException();
       }
 
-      return !!(await this.businessRepository.update(id, {
+      const result: boolean = !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.REJECTED,
       }));
+
+      this.eventEmitter.emit(
+        EventDispatcherEnum.REJECT_BUSINESS,
+        new RejectBusinessEvent({
+          content: `Your business '${business.name}' has been rejected. Please update your business again.`,
+          senderId: null,
+          receiverId: business.userId.toString(),
+        }),
+      );
+
+      return result;
     }
 
     // handle BANNED
     // BANNED business with any business status
     if (type === StatusActionsEnum.BANNED) {
-      return !!(await this.businessRepository.update(id, {
+      const result: boolean = !!(await this.businessRepository.update(id, {
         status: BusinessStatusEnum.BANNED,
       }));
+
+      this.eventEmitter.emit(
+        EventDispatcherEnum.BANNED_BUSINESS,
+        new BannedBusinessEvent({
+          content: `Your business '${business.name}' has been banned. Please contact admin for more information.`,
+          senderId: null,
+          receiverId: business.id,
+        }),
+      );
+
+      return result;
     }
 
-    // handle PENDING
-    if (type === StatusActionsEnum.PENDING) {
-      if (business.status !== BusinessStatusEnum.REJECTED) {
+    // handle CLOSED
+    if (type === StatusActionsEnum.CLOSED) {
+      if (business.status !== BusinessStatusEnum.APPROVED) {
         throw new BusinessStatusException(
-          'This action is only for rejected business, user has already updated and want to register again.',
+          "Can't close business. Must be approved first.",
         );
       }
 
-      return !!(await this.businessRepository.update(id, {
-        status: BusinessStatusEnum.PENDING,
+      const result: boolean = !!(await this.businessRepository.update(id, {
+        status: BusinessStatusEnum.CLOSED,
       }));
+
+      this.eventEmitter.emit(
+        EventDispatcherEnum.CLOSE_BUSINESS,
+        new CloseBusinessEvent({
+          content: `Your business "${business.name}" has been closed. If you want to restore, please contact admin.`,
+          senderId: null,
+          receiverId: business.id,
+        }),
+      );
+
+      return result;
     }
+
+    // handle PENDING
+    // if (type === StatusActionsEnum.PENDING) {
+    //   if (business.status !== BusinessStatusEnum.REJECTED) {
+    //     throw new BusinessStatusException(
+    //       'This action is only for rejected business, user has already updated and want to register again.',
+    //     );
+    //   }
+
+    //   return !!(await this.businessRepository.update(id, {
+    //     status: BusinessStatusEnum.PENDING,
+    //   }));
+    // }
 
     return false;
   }
