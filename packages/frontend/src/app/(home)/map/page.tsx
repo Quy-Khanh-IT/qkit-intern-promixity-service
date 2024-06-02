@@ -4,7 +4,7 @@ import { Layout, Image, Input } from 'antd'
 import './map.scss'
 import { useState } from 'react'
 import { useFindNearByQuery } from '@/services/near-by.service'
-import { IFindNearByPayLoad, IFindNearByResponse } from '@/types/near-by'
+import { IFindNearByPayLoad } from '@/types/near-by'
 
 export default function MapPage(): React.ReactNode {
   const { Header, Content, Sider } = Layout
@@ -16,10 +16,10 @@ export default function MapPage(): React.ReactNode {
   const data: IFindNearByPayLoad = {
     latitude: 10.78,
     longitude: 106.78,
-    radius: 10
+    radius: 10,
+    q: searchText
   }
 
-  // Use the query hook here
   const { data: response, error, isLoading } = useFindNearByQuery(data)
 
   const handleOnSearch = (): void => {}
@@ -40,7 +40,8 @@ export default function MapPage(): React.ReactNode {
             zIndex: 1,
             width: '100%',
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#fff'
           }}
         >
           <div className='demo-logo'>
@@ -62,7 +63,7 @@ export default function MapPage(): React.ReactNode {
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <div className='h-100'>
-            <Map position={[51.505, -0.09]} />
+            <Map zoom={13} position={[10.8772025213594, 106.81227922439577]} />
           </div>
         </Content>
       </Layout>
