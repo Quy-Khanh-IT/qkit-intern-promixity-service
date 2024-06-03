@@ -568,4 +568,10 @@ export class UserService {
       role: UserRole.ADMIN,
     });
   }
+
+  async decentralizeToBusiness(userId: string): Promise<boolean> {
+    return !!(await this.userRepository.update(userId, {
+      role: UserRole.BUSINESS,
+    }));
+  }
 }

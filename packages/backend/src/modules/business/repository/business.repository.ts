@@ -56,28 +56,28 @@ export class BusinessRepository
       }
     }
 
-    if (oldStar && parseInt(oldStar)) {
-      switch (parseInt(oldStar)) {
-        case 1:
-          oldStar = 'ONE';
-          break;
-        case 2:
-          oldStar = 'TWO';
-          break;
-        case 3:
-          oldStar = 'THREE';
-          break;
-        case 4:
-          oldStar = 'FOUR';
-          break;
-        case 5:
-          oldStar = 'FIVE';
-          break;
-      }
-    }
-
     // If "EDIT" action, we need to find the old star and decrease the count
     if (type === ReviewActionEnum.EDIT && oldStar) {
+      if (parseInt(oldStar)) {
+        switch (parseInt(oldStar)) {
+          case 1:
+            oldStar = 'ONE';
+            break;
+          case 2:
+            oldStar = 'TWO';
+            break;
+          case 3:
+            oldStar = 'THREE';
+            break;
+          case 4:
+            oldStar = 'FOUR';
+            break;
+          case 5:
+            oldStar = 'FIVE';
+            break;
+        }
+      }
+
       const decreaseOldStar = {
         $inc: {
           'stars.$[element].count': -1,
@@ -126,6 +126,14 @@ export class BusinessRepository
           },
         };
         break;
+      case ReviewActionEnum.RESTORE:
+        updates = {
+          $inc: {
+            totalReview: 1,
+            'stars.$[element].count': 1,
+          },
+        };
+        break;
     }
 
     const filters: any = {
@@ -144,10 +152,11 @@ export class BusinessRepository
     );
 
     // update rating
-    const totalStars = result.stars.reduce(
-      (acc, star) => acc + star.star * star.count,
-      0,
-    );
+    const totalStars = result.stars.reduce((acc, star) => {
+      const starNum = parseInt(star.star);
+
+      return acc + starNum * star.count;
+    }, 0);
 
     const overallRating =
       result.totalReview > 0 ? totalStars / result.totalReview : 0;

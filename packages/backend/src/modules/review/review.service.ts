@@ -10,6 +10,7 @@ import {
   ReviewActionEnum,
   ReviewTypeEnum,
   StarEnum,
+  UserRole,
 } from 'src/common/enums';
 import {
   BusinessNotFoundException,
@@ -20,6 +21,7 @@ import {
   ReviewDeleteException,
   ReviewForbiddenException,
   ReviewNotFoundException,
+  ReviewUnauthorizeException,
 } from 'src/common/exceptions/review.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
@@ -32,6 +34,9 @@ import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { ReplyReviewDto } from './dto/reply-review.dto';
 import { Review } from './entities/review.entity';
 import { ReviewRepository } from './repository/review.repository';
+import { transStringToObjectId } from 'src/common/utils';
+import { User } from '../user/entities/user.entity';
+import { Business } from '../business/entities/business.entity';
 
 @Injectable()
 export class ReviewService {
@@ -68,31 +73,44 @@ export class ReviewService {
     let sortStage: Record<string, any> = {};
     const finalPipeline: PipelineStage[] = [];
 
-    if (query.comment) {
-      matchStage['comment'] = { $regex: query.comment, $options: 'i' };
+    if (query.content) {
+      matchStage['content'] = { $regex: query.content, $options: 'i' };
     }
 
     if (query.type) {
-      matchStage['type'] = query.type;
-    }
+      let arr = [];
 
-    if (query.fromStar && query.toStar) {
-      matchStage['star'] = {
-        $gte: parseInt(query.fromStar.toString()),
-        $lte: parseInt(query.toStar.toString()),
+      if (!Array.isArray(query.type)) {
+        arr.push(query.type);
+      } else {
+        arr = query.type;
+      }
+
+      matchStage['type'] = {
+        $in: arr,
       };
-    } else if (query.fromStar) {
-      matchStage['star'] = { $gte: parseInt(query.fromStar.toString()) };
-    } else {
-      matchStage['star'] = { $lte: parseInt(query.toStar.toString()) };
     }
 
-    if (query.user_id) {
-      matchStage['user_id'] = query.user_id;
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.starsRating)) {
+        arr.push(query.starsRating);
+      } else {
+        arr = query.starsRating;
+      }
+
+      matchStage['star'] = {
+        $in: arr,
+      };
     }
 
-    if (query.business_id) {
-      matchStage['business_id'] = query.business_id;
+    if (query.userId) {
+      matchStage['userId'] = transStringToObjectId(query.userId);
+    }
+
+    if (query.businessId) {
+      matchStage['businessId'] = transStringToObjectId(query.businessId);
     }
 
     const result = PaginationHelper.configureBaseQueryFilter(
@@ -116,10 +134,12 @@ export class ReviewService {
   }
 
   async findById(id: string): Promise<Review> {
-    return await this.reviewRepository.findOneById(id);
+    const review = await this.reviewRepository.findOneById(id);
+
+    return plainToClass(Review, review);
   }
 
-  async create(createReviewDto: CreateReviewDto, userId: string) {
+  async createPreview(createReviewDto: CreateReviewDto, user: User) {
     const business = await this.businessService.findOneById(
       createReviewDto.businessId,
     );
@@ -140,11 +160,12 @@ export class ReviewService {
       transactionSession.startTransaction();
 
       const review = await this.reviewRepository.create({
-        comment: createReviewDto.comment,
-        star: StarEnum[createReviewDto.star],
+        content: createReviewDto.content,
+        star: parseInt(createReviewDto.star),
         type: ReviewTypeEnum.REVIEW,
-        business_id: business.id,
-        user_id: userId,
+        businessId: transStringToObjectId(business.id),
+        senderId: user._id,
+        receiverId: transStringToObjectId(business.user_id),
       });
 
       await this.businessService.updateRating(
@@ -156,7 +177,7 @@ export class ReviewService {
       await transactionSession.commitTransaction();
       transactionSession.endSession();
 
-      return review;
+      return plainToClass(Review, review);
     } catch (err) {
       await transactionSession.abortTransaction();
 
@@ -166,10 +187,10 @@ export class ReviewService {
     }
   }
 
-  async response(
+  async createResponse(
     replyReviewDto: ReplyReviewDto,
     parentReviewId: string,
-    userId: string,
+    senderId: string,
   ) {
     const review = await this.reviewRepository.findOneById(parentReviewId);
 
@@ -180,38 +201,36 @@ export class ReviewService {
     const currentDepth = review.depth;
 
     if (currentDepth === ReviewConstant.MAX_DEPTH) {
-      parentReviewId = review.parent_id.toString();
+      parentReviewId = review.parentId.toString();
     }
 
     const newResponse = await this.reviewRepository.create({
-      comment: replyReviewDto.comment,
+      content: replyReviewDto.content,
       star: null,
-      business_id: review.business_id,
-      user_id: userId,
-      parent_id: parentReviewId,
+      businessId: review.businessId,
+      senderId: transStringToObjectId(senderId),
+      parentId: transStringToObjectId(parentReviewId),
+      receiverId: review.senderId,
       type: ReviewTypeEnum.REPLY,
       depth:
         currentDepth < ReviewConstant.MAX_DEPTH
           ? currentDepth + 1
           : ReviewConstant.MAX_DEPTH,
-      // can_reply: currentDepth + 1 < 3,
-      // is_business_owner_reply: business.user_id.toString() === userId,
     });
 
-    return newResponse;
+    return plainToClass(Review, newResponse);
   }
 
   async editReview(
     id: string,
     editReviewDto: EditReviewDto,
-    userId: string,
-  ): Promise<Review> {
+    senderId: string,
+  ): Promise<boolean> {
     const oldReview = await this.reviewRepository.findOneByCondition({
       _id: id,
-      user_id: userId,
+      senderId: transStringToObjectId(senderId),
       type: ReviewTypeEnum.REVIEW,
-      parent_id: null, // ensure that this is a review, not a response
-      deleted_at: null, // ensure that this review is not deleted
+      parentId: null, // ensure that this is a review, not a response
     });
 
     if (!oldReview) {
@@ -226,12 +245,12 @@ export class ReviewService {
       transactionSession.startTransaction();
 
       const editedReview = await this.reviewRepository.update(id, {
-        comment: editReviewDto.comment,
+        content: editReviewDto.content,
         star: parseInt(editReviewDto.star),
       });
 
       await this.businessService.updateRating(
-        editedReview.business_id.toString(),
+        editedReview.businessId.toString(),
         ReviewActionEnum.EDIT,
         editedReview.star.toString(),
         oldReview.star.toString(),
@@ -240,7 +259,7 @@ export class ReviewService {
       await transactionSession.commitTransaction();
       transactionSession.endSession();
 
-      return editedReview;
+      return !!editedReview;
     } catch (err) {
       await transactionSession.abortTransaction();
       transactionSession.endSession();
@@ -252,11 +271,11 @@ export class ReviewService {
   async editResponse(
     id: string,
     editResponseDto: EditResponseDto,
-    userId: string,
-  ): Promise<Review> {
+    senderId: string,
+  ): Promise<boolean> {
     const response = await this.reviewRepository.findOneByCondition({
-      _id: id,
-      user_id: userId,
+      _id: transStringToObjectId(id),
+      senderId: transStringToObjectId(senderId),
       type: ReviewTypeEnum.REPLY,
     });
 
@@ -267,26 +286,39 @@ export class ReviewService {
     }
 
     const editedResponse = await this.reviewRepository.update(id, {
-      comment: editResponseDto.comment,
+      content: editResponseDto.content,
     });
 
-    return editedResponse;
+    return !!editedResponse;
   }
 
-  async softDelete(id: string, userId: string): Promise<boolean> {
-    const review = await this.reviewRepository.findOneByCondition({
-      _id: id,
-      user_id: userId,
-      type: ReviewTypeEnum.REVIEW,
-      parent_id: null,
-      deleted_at: null,
-    });
+  async softDelete(id: string, user: User): Promise<boolean> {
+    let review: Review;
 
-    if (!review) {
-      throw new ReviewDeleteException(
-        "Can't delete this review. Review not found or not belong to user or already deleted or not a review.",
-      );
+    if (user.role === UserRole.ADMIN) {
+      review = await this.reviewRepository.findOneByCondition({
+        _id: transStringToObjectId(id),
+        type: ReviewTypeEnum.REVIEW,
+        parentId: null,
+        deleted_at: null,
+      });
+    } else {
+      review = await this.reviewRepository.findOneByCondition({
+        _id: transStringToObjectId(id),
+        senderId: user._id,
+        type: ReviewTypeEnum.REVIEW,
+        parentId: null,
+        deleted_at: null,
+      });
+
+      if (!review) {
+        throw new ReviewDeleteException(
+          "Can't delete this review. Review not found or not belong to user or already deleted or not a review.",
+        );
+      }
     }
+
+    console.log('review', review);
 
     const transactionSession = await this.connection.startSession();
 
@@ -294,7 +326,7 @@ export class ReviewService {
       transactionSession.startTransaction();
 
       await this.businessService.updateRating(
-        review.business_id.toString(),
+        review.businessId.toString(),
         ReviewActionEnum.DELETE,
         review.star.toString(),
       );
@@ -313,11 +345,15 @@ export class ReviewService {
     }
   }
 
-  async hardDelete(id: string): Promise<boolean> {
+  async hardDelete(id: string, user: User): Promise<boolean> {
+    if (user.role !== UserRole.ADMIN) {
+      throw new ReviewUnauthorizeException();
+    }
+
     const review = await this.reviewRepository.findOneByConditionWithDeleted({
-      _id: id,
+      _id: transStringToObjectId(id),
       type: ReviewTypeEnum.REVIEW,
-      parent_id: null, // ensure that this is a review, not a response
+      parentId: null, // ensure that this is a review, not a response
     });
 
     if (!review) {
@@ -327,6 +363,46 @@ export class ReviewService {
     }
 
     return !!(await this.deleteWithChildren(id));
+  }
+
+  async restoreReview(reviewId: string) {
+    const review = await this.reviewRepository.findOneByConditionWithDeleted({
+      _id: transStringToObjectId(reviewId),
+      type: ReviewTypeEnum.REVIEW,
+      parentId: null, // ensure that this is a review, not a response
+    });
+
+    if (!review) {
+      throw new ReviewNotFoundException(
+        "Can't restore this review. Review are not deleted or not found.",
+      );
+    }
+
+    const transactionSession = await this.connection.startSession();
+
+    try {
+      transactionSession.startTransaction();
+
+      await this.businessService.updateRating(
+        review.businessId.toString(),
+        ReviewActionEnum.RESTORE,
+        review.star.toString(),
+      );
+
+      const restoreReview = await this.reviewRepository.restore(review.id);
+
+      await transactionSession.commitTransaction();
+      transactionSession.endSession();
+
+      return !!restoreReview;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      transactionSession.endSession();
+
+      return false;
+    }
+
+    return !!(await this.reviewRepository.restore(review.id));
   }
 
   async deleteResponses(id: string, userId: string): Promise<boolean> {
@@ -346,7 +422,7 @@ export class ReviewService {
 
   async deleteWithChildren(id: string) {
     const children = await this.reviewRepository.findAll({
-      parent_id: id,
+      parentId: id,
     });
 
     // Recursively delete each child review
@@ -356,4 +432,6 @@ export class ReviewService {
 
     return !!(await this.reviewRepository.hardDelete(id));
   }
+
+  async restore() {}
 }
