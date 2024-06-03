@@ -11,3 +11,8 @@ export interface IPaginationResponse<T = unknown> {
   totalPages: number
   totalRecords: number
 }
+
+export interface IOptionsPagination<T = unknown> {
+  count: number
+  items: T[]
+}

@@ -6,19 +6,18 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
 import { GET_PROFILE_OPTIONS } from '@/constants/baseQuery'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
   useGetAllUsersQuery,
-  useGetPrivateProfileQuery,
+  useGetPrivateUserProfileQuery,
   useRestoreDeletedUserMutation,
   useUpdateUserRoleMutation
 } from '@/services/user.service'
-import { ColorConstant, ColumnsType, SelectionOptions } from '@/types/common'
-import { RoleEnum } from '@/types/enum'
-import { GetAllUsersQuery } from '@/types/query'
+import { ColumnsType, IOptionsPipe } from '@/types/common'
+import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
@@ -38,10 +37,10 @@ import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { compareDates } from '../../../utils/helpers.util'
-import { DELETE_USER_OPTIONS, MANAGE_USER_FIELDS } from './manage-user.const'
+import { DELETE_OPTIONS } from '../admin.constant'
+import { generateRoleColor } from '../utils/generate-color.util'
+import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
-
-export interface IManageUserProps {}
 
 const { Text } = Typography
 const { RangePicker } = DatePicker
@@ -57,10 +56,9 @@ const DECENTRALIZE_OPTION = 2
 const RESTORE_OPTION = 2
 const DELETE_OPTION = 3
 
-// For search
 type DataIndex = keyof IUserInformation
-
-type SearchIndex = keyof GetAllUsersQuery
+// For search
+type SearchIndex = keyof IGetAllUsersQuery
 
 const ManageUser = (): React.ReactNode => {
   // Pagination
@@ -69,11 +67,11 @@ const ManageUser = (): React.ReactNode => {
   // User data
   const [userOption, setUserOption] = useState<string>(ACTIVE_FETCH)
   const userOptionBoolean: boolean = useMemo<boolean>(() => userOption === DELETED_FETCH, [userOption])
-  const [queryData, setQueryData] = useState<GetAllUsersQuery>({
+  const [queryData, setQueryData] = useState<IGetAllUsersQuery>({
     offset: currentPage,
     limit: PAGE_SIZE,
     isDeleted: userOptionBoolean
-  } as GetAllUsersQuery)
+  } as IGetAllUsersQuery)
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
   const [selectedUser, setSelectedUser] = useState<IUserInformation | null>(null)
 
@@ -87,7 +85,7 @@ const ManageUser = (): React.ReactNode => {
   const [deleteUserMutation] = useDeleteUserMutation()
   const [updateUserRoleMutation] = useUpdateUserRoleMutation()
   const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
-  const { data: privateProfileData } = useGetPrivateProfileQuery(
+  const { data: privateProfileData } = useGetPrivateUserProfileQuery(
     {
       userId: selectedUser?.id || '',
       userStatus: userOptionBoolean ? GET_PROFILE_OPTIONS.DELETED : GET_PROFILE_OPTIONS.ACTIVE
@@ -103,7 +101,7 @@ const ManageUser = (): React.ReactNode => {
           ...prev,
           offset: currentPage,
           isDeleted: userOptionBoolean
-        }) as GetAllUsersQuery
+        }) as IGetAllUsersQuery
     )
   }, [currentPage, userOptionBoolean])
 
@@ -124,11 +122,11 @@ const ManageUser = (): React.ReactNode => {
     setCurrentPage(ORIGIN_PAGE)
   }
 
-  const mapQueryData = (_queryData: GetAllUsersQuery, dataIndex: DataIndex, value: string): GetAllUsersQuery => {
+  const mapQueryData = (_queryData: IGetAllUsersQuery, dataIndex: DataIndex, value: string): IGetAllUsersQuery => {
     const queryDataTemp =
       (dataIndex as string) === 'phoneNumber'
-        ? ({ ..._queryData, phone: value } as GetAllUsersQuery)
-        : ({ ..._queryData, [dataIndex]: value } as GetAllUsersQuery)
+        ? ({ ..._queryData, phone: value } as IGetAllUsersQuery)
+        : ({ ..._queryData, [dataIndex]: value } as IGetAllUsersQuery)
     return queryDataTemp
   }
 
@@ -139,9 +137,9 @@ const ManageUser = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: GetAllUsersQuery = { ...prev }
+        const queryTemp: IGetAllUsersQuery = { ...prev }
         delete queryTemp[dataIndex as SearchIndex]
-        return { ...queryTemp } as GetAllUsersQuery
+        return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
       setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys[0]))
@@ -155,12 +153,12 @@ const ManageUser = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: GetAllUsersQuery = { ...prev }
+        const queryTemp: IGetAllUsersQuery = { ...prev }
         delete queryTemp[dataIndex as SearchIndex]
-        return { ...queryTemp } as GetAllUsersQuery
+        return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as GetAllUsersQuery)
+      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as IGetAllUsersQuery)
     }
   }
 
@@ -228,6 +226,7 @@ const ManageUser = (): React.ReactNode => {
       width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'firstName',
+        placeholder: MANAGE_USER_FIELDS.firstName,
         _handleSearch: handleSearch
       })
     },
@@ -238,6 +237,7 @@ const ManageUser = (): React.ReactNode => {
       width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'lastName',
+        placeholder: MANAGE_USER_FIELDS.lastName,
         _handleSearch: handleSearch
       })
     },
@@ -247,6 +247,7 @@ const ManageUser = (): React.ReactNode => {
       key: 'email',
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'email',
+        placeholder: MANAGE_USER_FIELDS.email,
         _handleSearch: handleSearch
       })
     },
@@ -257,6 +258,7 @@ const ManageUser = (): React.ReactNode => {
       width: 200,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'phoneNumber',
+        placeholder: MANAGE_USER_FIELDS.phoneNumber,
         _handleSearch: handleSearch
       })
     },
@@ -281,12 +283,12 @@ const ManageUser = (): React.ReactNode => {
       width: 250,
       render: (role: string): React.ReactNode => (
         <Tag color={generateRoleColor(role)} key={role} className='me-0'>
-          {role.toUpperCase()}
+          {role?.toUpperCase()}
         </Tag>
       ),
       ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'role',
-        optionsData: rolesData as SelectionOptions[],
+        optionsData: rolesData as IOptionsPipe,
         _handleFilter: handleFilter
       })
     }
@@ -296,22 +298,22 @@ const ManageUser = (): React.ReactNode => {
     {
       label: MANAGE_USER_FIELDS.firstName,
       span: 2,
-      children: privateProfileData?.firstName
+      children: privateProfileData?.firstName || PLACEHOLDER.EMPTY_TEXT
     },
     {
       label: MANAGE_USER_FIELDS.lastName,
       span: 2,
-      children: privateProfileData?.lastName
+      children: privateProfileData?.lastName || PLACEHOLDER.EMPTY_TEXT
     },
     {
       label: MANAGE_USER_FIELDS.email,
       span: 4,
-      children: privateProfileData?.email
+      children: privateProfileData?.email || PLACEHOLDER.EMPTY_TEXT
     },
     {
       label: MANAGE_USER_FIELDS.phoneNumber,
       span: 4,
-      children: privateProfileData?.phoneNumber
+      children: privateProfileData?.phoneNumber || PLACEHOLDER.EMPTY_TEXT
     },
     {
       label: MANAGE_USER_FIELDS.role,
@@ -347,7 +349,7 @@ const ManageUser = (): React.ReactNode => {
 
   const handleDeleteUser = (): void => {
     deleteUserMutation({
-      deleteType: userOptionBoolean ? DELETE_USER_OPTIONS.HARD : DELETE_USER_OPTIONS.SOFT,
+      deleteType: userOptionBoolean ? DELETE_OPTIONS.HARD : DELETE_OPTIONS.SOFT,
       id: selectedUser?.id ?? ''
     })
     refDeleteUserModal.current?.hideModal()
@@ -365,13 +367,13 @@ const ManageUser = (): React.ReactNode => {
   const onChangeDatePicker: RangePickerProps['onChange'] = (_dates: unknown, dateStrings: [string, string]) => {
     if (dateStrings[0] === '' || dateStrings[1] === '') {
       setQueryData((prev) => {
-        const queryTemp: GetAllUsersQuery = { ...prev }
+        const queryTemp: IGetAllUsersQuery = { ...prev }
         delete queryTemp.startDate
         delete queryTemp.endDate
-        return { ...queryTemp } as GetAllUsersQuery
+        return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as GetAllUsersQuery)
+      setQueryData((prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as IGetAllUsersQuery)
     }
   }
 
@@ -421,7 +423,7 @@ const ManageUser = (): React.ReactNode => {
         ref={refViewDetailsModal}
       />
       <DecentralizeModal
-        selectionOptions={rolesData as SelectionOptions[]}
+        selectionOptions={rolesData?.selectionOpts || []}
         presentOption={selectedUser?.role || ''}
         ref={refDecentralizeModal}
         title={'Decentralize'}
@@ -474,17 +476,3 @@ const ManageUser = (): React.ReactNode => {
 }
 
 export default ManageUser
-
-const generateRoleColor = (role: string): string => {
-  let color: string = ''
-
-  if (role === (RoleEnum._ADMIN as string)) {
-    color = ColorConstant._GREEN
-  } else if (role === (RoleEnum._USER as string)) {
-    color = ColorConstant._GEEK_BLUE
-  } else if (role === (RoleEnum._BUSINESS as string)) {
-    color = ColorConstant._VOLCANO
-  }
-
-  return color
-}

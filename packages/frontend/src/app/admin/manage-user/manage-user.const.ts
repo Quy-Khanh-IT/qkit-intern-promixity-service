@@ -6,23 +6,3 @@ export const MANAGE_USER_FIELDS = {
   created_at: 'Created At',
   role: 'Role'
 }
-
-export const MANAGE_USER_ROLE_PROPS = [
-  {
-    text: 'ADMIN',
-    value: 'admin'
-  },
-  {
-    text: 'USER',
-    value: 'user'
-  },
-  {
-    text: 'BUSINESS',
-    value: 'business'
-  }
-]
-
-export const DELETE_USER_OPTIONS = {
-  SOFT: 'soft',
-  HARD: 'hard'
-}

@@ -61,6 +61,9 @@ export default function RootLayout({
           crossOrigin='anonymous'
           defer
         ></script>
+        <script src='https://cdn.canvasjs.com/canvasjs.min.js' defer></script>
+        <script src='https://canvasjs.com/assets/script/jquery-1.11.1.min.js' defer></script>
+        <script src='https://cdn.canvasjs.com/jquery.canvasjs.min.js' defer></script>
       </body>
     </html>
   )

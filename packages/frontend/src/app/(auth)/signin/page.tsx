@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorResponse } from '@/types/error'
-import { saveToLocalStorage } from '@/utils/storage.util'
+import { saveToLocalStorage } from '@/utils/local-storage.util'
 import DevQuote from '../components/DevQuote'
 import './signin.scss'
 

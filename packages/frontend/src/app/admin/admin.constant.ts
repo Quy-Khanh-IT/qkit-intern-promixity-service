@@ -1,6 +1,8 @@
-export const ROLE_COLOR = {
-  GREEN: 'green',
-  GEEKBLUE: 'geekblue'
+import { FilterOptions, SelectionOptions } from '@/types/common'
+
+export const DELETE_OPTIONS = {
+  SOFT: 'soft',
+  HARD: 'hard'
 }
 
 export const SIDEBAR_MENU_OPTIONS = {
@@ -21,3 +23,57 @@ export const SIDEBAR_MENU_OPTIONS = {
     label: 'Manage review'
   }
 }
+
+export const RATING_OPTIONS_FILTERS: FilterOptions[] = [
+  {
+    text: '5 ⭐️',
+    value: '5'
+  },
+  {
+    text: '4 ⭐️',
+    value: '4'
+  },
+  {
+    text: '3 ⭐️',
+    value: '3'
+  },
+  {
+    text: '2 ⭐️',
+    value: '2'
+  },
+  {
+    text: '1 ⭐️',
+    value: '1'
+  },
+  {
+    text: '0 ⭐️',
+    value: '0'
+  }
+] as const
+
+export const RATING_SELECT_FILTERS: SelectionOptions[] = [
+  {
+    label: '5 ⭐️',
+    value: '5'
+  },
+  {
+    label: '4 ⭐️',
+    value: '4'
+  },
+  {
+    label: '3 ⭐️',
+    value: '3'
+  },
+  {
+    label: '2 ⭐️',
+    value: '2'
+  },
+  {
+    label: '1 ⭐️',
+    value: '1'
+  },
+  {
+    label: '0 ⭐️',
+    value: '0'
+  }
+] as const

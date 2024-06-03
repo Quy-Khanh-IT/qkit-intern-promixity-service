@@ -1,5 +1,6 @@
 import { Pagination, Row, Skeleton, Table } from 'antd'
-import { ColumnsType } from 'antd/es/table'
+import { ColumnsType, TablePaginationConfig } from 'antd/es/table'
+import { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface'
 import './table.scss'
 
 export interface ITableProps<T> {
@@ -12,6 +13,12 @@ export interface ITableProps<T> {
     total: number
     onChange: (_page: number, _pageSize: number) => void
   }
+  _onChange?: (
+    _pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>,
+    _sorter: SorterResult<T> | SorterResult<T>[],
+    _extra: TableCurrentDataSource<T>
+  ) => void
   className: string
 }
 
@@ -22,6 +29,7 @@ const TableComponent = <T,>({
   columns,
   dataSource,
   pagination,
+  _onChange,
   className
 }: ITableProps<T>): React.ReactNode => {
   const usersWithKeys: DataWithKey<T>[] = dataSource.map((item, index) => ({ ...item, key: index }) as DataWithKey<T>)
@@ -36,12 +44,13 @@ const TableComponent = <T,>({
             columns={columns as ColumnsType}
             pagination={false}
             dataSource={usersWithKeys}
+            onChange={_onChange}
             className={`scroll-bar-2 --manage-table ${className}`}
           />
         )}
       </div>
 
-      {pagination ? (
+      {dataSource.length && pagination ? (
         <Row justify='end' align='bottom' className='row-pagination'>
           <Pagination
             showSizeChanger={false}

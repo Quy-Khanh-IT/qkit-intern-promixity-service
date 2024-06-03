@@ -1,5 +1,4 @@
 export * from './common'
-export * from './role'
 export * from './route'
 export * from './storage'
 export * from './validation'

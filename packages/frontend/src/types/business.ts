@@ -1,9 +1,12 @@
+import { StatusEnum } from './enum'
+
 export interface IBusiness {
   name: string
   description: string
   phoneNumber: string
   website: string
   category: ICategory
+  categoryName?: string // alias for category.name
   services: IService[]
   overallRating: number
   totalReview: number
@@ -18,6 +21,7 @@ export interface IBusiness {
     type: string
   }
   userId?: Buffer
+  status: StatusEnum
   images: IBusinessImage[]
   stars: IStar[]
   created_at: string
@@ -25,6 +29,7 @@ export interface IBusiness {
   deleted_at: string | null
   id: string
   score: number
+  user_id: string
   _distance: number
 }
 
@@ -54,11 +59,16 @@ export interface IDayOfWeek {
 
 export interface IBusinessCategory {
   name: string
-  id: Buffer
+  id: string
+  description: string
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
 }
 
 export interface IService {
-  name: string
   id: string
+  name: string
+  description: string
   order: number
 }

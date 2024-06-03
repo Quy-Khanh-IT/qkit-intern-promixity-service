@@ -1,15 +1,26 @@
 import { RoleEnum, SortEnum } from './enum'
 
-export interface GetAllUsersQuery {
+interface IGelAllQuery {
   offset: number
   limit: number
   startDate?: string
   endDate?: string
   sortBy: SortEnum
   isDeleted: boolean
+}
+
+export interface IGetAllUsersQuery extends IGelAllQuery {
   email: string
   firstName: string
   lastName: string
   phone: string
   role: RoleEnum[]
+}
+
+export interface IGetAllBusinessQuery extends IGelAllQuery {
+  name: string
+  categoryIds: string[]
+  // address
+  starsRating: string[]
+  status: string[]
 }

@@ -45,7 +45,7 @@ export function middleware(req: NextRequest): NextResponse {
 
     if (authRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._ADMIN) {
-        return returnNextResponse(ROUTE.MANAGE_USER)
+        return returnNextResponse(ROUTE.DASHBOARD)
       } else if (role?.value === RoleEnum._USER) {
         return returnNextResponse(ROUTE.ABOUT)
       }
