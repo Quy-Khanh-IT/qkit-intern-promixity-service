@@ -120,7 +120,7 @@ export class BusinessController {
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.BUSINESS)
   @HttpCode(200)
-  async restoreRequest(@Query('id') id: string) {
+  async restoreRequest(@Param('id') id: string) {
     const result: boolean = await this.businessService.restoreRequest(id);
 
     return result;

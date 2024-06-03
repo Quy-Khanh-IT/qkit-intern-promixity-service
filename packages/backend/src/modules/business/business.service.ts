@@ -45,10 +45,12 @@ import { BannedBusinessEvent } from './events/banned-business.event';
 import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
 import { CloseBusinessEvent } from './events/close-business.event';
 import { RestoreBusinessEvent } from './events/restore-business.event';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class BusinessService {
   constructor(
+    private readonly userService: UserService,
     private readonly ServiceService: ServiceService,
     private readonly categoryService: CategoryService,
     private readonly uploadFileService: UploadFileService,
@@ -90,12 +92,8 @@ export class BusinessService {
       matchStage['name'] = { $regex: query.name, $options: 'i' };
     }
 
-    if (query.district) {
-      matchStage['district'] = { $regex: query.district, $options: 'i' };
-    }
-
-    if (query.province) {
-      matchStage['province'] = { $regex: query.province, $options: 'i' };
+    if (query.address) {
+      matchStage['fullAddress'] = { $regex: query.address, $options: 'i' };
     }
 
     if (query.status && query.status.length > 0) {
@@ -164,6 +162,14 @@ export class BusinessService {
           },
         });
       });
+    }
+
+    if (query.sortRatingBy) {
+      sortStage['overallRating'] = query.sortRatingBy === 'asc' ? 1 : -1;
+    }
+
+    if (query.sortTotalReviewsBy) {
+      sortStage['totalReview'] = query.sortTotalReviewsBy === 'asc' ? 1 : -1;
     }
 
     const result = PaginationHelper.configureBaseQueryFilter(
@@ -316,6 +322,10 @@ export class BusinessService {
     });
 
     if (business) {
+      if (user.role === UserRole.USER) {
+        await this.userService.decentralizeToBusiness(user.id);
+      }
+
       this.eventEmitter.emit(
         EventDispatcherEnum.CREATE_BUSINESS,
         new CreateBusinessEvent({
@@ -326,7 +336,7 @@ export class BusinessService {
       );
     }
 
-    return business;
+    return plainToClass(Business, business);
   }
 
   async updateInformation(
