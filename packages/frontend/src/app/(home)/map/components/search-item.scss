@@ -3,6 +3,16 @@
   font-size: 13px;
   color: $gray;
   border-bottom: 1px solid $gray-border;
+
+  &:hover {
+    background-color: $gray-hover;
+  }
+}
+
+.distance {
+  color: $gray;
+  font-size: 13px;
+  font-style: italic;
 }
 
 .business-title {
@@ -29,4 +39,19 @@
 
 .business-image {
   border-radius: 8px;
+}
+
+.active-status {
+  color: $open-color;
+  font-weight: 500;
+}
+
+.close-status {
+  color: $close-color;
+  font-weight: 500;
+}
+
+.close-soon-status {
+  color: $close-soon-color;
+  font-weight: 500;
 }
