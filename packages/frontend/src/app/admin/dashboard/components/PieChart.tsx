@@ -5,7 +5,7 @@ import { subFrontFamily } from '@/configs/themes/light';
 import $ from 'jquery'
 import './chart.scss'
 
-declare var CanvasJS: any;
+declare const CanvasJS: any;
 
 const generateChartFormat = () => ({
   animationEnabled: true,

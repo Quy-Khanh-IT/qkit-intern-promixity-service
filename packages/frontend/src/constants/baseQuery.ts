@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios'
 import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
-import { getFromLocalStorage } from '@/utils/storage.util'
+import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { checkValidRoutes } from '@/middleware/middleware.util'
 import { toast } from 'react-toastify'

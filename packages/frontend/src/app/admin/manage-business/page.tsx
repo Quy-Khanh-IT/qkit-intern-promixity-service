@@ -17,9 +17,9 @@ import {
   useRestoreDeletedBusinessMutation,
   useUpdateBusinessStatusMutation
 } from '@/services/business.service'
+import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
-import { ColorConstant, ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
-import { StatusEnum } from '@/types/enum'
+import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { IGetAllBusinessQuery } from '@/types/query'
 import { compareDates, formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
@@ -33,13 +33,15 @@ import {
   PaginationProps,
   Row,
   Select,
+  TableProps,
   Tag,
   Typography
 } from 'antd'
 import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DELETE_OPTIONS } from '../admin.constant'
+import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../admin.constant'
+import { generateStatusColor } from '../utils/generate-color.util'
 import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
 import './manage-business.scss'
 
@@ -92,6 +94,7 @@ const ManageBusiness = (): React.ReactNode => {
   })
   const { data: statusData } = useGetAllBusinessStatusQuery()
   const { data: actionsData } = useGetAllBusinessActionsQuery()
+  const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
 
   useEffect(() => {
     setQueryData(
@@ -121,15 +124,19 @@ const ManageBusiness = (): React.ReactNode => {
     setCurrentPage(ORIGIN_PAGE)
   }
 
-  const mapQueryData = (
+  const mapFilterQueryData = (
     _queryData: IGetAllBusinessQuery,
     dataIndex: DataIndex,
-    value: string
+    values: string[]
   ): IGetAllBusinessQuery => {
-    const queryDataTemp =
-      (dataIndex as string) === 'phoneNumber'
-        ? ({ ..._queryData, phone: value } as IGetAllBusinessQuery)
-        : ({ ..._queryData, [dataIndex]: value } as IGetAllBusinessQuery)
+    let queryDataTemp = {} as IGetAllBusinessQuery
+    if ((dataIndex as string) === 'overallRating') {
+      queryDataTemp = { ..._queryData, starsRating: values } as IGetAllBusinessQuery
+    } else if ((dataIndex as string) === 'categoryName') {
+      queryDataTemp = { ..._queryData, categoryIds: values } as IGetAllBusinessQuery
+    } else {
+      queryDataTemp = { ..._queryData, [dataIndex]: values } as IGetAllBusinessQuery
+    }
     return queryDataTemp
   }
 
@@ -145,7 +152,7 @@ const ManageBusiness = (): React.ReactNode => {
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
-      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys[0]))
+      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys[0] }) as IGetAllBusinessQuery)
     }
   }
 
@@ -161,7 +168,7 @@ const ManageBusiness = (): React.ReactNode => {
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as IGetAllBusinessQuery)
+      setQueryData((prev) => mapFilterQueryData(prev, dataIndex, selectedKeys))
     }
   }
 
@@ -229,6 +236,7 @@ const ManageBusiness = (): React.ReactNode => {
       width: 160,
       ...SearchPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'name',
+        placeholder: MANAGE_BUSINESS_FIELDS.name,
         _handleSearch: handleSearch
       })
     },
@@ -237,9 +245,10 @@ const ManageBusiness = (): React.ReactNode => {
       dataIndex: 'categoryName',
       key: 'category',
       width: 150,
-      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'categoryName',
-        _handleSearch: handleSearch
+        optionsData: businessCategoriesData as IOptionsPipe,
+        _handleFilter: handleFilter
       })
     },
     {
@@ -248,6 +257,7 @@ const ManageBusiness = (): React.ReactNode => {
       key: 'fullAddress',
       ...SearchPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'fullAddress',
+        placeholder: MANAGE_BUSINESS_FIELDS.fullAddress,
         _handleSearch: handleSearch
       })
     },
@@ -271,20 +281,26 @@ const ManageBusiness = (): React.ReactNode => {
       width: 150,
       render: (avgRating: number) => (
         <Flex justify='center' align='center'>
-          <Typography.Text style={{ width: 40, textAlign: 'end' }}>{avgRating}</Typography.Text>
+          <Typography.Text style={{ width: 30, textAlign: 'end' }}>{avgRating}</Typography.Text>
           <i className='fa-solid fa-star ms-2' style={{ color: starColor }}></i>
         </Flex>
       ),
       showSorterTooltip: false,
       sorter: {
-        compare: (a, b) => a.overallRating - b.overallRating,
+        compare: (businessA: IBusiness, businessB: IBusiness) => businessA.overallRating - businessB.overallRating,
         multiple: 1
       },
       ...FilterPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'overallRating',
         optionsData: statusData as IOptionsPipe,
+        filterCustom: RATING_OPTIONS_FILTERS,
+        selectCustom: RATING_SELECT_FILTERS,
         _handleFilter: handleFilter
       })
+      // onFilter: (value, record: IBusiness): boolean => {
+      //   const parseValue: number = parseInt(value as string)
+      //   return Math.floor(record.overallRating) === parseValue
+      // }
     },
     {
       title: MANAGE_BUSINESS_FIELDS.created_at,
@@ -297,7 +313,8 @@ const ManageBusiness = (): React.ReactNode => {
       showSorterTooltip: false,
       sorter: {
         compare: (businessA: IBusiness, businessB: IBusiness) =>
-          compareDates(businessA.created_at, businessB.created_at)
+          compareDates(businessA.created_at, businessB.created_at),
+        multiple: 3
       }
     },
     {
@@ -432,6 +449,10 @@ const ManageBusiness = (): React.ReactNode => {
     }
   }
 
+  const onChangeSorter: TableProps<IBusiness>['onChange'] = (pagination, filters, sorter, extra) => {
+    console.log(pagination, filters, sorter, extra)
+  }
+
   return (
     <div className='--manage-business'>
       <Row className='pb-3'>
@@ -453,7 +474,6 @@ const ManageBusiness = (): React.ReactNode => {
             Total: <strong>{businessesData?.totalRecords ?? 0}</strong>
           </span>
         </Col>
-
         <Col span={6} className='d-flex justify-content-end'>
           <RangePicker format={DEFAULT_DATE_FORMAT} onChange={onChangeDatePicker} />
         </Col>
@@ -469,6 +489,7 @@ const ManageBusiness = (): React.ReactNode => {
           total: businessesData?.totalRecords ?? 0,
           onChange: onChangePagination
         }}
+        _onChange={onChangeSorter}
         className='--manage-business-table'
       />
       <ViewRowDetailsModal
@@ -536,21 +557,3 @@ const ManageBusiness = (): React.ReactNode => {
 }
 
 export default ManageBusiness
-
-const generateStatusColor = (role: string): string => {
-  let color: string = ColorConstant._PINK
-
-  if (role === (StatusEnum._APPROVED as string)) {
-    color = ColorConstant._GREEN
-  } else if (role === (StatusEnum._PENDING as string)) {
-    color = ColorConstant._GEEK_BLUE
-  } else if (role === (StatusEnum._REJECTED as string)) {
-    color = ColorConstant._GOLD
-  } else if (role === (StatusEnum._BANNED as string)) {
-    color = ColorConstant._RED
-  } else if (role === (StatusEnum._CLOSED as string)) {
-    color = ColorConstant._GREY
-  }
-
-  return color
-}

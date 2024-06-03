@@ -19,11 +19,8 @@ export interface IGetAllUsersQuery extends IGelAllQuery {
 
 export interface IGetAllBusinessQuery extends IGelAllQuery {
   name: string
-  phoneNumber: string
-  categoryId: string
+  categoryIds: string[]
+  // address
   starsRating: string[]
-  district: string
-  province: string
   status: string[]
-  dayOfWeek: string
 }

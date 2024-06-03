@@ -3,7 +3,7 @@ import qs from 'qs'
 
 import { StorageKey } from '@/constants/storage'
 import { generateError } from '@/utils/catching-error.util'
-import { getFromLocalStorage } from '@/utils/storage.util'
+import { getFromLocalStorage } from '@/utils/local-storage.util'
 
 import { HttpClientInterface } from './http-client.interface'
 import { ErrorResponse } from '@/types/error'

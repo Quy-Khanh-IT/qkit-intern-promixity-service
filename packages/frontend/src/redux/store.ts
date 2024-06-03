@@ -8,6 +8,7 @@ import { rtkQueryErrorLogger } from '@/utils/catching-error-rtk-util'
 import { userApi } from '@/services/user.service'
 import { nearByApi } from '@/services/near-by.service'
 import { businessApi } from '@/services/business.service'
+import { categoryApi } from '@/services/category.service'
 
 export const store = configureStore({
   reducer: {
@@ -16,7 +17,8 @@ export const store = configureStore({
     [businessApi.reducerPath]: businessApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
-    [nearByApi.reducerPath]: nearByApi.reducer
+    [nearByApi.reducerPath]: nearByApi.reducer,
+    [categoryApi.reducerPath]: categoryApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -27,6 +29,7 @@ export const store = configureStore({
       otpApi.middleware,
       addressApi.middleware,
       nearByApi.middleware,
+      categoryApi.middleware,
       rtkQueryErrorLogger
     )
 })

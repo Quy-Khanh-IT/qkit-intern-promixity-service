@@ -1,4 +1,4 @@
-import { IOptionsPipe } from '@/types/common'
+import { FilterOptions, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { Button, Checkbox, Space } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import type { ColumnType } from 'antd/es/table'
@@ -8,6 +8,8 @@ import React, { useEffect, useRef, useState } from 'react'
 interface IFilterPopupProps<K> {
   dataIndex: K
   optionsData: IOptionsPipe
+  filterCustom?: FilterOptions[]
+  selectCustom?: SelectionOptions[]
   _handleFilter: (_selectedKeys: string[], _confirm: FilterDropdownProps['confirm'], _dataIndex: K) => void
 }
 
@@ -16,6 +18,8 @@ const CheckboxGroup = Checkbox.Group
 const FilterPopupProps = <T, K extends keyof T>({
   dataIndex,
   optionsData,
+  filterCustom,
+  selectCustom,
   _handleFilter
 }: IFilterPopupProps<K>): ColumnType<T> => {
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
@@ -53,7 +57,7 @@ const FilterPopupProps = <T, K extends keyof T>({
   }
 
   return {
-    filters: optionsData?.filterOpts,
+    filters: filterCustom ?? optionsData?.filterOpts,
     filterDropdown: ({ setSelectedKeys, confirm, clearFilters }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()} className='d-flex flex-column gap-2'>
         <Checkbox
@@ -64,7 +68,7 @@ const FilterPopupProps = <T, K extends keyof T>({
           Check all
         </Checkbox>
         <CheckboxGroup
-          options={optionsData?.selectionOpts}
+          options={selectCustom ?? optionsData?.selectionOpts}
           value={checkedList.current}
           onChange={(list: string[]) => {
             checkedList.current = list
@@ -100,10 +104,7 @@ const FilterPopupProps = <T, K extends keyof T>({
           </Button>
         </Space>
       </div>
-    ),
-    onFilter: (value, record: T): boolean => {
-      return record[dataIndex] === (value as string).toLowerCase()
-    }
+    )
   }
 }
 

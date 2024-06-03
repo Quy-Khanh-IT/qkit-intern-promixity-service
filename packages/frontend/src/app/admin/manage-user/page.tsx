@@ -16,8 +16,7 @@ import {
   useRestoreDeletedUserMutation,
   useUpdateUserRoleMutation
 } from '@/services/user.service'
-import { ColorConstant, ColumnsType, IOptionsPipe } from '@/types/common'
-import { RoleEnum } from '@/types/enum'
+import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { formatDate } from '@/utils/helpers.util'
@@ -38,9 +37,10 @@ import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { compareDates } from '../../../utils/helpers.util'
+import { DELETE_OPTIONS } from '../admin.constant'
+import { generateRoleColor } from '../utils/generate-color.util'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
-import { DELETE_OPTIONS } from '../admin.constant'
 
 const { Text } = Typography
 const { RangePicker } = DatePicker
@@ -226,6 +226,7 @@ const ManageUser = (): React.ReactNode => {
       width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'firstName',
+        placeholder: MANAGE_USER_FIELDS.firstName,
         _handleSearch: handleSearch
       })
     },
@@ -236,6 +237,7 @@ const ManageUser = (): React.ReactNode => {
       width: 160,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'lastName',
+        placeholder: MANAGE_USER_FIELDS.lastName,
         _handleSearch: handleSearch
       })
     },
@@ -245,6 +247,7 @@ const ManageUser = (): React.ReactNode => {
       key: 'email',
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'email',
+        placeholder: MANAGE_USER_FIELDS.email,
         _handleSearch: handleSearch
       })
     },
@@ -255,6 +258,7 @@ const ManageUser = (): React.ReactNode => {
       width: 200,
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'phoneNumber',
+        placeholder: MANAGE_USER_FIELDS.phoneNumber,
         _handleSearch: handleSearch
       })
     },
@@ -279,7 +283,7 @@ const ManageUser = (): React.ReactNode => {
       width: 250,
       render: (role: string): React.ReactNode => (
         <Tag color={generateRoleColor(role)} key={role} className='me-0'>
-          {role.toUpperCase()}
+          {role?.toUpperCase()}
         </Tag>
       ),
       ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
@@ -472,17 +476,3 @@ const ManageUser = (): React.ReactNode => {
 }
 
 export default ManageUser
-
-const generateRoleColor = (role: string): string => {
-  let color: string = ''
-
-  if (role === (RoleEnum._ADMIN as string)) {
-    color = ColorConstant._GREEN
-  } else if (role === (RoleEnum._USER as string)) {
-    color = ColorConstant._GEEK_BLUE
-  } else if (role === (RoleEnum._BUSINESS as string)) {
-    color = ColorConstant._GOLD
-  }
-
-  return color
-}

@@ -12,6 +12,7 @@ import './admin.scss'
 import AdminHeader from './layouts/AdminHeader'
 import AdminSidebar from './layouts/AdminSidebar'
 import { SIDEBAR_MENU_OPTIONS } from './admin.constant'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
@@ -29,8 +30,8 @@ export default function RootLayout({
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
 
-  const [routeValue, setRouteValue, _removeRouteValue] = useLocalStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
-  const [selectedMenuKey, setSelectedMenuKey] = useState<string>('')
+  const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
+  const [selectedMenuKey, setSelectedMenuKey] = useState<unknown>(routeValue || SIDEBAR_MENU_OPTIONS.DASHBOARD.key)
 
   useEffect(() => {
     if (routeValue) {
@@ -123,7 +124,7 @@ export default function RootLayout({
             xl={collapsed ? 0 : 4}
             className='sidebar-col h-100'
           >
-            <AdminSidebar selectedMenuKey={selectedMenuKey} handleMenuClick={onMenuClick} />
+            <AdminSidebar selectedMenuKey={selectedMenuKey as string} handleMenuClick={onMenuClick} />
           </Col>
           <Col
             xs={collapsed ? 24 : 24}

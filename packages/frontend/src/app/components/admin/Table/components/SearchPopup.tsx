@@ -6,10 +6,15 @@ import React, { useRef } from 'react'
 
 interface ISearchPopupProps<K> {
   dataIndex: K
+  placeholder: string
   _handleSearch: (_selectedKeys: string[], _confirm: FilterDropdownProps['confirm'], _dataIndex: K) => void
 }
 
-const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: ISearchPopupProps<K>): ColumnType<T> => {
+const SearchPopupProps = <T, K extends keyof T>({
+  dataIndex,
+  placeholder,
+  _handleSearch
+}: ISearchPopupProps<K>): ColumnType<T> => {
   const searchRef = useRef<InputRef>(null)
   const searchValueRef = useRef<string[]>([])
 
@@ -23,7 +28,7 @@ const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: IS
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
           ref={searchRef}
-          placeholder={`Search ${String(dataIndex)}`}
+          placeholder={`Search ${placeholder.toLowerCase()}`}
           value={searchValueRef.current[0]}
           onChange={(e) => {
             const value = e.target.value ? [e.target.value] : []
@@ -59,11 +64,6 @@ const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: IS
       </div>
     ),
     filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#8fce00' : undefined }} />,
-    onFilter: (value: unknown, record: T): boolean =>
-      record[dataIndex]
-        ?.toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase()) || false,
     onFilterDropdownOpenChange: (visible): void => {
       if (visible) {
         setTimeout(() => searchRef.current?.select(), 100)

@@ -53,8 +53,12 @@ export interface IDayOfWeek {
 }
 
 export interface IBusinessCategory {
-  name: string
   id: string
+  name: string
+  description: string
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
 }
 
 export interface IService {
