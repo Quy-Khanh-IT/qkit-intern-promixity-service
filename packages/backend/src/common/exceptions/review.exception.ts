@@ -22,6 +22,16 @@ export class ReviewNotFoundException extends BaseException {
   }
 }
 
+export class ReviewUnauthorizeException extends BaseException {
+  constructor(message?: string) {
+    const errorDictionary = ERRORS_DICTIONARY.REVIEW_UNAUTHORIZED;
+    const errorMessage =
+      message || ERROR_MESSAGES[ERRORS_DICTIONARY.REVIEW_UNAUTHORIZED];
+
+    super(errorDictionary, errorMessage, 401);
+  }
+}
+
 export class ReviewDeleteException extends BaseException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.REVIEW_CAN_NOT_DELETE;

@@ -38,6 +38,7 @@ export class AxiosService {
           }),
         ),
     );
+
     return data;
   }
 
@@ -45,7 +46,9 @@ export class AxiosService {
     const source = axios.CancelToken.source();
     let timerId = null;
 
-    const res = firstValueFrom(
+    console.log('url', url);
+
+    const res = await firstValueFrom(
       this.httpService
         .get(url, {
           httpAgent: getHost(),
@@ -58,6 +61,8 @@ export class AxiosService {
           }),
         ),
     );
+
+    console.log('res', res);
 
     const timeout = new Promise((resolve, reject) => {
       timerId = setTimeout(() => {

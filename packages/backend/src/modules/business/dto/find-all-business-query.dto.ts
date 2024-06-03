@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
-import { BusinessStatusEnum } from 'src/common/enums';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { BusinessStatusEnum, TypeSort } from 'src/common/enums';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 
 export class FindAllBusinessQuery extends QueryFilterBase {
@@ -24,15 +24,28 @@ export class FindAllBusinessQuery extends QueryFilterBase {
   @ApiPropertyOptional({ required: false, example: ['3', '5'] })
   starsRating: string[];
 
-  @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: 'Quận 1' })
-  district: string;
+  @IsEnum(TypeSort)
+  @ApiPropertyOptional({
+    required: false,
+    enum: TypeSort,
+    example: TypeSort.DESC,
+  })
+  sortTotalReviewsBy: string;
+
+  @IsOptional()
+  @IsEnum(TypeSort)
+  @ApiPropertyOptional({
+    required: false,
+    enum: TypeSort,
+    example: TypeSort.DESC,
+  })
+  sortRatingBy: string;
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ example: 'Thành phố Hồ Chí Minh' })
-  province: string;
+  @ApiPropertyOptional({ example: 'Phường Phạm Ngũ Lão, Quận 1' })
+  address: string;
 
   @ApiPropertyOptional({
     example: ['approved', 'pending'],
