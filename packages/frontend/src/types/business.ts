@@ -3,7 +3,7 @@ export interface IBusiness {
   description: string
   phoneNumber: string
   website: string
-  category: ICategory[]
+  category: ICategory
   services: IService[]
   overallRating: number
   totalReview: number
@@ -13,14 +13,18 @@ export interface IBusiness {
   district: string
   country: string
   dayOfWeek: IDayOfWeek[]
-  userId: Buffer
+  location: {
+    coordinates: [number, number]
+    type: string
+  }
+  userId?: Buffer
   images: IBusinessImage[]
   stars: IStar[]
   created_at: string
   updated_at: string
   deleted_at: string | null
-  score: number
   id: string
+  score: number
   _distance: number
 }
 
@@ -31,7 +35,7 @@ export interface IStar {
 
 export interface ICategory {
   name: string
-  id: Buffer
+  id: string
 }
 
 export interface IBusinessImage {
@@ -55,6 +59,6 @@ export interface IBusinessCategory {
 
 export interface IService {
   name: string
-  id: Buffer
+  id: string
   order: number
 }

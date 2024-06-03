@@ -1,0 +1,18 @@
+@import '@/sass/common/common.scss';
+.not-found-wrapper {
+  font-size: 13px;
+}
+
+.not-found-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.linking-content {
+  color: $link-color;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
