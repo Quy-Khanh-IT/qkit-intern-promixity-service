@@ -1,3 +1,5 @@
+@import '@/sass/common/common.scss';
+
 .leaflet-container {
   height: 100%;
 }
@@ -17,4 +19,22 @@ main {
 
 .ant-input-search-button {
   height: 44px !important;
+}
+
+.search-header {
+  z-index: 1;
+  background-color: $light !important;
+  position: sticky;
+}
+
+.header-sider-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.search-sider {
+  /* Styles for SearchSider */
+  height: calc(100% - 66px);
+  position: relative;
 }

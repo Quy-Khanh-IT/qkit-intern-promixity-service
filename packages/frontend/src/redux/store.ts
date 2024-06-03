@@ -7,6 +7,7 @@ import { addressApi } from '@/services/address.service'
 import { rtkQueryErrorLogger } from '@/utils/catching-error-rtk-util'
 import { userApi } from '@/services/user.service'
 import { nearByApi } from '@/services/near-by.service'
+import { mapPropsSlice } from './slices/map-props.slice'
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
-    [nearByApi.reducerPath]: nearByApi.reducer
+    [nearByApi.reducerPath]: nearByApi.reducer,
+    mapProps: mapPropsSlice.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -30,4 +32,4 @@ export const store = configureStore({
 
 setupListeners(store.dispatch)
 
-export type RootState = ReturnType<typeof reducers>
+export type RootState = ReturnType<typeof store.getState>

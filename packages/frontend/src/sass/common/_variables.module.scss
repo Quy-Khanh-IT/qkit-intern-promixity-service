@@ -18,9 +18,11 @@ $error: #ea1d18; //
 $error-hover: #ff9997;
 $success: #48c14e; //
 $success-hover: #b9f6ca;
-$warning: #FFD43B; //
+$warning: #ffd43b; //
 $warning-hover: #eaefa2;
-$star-color: orange;
+$star-color: #fcb91b;
+$star-color-hover: #ffcc99;
+$link-color: #007bff;
 
 :export {
   mainColor: $main-color;

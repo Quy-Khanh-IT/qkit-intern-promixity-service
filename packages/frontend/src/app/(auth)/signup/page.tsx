@@ -38,7 +38,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
     verifyTokenHeader: ''
   })
 
-  const [isGetOTP, setIsGetOTP] = useState(false)
+  const [isGetOTP, setIsGetOTP] = useState<boolean>(false)
   const toastService = useMemo(() => new ToastService(), [])
   const router = useRouter()
 
@@ -53,8 +53,8 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
   const [verifyEmail, { isSuccess: isVerifySuccess, isError: isVerifyError, error: verifyError }] =
     useVerifyEmailMutation()
 
-  const [resendTimer, setResendTimer] = useState(0)
-  const [isResendDisabled, setIsResendDisabled] = useState(false)
+  const [resendTimer, setResendTimer] = useState<number>(0)
+  const [isResendDisabled, setIsResendDisabled] = useState<boolean>(false)
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -176,7 +176,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
     })
 
     setRegisterDataErrors({
-      email: 'must be ok',
+      email: '',
       password: '',
       firstName: '',
       lastName: '',
