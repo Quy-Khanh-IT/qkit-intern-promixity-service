@@ -1,0 +1,47 @@
+@import '@/sass/common/common.scss';
+
+.search-sider {
+  background-color: $light !important;
+  font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
+}
+
+.ant-layout-sider-children {
+  width: 100%;
+}
+
+.search-result-wrapper {
+  border: 1px solid $gray-border;
+  overflow-y: scroll;
+}
+
+.search-result-title {
+  font-weight: 500;
+  font-size: 18px;
+  i {
+    font-weight: 500;
+  }
+}
+
+.tooltip-wrapper {
+  color: $dark;
+  font-size: 14px;
+
+  .tooltip-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .tooltip-detail {
+    text-align: justify;
+  }
+}
+
+.close-btn {
+  i {
+    cursor: pointer;
+
+    &:hover {
+      color: $link-color;
+    }
+  }
+}

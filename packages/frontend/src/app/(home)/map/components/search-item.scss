@@ -1,0 +1,32 @@
+@import '@/sass/common/common.scss';
+.business-detail-wrapper {
+  font-size: 13px;
+  color: $gray;
+  border-bottom: 1px solid $gray-border;
+}
+
+.business-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: $dark;
+}
+
+.business-rating {
+  .rating-count {
+    margin-right: 4px;
+  }
+
+  .rating-star {
+    margin-right: 4px;
+    i {
+      color: $gray-bg;
+    }
+    .star-fill {
+      color: $star-color;
+    }
+  }
+}
+
+.business-image {
+  border-radius: 8px;
+}
