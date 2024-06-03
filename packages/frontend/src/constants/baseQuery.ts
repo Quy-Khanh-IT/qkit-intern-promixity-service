@@ -3,6 +3,7 @@ import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { getFromLocalStorage } from '@/utils/storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { checkValidRoutes } from '@/middleware/middleware.util'
+import { toast } from 'react-toastify'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
@@ -21,6 +22,7 @@ export const baseQueryWithAuth = fetchBaseQuery({
     if (response.status === (HttpStatusCode.Unauthorized as number)) {
       if (checkProtectedRoute) {
         window.location.href = ROUTE.USER_LOGIN
+        toast.error('Token is required')
         throw new Error('Token is required')
       }
     }

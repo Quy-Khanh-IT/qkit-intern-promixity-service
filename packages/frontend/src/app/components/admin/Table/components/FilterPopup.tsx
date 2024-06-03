@@ -1,5 +1,4 @@
-import { MANAGE_USER_ROLE_PROPS } from '@/app/admin/manage-user/manage-user.const'
-import { SelectionOptions } from '@/types/common'
+import { IOptionsPipe } from '@/types/common'
 import { Button, Checkbox, Space } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import type { ColumnType } from 'antd/es/table'
@@ -8,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 interface IFilterPopupProps<K> {
   dataIndex: K
-  optionsData: SelectionOptions[]
+  optionsData: IOptionsPipe
   _handleFilter: (_selectedKeys: string[], _confirm: FilterDropdownProps['confirm'], _dataIndex: K) => void
 }
 
@@ -22,14 +21,14 @@ const FilterPopupProps = <T, K extends keyof T>({
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
   const checkedList = useRef<string[]>([])
 
-  const checkAll = useRef<boolean>(optionsData?.length === checkedList.current.length)
+  const checkAll = useRef<boolean>(optionsData?.selectionOpts.length === checkedList.current.length)
   const indeterminate = useRef<boolean>(
-    checkedList.current.length > 0 && checkedList.current.length < optionsData.length
+    checkedList.current.length > 0 && checkedList.current.length < optionsData.selectionOpts.length
   )
 
   useEffect(() => {
     if (optionsData) {
-      setOptionsDataValue(optionsData.map((option) => option.value))
+      setOptionsDataValue(optionsData.selectionOpts.map((option) => option.value))
     }
   }, [optionsData])
 
@@ -54,7 +53,7 @@ const FilterPopupProps = <T, K extends keyof T>({
   }
 
   return {
-    filters: MANAGE_USER_ROLE_PROPS,
+    filters: optionsData?.filterOpts,
     filterDropdown: ({ setSelectedKeys, confirm, clearFilters }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()} className='d-flex flex-column gap-2'>
         <Checkbox
@@ -65,7 +64,7 @@ const FilterPopupProps = <T, K extends keyof T>({
           Check all
         </Checkbox>
         <CheckboxGroup
-          options={optionsData}
+          options={optionsData?.selectionOpts}
           value={checkedList.current}
           onChange={(list: string[]) => {
             checkedList.current = list

@@ -14,6 +14,7 @@ const SearchPopupProps = <T, K extends keyof T>({ dataIndex, _handleSearch }: IS
   const searchValueRef = useRef<string[]>([])
 
   const handleReset = (clearFilters: () => void): void => {
+    searchValueRef.current = []
     clearFilters()
   }
 

@@ -1,6 +1,6 @@
-export const ROLE_COLOR = {
-  GREEN: 'green',
-  GEEKBLUE: 'geekblue'
+export const DELETE_OPTIONS = {
+  SOFT: 'soft',
+  HARD: 'hard'
 }
 
 export const SIDEBAR_MENU_OPTIONS = {

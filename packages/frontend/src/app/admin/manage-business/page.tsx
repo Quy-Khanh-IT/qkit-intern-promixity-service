@@ -1,166 +1,178 @@
 'use client'
-import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import DeleteModal from '@/app/components/admin/DeleteModal/DeleteModal'
+import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
+import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/DeleteModal/DeleteModal'
 import { IModalMethods } from '@/app/components/admin/modal'
+import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
+import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { MODAL_TEXT } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
 import variables from '@/sass/common/_variables.module.scss'
-import { IBusiness } from '@/types/business'
-import { ColumnsType, SelectionOptions } from '@/types/common'
-import { EllipsisOutlined, FolderViewOutlined, SearchOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
-  Button,
+  useDeleteBusinessMutation,
+  useGetAllBusinessActionsQuery,
+  useGetAllBusinessesQuery,
+  useGetAllBusinessStatusQuery,
+  useGetPrivateBusinessProfileQuery,
+  useRestoreDeletedBusinessMutation,
+  useUpdateBusinessStatusMutation
+} from '@/services/business.service'
+import { IBusiness } from '@/types/business'
+import { ColorConstant, ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
+import { StatusEnum } from '@/types/enum'
+import { IGetAllBusinessQuery } from '@/types/query'
+import { compareDates, formatDate } from '@/utils/helpers.util'
+import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
+import {
   Col,
+  DatePicker,
   DescriptionsProps,
   Dropdown,
   Flex,
-  Input,
-  InputRef,
   MenuProps,
+  PaginationProps,
   Row,
   Select,
-  Space,
-  TableColumnType,
   Tag,
   Typography
 } from 'antd'
+import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
-import { useRef, useState } from 'react'
-import Highlighter from 'react-highlight-words'
-import businessData from './business-data.json'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { DELETE_OPTIONS } from '../admin.constant'
+import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
 import './manage-business.scss'
 
 const { Text } = Typography
 const { starColor } = variables
+const { RangePicker } = DatePicker
 
-export interface IManageUserProps {}
+const ORIGIN_PAGE = 1
+const PAGE_SIZE = 20
 
-// For search
+const ACTIVE_FETCH = '1'
+const DELETED_FETCH = '2'
+
+const VIEW_DETAILS_OPTION = 1
+const MODERATE_OPTION = 2
+const RESTORE_OPTION = 2
+const DELETE_OPTION = 3
+
 type DataIndex = keyof IBusiness
+// For search
+type SearchIndex = keyof IGetAllBusinessQuery
 
 const ManageBusiness = (): React.ReactNode => {
-  const [businessOption, setBusinessOption] = useState<string>('1')
-  const [businessOne, setBusinessOne] = useState<IBusiness>()
-  const [searchText, setSearchText] = useState<string>('')
-  const [searchedColumn, setSearchedColumn] = useState<string>('')
-  const searchInput = useRef<InputRef>(null)
+  // Pagination
+  const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
+  // User data
+  const [businessOption, setBusinessOption] = useState<string>(ACTIVE_FETCH)
+  const businessOptionBoolean: boolean = useMemo<boolean>(() => businessOption === DELETED_FETCH, [businessOption])
+  const [queryData, setQueryData] = useState<IGetAllBusinessQuery>({
+    offset: currentPage,
+    limit: PAGE_SIZE,
+    isDeleted: businessOptionBoolean
+  } as IGetAllBusinessQuery)
+  const { data: businessesData, isFetching: isLoadingBusinesses } = useGetAllBusinessesQuery(queryData)
+  const [selectedBusiness, setSelectedBusiness] = useState<IBusiness | null>(null)
+
+  // Modal
   const refViewDetailsModal = useRef<IModalMethods | null>(null)
   const refModerateModal = useRef<IModalMethods | null>(null)
+  const refRestoreModal = useRef<IModalMethods | null>(null)
   const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
-  const [deleteModalTitle, setDeleteModalTitle] = useState<string>(MODAL_TEXT.DELETE_BUSINESS_TITLE)
-  const [deleteModalContent, setDeleteModalContent] = useState(MODAL_TEXT.DELETE_BUSINESS_TEMPORARY)
-  const [decentralizeOpts, _setDecentralizeOpts] = useState<SelectionOptions[]>([
-    { label: 'ACCEPTED', value: 'ACCEPTED' },
-    { label: 'PENDING', value: 'PENDING' },
-    { label: 'REJECTED', value: 'REJECTED' }
-  ])
+
+  // Other
+  const [deleteBusinessMutation] = useDeleteBusinessMutation()
+  const [updateBusinessStatusMutation] = useUpdateBusinessStatusMutation()
+  const [restoreDeletedBusinessMutation] = useRestoreDeletedBusinessMutation()
+  const { data: privateProfileData } = useGetPrivateBusinessProfileQuery(selectedBusiness?.id || '', {
+    skip: !selectedBusiness
+  })
+  const { data: statusData } = useGetAllBusinessStatusQuery()
+  const { data: actionsData } = useGetAllBusinessActionsQuery()
+
+  useEffect(() => {
+    setQueryData(
+      (prev) =>
+        ({
+          ...prev,
+          offset: currentPage,
+          isDeleted: businessOptionBoolean
+        }) as IGetAllBusinessQuery
+    )
+  }, [currentPage, businessOptionBoolean])
 
   const handleModal = (selectedOpt: number): void => {
-    if (selectedOpt === 1) {
+    if (selectedOpt === VIEW_DETAILS_OPTION) {
       refViewDetailsModal.current?.showModal()
-    } else if (selectedOpt === 2) {
-      if (businessOption === '2') {
-        refDeleteBusinessModal.current?.showModal()
-      } else {
-        refModerateModal.current?.showModal()
-      }
-    } else if (selectedOpt === 3) {
+    } else if (selectedOpt === MODERATE_OPTION && businessOptionBoolean === false) {
+      refModerateModal.current?.showModal()
+    } else if (selectedOpt === RESTORE_OPTION && businessOptionBoolean === true) {
+      refRestoreModal.current?.showModal()
+    } else if (selectedOpt === DELETE_OPTION) {
       refDeleteBusinessModal.current?.showModal()
     }
   }
 
+  const onChangeSelection = (value: string): void => {
+    setBusinessOption(value)
+    setCurrentPage(ORIGIN_PAGE)
+  }
+
+  const mapQueryData = (
+    _queryData: IGetAllBusinessQuery,
+    dataIndex: DataIndex,
+    value: string
+  ): IGetAllBusinessQuery => {
+    const queryDataTemp =
+      (dataIndex as string) === 'phoneNumber'
+        ? ({ ..._queryData, phone: value } as IGetAllBusinessQuery)
+        : ({ ..._queryData, [dataIndex]: value } as IGetAllBusinessQuery)
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
-    confirm: FilterDropdownProps['confirm'],
+    _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
-    confirm()
-    setSearchText(selectedKeys[0])
-    setSearchedColumn(dataIndex)
+    if (selectedKeys.length === 0) {
+      setQueryData((prev) => {
+        const queryTemp: IGetAllBusinessQuery = { ...prev }
+        delete queryTemp[dataIndex as SearchIndex]
+        return { ...queryTemp } as IGetAllBusinessQuery
+      })
+    } else {
+      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys[0]))
+    }
   }
 
-  const handleReset = (clearFilters: () => void): void => {
-    clearFilters()
-    setSearchText('')
+  const handleFilter = (
+    selectedKeys: string[],
+    _confirm: FilterDropdownProps['confirm'],
+    dataIndex: DataIndex
+  ): void => {
+    if (selectedKeys.length === 0) {
+      setQueryData((prev) => {
+        const queryTemp: IGetAllBusinessQuery = { ...prev }
+        delete queryTemp[dataIndex as SearchIndex]
+        return { ...queryTemp } as IGetAllBusinessQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as IGetAllBusinessQuery)
+    }
   }
-
-  const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<IBusiness> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
-        <Space>
-          <Button
-            type='primary'
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-primary-small'
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size='small'
-            style={{ width: 90 }}
-            className='btn-negative-small'
-          >
-            Reset
-          </Button>
-          <Button
-            type='link'
-            size='small'
-            className='btn-cancel-small'
-            onClick={() => {
-              close()
-            }}
-          >
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1677ff' : undefined }} />,
-    // onFilter: (value, record: IBusiness) =>
-    //   record[dataIndex as keyof IBusiness]
-    //     .toString()
-    //     .toLowerCase()
-    //     .includes((value as string).toLowerCase()),
-    onFilterDropdownOpenChange: (visible): void => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100)
-      }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={(text || '') as string}
-        />
-      ) : (
-        <>{text}</>
-      )
-  })
 
   const listColumns: ColumnsType<IBusiness> = [
     {
-      width: 75,
       align: 'center',
+      width: 75,
       onCell: (business: IBusiness): React.HTMLAttributes<HTMLElement> => {
         return {
           onClick: (): void => {
-            setBusinessOne(business)
+            setSelectedBusiness(business)
           }
         }
       },
@@ -172,7 +184,7 @@ const ManageBusiness = (): React.ReactNode => {
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
           },
-          ...(!(businessOption === '2')
+          ...(businessOption === ACTIVE_FETCH
             ? [
                 {
                   key: 'Moderate',
@@ -186,31 +198,19 @@ const ManageBusiness = (): React.ReactNode => {
                   key: 'Restore',
                   label: <span>Restore</span>,
                   icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: (): void => {
-                    setDeleteModalTitle(MODAL_TEXT.RESTORE_BUSINESS_TITLE)
-                    setDeleteModalContent(MODAL_TEXT.RESTORE_BUSINESS)
-                    handleModal(2)
-                  }
+                  onClick: (): void => handleModal(2)
                 }
               ]),
           {
             key: 'Delete ',
-            label: <span className={businessOption === '2' ? 'error-modal-title' : ''}>Delete</span>,
+            label: <span className={businessOptionBoolean ? 'error-modal-title' : ''}>Delete</span>,
             icon: (
               <i
-                className={`fa-regular fa-trash ${businessOption === '2' ? 'error-modal-title' : 'delete-icon'}`}
+                className={`fa-regular fa-trash ${businessOptionBoolean ? 'error-modal-title' : 'delete-icon'}`}
                 style={{ fontSize: 15, cursor: 'pointer' }}
               ></i>
             ),
-            onClick: (): void => {
-              setDeleteModalTitle(MODAL_TEXT.DELETE_BUSINESS_TITLE)
-              if (businessOption === '2') {
-                setDeleteModalContent(MODAL_TEXT.DELETE_BUSINESS_PERMANENT)
-              } else {
-                setDeleteModalContent(MODAL_TEXT.DELETE_BUSINESS_TEMPORARY)
-              }
-              handleModal(3)
-            }
+            onClick: (): void => handleModal(3)
           }
         ]
         return (
@@ -223,63 +223,52 @@ const ManageBusiness = (): React.ReactNode => {
       }
     },
     {
-      title: 'Name',
+      title: MANAGE_BUSINESS_FIELDS.name,
       dataIndex: 'name',
       key: 'name',
-      width: 200,
-      ...getColumnSearchProps('name')
+      width: 160,
+      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+        dataIndex: 'name',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Category',
-      dataIndex: 'category',
+      title: MANAGE_BUSINESS_FIELDS.category,
+      dataIndex: 'categoryName',
       key: 'category',
-      width: 200,
-      render: (category: string[]): React.ReactNode => {
-        return category.join(', ')
-      },
-      filters: [
-        {
-          text: 'Cafe',
-          value: 'Cafe'
-        },
-        {
-          text: 'Restaurant',
-          value: 'Restaurant'
-        },
-        {
-          text: 'Hotel',
-          value: 'Hotel'
-        }
-      ],
-      filterMode: 'tree',
-      onFilter: (value, record: IBusiness): boolean => {
-        return record.category.includes(value as string)
-      }
+      width: 150,
+      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+        dataIndex: 'categoryName',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      ...getColumnSearchProps('address')
+      title: MANAGE_BUSINESS_FIELDS.fullAddress,
+      dataIndex: 'fullAddress',
+      key: 'fullAddress',
+      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+        dataIndex: 'fullAddress',
+        _handleSearch: handleSearch
+      })
     },
     {
-      title: 'Total Reviews',
-      dataIndex: 'totalReviews',
+      title: MANAGE_BUSINESS_FIELDS.totalReview,
+      dataIndex: 'totalReview',
       align: 'center',
-      key: 'totalReviews',
-      width: 30,
+      key: 'totalReview',
+      width: 150,
       showSorterTooltip: false,
       sorter: {
-        compare: (a, b) => a.totalReviews - b.totalReviews,
+        compare: (a, b) => a.totalReview - b.totalReview,
         multiple: 2 // higher priority
       }
     },
     {
-      title: 'Average Rating',
+      title: 'Rating',
       dataIndex: 'overallRating',
       align: 'center',
       key: 'overallRating',
-      width: 30,
+      width: 150,
       render: (avgRating: number) => (
         <Flex justify='center' align='center'>
           <Typography.Text style={{ width: 40, textAlign: 'end' }}>{avgRating}</Typography.Text>
@@ -291,197 +280,252 @@ const ManageBusiness = (): React.ReactNode => {
         compare: (a, b) => a.overallRating - b.overallRating,
         multiple: 1
       },
-      filters: [
-        {
-          text: '5 ⭐️',
-          value: '5'
-        },
-        {
-          text: '4 ⭐️',
-          value: '4'
-        },
-        {
-          text: '3 ⭐️',
-          value: '3'
-        },
-        {
-          text: '2 ⭐️',
-          value: '2'
-        },
-        {
-          text: '1 ⭐️',
-          value: '1'
-        }
-      ],
-      filterMode: 'tree',
-      onFilter: (value, record: IBusiness): boolean => {
-        const parseValue: number = parseInt(value as string)
-        return Math.floor(record.overallRating) === parseValue
+      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+        dataIndex: 'overallRating',
+        optionsData: statusData as IOptionsPipe,
+        _handleFilter: handleFilter
+      })
+    },
+    {
+      title: MANAGE_BUSINESS_FIELDS.created_at,
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 180,
+      render: (createdDate: string): React.ReactNode => {
+        return <Text>{formatDate(createdDate)}</Text>
+      },
+      showSorterTooltip: false,
+      sorter: {
+        compare: (businessA: IBusiness, businessB: IBusiness) =>
+          compareDates(businessA.created_at, businessB.created_at)
       }
     },
     {
-      title: 'Status',
+      title: MANAGE_BUSINESS_FIELDS.status,
       dataIndex: 'status',
       align: 'center',
       key: 'status',
       width: 150,
-      render: (status: string): React.ReactNode => {
-        const color = status === 'Accepted' ? 'green' : 'geekblue'
-        return (
-          <Tag color={color} key={status} className='me-0'>
-            {status.toUpperCase()}
-          </Tag>
-        )
-      },
-      filters: [
-        {
-          text: 'Pending',
-          value: 'Pending'
-        },
-        {
-          text: 'Accepted',
-          value: 'Accepted'
-        },
-        {
-          text: 'Rejected',
-          value: 'Rejected'
-        }
-      ],
-      filterMode: 'tree',
-      onFilter: (value, record: IBusiness): boolean => {
-        return record.status.toLowerCase().includes((value as string).toLowerCase())
-      }
+      render: (status: string): React.ReactNode => (
+        <Tag color={generateStatusColor(status)} key={status} className='me-0'>
+          {status.toUpperCase()}
+        </Tag>
+      ),
+      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+        dataIndex: 'status',
+        optionsData: statusData as IOptionsPipe,
+        _handleFilter: handleFilter
+      })
     }
   ]
 
   const detailedItems: DescriptionsProps['items'] = [
     {
-      label: 'Name',
-      span: 2,
-      children: businessOne?.name
-    },
-    {
-      label: 'Category',
-      span: 2,
-      children: businessOne?.category.join(', ')
-    },
-    {
-      label: 'Address',
+      label: MANAGE_BUSINESS_FIELDS.name,
       span: 4,
-      children: businessOne?.address
+      children: privateProfileData?.name
     },
     {
-      label: 'Total Reviews',
+      label: MANAGE_BUSINESS_FIELDS.description,
       span: 2,
-      children: businessOne?.totalReviews
+      children: privateProfileData?.description || PLACEHOLDER.EMPTY_TEXT
     },
     {
-      label: 'Average Rating',
-      span: 2,
-      children: businessOne?.overallRating + ' ⭐️'
-    },
-    {
-      label: 'Role',
+      label: MANAGE_BUSINESS_FIELDS.website,
       span: 4,
+      children: privateProfileData?.website
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.fullAddress,
+      span: 4,
+      children: privateProfileData?.fullAddress
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.category,
+      span: 2,
+      children: privateProfileData?.category.name
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.phoneNumber,
+      span: 2,
+      children: privateProfileData?.phoneNumber
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.services,
+      span: 4,
+      children: privateProfileData?.services.join(', ')
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.totalReview,
+      span: 2,
+      children: privateProfileData?.totalReview
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.overallRating,
+      span: 2,
+      children: privateProfileData?.overallRating
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.status,
+      span: 2,
       children: (
-        <>
-          {[businessOne?.status].map((role, index) => {
-            const color = role === 'ADMIN' ? 'green' : 'geekblue'
-            return (
-              <Tag color={color} key={`${role}-${index}`}>
-                {role}
-              </Tag>
-            )
-          })}
-        </>
+        <Tag
+          color={generateStatusColor(privateProfileData?.status || '')}
+          key={privateProfileData?.status}
+          className='me-0'
+        >
+          {privateProfileData?.status && privateProfileData?.status.toUpperCase()}
+        </Tag>
       )
+    },
+    {
+      label: MANAGE_BUSINESS_FIELDS.created_at,
+      span: 2,
+      children: formatDate(privateProfileData?.created_at || '')
     }
+    // date of week & images
   ]
 
   const options = [
     {
-      value: '1',
+      value: ACTIVE_FETCH,
       label: 'Active businesses'
     },
     {
-      value: '2',
+      value: DELETED_FETCH,
       label: 'Deleted businesses'
     }
   ]
 
-  const onChangeSelection = (value: string): void => {
-    setBusinessOption(value)
+  const handleDecentralizeRole = (type: string): void => {
+    updateBusinessStatusMutation({ type, id: selectedBusiness?.id ?? '' })
+    refModerateModal.current?.hideModal()
   }
 
-  const businessWithKeys = businessData.map((item, index) => ({ ...item, key: index }))
+  const handleDeleteBusiness = (): void => {
+    deleteBusinessMutation({
+      type: businessOptionBoolean ? DELETE_OPTIONS.HARD : DELETE_OPTIONS.SOFT,
+      id: selectedBusiness?.id ?? ''
+    })
+    refDeleteBusinessModal.current?.hideModal()
+  }
 
-  const handleModerate = (): void => {}
+  const handleRestoreBusiness = (): void => {
+    restoreDeletedBusinessMutation(selectedBusiness?.id ?? '')
+    refRestoreModal.current?.hideModal()
+  }
 
-  const handleDeleteBusiness = (): void => {}
+  const onChangePagination: PaginationProps['onChange'] = (page) => {
+    setCurrentPage(page)
+  }
+
+  const onChangeDatePicker: RangePickerProps['onChange'] = (_dates: unknown, dateStrings: [string, string]) => {
+    if (dateStrings[0] === '' || dateStrings[1] === '') {
+      setQueryData((prev) => {
+        const queryTemp: IGetAllBusinessQuery = { ...prev }
+        delete queryTemp.startDate
+        delete queryTemp.endDate
+        return { ...queryTemp } as IGetAllBusinessQuery
+      })
+    } else {
+      setQueryData((prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as IGetAllBusinessQuery)
+    }
+  }
 
   return (
     <div className='--manage-business'>
       <Row className='pb-3'>
-        <Col span={16} style={{ display: 'flex', flexWrap: 'wrap' }}>
-          <Col xs={21} sm={16} md={14} lg={10} xl={6}>
+        <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select
               onChange={onChangeSelection}
-              // style={{ marginTop: 16 }}
               optionFilterProp='children'
               filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
               className='filter-select w-100'
               value={businessOption}
-              // defaultValue={options[0]}
               options={options}
             />
           </Col>
         </Col>
 
-        <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* 'users?.itemCount' */}
+        <Col span={6} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span>
-            Total: <strong>{'8'}</strong>
+            Total: <strong>{businessesData?.totalRecords ?? 0}</strong>
           </span>
         </Col>
-      </Row>
-      <TableComponent
-        isFetching={false}
-        columns={listColumns}
-        dataSource={businessWithKeys}
-        className='manage-business-table'
-      />
 
-      <ViewRowDetailsModal title='Business details' data={detailedItems} ref={refViewDetailsModal} />
-      <DecentralizeModal
-        selectionOptions={decentralizeOpts}
-        presentOption=''
+        <Col span={6} className='d-flex justify-content-end'>
+          <RangePicker format={DEFAULT_DATE_FORMAT} onChange={onChangeDatePicker} />
+        </Col>
+      </Row>
+
+      <TableComponent
+        isFetching={isLoadingBusinesses}
+        columns={listColumns}
+        dataSource={businessesData?.data ?? []}
+        pagination={{
+          current: currentPage,
+          pageSize: PAGE_SIZE,
+          total: businessesData?.totalRecords ?? 0,
+          onChange: onChangePagination
+        }}
+        className='--manage-business-table'
+      />
+      <ViewRowDetailsModal
+        title='Business details'
+        // imageData={privateProfileData?.image}
+        data={detailedItems}
+        ref={refViewDetailsModal}
+      />
+      <ModerateModal
+        selectionOptions={actionsData as SelectionOptions[]}
+        presentOption={selectedBusiness?.status || ''}
         ref={refModerateModal}
-        title={'Moderate business'}
+        title={'Decentralize'}
         specificInfo={
           <>
-            <Text>{businessOne?.name}</Text>
+            <Text>
+              {selectedBusiness?.name}
+              {selectedBusiness?.website && '-' + selectedBusiness?.website}
+            </Text>
           </>
         }
-        handleConfirm={handleModerate}
+        handleConfirm={handleDecentralizeRole}
       >
-        <Text>Business name:</Text>
-        <Text>Status:</Text>
-      </DecentralizeModal>
-      <DeleteModal
-        title={deleteModalTitle}
+        <Text>Email:</Text>
+        <Text>Role:</Text>
+      </ModerateModal>
+
+      <RestoreModal
+        title={MODAL_TEXT.RESTORE_USER_TITLE}
         content={
           <>
-            <span
-              className={
-                businessOption === '2' && deleteModalContent === MODAL_TEXT.DELETE_BUSINESS_PERMANENT
-                  ? 'error-modal-title'
-                  : ''
-              }
-            >
-              {deleteModalContent}
-            </span>
-            {'('}
-            <strong>{businessOne?.name}</strong> {')'}
+            <Text className='d-inline'>{MODAL_TEXT.RESTORE_USER}</Text>
+            {' ('}
+            <Text className='d-inline' strong>
+              {selectedBusiness?.name}
+              {selectedBusiness?.website && '-' + selectedBusiness?.website}
+            </Text>{' '}
+            {')'}
+          </>
+        }
+        handleConfirm={handleRestoreBusiness}
+        ref={refRestoreModal}
+      />
+
+      <DeleteModal
+        title={MODAL_TEXT.DELETE_USER_TITLE}
+        content={
+          <>
+            <Text className='d-inline' strong type={businessOptionBoolean ? 'danger' : undefined}>
+              {businessOptionBoolean ? MODAL_TEXT.DELETE_USER_PERMANENT : MODAL_TEXT.DELETE_USER_TEMPORARY}
+            </Text>
+            {' ('}
+            <Text className='d-inline' strong>
+              {selectedBusiness?.name}
+              {selectedBusiness?.website && '-' + selectedBusiness?.website}
+            </Text>{' '}
+            {')'}
           </>
         }
         handleConfirm={handleDeleteBusiness}
@@ -492,3 +536,21 @@ const ManageBusiness = (): React.ReactNode => {
 }
 
 export default ManageBusiness
+
+const generateStatusColor = (role: string): string => {
+  let color: string = ColorConstant._PINK
+
+  if (role === (StatusEnum._APPROVED as string)) {
+    color = ColorConstant._GREEN
+  } else if (role === (StatusEnum._PENDING as string)) {
+    color = ColorConstant._GEEK_BLUE
+  } else if (role === (StatusEnum._REJECTED as string)) {
+    color = ColorConstant._GOLD
+  } else if (role === (StatusEnum._BANNED as string)) {
+    color = ColorConstant._RED
+  } else if (role === (StatusEnum._CLOSED as string)) {
+    color = ColorConstant._GREY
+  }
+
+  return color
+}

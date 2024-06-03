@@ -1,10 +1,10 @@
-import { API_ENDPOINT, ROLE_OPTIONS } from '@/constants'
+import { API_ENDPOINT } from '@/constants'
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { HttpClient } from '@/models/http-client/http-client'
 import { HttpRequestParamsInterface } from '@/models/http-client/http-request-params.interface'
-import { SelectionOptions } from '@/types/common'
+import { FilterOptions, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { IPaginationResponse } from '@/types/pagination'
-import { GetAllUsersQuery } from '@/types/query'
+import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { omit } from 'lodash-es'
@@ -25,7 +25,7 @@ export const userApi = createApi({
   tagTypes: ['UserInfo', 'UserList', 'Roles'],
   endpoints: (builder) => ({
     // /user
-    getPrivateProfile: builder.query<IUserInformation, { userId: string; userStatus: string }>({
+    getPrivateUserProfile: builder.query<IUserInformation, { userId: string; userStatus: string }>({
       query: (payload) => ({
         url: `/users/${payload.userId}/profile?userStatus=${payload.userStatus}`,
         method: 'GET'
@@ -34,7 +34,7 @@ export const userApi = createApi({
     }),
 
     // /admin
-    getAllUsers: builder.query<IPaginationResponse<IUserInformation>, GetAllUsersQuery>({
+    getAllUsers: builder.query<IPaginationResponse<IUserInformation>, IGetAllUsersQuery>({
       query: (params) => {
         const queryString = qs.stringify(params, { arrayFormat: 'repeat' })
         return {
@@ -44,17 +44,32 @@ export const userApi = createApi({
       },
       providesTags: ['UserList']
     }),
-    getAllRoles: builder.query<SelectionOptions[], void>({
+    getAllRoles: builder.query<IOptionsPipe, void>({
       query: () => ({
         url: `/admin/roles`,
         method: 'GET'
       }),
-      transformResponse: (response: string[]): SelectionOptions[] => {
-        const tempData: SelectionOptions[] = response?.map((role: string) => {
-          const matchedRole = ROLE_OPTIONS.find((roleOption) => roleOption.value === role)
-          return matchedRole || { label: role.toUpperCase(), value: role }
-        })
-        return tempData
+      transformResponse: (response: string[]): IOptionsPipe => {
+        const _tempSelectData: SelectionOptions[] = response?.map(
+          (role: string) =>
+            ({
+              label: role.toUpperCase(),
+              value: role
+            }) as SelectionOptions
+        )
+
+        const _tempFilterData: FilterOptions[] = response?.map(
+          (role: string) =>
+            ({
+              text: role.toUpperCase(),
+              value: role
+            }) as FilterOptions
+        )
+
+        return {
+          selectionOpts: _tempSelectData,
+          filterOpts: _tempFilterData
+        } as IOptionsPipe
       },
       providesTags: ['Roles']
     }),
@@ -85,7 +100,7 @@ export const userApi = createApi({
 })
 
 export const {
-  useGetPrivateProfileQuery,
+  useGetPrivateUserProfileQuery,
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useUpdateUserRoleMutation,
