@@ -38,3 +38,7 @@ main {
   height: calc(100% - 66px);
   position: relative;
 }
+
+.ant-layout-content {
+  overflow: hidden;
+}

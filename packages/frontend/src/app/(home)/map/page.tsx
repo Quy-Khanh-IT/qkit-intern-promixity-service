@@ -3,11 +3,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import Map from './components'
 import { Layout, Image, Input } from 'antd'
 import './map.scss'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
 import SearchSider from './components/SearchSider'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
+import { setSearchPosition } from '@/redux/slices/map-props.slice'
 
 export default function MapPage(): React.ReactNode {
   const position = useSelector((state: RootState) => state.mapProps.position)
@@ -16,6 +17,9 @@ export default function MapPage(): React.ReactNode {
   const { Search } = Input
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const [searchText, setSearchText] = useState<string>('')
+  const [isFly, setIsFly] = useState<boolean>(false)
+  const dispatch = useDispatch()
+
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
@@ -34,21 +38,26 @@ export default function MapPage(): React.ReactNode {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleOnSearch = (): void => {
+    setIsFly(true)
     setCollapsed(true)
     const data: IFindNearByPayLoad = {
       latitude: position[0],
       longitude: position[1],
-      radius: 10,
+      radius: 2,
       q: searchText
     }
+    dispatch(setSearchPosition(position))
     setQueryData(data) // Trigger the query with new data
     setCollapsed(false)
+  }
+
+  const handleStopFly = (): void => {
+    setIsFly(false)
   }
 
   const [showSpinner, setShowSpinner] = useState<boolean>(false)
 
   useEffect(() => {
-    console.log('map page render')
     if (isFetching) {
       setShowSpinner(true)
 
@@ -66,10 +75,11 @@ export default function MapPage(): React.ReactNode {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [isFetching])
+  }, [isFetching, zoom])
 
   const handleCloseSider = (): void => {
     setCollapsed(true)
+    dispatch(setSearchPosition(null))
   }
 
   return (
@@ -111,7 +121,7 @@ export default function MapPage(): React.ReactNode {
         />
         <Content style={{ margin: '0 16px' }}>
           <div className='h-100'>
-            <Map zoom={zoom} position={position} />
+            <Map businesses={response?.data} setStopFly={handleStopFly} isFly={isFly} zoom={zoom} position={position} />
           </div>
         </Content>
       </Layout>

@@ -45,15 +45,15 @@ export default function SearchSider({
             <Spin size='large' />
           </div>
         ) : (
-          <div className='container search-result-wrapper w-100 h-100 search-result-wrapper scroll-bar-2 pt-2'>
+          <div className='search-result-wrapper w-100 h-100 search-result-wrapper scroll-bar-2 pt-2'>
             <div className='search-result-title mt-2 d-flex justify-content-between align-items-center'>
-              <div>
+              <div className='ms-2'>
                 Results{' '}
                 <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
                   <i className='fa-light fa-circle-info'></i>{' '}
                 </Tooltip>
               </div>
-              <div onClick={onClose} className='close-btn'>
+              <div onClick={onClose} className='close-btn me-2'>
                 <i className='fa-solid fa-x'></i>
               </div>
             </div>
