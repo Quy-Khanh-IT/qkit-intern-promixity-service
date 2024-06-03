@@ -1,6 +1,6 @@
 'use client'
 import { ROUTE, StorageKey } from '@/constants'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
 import { Col, Grid, MenuProps, Row, theme } from 'antd'
@@ -8,11 +8,10 @@ import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { SIDEBAR_MENU_OPTIONS } from './admin.constant'
 import './admin.scss'
 import AdminHeader from './layouts/AdminHeader'
 import AdminSidebar from './layouts/AdminSidebar'
-import { SIDEBAR_MENU_OPTIONS } from './admin.constant'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables

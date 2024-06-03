@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-import reducers from './reducers'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import { authApi } from '@/services/auth.service'
 import { otpApi } from '@/services/otp.service'
