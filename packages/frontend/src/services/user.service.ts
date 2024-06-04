@@ -25,11 +25,14 @@ export const userApi = createApi({
   tagTypes: ['UserInfo', 'UserList', 'Roles'],
   endpoints: (builder) => ({
     // /user
-    getPrivateUserProfile: builder.query<IUserInformation, { userId: string; userStatus: string }>({
-      query: (payload) => ({
-        url: `/users/${payload.userId}/profile?userStatus=${payload.userStatus}`,
-        method: 'GET'
-      }),
+    getPrivateUserProfile: builder.query<IUserInformation, { userId: string; userStatus?: string }>({
+      query: (payload) => {
+        const queryString = qs.stringify(omit(payload, 'userId'), { arrayFormat: 'repeat' })
+        return {
+          url: `/users/${payload.userId}/profile?${queryString}`,
+          method: 'GET'
+        }
+      },
       providesTags: ['UserInfo']
     }),
 

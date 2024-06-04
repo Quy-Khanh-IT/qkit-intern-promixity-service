@@ -1,6 +1,6 @@
 'use client'
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/DeleteModal/DeleteModal'
+import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'

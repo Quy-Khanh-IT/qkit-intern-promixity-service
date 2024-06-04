@@ -1,3 +1,5 @@
+import { LOCAL_ENDPOINT } from '@/constants'
+
 export function formatDate(inputDate: string): string {
   const dateObj = new Date(inputDate)
 
@@ -19,4 +21,13 @@ export function compareDates(date1: string, date2: string): number {
   const dateObj2 = new Date(date2)
 
   return dateObj1.getTime() - dateObj2.getTime()
+}
+
+export const getPresentUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const currentUrl = window.location.href
+    const coreUrl = currentUrl && currentUrl.split(LOCAL_ENDPOINT || '')[1]
+    return coreUrl
+  }
+  return ''
 }

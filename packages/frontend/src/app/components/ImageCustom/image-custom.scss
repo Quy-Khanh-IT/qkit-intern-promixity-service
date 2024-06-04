@@ -1,0 +1,12 @@
+.--image-circle{
+  .ant-image{
+    align-self: center !important;
+    img{
+      object-fit: cover !important;
+      border-radius: 50% !important;
+    }
+    .ant-image-mask{
+      border-radius: 50% !important;
+    }
+  }
+}

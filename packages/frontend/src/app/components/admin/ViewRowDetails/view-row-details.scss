@@ -4,17 +4,6 @@
   padding: 0 16px;
   width: 100%;
 
-  .ant-image{
-    align-self: center !important;
-    img{
-      object-fit: cover !important;
-      border-radius: 50% !important;
-    }
-    .ant-image-mask{
-      border-radius: 50% !important;
-    }
-  }
-
   table{
     border: $gray-border 1px solid !important;
 

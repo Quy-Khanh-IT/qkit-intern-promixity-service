@@ -1,17 +1,16 @@
-import './delete-user.scss'
 import { Button, Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
-import './delete-user.scss'
+import './confirm-modal.scss'
 
-export interface IDeleteUserProps {
+export interface IConfirmModalProps {
   title: string
   content: React.ReactNode
   handleConfirm: () => void
 }
 
-const _DeleteModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserProps> = (
+const _ConfirmModal: React.ForwardRefRenderFunction<IModalMethods, IConfirmModalProps> = (
   { title, content, handleConfirm },
   ref
 ) => {
@@ -60,5 +59,5 @@ const _DeleteModal: React.ForwardRefRenderFunction<IModalMethods, IDeleteUserPro
   )
 }
 
-const DeleteModal = forwardRef(_DeleteModal)
-export default DeleteModal
+const ConfirmModal = forwardRef(_ConfirmModal)
+export default ConfirmModal

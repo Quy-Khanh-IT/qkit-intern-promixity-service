@@ -12,7 +12,7 @@ export type ChildProps = {
 
 export type UserContextType = {
   onLogin: (_loginPayload: ILoginPayload) => void
-  logout: () => void
+  onLogout: () => void
   // authSession: string
   userInformation: IUserInformation
 }

@@ -1,6 +1,6 @@
 'use client'
 import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/DeleteModal/DeleteModal'
+import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
@@ -370,7 +370,7 @@ const ManageBusiness = (): React.ReactNode => {
     {
       label: MANAGE_BUSINESS_FIELDS.services,
       span: 4,
-      children: privateProfileData?.services.join(', ')
+      children: privateProfileData?.services.map((item) => item.name).join(', ')
     },
     {
       label: MANAGE_BUSINESS_FIELDS.totalReview,
@@ -380,7 +380,12 @@ const ManageBusiness = (): React.ReactNode => {
     {
       label: MANAGE_BUSINESS_FIELDS.overallRating,
       span: 2,
-      children: privateProfileData?.overallRating
+      children: (
+        <Flex align='center'>
+          <Typography.Text>{privateProfileData?.overallRating}</Typography.Text>
+          <i className='fa-solid fa-star ms-2' style={{ color: starColor }}></i>
+        </Flex>
+      )
     },
     {
       label: MANAGE_BUSINESS_FIELDS.status,

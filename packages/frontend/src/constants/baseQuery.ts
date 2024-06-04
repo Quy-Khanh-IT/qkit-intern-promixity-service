@@ -1,9 +1,10 @@
-import { HttpStatusCode } from 'axios'
-import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
+import { API_ENDPOINT, ROUTE, StorageKey } from '@/constants'
+import { checkValidRoutes } from '@/middleware/middleware.util'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
-import { checkValidRoutes } from '@/middleware/middleware.util'
+import { HttpStatusCode } from 'axios'
 import { toast } from 'react-toastify'
+import { getPresentUrl } from '../utils/helpers.util'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
@@ -15,9 +16,7 @@ export const baseQueryWithAuth = fetchBaseQuery({
     return headers
   },
   validateStatus(response: Response) {
-    const currentUrl = window.location.href
-    const coreUrl = currentUrl && currentUrl.split(LOCAL_ENDPOINT || '')[1]
-    const checkProtectedRoute: boolean = checkValidRoutes(coreUrl)
+    const checkProtectedRoute: boolean = checkValidRoutes(getPresentUrl())
 
     if (response.status === (HttpStatusCode.Unauthorized as number)) {
       if (checkProtectedRoute) {
