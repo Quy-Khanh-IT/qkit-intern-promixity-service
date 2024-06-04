@@ -1,9 +1,9 @@
-import { Button, Descriptions, DescriptionsProps, Modal, Image } from 'antd'
+import { Button, Descriptions, DescriptionsProps, Modal } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import ImageCustom from '../../ImageCustom/ImageCustom'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
-import { PLACEHOLDER } from '@/constants'
 
 export interface ViewRowDetailsProps {
   title: string
@@ -47,17 +47,7 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
         ]}
       >
         <div className='content-box d-flex flex-column gap-3'>
-          <Image
-            width={200}
-            height={200}
-            src={src}
-            alt={PLACEHOLDER.ALT_IMAGE}
-            className='--avatar-details align-self-center'
-            placeholder={
-              <Image preview={false} src={PLACEHOLDER.LOADING_IMAGE} width={200} alt={PLACEHOLDER.ALT_IMAGE} />
-            }
-            fallback={PLACEHOLDER.ERROR_IMAGE}
-          />
+          <ImageCustom width={200} height={200} src={src || ''} className='--avatar-custom d-flex align-self-center' />
           <Descriptions bordered items={data} size='small' layout='vertical' />
         </div>
       </Modal>

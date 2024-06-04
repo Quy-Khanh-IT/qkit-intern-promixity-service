@@ -1,6 +1,7 @@
 'use client'
 import { ROUTE, StorageKey, TOAST_MSG } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { useLoginUserMutation } from '@/services/auth.service'
 import { getMyProfile } from '@/services/user.service'
 import { ILoginPayload, ILoginResponse } from '@/types/auth'
@@ -8,22 +9,27 @@ import { ChildProps, UserContextType } from '@/types/context'
 import { RoleEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
 import { IUserInformation } from '@/types/user'
-import { setCookieFromClient } from '@/utils/cookies.util'
-import { saveToSessionStorage } from '@/utils/session-storage.util'
+import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
 import Error from 'next/error'
 import { useRouter } from 'next/navigation'
-import React, { createContext, useCallback, useRef } from 'react'
+import React, { createContext, useCallback } from 'react'
 import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
 export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const router = useRouter()
-  const [_accessToken, setAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
-  const [_refreshToken, setRefreshToken] = useLocalStorage(StorageKey._REFRESH_TOKEN, '')
-  const [userInformation, setUserInformation] = useLocalStorage(StorageKey._USER, {} as IUserInformation)
-  const [_authSession, setAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
-  const userId = useRef<string>('')
+  const [_accessToken, setAccessToken, removeAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
+  const [_refreshToken, setRefreshToken, removeRefreshToken] = useLocalStorage(StorageKey._REFRESH_TOKEN, '')
+  const [userInformation, setUserInformation, removeUserInformation] = useLocalStorage(
+    StorageKey._USER,
+    {} as IUserInformation
+  )
+  const [_userId, setUserId, removeUserId] = useLocalStorage(StorageKey._USER_ID, '')
+  const [_authSession, setAuthSession, removeAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
+
+  const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
+
   const [login] = useLoginUserMutation()
 
   const fetchUserInformation = useCallback<(_: Omit<ILoginResponse, 'refreshToken'>) => Promise<void>>(
@@ -32,9 +38,10 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         const res: IUserInformation = await getMyProfile(response.userId)
         if (res) {
           setUserInformation(res)
+          setUserId(response.userId)
           setCookieFromClient(StorageKey._ACCESS_TOKEN, response.accessToken)
           setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
-          saveToSessionStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
+          setRouteValue(ROUTE.DASHBOARD)
 
           if (res.role === (RoleEnum._ADMIN as string)) {
             router.push(ROUTE.DASHBOARD)
@@ -65,18 +72,29 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setAccessToken(res.accessToken)
         setRefreshToken(res.refreshToken)
         setAuthSession(true)
-        userId.current = res.userId
 
         fetchUserInformation(res)
       })
   }
 
-  const logout = (): void => {
+  const onLogout = (): void => {
+    resetSession()
     router.push(ROUTE.ROOT)
+    window.location.reload()
+  }
+
+  const resetSession = (): void => {
+    removeAccessToken()
+    removeRefreshToken()
+    removeAuthSession()
+    removeUserInformation()
+    removeUserId()
+    removeRouteValue()
+    clearCookiesFromClient()
   }
 
   return (
-    <AuthContext.Provider value={{ onLogin, logout, userInformation: userInformation as IUserInformation }}>
+    <AuthContext.Provider value={{ onLogin, onLogout, userInformation: userInformation as IUserInformation }}>
       {children}
     </AuthContext.Provider>
   )

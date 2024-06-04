@@ -12,6 +12,7 @@ import { SIDEBAR_MENU_OPTIONS } from './admin.constant'
 import './admin.scss'
 import AdminHeader from './layouts/AdminHeader'
 import AdminSidebar from './layouts/AdminSidebar'
+import { getPresentUrl } from '@/utils/helpers.util'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
@@ -29,7 +30,10 @@ export default function RootLayout({
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
 
-  const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, ROUTE.DASHBOARD)
+  const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
+    StorageKey._ROUTE_VALUE,
+    getPresentUrl() || ROUTE.DASHBOARD
+  )
   const [selectedMenuKey, setSelectedMenuKey] = useState<unknown>(routeValue || SIDEBAR_MENU_OPTIONS.DASHBOARD.key)
 
   useEffect(() => {

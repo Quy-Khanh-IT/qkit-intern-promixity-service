@@ -8,3 +8,23 @@ export const setCookieFromClient = (key: string, value: string): void => {
     sameSite: 'strict'
   })
 }
+
+export const removeCookieFromClient = (key: string): void => {
+  Cookies.remove(key, {
+    path: '/',
+    sameSite: 'strict'
+  })
+}
+
+export const clearCookiesFromClient = (): void => {
+  const allCookies = Cookies.get()
+
+  for (const key in allCookies) {
+    if (Object.prototype.hasOwnProperty.call(allCookies, key)) {
+      Cookies.remove(key, {
+        path: '/',
+        sameSite: 'strict'
+      })
+    }
+  }
+}

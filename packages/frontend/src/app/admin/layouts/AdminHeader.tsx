@@ -1,12 +1,18 @@
 'use client'
-import { ROUTE } from '@/constants'
+import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
+import { ROUTE, StorageKey } from '@/constants'
+import { useAuth } from '@/context/AuthContext'
 import '@/sass/common/_common.scss'
-import { BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Badge, Button, Col, Flex, Image, Space, theme, Tooltip } from 'antd'
+import { IUserInformation } from '@/types/user'
+import { getFromLocalStorage } from '@/utils/local-storage.util'
+import { BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { Badge, Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Tooltip, Typography } from 'antd'
 import { Header } from 'antd/es/layout/layout'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import '../admin.scss'
+
+const { Text } = Typography
 
 interface IAdminHeaderProps {
   collapsed: boolean
@@ -18,6 +24,38 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
   const {
     token: { colorBgContainer }
   } = theme.useToken()
+  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
+  const [userImage, setUserImage] = useState<string>('')
+  const { onLogout } = useAuth()
+
+  useEffect(() => {
+    if (storedUser) {
+      setUserImage(storedUser.image)
+    }
+  }, [storedUser])
+
+  const handleLogout = (): void => {
+    onLogout()
+  }
+
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <Link href={ROUTE.ADMIN_PROFILE} className='p-2 '>
+          <Text>My Profile</Text>
+        </Link>
+      )
+    },
+    {
+      key: '2',
+      label: (
+        <Text onClick={handleLogout} className='p-2  '>
+          Log out
+        </Text>
+      )
+    }
+  ]
 
   return (
     <>
@@ -67,9 +105,17 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
               <BellOutlined style={{ fontSize: 24 }} className='action-button' />
             </Badge>
           </Tooltip>
-          <Link href={ROUTE.ADMIN_PROFILE}>
-            <Avatar icon={<UserOutlined />} className='cursor' style={{ height: 36, width: 36 }} />
-          </Link>
+          <Dropdown menu={{ items }} placement='bottomRight' arrow>
+            <div>
+              <ImageCustom
+                width={36}
+                height={36}
+                src={userImage}
+                preview={false}
+                className='--avatar-custom d-cursor'
+              />
+            </div>
+          </Dropdown>
         </Space>
       </Col>
     </>

@@ -1,12 +1,15 @@
 'use client'
-import { UserOutlined } from '@ant-design/icons'
-import type { FormInstance } from 'antd'
-import { Avatar, Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
-import './profile.scss'
 import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
 import { IModalMethods } from '@/app/components/admin/modal'
-import { IUserInformation } from '@/types/user'
+import { StorageKey } from '@/constants'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useGetPrivateUserProfileQuery } from '@/services/user.service'
+import type { FormInstance } from 'antd'
+import { Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import ImageCustom from '../../components/ImageCustom/ImageCustom'
+import { generateRoleColor } from '../utils/generate-color.util'
+import './profile.scss'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -37,23 +40,34 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const Profile: React.FC = () => {
-  const [user, _setUser] = useState<IUserInformation>()
+  const [storedUserId, _setStoredUserId, _removeStoredUserId] = useLocalStorage(StorageKey._USER_ID, '')
+  // const [userId, setUserId] = useState<string | null>(null)
+  const { data: userProfile } = useGetPrivateUserProfileQuery(
+    {
+      userId: (storedUserId as string) || ''
+    },
+    { skip: !storedUserId }
+  )
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
-  const changePwModalRef = useRef<IModalMethods | null>(null)
+  const changePasswordModalRef = useRef<IModalMethods | null>(null)
   const [_open, _setOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (userProfile) {
+      form.setFieldsValue({
+        firstName: userProfile.firstName,
+        lastName: userProfile.lastName,
+        email: userProfile.email,
+        phone: userProfile.phoneNumber
+      })
+    }
+  }, [userProfile])
 
   const onLoadingCallback = (loading: boolean): void => {
     setConfirmLoading(loading)
   }
-
-  useEffect(() => {
-    fetchUser()
-  }, [])
-
-  // async
-  const fetchUser = (): void => {}
 
   const onChangeEditBtn = (): void => {
     setIsEditInfo((prev) => {
@@ -62,7 +76,7 @@ const Profile: React.FC = () => {
   }
 
   const openChangePwModal = (): void => {
-    changePwModalRef.current?.showModal()
+    changePasswordModalRef.current?.showModal()
   }
 
   return (
@@ -72,9 +86,9 @@ const Profile: React.FC = () => {
           <div className='profile-cover'>
             <Flex justify='center' style={{ marginBottom: '8px' }}>
               <div className='avatar-cover'>
-                <Avatar size={128} icon={<UserOutlined />} />
-                <Tag color='green' key='ADMIN' className='role'>
-                  ADMIN
+                <ImageCustom width={150} height={150} src={userProfile?.image || ''} className='d-flex align-self-center'/>
+                <Tag color={generateRoleColor(userProfile?.role || '')} key={userProfile?.role} className='role'>
+                  {userProfile?.role.toUpperCase()}
                 </Tag>
               </div>
             </Flex>
@@ -88,7 +102,6 @@ const Profile: React.FC = () => {
             >
               <Form.Item
                 name='firstName'
-                initialValue={user?.firstName}
                 label='First name'
                 rules={[{ required: true, message: 'Please enter your first name' }]}
                 validateTrigger={['onBlur']}
@@ -98,17 +111,15 @@ const Profile: React.FC = () => {
 
               <Form.Item
                 name='lastName'
-                initialValue={user?.lastName}
                 label='Last name'
                 rules={[{ required: true, message: 'Please enter your last name' }]}
                 validateTrigger={['onBlur']}
               >
-                <Input value={user?.lastName} />
+                <Input value={userProfile?.lastName} />
               </Form.Item>
 
               <Form.Item
                 name='email'
-                initialValue={user?.email}
                 label='Email'
                 rules={[
                   { required: true, message: 'Please enter your email' },
@@ -120,7 +131,6 @@ const Profile: React.FC = () => {
               </Form.Item>
               <Form.Item
                 name='phone'
-                initialValue={user?.phoneNumber}
                 label='Phone number'
                 rules={[{ required: true, message: 'Please enter your phone number' }]}
                 validateTrigger={['onBlur']}
@@ -157,7 +167,7 @@ const Profile: React.FC = () => {
             <Typography.Text style={{ margin: '8px 0', display: 'block' }}>
               <span style={{ color: 'red' }}>*</span> Password
             </Typography.Text>
-            <Input defaultValue='Hello, antd!' type='password' disabled={true} />
+            <Input defaultValue='Hello, ant design!' type='password' disabled={true} />
 
             <Flex justify='end' style={{ margin: '16px 0', flexGrow: 1 }}>
               <Button type='default' htmlType='reset' className={`btn-primary`} onClick={openChangePwModal}>
@@ -167,7 +177,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
       </Flex>
-      <ChangePasswordModal ref={changePwModalRef} id={''} value={''} description={''} />
+      <ChangePasswordModal ref={changePasswordModalRef} id={''} value={''} description={''} />
     </>
   )
 }
