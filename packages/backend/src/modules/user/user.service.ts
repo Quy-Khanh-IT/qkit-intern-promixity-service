@@ -19,6 +19,7 @@ import {
 import {
   InvalidTokenException,
   OTPNotMatchException,
+  UnVerifiedUser,
   UnauthorizedException,
   WrongCredentialsException,
 } from 'src/common/exceptions';
@@ -482,6 +483,10 @@ export class UserService {
   ): Promise<boolean> {
     await this.checkCRUDConditionForAdmin(updateUserId, adminId);
 
+    const user = await this.findVerifiedOneWithId(updateUserId);
+    if (!user) {
+      throw new UnVerifiedUser('');
+    }
     const result = await this.userRepository.update(updateUserId, {
       role: role,
     });
@@ -520,6 +525,9 @@ export class UserService {
 
   async processSoftDelete(adminId: string, deleteUserId: string) {
     const user = await this.userRepository.findOneById(deleteUserId);
+    if (user.role === UserRole.ADMIN) {
+      throw new UserConflictAdminException();
+    }
     if (!user) {
       throw new UserNotFoundException();
     }
@@ -531,6 +539,9 @@ export class UserService {
 
   async processHardDelete(adminId: string, deleteUserId: string) {
     const user = await this.findOneDeleteById(deleteUserId);
+    if (user.role === UserRole.ADMIN) {
+      throw new UserConflictAdminException();
+    }
     if (!user) {
       throw new UserNotFoundException(); //
     }

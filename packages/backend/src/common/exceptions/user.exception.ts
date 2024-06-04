@@ -61,6 +61,16 @@ export class UserNotFoundException extends BaseException {
   }
 }
 
+export class UserUnVerifiedException extends BaseException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_UNVERIFIED,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_FOUND],
+      404,
+    );
+  }
+}
+
 export class UserAlreadyExistException extends BaseException {
   constructor() {
     super(
