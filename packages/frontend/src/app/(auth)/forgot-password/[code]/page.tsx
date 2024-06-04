@@ -10,15 +10,15 @@ import { useEffect, useMemo, useState } from 'react'
 export default function ResetPassword({ params }: { params: { code: string } }): React.ReactNode {
   const router = useRouter()
   const token = params.code
-  const toastService = useMemo(() => new ToastService(), [])
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const email: string | null = decodeString(token)
   const [
     forgetPassword,
     { isSuccess: isForgetPasswordSuccess, isError: isForgetPasswordError, error: ForgotPasswordError }
   ] = useForgotPasswordMutation()
 
-  const [resendTimer, setResendTimer] = useState(0)
-  const [isResendDisabled, setIsResendDisabled] = useState(false)
+  const [resendTimer, setResendTimer] = useState<number>(0)
+  const [isResendDisabled, setIsResendDisabled] = useState<boolean>(false)
 
   useEffect(() => {
     let interval: NodeJS.Timeout

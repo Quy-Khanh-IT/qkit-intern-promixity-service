@@ -14,7 +14,7 @@ export function SearchList({ businesses }: { businesses: IBusiness[] | [] | unde
           )
         })
       ) : (
-        <div className='not-found-wrapper'>
+        <div className='not-found-wrapper container'>
           <div className='not-found-title mb-2'>Proximity Service can&apos;t find any business in your area.</div>
           <div>Make sure your search is spelled correctly. Try adding a city, state, or more detail information.</div>
           <div className='mt-3'>Should this place be on Proximity Service?</div>

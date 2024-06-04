@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import './scroll-to-top.scss'
 
 const ScrollToTopButton = (): React.ReactNode => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState<boolean>(false)
 
   const handleScroll = (): void => {
     if (window.scrollY > 200) {

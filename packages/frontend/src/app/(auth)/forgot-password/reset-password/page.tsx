@@ -8,7 +8,10 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function ResetPassword(): React.ReactNode {
-  const [resetPasswordData, setResetPasswordData] = useState({
+  const [resetPasswordData, setResetPasswordData] = useState<{
+    newPassword: string
+    confirmPassword: string
+  }>({
     newPassword: '',
     confirmPassword: ''
   })
@@ -25,7 +28,7 @@ export default function ResetPassword(): React.ReactNode {
     }
   })
 
-  const toastService = useMemo(() => new ToastService(), [])
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const onChangeInput = (value: string, type: string): void => {
     setResetPasswordData({
       ...resetPasswordData,
