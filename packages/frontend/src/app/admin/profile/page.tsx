@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ImageCustom from '../../components/ImageCustom/ImageCustom'
 import { generateRoleColor } from '../utils/generate-color.util'
 import './profile.scss'
+import { useAuth } from '@/context/AuthContext'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -41,10 +42,11 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 
 const Profile: React.FC = () => {
   const [storedUserId, _setStoredUserId, _removeStoredUserId] = useLocalStorage(StorageKey._USER_ID, '')
+  // const { userId: storedUserId, } = useAuth()
   // const [userId, setUserId] = useState<string | null>(null)
   const { data: userProfile } = useGetPrivateUserProfileQuery(
     {
-      userId: (storedUserId as string) || ''
+      userId: storedUserId as string
     },
     { skip: !storedUserId }
   )
@@ -86,7 +88,12 @@ const Profile: React.FC = () => {
           <div className='profile-cover'>
             <Flex justify='center' style={{ marginBottom: '8px' }}>
               <div className='avatar-cover'>
-                <ImageCustom width={150} height={150} src={userProfile?.image || ''} className='d-flex align-self-center'/>
+                <ImageCustom
+                  width={150}
+                  height={150}
+                  src={userProfile?.image || ''}
+                  className='d-flex align-self-center'
+                />
                 <Tag color={generateRoleColor(userProfile?.role || '')} key={userProfile?.role} className='role'>
                   {userProfile?.role.toUpperCase()}
                 </Tag>

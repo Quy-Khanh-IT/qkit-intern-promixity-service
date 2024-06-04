@@ -14,5 +14,7 @@ export type UserContextType = {
   onLogin: (_loginPayload: ILoginPayload) => void
   onLogout: () => void
   // authSession: string
+  fetchUserInformation: (userId: string) => void
+  userId: string
   userInformation: IUserInformation
 }
