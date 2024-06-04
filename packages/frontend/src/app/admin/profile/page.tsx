@@ -1,5 +1,6 @@
 'use client'
-import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
+// import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
+import ChangePasswordModal from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import { useAuth } from '@/context/AuthContext'
 import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } from '@/services/user.service'
@@ -11,7 +12,8 @@ import { generateRoleColor } from '../utils/generate-color.util'
 import './profile.scss'
 import { IUpdateProfilePayload } from '@/types/user'
 import { toast } from 'react-toastify'
-import { TOAST_MSG } from '@/constants'
+import { MODAL_TEXT, TOAST_MSG } from '@/constants'
+import ChangePasswordForm from '@/app/components/admin/ChangePassword/ChangePasswordForm'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -105,9 +107,15 @@ const Profile: React.FC = () => {
     })
   }
 
-  const openChangePwModal = (): void => {
+  const openChangePasswordModal = (): void => {
     changePasswordModalRef.current?.showModal()
   }
+
+  const closeChangePasswordModal = (): void => {
+    changePasswordModalRef.current?.hideModal()
+  }
+
+  const handlePasswordForm = (): void => {}
 
   return (
     <>
@@ -206,14 +214,24 @@ const Profile: React.FC = () => {
             <Input defaultValue='Hello, ant design!' type='password' disabled={true} />
 
             <Flex justify='end' style={{ margin: '16px 0', flexGrow: 1 }}>
-              <Button type='default' htmlType='reset' className={`btn-primary`} onClick={openChangePwModal}>
+              <Button type='default' htmlType='reset' className={`btn-primary`} onClick={openChangePasswordModal}>
                 Change password
               </Button>
             </Flex>
           </div>
         </div>
       </Flex>
-      <ChangePasswordModal ref={changePasswordModalRef} id={''} value={''} description={''} />
+
+      <ChangePasswordModal
+        title={MODAL_TEXT.CHANGE_PASSWORD_TITLE}
+        width={400}
+        content={
+          <>
+            <ChangePasswordForm closeModal={closeChangePasswordModal} />
+          </>
+        }
+        ref={changePasswordModalRef}
+      />
     </>
   )
 }

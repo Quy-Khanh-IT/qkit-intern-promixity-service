@@ -7,11 +7,12 @@ import './confirm-modal.scss'
 export interface IConfirmModalProps {
   title: string
   content: React.ReactNode
-  handleConfirm: () => void
+  width?: number
+  handleConfirm?: () => void
 }
 
 const _ConfirmModal: React.ForwardRefRenderFunction<IModalMethods, IConfirmModalProps> = (
-  { title, content, handleConfirm },
+  { title, content, handleConfirm, width },
   ref
 ) => {
   const [open, setOpen] = useState<boolean>(false)
@@ -26,7 +27,7 @@ const _ConfirmModal: React.ForwardRefRenderFunction<IModalMethods, IConfirmModal
   }
 
   const handleConfirmChild = (): void => {
-    handleConfirm()
+    handleConfirm && handleConfirm()
   }
 
   return (
@@ -36,22 +37,20 @@ const _ConfirmModal: React.ForwardRefRenderFunction<IModalMethods, IConfirmModal
         title={title}
         open={open}
         transitionName='ant-move-up'
-        width={'600px'}
+        width={width ? width + 'px' : '600px'}
         onCancel={handleCancelChild}
-        footer={[
-          <Button className='btn-cancel mt-1' onClick={handleCancelChild} type='primary' key='cancel'>
-            Close
-          </Button>,
-          <Button
-            className='btn-primary mt-1'
-            onClick={handleConfirmChild}
-            type='primary'
-            key='ok'
-            // loading={confirmLoading}
-          >
-            Confirm
-          </Button>
-        ]}
+        footer={
+          handleConfirm
+            ? [
+                <Button className='btn-cancel mt-1' onClick={handleCancelChild} type='primary' key='cancel'>
+                  Close
+                </Button>,
+                <Button className='btn-primary mt-1' onClick={handleConfirmChild} type='primary' key='ok'>
+                  Confirm
+                </Button>
+              ]
+            : null
+        }
       >
         <div className='content-box'>{content}</div>
       </Modal>

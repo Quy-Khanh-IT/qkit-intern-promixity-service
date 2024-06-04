@@ -25,7 +25,9 @@ export const MODAL_TEXT = {
   DELETE_BUSINESS_TEMPORARY: 'Do you want to delete this business?',
   DELETE_BUSINESS_PERMANENT: 'Do you want to delete this business permanently?',
   RESTORE_BUSINESS_TITLE: 'Restore Business',
-  RESTORE_BUSINESS: 'Do you want to restore this business?'
+  RESTORE_BUSINESS: 'Do you want to restore this business?',
+
+  CHANGE_PASSWORD_TITLE: 'Change Password'
 }
 
 // public

@@ -19,6 +19,12 @@ export interface IUpdateProfilePayload {
   phoneNumber: string
 }
 
+export interface IUpdatePasswordPayload {
+  oldPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
 export interface RoleFiltered {
   label: string
   value: string

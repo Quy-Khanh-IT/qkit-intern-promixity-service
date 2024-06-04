@@ -39,7 +39,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
 
   return (
     <>
-      <Form form={form} name='changePWForm' layout='vertical' autoComplete='off'>
+      <Form form={form} name='changePWForm' layout='vertical' autoComplete='off' className='pb-3 pt-3'>
         <Form.Item name='currentPassword' label='Mật khẩu' rules={VALIDATION.PASSWORD} validateTrigger={['onBlur']}>
           <Input type='password' />
         </Form.Item>
