@@ -550,7 +550,7 @@ const ManageBusiness = (): React.ReactNode => {
             <Text className='d-inline' strong>
               {selectedBusiness?.name}
               {selectedBusiness?.website && '-' + selectedBusiness?.website}
-            </Text>{' '}
+            </Text>
             {')'}
           </>
         }

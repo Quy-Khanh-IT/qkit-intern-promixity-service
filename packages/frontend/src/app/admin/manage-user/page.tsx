@@ -464,7 +464,7 @@ const ManageUser = (): React.ReactNode => {
             {' ('}
             <Text className='d-inline' strong>
               {selectedUser?.email}
-            </Text>{' '}
+            </Text>
             {')'}
           </>
         }

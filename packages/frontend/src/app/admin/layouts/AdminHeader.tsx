@@ -42,7 +42,7 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
     {
       key: '1',
       label: (
-        <Link href={ROUTE.ADMIN_PROFILE} className='p-2 '>
+        <Link href={ROUTE.ADMIN_PROFILE} className='p-2' onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}>
           <Text>My Profile</Text>
         </Link>
       )

@@ -10,7 +10,8 @@ export const PLACEHOLDER = {
 
 export const TOAST_MSG = {
   NO_AUTHORIZATION: 'No authorization',
-  LOGIN_SUCCESS: 'Login successfully'
+  LOGIN_SUCCESS: 'Login successfully',
+  UPDATE_PROFILE_SUCCESS: 'Update profile successfully'
 }
 
 export const MODAL_TEXT = {

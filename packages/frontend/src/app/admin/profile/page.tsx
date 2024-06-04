@@ -1,16 +1,17 @@
 'use client'
 import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
 import { IModalMethods } from '@/app/components/admin/modal'
-import { StorageKey } from '@/constants'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { useGetPrivateUserProfileQuery } from '@/services/user.service'
+import { useAuth } from '@/context/AuthContext'
+import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } from '@/services/user.service'
 import type { FormInstance } from 'antd'
 import { Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import ImageCustom from '../../components/ImageCustom/ImageCustom'
 import { generateRoleColor } from '../utils/generate-color.util'
 import './profile.scss'
-import { useAuth } from '@/context/AuthContext'
+import { IUpdateProfilePayload } from '@/types/user'
+import { toast } from 'react-toastify'
+import { TOAST_MSG } from '@/constants'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -26,13 +27,47 @@ interface ProfileProps {
   isEditInfo: boolean
 }
 
-const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ children, isEditInfo }) => {
-  const [submittable, _setSubmittable] = useState<boolean>(true)
+const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({
+  form,
+  children,
+  isEditInfo,
+  onLoadingCallback,
+  onChangeEditBtn
+}) => {
+  const [submittable, setSubmittable] = useState<boolean>(false)
+  const { userInformation, fetchUserInformation } = useAuth()
+  const [updateUserProfile, { isLoading: confirmLoading }] = useUpdatePrivateUserProfileMutation()
+  const values = Form.useWatch<IUpdateProfilePayload>([], form)
+
+  useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(() => {
+        setSubmittable(true)
+      })
+      .catch(() => setSubmittable(false))
+  }, [form, values])
+
+  const onEditProfile = async (): Promise<void> => {
+    onLoadingCallback(true)
+    await updateUserProfile({ userId: userInformation.id, userData: values })
+      .unwrap()
+      .then(() => {
+        onChangeEditBtn()
+        fetchUserInformation(userInformation.id)
+        toast.success(TOAST_MSG.UPDATE_PROFILE_SUCCESS)
+      })
+      .then(() => {
+        onLoadingCallback(false)
+      })
+  }
 
   return (
     <Button
       type='primary'
       htmlType='submit'
+      loading={confirmLoading}
+      onClick={onEditProfile}
       className={`${submittable && isEditInfo ? 'btn-primary' : 'btn-negative'}`}
     >
       {children}
@@ -41,15 +76,8 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const Profile: React.FC = () => {
-  const [storedUserId, _setStoredUserId, _removeStoredUserId] = useLocalStorage(StorageKey._USER_ID, '')
-  // const { userId: storedUserId, } = useAuth()
-  // const [userId, setUserId] = useState<string | null>(null)
-  const { data: userProfile } = useGetPrivateUserProfileQuery(
-    {
-      userId: storedUserId as string
-    },
-    { skip: !storedUserId }
-  )
+  const { userId: storedUserId } = useAuth()
+  const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
@@ -62,7 +90,7 @@ const Profile: React.FC = () => {
         firstName: userProfile.firstName,
         lastName: userProfile.lastName,
         email: userProfile.email,
-        phone: userProfile.phoneNumber
+        phoneNumber: userProfile.phoneNumber
       })
     }
   }, [userProfile])
@@ -137,7 +165,7 @@ const Profile: React.FC = () => {
                 <Input disabled={true} />
               </Form.Item>
               <Form.Item
-                name='phone'
+                name='phoneNumber'
                 label='Phone number'
                 rules={[{ required: true, message: 'Please enter your phone number' }]}
                 validateTrigger={['onBlur']}
@@ -166,6 +194,7 @@ const Profile: React.FC = () => {
               htmlType='reset'
               className={`${isEditInfo ? 'btn-cancel' : 'btn-primary'} editable-btn ${confirmLoading ? 'loading' : ''}`}
               onClick={onChangeEditBtn}
+              style={{ width: '105px' }}
             >
               {isEditInfo ? 'Cancel' : 'Update'}
             </Button>

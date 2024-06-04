@@ -13,6 +13,12 @@ export interface IUserInformation {
   _id: Buffer
 }
 
+export interface IUpdateProfilePayload {
+  firstName: string
+  lastName: string
+  phoneNumber: string
+}
+
 export interface RoleFiltered {
   label: string
   value: string

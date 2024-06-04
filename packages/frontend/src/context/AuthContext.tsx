@@ -4,7 +4,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { useLoginUserMutation } from '@/services/auth.service'
 import { getMyProfile } from '@/services/user.service'
-import { ILoginPayload, ILoginResponse } from '@/types/auth'
+import { ILoginPayload } from '@/types/auth'
 import { ChildProps, UserContextType } from '@/types/context'
 import { RoleEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
@@ -12,7 +12,7 @@ import { IUserInformation } from '@/types/user'
 import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
 import Error from 'next/error'
 import { useRouter } from 'next/navigation'
-import React, { createContext, use, useCallback, useEffect } from 'react'
+import React, { createContext, useCallback } from 'react'
 import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
@@ -32,19 +32,20 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
 
   const [login] = useLoginUserMutation()
 
-  const fetchUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
+  const getFirstUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
     try {
       const res: IUserInformation = await getMyProfile(userId)
       if (res) {
         setUserInformation(res)
         setUserId(userId)
         setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
-        setRouteValue(ROUTE.DASHBOARD)
 
         if (res.role === (RoleEnum._ADMIN as string)) {
           router.push(ROUTE.DASHBOARD)
+          setRouteValue(ROUTE.DASHBOARD)
         } else {
           router.push(ROUTE.ABOUT)
+          setRouteValue(ROUTE.ABOUT)
         }
       }
     } catch (err: unknown) {
@@ -58,11 +59,24 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     }
   }, [])
 
-  useEffect(() => {
-    if ((userInformation as IUserInformation).id) {
-      fetchUserInformation((userInformation as IUserInformation).id)
+  const fetchUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
+    try {
+      const res: IUserInformation = await getMyProfile(userId)
+      if (res) {
+        setUserInformation(res)
+        setUserId(userId)
+        setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        const customError = err as ErrorResponse
+        const errorMessage = customError.data?.message
+        toast.error(errorMessage)
+      } else {
+        toast.error('An unknown error occurred')
+      }
     }
-  }, [fetchUserInformation])
+  }, [])
 
   const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
     await login(loginPayload)
@@ -73,7 +87,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setAuthSession(true)
         setCookieFromClient(StorageKey._ACCESS_TOKEN, res.accessToken)
 
-        fetchUserInformation(res.userId)
+        getFirstUserInformation(res.userId)
       })
       .then(() => {
         setTimeout(() => {
@@ -105,7 +119,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         onLogout,
         userId: userId as string,
         userInformation: userInformation as IUserInformation,
-        fetchUserInformation
+        fetchUserInformation,
+        setRouteValue
       }}
     >
       {children}

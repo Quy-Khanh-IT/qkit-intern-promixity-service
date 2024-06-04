@@ -5,7 +5,7 @@ import { HttpRequestParamsInterface } from '@/models/http-client/http-request-pa
 import { FilterOptions, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { IPaginationResponse } from '@/types/pagination'
 import { IGetAllUsersQuery } from '@/types/query'
-import { IUserInformation } from '@/types/user'
+import { IUpdateProfilePayload, IUserInformation } from '@/types/user'
 import { createApi } from '@reduxjs/toolkit/query/react'
 import { omit } from 'lodash-es'
 import qs from 'qs'
@@ -34,6 +34,14 @@ export const userApi = createApi({
         }
       },
       providesTags: ['UserInfo']
+    }),
+    updatePrivateUserProfile: builder.mutation<IUserInformation, { userId: string; userData: IUpdateProfilePayload }>({
+      query: (payload) => ({
+        url: `/users/${payload.userId}/profile`,
+        method: 'PATCH',
+        body: payload.userData
+      }),
+      invalidatesTags: ['UserInfo']
     }),
 
     // /admin
@@ -104,6 +112,7 @@ export const userApi = createApi({
 
 export const {
   useGetPrivateUserProfileQuery,
+  useUpdatePrivateUserProfileMutation,
   useGetAllUsersQuery,
   useDeleteUserMutation,
   useUpdateUserRoleMutation,

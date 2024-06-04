@@ -32,11 +32,12 @@ export default function RootLayout({
 
   const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
-    getPresentUrl() || ROUTE.DASHBOARD
+    getPresentUrl() || ROUTE.MANAGE_USER
   )
   const [selectedMenuKey, setSelectedMenuKey] = useState<unknown>(routeValue || SIDEBAR_MENU_OPTIONS.DASHBOARD.key)
 
   useEffect(() => {
+    console.log('routeValue', routeValue)
     if (routeValue) {
       if (routeValue === ROUTE.DASHBOARD) {
         setSelectedMenuKey(SIDEBAR_MENU_OPTIONS.DASHBOARD.key)

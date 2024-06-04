@@ -5,16 +5,11 @@ export type ChildProps = {
   children?: React.ReactNode
 }
 
-// export type TAuthContext = {
-//   authenticated: boolean
-//   setAuthenticated: (_newVal: boolean) => void
-// }
-
 export type UserContextType = {
   onLogin: (_loginPayload: ILoginPayload) => void
   onLogout: () => void
-  // authSession: string
-  fetchUserInformation: (userId: string) => void
+  fetchUserInformation: (userId: string) => Promise<void>
   userId: string
   userInformation: IUserInformation
+  setRouteValue: (_value: string) => void
 }

@@ -4,6 +4,10 @@
   overflow-y: auto;
   max-height: calc(100vh - 170px);
 
+  .ant-input{
+    padding: 8px 12px !important;
+  }
+
   .profile-cover {
     position: relative;
   
@@ -33,12 +37,13 @@
       // bottom: calc(4% + -1px);
       // right: 28%;
       bottom: calc(0.5% - 2.5px);
-      right: 105px;
+      right: 110px;
       transition-duration: 0.4s;
     }
   
     .loading {
       right: 130px !important;
+      transition: all .3s ease-in-out;
     }
   }
   
