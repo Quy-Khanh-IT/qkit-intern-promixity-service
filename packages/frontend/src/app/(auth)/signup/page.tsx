@@ -39,7 +39,7 @@ export default function SignUp({ searchParams: { token } }: ISignUpProps): React
   })
 
   const [isGetOTP, setIsGetOTP] = useState<boolean>(false)
-  const toastService = useMemo(() => new ToastService(), [])
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const router = useRouter()
 
   const [registrationOTP, { isSuccess: isOTPSuccess, isError: isOTPError, error: otpError }] =

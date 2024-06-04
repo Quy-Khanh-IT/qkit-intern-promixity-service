@@ -8,7 +8,7 @@ interface StoreProviderProps {
 }
 
 const StoreProvider: React.FC<StoreProviderProps> = ({ children }) => {
-  const storeRef = useRef(store)
+  const storeRef = useRef<typeof store>(store)
 
   return <Provider store={storeRef.current}>{children}</Provider>
 }

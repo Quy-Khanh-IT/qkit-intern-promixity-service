@@ -4,7 +4,7 @@ import './dev-quote.scss'
 import { IQuotes } from '@/types/common'
 
 export default function DevQuote(): React.ReactNode {
-  const [currentQuoteId, setCurrentQuoteId] = useState(0)
+  const [currentQuoteId, setCurrentQuoteId] = useState<number>(0)
 
   const quotes: IQuotes[] = [
     {
