@@ -36,18 +36,12 @@ const AdminLogin: React.FC = () => {
                 <h3 className='title' style={{ fontWeight: 700 }}>
                   Admin Login
                 </h3>
-                <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} className='hide-required-mark'>
-                  <Input size='large' autoComplete='true' placeholder='user@gmail.com' className='input-email' />
+                <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} className='mb-0'>
+                  <Input size='large' placeholder='user@gmail.com' className='input-email' />
                 </Form.Item>
 
-                <Form.Item
-                  name='password'
-                  label='Mật khẩu'
-                  className='hide-required-mark'
-                  rules={VALIDATION.PASSWORD}
-                  style={{ marginBottom: '0' }}
-                >
-                  <Input.Password size='large' autoComplete='true' placeholder='Mật khẩu' />
+                <Form.Item name='password' label='Password' rules={VALIDATION.PASSWORD} className='mb-0 mt-2'>
+                  <Input.Password size='large' placeholder='Password' />
                 </Form.Item>
                 <button className='login-btn w-100 mt-4'>LOGIN</button>
               </Form>

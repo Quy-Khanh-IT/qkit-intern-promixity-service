@@ -1,7 +1,12 @@
-import { VALIDATION } from '@/constants'
+import { TOAST_MSG, VALIDATION } from '@/constants'
+import { useAuth } from '@/context/AuthContext'
+import { useUpdatePasswordProfileMutation } from '@/services/user.service'
+import { IUpdatePasswordPayload } from '@/types/user'
 import type { FormInstance } from 'antd'
 import { Button, Flex, Form, Input, Space } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import './change-password-modal.scss'
 
 interface SubmitButtonProps extends ChangePasswordFormProps {
   form: FormInstance
@@ -12,23 +17,54 @@ interface ChangePasswordFormProps {
 }
 
 const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ closeModal, form, children }) => {
-  const [_submittable, _setSubmittable] = useState<boolean>(false)
+  const [submittable, setSubmittable] = useState<boolean>(false)
+  const [updatePasswordMutation, { isLoading: confirmLoading }] = useUpdatePasswordProfileMutation()
+  const { userInformation } = useAuth()
 
-  const stopHandle = (): void => {
+  const values = Form.useWatch<IUpdatePasswordPayload>([], form)
+
+  useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(() => {
+        setSubmittable(true)
+      })
+      .catch(() => setSubmittable(false))
+  }, [form, values])
+
+  const clearForm = (): void => {
     form.resetFields()
     closeModal()
   }
 
-  const onCreateUser = (): void => {
-    stopHandle()
+  const handleChangePassword = async (): Promise<void> => {
+    const passwordPayload: IUpdatePasswordPayload = {
+      oldPassword: values.oldPassword,
+      newPassword: values.newPassword,
+      confirmPassword: values.confirmPassword
+    }
+    await updatePasswordMutation({ userId: userInformation.id, passwordPayload: passwordPayload })
+      .unwrap()
+      .then(() => {
+        clearForm()
+        toast.success(TOAST_MSG.UPDATE_PASSWORD_SUCCESS)
+      })
   }
 
   const onSubmitForm = (): void => {
-    onCreateUser()
+    handleChangePassword()
+    clearForm()
   }
 
   return (
-    <Button type='primary' htmlType='submit' onClick={onSubmitForm} className='btn-primary'>
+    <Button
+      type='primary'
+      htmlType='submit'
+      disabled={!submittable}
+      onClick={onSubmitForm}
+      loading={confirmLoading}
+      className={`${submittable ? 'btn-primary' : 'btn-negative'}`}
+    >
       {children}
     </Button>
   )
@@ -39,23 +75,68 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
 
   return (
     <>
-      <Form form={form} name='changePWForm' layout='vertical' autoComplete='off' className='pb-3 pt-3'>
-        <Form.Item name='currentPassword' label='Mật khẩu' rules={VALIDATION.PASSWORD} validateTrigger={['onBlur']}>
-          <Input type='password' />
-        </Form.Item>
-        <Form.Item name='newPassword' label='Mật khẩu mới' rules={VALIDATION.PASSWORD} validateTrigger={['onBlur']}>
-          <Input type='password' />
+      <Form
+        form={form}
+        name='changePasswordForm'
+        layout='vertical'
+        autoComplete='off'
+        className='change-password-modal pb-3 pt-3'
+      >
+        <Form.Item name='oldPassword' label='Password' rules={VALIDATION.PASSWORD} className='mb-0'>
+          <Input.Password />
         </Form.Item>
         <Form.Item
-          name='newPasswordConfirm'
-          label='Xác nhận mật khẩu mới'
-          rules={VALIDATION.CONFIRM_PASSWORD}
+          name='newPassword'
+          label='New password'
+          rules={[
+            {
+              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+              validator(_, value: string) {
+                if (!value) {
+                  return Promise.reject(new Error('Please enter password'))
+                }
+                if (value?.length < 6 || value?.length > 25) {
+                  return Promise.reject(new Error('Password must be 6-25 characters long'))
+                }
+                if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{6,25}$/.test(value)) {
+                  return Promise.reject(
+                    new Error(
+                      'Password must include at least one uppercase letter, one number, and one special character'
+                    )
+                  )
+                }
+                return Promise.resolve()
+              }
+            }
+          ]}
+          className='mb-0 mt-2'
+        >
+          <Input.Password />
+        </Form.Item>
+        <Form.Item
+          name='confirmPassword'
+          label='Confirm password'
+          className='mb-0 mt-2'
+          rules={[
+            { required: true, message: 'Please confirm your password' },
+            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+            ({ getFieldValue }) => ({
+              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+              validator(_, value) {
+                console.log('dang check')
+                if (!value || getFieldValue('newPassword') === value) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(new Error('The confirmation password does not match!'))
+              }
+            })
+          ]}
           validateTrigger={['onBlur']}
         >
-          <Input type='password' />
+          <Input.Password />
         </Form.Item>
 
-        <Form.Item className='mb-0'>
+        <Form.Item className='mb-0 mt-3'>
           <Flex justify='end' className='mt-2'>
             <Space>
               <SubmitButton form={form} closeModal={closeModal}>

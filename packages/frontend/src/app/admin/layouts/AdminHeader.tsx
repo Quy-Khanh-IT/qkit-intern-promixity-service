@@ -69,7 +69,7 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
             }}
             className='h-100'
           >
-            <Link href={ROUTE.MANAGE_USER} onClick={() => setRouteValue(ROUTE.MANAGE_USER)}>
+            <Link href={ROUTE.MANAGE_USER} onClick={() => setRouteValue(ROUTE.DASHBOARD)}>
               <Image
                 src='/logo_light.png'
                 className='header-logo'

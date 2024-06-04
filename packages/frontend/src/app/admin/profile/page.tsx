@@ -115,8 +115,6 @@ const Profile: React.FC = () => {
     changePasswordModalRef.current?.hideModal()
   }
 
-  const handlePasswordForm = (): void => {}
-
   return (
     <>
       <Flex align='center' vertical className='--profile-wrapper scroll-bar-2'>
@@ -149,7 +147,7 @@ const Profile: React.FC = () => {
                 rules={[{ required: true, message: 'Please enter your first name' }]}
                 validateTrigger={['onBlur']}
               >
-                <Input />
+                <Input autoComplete='true' />
               </Form.Item>
 
               <Form.Item

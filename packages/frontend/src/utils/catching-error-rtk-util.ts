@@ -11,12 +11,16 @@ const clarifyError = (error: ErrorResponse): string => {
   const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
   let errorMessage: string | undefined = error?.data?.message || 'Something wrong on server!'
 
-  const startsWithAny = prefixes.some((prefix) => errorMessage?.startsWith(prefix))
+  const startsWithAny = prefixes.find((prefix) => errorMessage?.startsWith(prefix))
 
   if (startsWithAny) {
-    errorMessage = Array.isArray(error?.data?.errors?.detail)
-      ? error?.data?.errors?.detail.join(', ')
-      : error?.data?.errors?.detail || errorMessage
+    if (startsWithAny === 'ATH') {
+      errorMessage = 'Incorrect username or password.'
+    } else {
+      errorMessage = Array.isArray(error?.data?.errors?.detail)
+        ? error?.data?.errors?.detail.join(', ')
+        : error?.data?.errors?.detail || errorMessage
+    }
   }
   return errorMessage || ''
 }
