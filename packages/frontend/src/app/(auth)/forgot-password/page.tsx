@@ -11,8 +11,8 @@ import DevQuote from '../components/DevQuote'
 
 export default function ForgotPassword(): React.ReactNode {
   const [email, setEmail] = useState<string>('')
-  const [emailError, setEmailError] = useState('')
-  const toastService = useMemo(() => new ToastService(), [])
+  const [emailError, setEmailError] = useState<string>('')
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const router = useRouter()
 
   const [
