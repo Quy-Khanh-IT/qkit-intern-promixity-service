@@ -169,7 +169,14 @@ export default function SearchItem({ business }: { business: IBusiness }): React
         <div className='mt-3 d-flex'>{renderServices()}</div>
       </div>
       <div className='content-right'>
-        <Image src={business.images?.[0]?.url} width={84} height={84} alt='business-image' className='business-image' />
+        <Image
+          src={business.images?.[0]?.url ? business.images?.[0]?.url : './images/default_business.png'}
+          width={84}
+          height={84}
+          alt='business-image'
+          className='business-image'
+          fallback='./images/default_business.png'
+        />
       </div>
     </div>
   )
