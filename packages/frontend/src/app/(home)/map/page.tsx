@@ -24,17 +24,19 @@ export default function MapPage(): React.ReactNode {
   const [distanceRadius, setDistanceRadius] = useState<number>(MAP_RADIUS.LEVEL_DEFAULT / 1000)
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
+  const [rating, setRating] = useState<number>(0)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
     radius: MAP_RADIUS.LEVEL_DEFAULT / 1000,
     q: '',
-    limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT
+    limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT,
+    ...(rating !== 0 ? { star: rating } : {})
   })
 
   const {
-    data: response,
+    data: searchResponse,
     isLoading,
     isFetching
   } = useFindNearByQuery(queryData, {
@@ -55,7 +57,8 @@ export default function MapPage(): React.ReactNode {
       longitude: clickPosition ? clickPosition[1] : position[1],
       radius: distanceRadius === 0 ? 0.5 : distanceRadius,
       q: searchText,
-      limit: maxLimit
+      limit: maxLimit,
+      ...(rating !== 0 ? { star: rating } : {})
     }
     dispatch(setSearchPosition(clickPosition ? clickPosition : position))
     setQueryData(data)
@@ -113,7 +116,7 @@ export default function MapPage(): React.ReactNode {
     if (shouldFetch) {
       handleOnSearch()
     }
-  }, [distanceRadius])
+  }, [distanceRadius, rating])
 
   useEffect(() => {
     setCollapsed(true)
@@ -123,6 +126,10 @@ export default function MapPage(): React.ReactNode {
 
   const handleItemClick = (): void => {
     setIsFly(true)
+  }
+
+  const handleOnChangeRating = (value: string): void => {
+    setRating(parseFloat(value))
   }
   return (
     <Layout className='vh-100'>
@@ -146,7 +153,10 @@ export default function MapPage(): React.ReactNode {
           />
           <Dropdown className='ms-1' menu={menuProps}>
             <Button className='btn-dropdown'>
-              <Space>{`Distance: ${distanceRadius === 0 ? `500m` : `${distanceRadius}km`}`}</Space>
+              <Space>
+                {`Distance: ${distanceRadius === 0 ? `500m` : `${distanceRadius}km`}`}
+                <i className='fa-solid fa-angle-down'></i>
+              </Space>
             </Button>
           </Dropdown>
         </div>
@@ -165,17 +175,19 @@ export default function MapPage(): React.ReactNode {
         <SearchSider
           onClose={handleCloseSider}
           showSpinner={showSpinner}
-          businesses={response?.data}
+          businesses={searchResponse?.data}
           collapsed={collapsed}
-          totalResult={response?.totalRecords}
+          totalResult={searchResponse?.totalRecords}
           handleItemClick={handleItemClick}
+          handleOnChangeRating={handleOnChangeRating}
+          rating={rating}
         />
 
         <Content style={{ margin: '0 16px' }}>
           <div className='h-100 w-100'>
             <Map
               radius={queryData.radius * 1000}
-              businesses={!collapsed ? response?.data : []}
+              businesses={!collapsed ? searchResponse?.data : []}
               handleSetStopFly={handleStopFly}
               isFly={isFly}
               zoom={zoom}

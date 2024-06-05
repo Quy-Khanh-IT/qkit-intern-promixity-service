@@ -1,9 +1,11 @@
 'use client'
 import Sider from 'antd/es/layout/Sider'
 import './search-sider.scss'
-import { Spin, Tooltip } from 'antd'
+import { Button, Dropdown, MenuProps, Space, Spin, Tooltip } from 'antd'
 import { SearchList } from './SearchList'
 import { ISearchSider } from '@/types/map'
+import { RatingMenu } from '@/constants/map'
+import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 
 export default function SearchSider(props: ISearchSider): React.ReactNode {
   const searchResultTooltip = (): React.ReactNode => {
@@ -18,6 +20,16 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
       </div>
     )
   }
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    props.handleOnChangeRating(e.key)
+  }
+  const items: MenuProps['items'] = RatingMenu
+  const menuProps = {
+    items,
+    onClick: handleMenuClick
+  }
+
+  const { data: getCategoryResponse } = useGetAllBusinessCategoriesQuery()
 
   return (
     <div>
@@ -42,6 +54,22 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
                   <i className='fa-light fa-circle-info'></i>{' '}
                 </Tooltip>
                 <span className='total-results ms-1'>{props.totalResult ? `(${props.totalResult} results)` : ''}</span>
+                <Dropdown className='ms-2' menu={menuProps}>
+                  <Button className='btn-dropdown'>
+                    <Space>
+                      {props.rating ? `${props.rating} +⭐` : 'Any ⭐'}
+                      <i className='fa-solid fa-angle-down'></i>
+                    </Space>
+                  </Button>
+                </Dropdown>
+                {/* <Dropdown className='ms-2' menu={menuProps}>
+                  <Button className='btn-dropdown'>
+                    <Space>
+                      {props.rating ? `${props.rating} +⭐` : 'Any ⭐'}
+                      <i className='fa-solid fa-angle-down'></i>
+                    </Space>
+                  </Button>
+                </Dropdown> */}
               </div>
               <div onClick={props.onClose} className='close-btn me-2'>
                 <i className='fa-solid fa-x'></i>

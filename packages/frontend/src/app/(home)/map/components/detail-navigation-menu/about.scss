@@ -1,0 +1,13 @@
+@import '@/sass/common/common.scss';
+.list-service {
+  font-size: 14px;
+  color: black;
+
+  i {
+    color: $open-color;
+  }
+}
+
+.title {
+  font-size: 15px;
+}

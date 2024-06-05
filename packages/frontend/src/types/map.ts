@@ -20,6 +20,8 @@ export interface ISearchSider {
   onClose: () => void
   totalResult: number | undefined
   handleItemClick: () => void
+  rating: number
+  handleOnChangeRating: (value: string) => void
 }
 
 export interface IMarkerProps {

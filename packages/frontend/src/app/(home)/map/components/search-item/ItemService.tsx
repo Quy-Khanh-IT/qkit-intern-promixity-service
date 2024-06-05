@@ -10,6 +10,9 @@ export default function ItemService({
 }): React.ReactNode {
   const maxServices = isDetail ? 2 : 3
   const servicesToShow: IService[] = services.slice(0, maxServices)
+
+  if (services.length === 0) return null
+
   return servicesToShow.map((service, index) => (
     <React.Fragment key={service.id}>
       {isDetail ? <i className='fa-solid fa-check me-1 check-icon'></i> : ''}
