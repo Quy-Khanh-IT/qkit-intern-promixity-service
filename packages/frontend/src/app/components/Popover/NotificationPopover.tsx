@@ -71,45 +71,52 @@ const NotificationPopover = (): React.ReactNode => {
     </Flex>
   )
 
-  const fetchNotifications = async (page: number, take: number): Promise<IPaginationResponse<INotification>> => {
+  const fetchNotifications = async (page: number, take: number): Promise<void> => {
     const payload = {
       offset: page,
       limit: take
     } as IGetAllNotificationQuery
-    }
 
     if (tabKeyRef.current === TAB_STEPS.UNREAD) {
-      payload.isRead = BooleanEnum._TRUE
-    } else if (tabKeyRef.current === TAB_STEPS.READ) {
       payload.isRead = BooleanEnum._FALSE
+    } else if (tabKeyRef.current === TAB_STEPS.READ) {
+      payload.isRead = BooleanEnum._TRUE
     }
-    const notificationData = await getAllNotifications(payload).unwrap();
-    return notificationData;
+
+    await getAllNotifications(payload)
+      .unwrap()
+      .then((res) => {
+        if (res.data.length === 0) {
+          setLoadMoreFull(false)
+        } else {
+          const newData = cacheData.concat(res.data)
+          setCacheData(newData)
+          setNotificationsData(newData)
+        }
+        setLoading(false)
+      })
   }
 
-  // const onLoadMore = async () => {
-  //   setLoading(true)
-  //   perPage.current = perPage.current + PAGE_SIZE
-  //   const notificationData = await getFetchData(perPage.current / PAGE_SIZE, PAGE_SIZE)
-  //   const newData = data.concat(notificationData.items)
-  //   if (notificationData.items.length === 0) {
-  //     setLoadMoreFull(true)
-  //   }
-  //   setData(newData)
-  //   setList(newData)
-  //   setLoading(false)
+  const onLoadMore = async (): Promise<void> => {
+    setLoading(true)
+    perPage.current = perPage.current + PAGE_SIZE
+    await fetchNotifications(perPage.current / PAGE_SIZE, PAGE_SIZE)
 
-  //   window.dispatchEvent(new Event('resize'))
-  // }
+    window.dispatchEvent(new Event('resize'))
+  }
 
-  // const onLoadInterval = async () => {
-  //   setLoading(true)
-  //   const notificationData = await getFetchData(ORIGIN_PAGE, perPage.current)
-  //   setData(notificationData.items)
-  //   setList(notificationData.items)
+  const onLoadInterval = async (): Promise<void> => {
+    setLoading(true)
+    await fetchNotifications(ORIGIN_PAGE, perPage.current)
 
-  //   window.dispatchEvent(new Event('resize'))
-  // }
+    window.dispatchEvent(new Event('resize'))
+  }
+
+  const loadWhenChangeTab = async (tabKey: string): Promise<void> => {
+    setLoading(true)
+    await fetchNotifications(ORIGIN_PAGE, PAGE_SIZE)
+    resetValues()
+  }
 
   const items = tabTitle.map((item, i) => {
     return {
@@ -120,7 +127,7 @@ const NotificationPopover = (): React.ReactNode => {
           initLoading={initLoading}
           loading={loading}
           list={notificationsData}
-          // onLoadMore={onLoadMore}
+          onLoadMore={onLoadMore}
           loadMoreFull={loadMoreFull}
           setOpenModal={setOpenModal}
         />
@@ -141,7 +148,9 @@ const NotificationPopover = (): React.ReactNode => {
       activeKey={tabKeyRef.current}
       onChange={(key) => {
         tabKeyRef.current = key
-        onClose(false)
+        console.log('tabKeyRef.current', tabKeyRef.current, typeof tabKeyRef.current)
+        // onClose(false)
+        loadWhenChangeTab(key)
       }}
       className='tab-list'
       renderTabBar={renderTabBar}
@@ -168,7 +177,7 @@ const NotificationPopover = (): React.ReactNode => {
   useEffect(() => {
     loadFirstNotifications(firstPayload)
     const timer = setInterval(() => {
-      // onLoadInterval()
+      onLoadInterval()
     }, 60000)
 
     return (): void => {
@@ -176,13 +185,17 @@ const NotificationPopover = (): React.ReactNode => {
     }
   }, [])
 
+  const resetValues = (): void => {
+    setLoadMoreFull(true)
+    perPage.current = PAGE_SIZE
+  }
+
   const onClose = (setTabKeyBool: boolean = true): void => {
     if (setTabKeyBool) {
       tabKeyRef.current = ORIGIN_TAB
     }
     loadFirstNotifications(firstPayload)
-    setLoadMoreFull(true)
-    perPage.current = PAGE_SIZE
+    resetValues()
 
     const popoverElement = document.querySelector('.ant-popover') as HTMLElement
     if (popoverElement) {
