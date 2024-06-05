@@ -118,6 +118,9 @@ export class Business extends BaseEntity {
   @Transform((value) => value.obj?.userId?.toString(), { toClassOnly: true })
   @Expose()
   user_id?: string;
+
+  @Prop({ default: 0 })
+  _page: number;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
