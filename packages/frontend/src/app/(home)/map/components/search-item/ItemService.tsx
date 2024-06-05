@@ -8,7 +8,7 @@ export default function ItemService({
   services: IService[]
   isDetail?: boolean
 }): React.ReactNode {
-  const maxServices = 3
+  const maxServices = isDetail ? 2 : 3
   const servicesToShow: IService[] = services.slice(0, maxServices)
   return servicesToShow.map((service, index) => (
     <React.Fragment key={service.id}>

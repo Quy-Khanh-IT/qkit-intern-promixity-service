@@ -2,14 +2,20 @@ import { IBusiness } from '@/types/business'
 import './search-list.scss'
 import SearchItem from './SearchItem'
 
-export function SearchList({ businesses }: { businesses: IBusiness[] | [] | undefined }): React.ReactNode {
+export function SearchList({
+  businesses,
+  handleItemClick
+}: {
+  businesses: IBusiness[] | [] | undefined
+  handleItemClick: () => void
+}): React.ReactNode {
   return (
     <div className='search-list-wrapper'>
       {businesses && businesses.length > 0 ? (
         businesses.map((business) => {
           return (
             <div key={business.id}>
-              <SearchItem business={business} />
+              <SearchItem handleItemClick={handleItemClick} business={business} />
             </div>
           )
         })

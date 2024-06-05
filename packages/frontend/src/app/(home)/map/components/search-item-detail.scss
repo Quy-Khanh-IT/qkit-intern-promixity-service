@@ -1,5 +1,14 @@
 @import '@/sass/common/common.scss';
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .detail-container {
   position: fixed;
   top: 72px;
@@ -12,7 +21,7 @@
   color: $gray;
   font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
   max-width: 360px;
-
+  animation: fadeIn 0.5s ease-in-out;
   .close-btn {
     position: absolute;
     height: 40px;

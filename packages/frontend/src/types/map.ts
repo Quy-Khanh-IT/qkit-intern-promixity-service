@@ -19,6 +19,7 @@ export interface ISearchSider {
   showSpinner: boolean
   onClose: () => void
   totalResult: number | undefined
+  handleItemClick: () => void
 }
 
 export interface IMarkerProps {
