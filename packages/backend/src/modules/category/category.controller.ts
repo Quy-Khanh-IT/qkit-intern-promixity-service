@@ -17,20 +17,18 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('categories')
 @ApiTags('categories')
-@ApiBearerAuth()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Get()
   @HttpCode(200)
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   findAll() {
     return this.categoryService.findAll();
   }
 
   @Post()
   @HttpCode(201)
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto) {

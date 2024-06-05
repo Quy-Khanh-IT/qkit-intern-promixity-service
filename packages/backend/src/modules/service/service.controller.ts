@@ -17,20 +17,18 @@ import { ServiceService } from './service.service';
 
 @Controller('services')
 @ApiTags('services')
-@ApiBearerAuth()
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
   @Get()
   @HttpCode(200)
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   async getAll() {
     return this.serviceService.getAll();
   }
 
   @Post()
   @HttpCode(201)
+  @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   create(@Body() createServiceDto: CreateServiceDto) {

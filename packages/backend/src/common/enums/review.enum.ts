@@ -15,5 +15,5 @@ export enum ReviewActionEnum {
 
 export enum ReviewTypeEnum {
   REVIEW = 'review',
-  REPLY = 'reply',
+  COMMENT = 'comment',
 }
