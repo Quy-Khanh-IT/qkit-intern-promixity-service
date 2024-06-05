@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
           router.push(ROUTE.DASHBOARD)
           setRouteValue(ROUTE.DASHBOARD)
         } else {
-          router.push(ROUTE.ABOUT)
-          setRouteValue(ROUTE.ABOUT)
+          router.push(ROUTE.USER_PROFILE)
+          setRouteValue(ROUTE.USER_PROFILE)
         }
       }
     } catch (err: unknown) {
@@ -97,8 +97,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   }
 
   const onLogout = (): void => {
-    resetSession()
     router.push(ROUTE.ROOT)
+    resetSession()
     window.location.reload()
   }
 

@@ -47,7 +47,7 @@ export function middleware(req: NextRequest): NextResponse {
       if (role?.value === RoleEnum._ADMIN) {
         return returnNextResponse(ROUTE.DASHBOARD)
       } else if (role?.value === RoleEnum._USER) {
-        return returnNextResponse(ROUTE.ABOUT)
+        return returnNextResponse(ROUTE.USER_PROFILE)
       }
     }
   }
