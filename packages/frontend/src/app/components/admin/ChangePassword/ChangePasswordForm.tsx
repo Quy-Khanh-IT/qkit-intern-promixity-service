@@ -123,7 +123,6 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
             ({ getFieldValue }) => ({
               // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
               validator(_, value) {
-                console.log('dang check')
                 if (!value || getFieldValue('newPassword') === value) {
                   return Promise.resolve()
                 }

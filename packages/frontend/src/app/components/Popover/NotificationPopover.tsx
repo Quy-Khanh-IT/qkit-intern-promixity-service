@@ -53,7 +53,6 @@ const NotificationPopover = (): React.ReactNode => {
     fetchAllRead()
     const allReadBtn = document.querySelectorAll('.ant-list-item-action .read-btn')
     allReadBtn.forEach((item: Element) => {
-      console.log(item)
       item.classList.add('d-none')
     })
     ;(e.currentTarget as HTMLElement).remove()
@@ -159,7 +158,6 @@ const NotificationPopover = (): React.ReactNode => {
       activeKey={tabKeyRef.current}
       onChange={(key) => {
         tabKeyRef.current = key
-        console.log('tabKeyRef.current', tabKeyRef.current, typeof tabKeyRef.current)
         onClose(false)
       }}
       className='tab-list'
