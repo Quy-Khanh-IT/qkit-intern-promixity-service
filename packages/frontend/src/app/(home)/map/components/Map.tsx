@@ -34,6 +34,7 @@ const Map = (props: IMapProps): React.ReactNode => {
   const [center, setCenter] = useState<[number, number]>(props.position)
   const [currentZoom, setCurrentZoom] = useState<number>(props.zoom)
   const searchPosition = useSelector((state: RootState) => state.mapProps.searchPosition)
+  const selectedBusinessData = useSelector((state: RootState) => state.selectedBusiness.selectedBusinessData)
   const dispatch = useDispatch()
 
   const CenterMarker = (): React.ReactNode => {
@@ -60,7 +61,12 @@ const Map = (props: IMapProps): React.ReactNode => {
         map.flyTo(searchPosition, flyZoom)
         props.handleSetStopFly?.()
       }
-    }, [center, map])
+      if (props.isFly && selectedBusinessData) {
+        const businessCoordinate = selectedBusinessData.location.coordinates
+        map.flyTo([businessCoordinate[1], businessCoordinate[0]], 18)
+        props.handleSetStopFly?.()
+      }
+    }, [center, map, selectedBusinessData])
     return null
   }
 

@@ -61,6 +61,7 @@ export default function MapPage(): React.ReactNode {
     setQueryData(data)
     setCollapsed(false)
     setShouldFetch(true)
+    dispatch(setSelectedBusiness({ selectedBusinessId: null, selectedBusinessData: null }))
   }
 
   const handleStopFly = (): void => {
@@ -119,6 +120,10 @@ export default function MapPage(): React.ReactNode {
     dispatch(setSearchPosition(null))
     dispatch(setSelectedBusiness({ selectedBusinessId: null, selectedBusinessData: null }))
   }, [clickPosition])
+
+  const handleItemClick = (): void => {
+    setIsFly(true)
+  }
   return (
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>
@@ -163,6 +168,7 @@ export default function MapPage(): React.ReactNode {
           businesses={response?.data}
           collapsed={collapsed}
           totalResult={response?.totalRecords}
+          handleItemClick={handleItemClick}
         />
 
         <Content style={{ margin: '0 16px' }}>

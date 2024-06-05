@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './search-item.scss'
 import { IBusiness, IDayOfWeek, ISelectedBusiness } from '@/types/business'
 import { Image } from 'antd'
@@ -9,7 +9,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 import { RootState } from '@/redux/store'
 
-export default function SearchItem({ business }: { business: IBusiness }): React.ReactNode {
+export default function SearchItem({
+  business,
+  handleItemClick
+}: {
+  business: IBusiness
+  handleItemClick: () => void
+}): React.ReactNode {
+  const [lastClickTime, setLastClickTime] = useState<number | null>(null)
   const dispatch = useDispatch()
   const selectedBusinessId = useSelector((state: RootState) => state.selectedBusiness.selectedBusinessId)
   const getBusinessStatus = (): React.ReactNode => {
@@ -109,7 +116,7 @@ export default function SearchItem({ business }: { business: IBusiness }): React
     const sortedDayOfWeek = [...dayOfWeek].sort((a, b) => {
       const dayA = Object.keys(dayOfWeekMap).find((key) => dayOfWeekMap[parseInt(key)] === a.day)
       const dayB = Object.keys(dayOfWeekMap).find((key) => dayOfWeekMap[parseInt(key)] === b.day)
-      return parseInt(dayA || '0') - parseInt(dayB || '0')
+      return parseInt(dayA || '0', 10) - parseInt(dayB || '0', 10)
     })
 
     for (const schedule of sortedDayOfWeek) {
@@ -127,11 +134,20 @@ export default function SearchItem({ business }: { business: IBusiness }): React
   }
 
   const handleOnClick = (): void => {
+    const currentTime = new Date().getTime()
+
     const data: ISelectedBusiness = {
       selectedBusinessId: business.id,
       selectedBusinessData: business
     }
     dispatch(setSelectedBusiness(data))
+
+    if (lastClickTime && currentTime - lastClickTime < 300) {
+      // when double click
+      handleItemClick()
+    } else {
+      setLastClickTime(currentTime)
+    }
   }
 
   return (
