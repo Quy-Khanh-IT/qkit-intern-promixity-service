@@ -1,11 +1,12 @@
 import { FilterOptions, SelectionOptions } from '@/types/common'
+import { SidebarOptions } from '@/types/menu'
 
 export const DELETE_OPTIONS = {
   SOFT: 'soft',
   HARD: 'hard'
 }
 
-export const SIDEBAR_MENU_OPTIONS = {
+export const ADMIN_SIDEBAR_OPTIONS: SidebarOptions = {
   DASHBOARD: {
     key: '1',
     label: 'Dashboard'
@@ -18,9 +19,16 @@ export const SIDEBAR_MENU_OPTIONS = {
     key: '3',
     label: 'Manage business'
   },
-  MANAGE_REVIEW: {
-    key: '4',
-    label: 'Manage review'
+}
+
+export const USER_SIDEBAR_OPTIONS: SidebarOptions = {
+  USER_PROFILE: {
+    key: '1',
+    label: 'My profile'
+  },
+  MY_BUSINESS: {
+    key: '2',
+    label: 'My business'
   }
 }
 

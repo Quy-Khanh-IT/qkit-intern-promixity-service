@@ -27,6 +27,7 @@ export const getPresentUrl = (): string => {
   if (typeof window !== 'undefined') {
     const currentUrl = window.location.href
     const coreUrl = currentUrl && currentUrl.split(LOCAL_ENDPOINT || '')[1]
+    console.log('coreUrl', coreUrl)
     return coreUrl
   }
   return ''

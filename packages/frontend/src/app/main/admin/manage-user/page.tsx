@@ -19,7 +19,7 @@ import {
 import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { formatDate } from '@/utils/helpers.util'
+import { compareDates, formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -36,9 +36,8 @@ import {
 import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { compareDates } from '../../../utils/helpers.util'
-import { DELETE_OPTIONS } from '../admin.constant'
-import { generateRoleColor } from '../utils/generate-color.util'
+import { DELETE_OPTIONS } from '../../admin.constant'
+import { generateRoleColor } from '../../utils/main.util'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
 

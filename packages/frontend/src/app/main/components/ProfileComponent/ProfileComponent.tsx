@@ -1,5 +1,4 @@
 'use client'
-// import ChangePasswordModal from '@/app/components/admin/ChangePassword/ChangePasswordModal'
 import ChangePasswordModal from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import { useAuth } from '@/context/AuthContext'
@@ -7,13 +6,13 @@ import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } fr
 import type { FormInstance } from 'antd'
 import { Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
-import ImageCustom from '../../components/ImageCustom/ImageCustom'
-import { generateRoleColor } from '../utils/generate-color.util'
-import './profile.scss'
+import './profile-component.scss'
 import { IUpdateProfilePayload } from '@/types/user'
 import { toast } from 'react-toastify'
 import { MODAL_TEXT, TOAST_MSG } from '@/constants'
 import ChangePasswordForm from '@/app/components/admin/ChangePassword/ChangePasswordForm'
+import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
+import { generateRoleColor } from '../../utils/main.util'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -77,7 +76,7 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
   )
 }
 
-const Profile: React.FC = () => {
+const ProfileComponent: React.FC = () => {
   const { userId: storedUserId } = useAuth()
   const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
@@ -234,4 +233,4 @@ const Profile: React.FC = () => {
   )
 }
 
-export default Profile
+export default ProfileComponent

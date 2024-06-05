@@ -38,11 +38,9 @@ const Content: React.FC<IContentLayout> = ({ children }): React.ReactNode => {
     <AntdRegistry>
       <ConfigProvider theme={themConfig}>
         <div className={`app-content blur`}>
-          {/* <Suspense fallback={<LoaderArea />}> */}
           <StoreProvider>
             <AuthProvider>{children}</AuthProvider>
           </StoreProvider>
-          {/* </Suspense> */}
         </div>
         {loading ? <LoaderArea /> : null}
       </ConfigProvider>

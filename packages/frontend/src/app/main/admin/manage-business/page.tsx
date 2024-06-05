@@ -40,8 +40,8 @@ import {
 import { RangePickerProps } from 'antd/es/date-picker'
 import { FilterDropdownProps } from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../admin.constant'
-import { generateStatusColor } from '../utils/generate-color.util'
+import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
+import { generateStatusColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
 import './manage-business.scss'
 

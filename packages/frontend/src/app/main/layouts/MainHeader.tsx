@@ -10,23 +10,25 @@ import { Badge, Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Too
 import { Header } from 'antd/es/layout/layout'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import '../admin.scss'
+import '../main.scss'
+import { RoleEnum } from '@/types/enum'
+import { directRoutes } from '../utils/main.util'
 
 const { Text } = Typography
 
-interface IAdminHeaderProps {
+interface IMainHeaderProps {
   collapsed: boolean
   setCollapsed: (_collapsed: boolean) => void
   setRouteValue: (_value: string) => void
 }
 
-const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, setRouteValue }) => {
+const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRouteValue }) => {
   const {
     token: { colorBgContainer }
   } = theme.useToken()
   const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
   const [userImage, setUserImage] = useState<string>('')
-  const { onLogout } = useAuth()
+  const { onLogout, userInformation } = useAuth()
 
   useEffect(() => {
     if (storedUser) {
@@ -39,14 +41,18 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
   }
 
   const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: (
-        <Link href={ROUTE.ADMIN_PROFILE} className='p-2' onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}>
-          <Text>My Profile</Text>
-        </Link>
-      )
-    },
+    ...(userInformation?.role === (RoleEnum._ADMIN as string)
+      ? [
+          {
+            key: '1',
+            label: (
+              <Link href={ROUTE.ADMIN_PROFILE} onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}>
+                <Text className='p-2'>Profile</Text>
+              </Link>
+            )
+          }
+        ]
+      : []),
     {
       key: '2',
       label: (
@@ -56,6 +62,11 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
       )
     }
   ]
+
+  const directRoutesObject = {
+    logo: directRoutes(userInformation?.role, ROUTE.DASHBOARD, ROUTE.USER_PROFILE),
+    [ROUTE.USER_PROFILE]: ROUTE.USER_PROFILE
+  }
 
   return (
     <>
@@ -69,7 +80,7 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
             }}
             className='h-100'
           >
-            <Link href={ROUTE.MANAGE_USER} onClick={() => setRouteValue(ROUTE.DASHBOARD)}>
+            <Link href={directRoutesObject.logo} onClick={() => setRouteValue(directRoutesObject.logo)}>
               <Image
                 src='/logo_light.png'
                 className='header-logo'
@@ -122,4 +133,4 @@ const AdminHeader: React.FC<IAdminHeaderProps> = ({ collapsed, setCollapsed, set
   )
 }
 
-export default AdminHeader
+export default MainHeader

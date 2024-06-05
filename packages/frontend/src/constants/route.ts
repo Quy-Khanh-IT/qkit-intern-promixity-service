@@ -9,11 +9,12 @@ export const ROUTE = {
   ADMIN_LOGIN: '/admin-signin',
 
   // User
-  CREATE_BUSINESS: '/create-business',
+  USER_PROFILE: '/main/user/profile',
+  MY_BUSINESS: '/main/user/my-business',
   // Admin
-  DASHBOARD: '/admin/dashboard',
-  MANAGE_USER: '/admin/manage-user',
-  MANAGE_BUSINESS: '/admin/manage-business',
-  MANAGE_REVIEW: '/admin/manage-review',
-  ADMIN_PROFILE: '/admin/profile'
+  DASHBOARD: '/main/admin/dashboard',
+  MANAGE_USER: '/main/admin/manage-user',
+  MANAGE_BUSINESS: '/main/admin/manage-business',
+  MANAGE_REVIEW: '/main/admin/manage-review',
+  ADMIN_PROFILE: '/main/admin/profile'
 }
