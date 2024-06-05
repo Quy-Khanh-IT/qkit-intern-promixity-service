@@ -32,11 +32,13 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
-import { ReplyReviewDto } from './dto/reply-review.dto';
-import { Review } from './entities/review.entity';
+import { CommentDto } from './dto/reply-review.dto';
+import { Review } from './entities/review2.entity';
 import { ReviewService } from './review.service';
 import { RoleGuard } from 'src/cores/guard/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
+import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
 
 @Controller('reviews')
 @ApiTags('reviews')
@@ -58,14 +60,29 @@ export class ReviewController {
     return await this.reviewService.findAll(transferData);
   }
 
-  @Get(':previewId')
+  @Get(':businessId/filter')
+  @HttpCode(200)
+  @ApiOperation({
+    summary:
+      '[ADMIN]: create a review which can react with combination of star and comment',
+  })
+  async findReviewBusiness(
+    @Param('businessId') id: string,
+    @Query() data: FindAllBusinessReviewQuery,
+  ) {
+    const transferData = plainToClass(FindAllBusinessReviewQuery, data);
+
+    return await this.reviewService.findReviewBusiness(id, transferData);
+  }
+
+  @Get(':reviewId')
   @HttpCode(200)
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: '[ADMIN]: filter reviews',
   })
-  async findById(@Param('previewId') id: string) {
+  async findById(@Param('reviewId') id: string) {
     const review: Review = await this.reviewService.findById(id);
 
     return review;
@@ -89,27 +106,27 @@ export class ReviewController {
     createReviewDto: CreateReviewDto,
     @Req() req: Request,
   ) {
-    return this.reviewService.createPreview(createReviewDto, req.user);
+    return this.reviewService.createReview(createReviewDto, req.user);
   }
 
-  @Post(':id/responses')
+  @Post(':id/comment')
   @HttpCode(201)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
-      '[ADMIN, USER, BUSINESS]: create a reply which can comment/reply only (id can be reviewId/responseId)',
+      '[ADMIN, USER, BUSINESS]: create a reply which can comment/reply only (id can be reviewId/commentId)',
   })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   @ApiBody({
-    type: ReplyReviewDto,
+    type: CommentDto,
   })
-  CreateReply(
-    @Param('id') id: string,
-    @Body() replyReviewDto: ReplyReviewDto,
+  CreateComment(
+    @Param('commentId') id: string,
+    @Body() commentDto: CommentDto,
     @Req() req: Request,
   ) {
-    return this.reviewService.createResponse(replyReviewDto, id, req.user.id);
+    return this.reviewService.CreateComment(commentDto, id, req.user);
   }
 
   @Put(':reviewId')
@@ -132,7 +149,7 @@ export class ReviewController {
     return this.reviewService.editReview(id, editReviewDto, req.user.id);
   }
 
-  @Put(':responseId/responses')
+  @Put(':commentId')
   @HttpCode(200)
   @ApiBearerAuth()
   @ApiOperation({
@@ -144,37 +161,37 @@ export class ReviewController {
   @ApiBody({
     type: EditResponseDto,
   })
-  async editResponse(
-    @Param('responseId') id: string,
+  async editComment(
+    @Param('commentId') id: string,
     @Body() editResponseDto: EditResponseDto,
     @Req() req: Request,
   ) {
-    return this.reviewService.editResponse(id, editResponseDto, req.user.id);
+    return this.reviewService.editComment(id, editResponseDto, req.user.id);
   }
 
-  @Delete(':reviewId')
-  @HttpCode(200)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary:
-      '[ADMIN, USER, BUSINESS]: USER, BUSINESS can delete their own review, ADMIN can delete any review.',
-  })
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
-  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
-  async delete(
-    @Param('reviewId') id: string,
-    @Query('type') type: DeleteActionEnum,
-    @Req() req: Request,
-  ) {
-    if (type === DeleteActionEnum.SOFT) {
-      return this.reviewService.softDelete(id, req.user);
-    }
+  // @Delete(':reviewId')
+  // @HttpCode(200)
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary:
+  //     '[ADMIN, USER, BUSINESS]: USER, BUSINESS can delete their own review, ADMIN can delete any review.',
+  // })
+  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  // @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
+  // @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  // async delete(
+  //   @Param('reviewId') id: string,
+  //   @Query('type') type: DeleteActionEnum,
+  //   @Req() req: Request,
+  // ) {
+  //   if (type === DeleteActionEnum.SOFT) {
+  //     return this.reviewService.softDelete(id, req.user);
+  //   }
 
-    if (type === DeleteActionEnum.HARD) {
-      return this.reviewService.hardDelete(id, req.user);
-    }
-  }
+  //   if (type === DeleteActionEnum.HARD) {
+  //     return this.reviewService.hardDelete(id, req.user);
+  //   }
+  // }
 
   @Patch(':id/restore')
   @HttpCode(200)
@@ -188,15 +205,15 @@ export class ReviewController {
     return this.reviewService.restoreReview(id);
   }
 
-  @Delete(':responseId/responses')
+  @Delete(':commentId/comments')
   @ApiBearerAuth()
   @HttpCode(200)
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiOperation({
-    summary: '[ADMIN, USER, BUSINESS]: delete a response',
+    summary: '[ADMIN, USER, BUSINESS]: delete a comment',
   })
-  async deleteResponses(@Param('responseId') id: string, @Req() req: Request) {
-    return this.reviewService.deleteResponses(id, req.user.id);
+  async deleteComment(@Param('commentId') id: string, @Req() req: Request) {
+    return this.reviewService.deleteComment(id, req.user.id);
   }
 }

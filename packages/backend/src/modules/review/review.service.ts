@@ -31,18 +31,21 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
-import { ReplyReviewDto } from './dto/reply-review.dto';
-import { Review } from './entities/review.entity';
+import { CommentDto } from './dto/reply-review.dto';
+import { Review } from './entities/review2.entity';
 import { ReviewRepository } from './repository/review.repository';
 import { transStringToObjectId } from 'src/common/utils';
 import { User } from '../user/entities/user.entity';
 import { Business } from '../business/entities/business.entity';
+import { Review2Repository } from './repository/review2.repository';
+import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
 
 @Injectable()
 export class ReviewService {
   constructor(
     private readonly businessService: BusinessService,
     private readonly reviewRepository: ReviewRepository,
+    private readonly review2Repository: Review2Repository,
     private readonly configService: ConfigService,
     @InjectConnection() private readonly connection: mongoose.Connection,
   ) {}
@@ -54,7 +57,32 @@ export class ReviewService {
       URL,
       query,
       this.reviewRepository,
-      this.configGetAllBusinessPipeLine,
+      this.configGetAllReviewPipeLine,
+    );
+
+    const reviews = aggregateResult.data.map((review) =>
+      plainToClass(Review, review),
+    );
+
+    // aggregateResult.data = reviews;
+
+    // return aggregateResult;
+    return null;
+  }
+
+  async findReviewBusiness(
+    businessId: string,
+    query: FindAllBusinessReviewQuery,
+  ): Promise<PaginationResult<Review>> {
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/reviews/${businessId}/filter`;
+
+    query.businessId = businessId;
+
+    const aggregateResult = await PaginationHelper.paginate(
+      URL,
+      query as FindAllReviewQuery,
+      this.reviewRepository,
+      this.configGetAllBusinessReviewPipeLine,
     );
 
     const reviews = aggregateResult.data.map((review) =>
@@ -63,10 +91,83 @@ export class ReviewService {
 
     aggregateResult.data = reviews;
 
+    // let newData = aggregateResult.data.filter((review) => {
+    //   console.log('review.business_id', review.business_id);
+    //   console.log('businessId', businessId);
+
+    //   return review.business_id === businessId;
+    // });
+
+    // console.log('newData', newData);
+
+    // aggregateResult = {
+    //   ...aggregateResult,
+    //   data: newData,
+    // } as PaginationResult<Review>;
+
     return aggregateResult;
   }
 
-  async configGetAllBusinessPipeLine(
+  async configGetAllBusinessReviewPipeLine(
+    query: FindAllBusinessReviewQuery,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.starsRating)) {
+        arr.push(query.starsRating);
+      } else {
+        arr = query.starsRating;
+      }
+
+      matchStage['star'] = {
+        $in: arr,
+      };
+    }
+
+    if (query.businessId) {
+      matchStage['businessId'] = transStringToObjectId(query.businessId);
+    }
+
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.starsRating)) {
+        arr.push(query.starsRating);
+      } else {
+        arr = query.starsRating;
+      }
+
+      matchStage['star'] = {
+        $in: arr,
+      };
+    }
+
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query as FindAllReviewQuery,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
+  }
+
+  async configGetAllReviewPipeLine(
     query: FindAllReviewQuery,
   ): Promise<PipelineStage[]> {
     let matchStage: Record<string, any> = {};
@@ -139,7 +240,7 @@ export class ReviewService {
     return plainToClass(Review, review);
   }
 
-  async createPreview(createReviewDto: CreateReviewDto, user: User) {
+  async createReview(createReviewDto: CreateReviewDto, user: User) {
     const business = await this.businessService.findOneById(
       createReviewDto.businessId,
     );
@@ -159,14 +260,10 @@ export class ReviewService {
     try {
       transactionSession.startTransaction();
 
-      const review = await this.reviewRepository.create({
-        content: createReviewDto.content,
-        star: parseInt(createReviewDto.star),
-        type: ReviewTypeEnum.REVIEW,
-        businessId: transStringToObjectId(business.id),
-        senderId: user._id,
-        receiverId: transStringToObjectId(business.user_id),
-      });
+      let review = await this.review2Repository.createReview(
+        createReviewDto,
+        user,
+      );
 
       await this.businessService.updateRating(
         business.id,
@@ -177,7 +274,7 @@ export class ReviewService {
       await transactionSession.commitTransaction();
       transactionSession.endSession();
 
-      return plainToClass(Review, review);
+      return true;
     } catch (err) {
       await transactionSession.abortTransaction();
 
@@ -187,38 +284,14 @@ export class ReviewService {
     }
   }
 
-  async createResponse(
-    replyReviewDto: ReplyReviewDto,
-    parentReviewId: string,
-    senderId: string,
-  ) {
-    const review = await this.reviewRepository.findOneById(parentReviewId);
+  async CreateComment(commentDto: CommentDto, reviewId: string, user: User) {
+    const comment = await this.review2Repository.createComment(
+      commentDto,
+      reviewId,
+      user,
+    );
 
-    if (!review) {
-      throw new ReviewNotFoundException();
-    }
-
-    const currentDepth = review.depth;
-
-    if (currentDepth === ReviewConstant.MAX_DEPTH) {
-      parentReviewId = review.parentId.toString();
-    }
-
-    const newResponse = await this.reviewRepository.create({
-      content: replyReviewDto.content,
-      star: null,
-      businessId: review.businessId,
-      senderId: transStringToObjectId(senderId),
-      parentId: transStringToObjectId(parentReviewId),
-      receiverId: review.senderId,
-      type: ReviewTypeEnum.REPLY,
-      depth:
-        currentDepth < ReviewConstant.MAX_DEPTH
-          ? currentDepth + 1
-          : ReviewConstant.MAX_DEPTH,
-    });
-
-    return plainToClass(Review, newResponse);
+    return plainToClass(Review, comment);
   }
 
   async editReview(
@@ -268,7 +341,7 @@ export class ReviewService {
     }
   }
 
-  async editResponse(
+  async editComment(
     id: string,
     editResponseDto: EditResponseDto,
     senderId: string,
@@ -276,7 +349,7 @@ export class ReviewService {
     const response = await this.reviewRepository.findOneByCondition({
       _id: transStringToObjectId(id),
       senderId: transStringToObjectId(senderId),
-      type: ReviewTypeEnum.REPLY,
+      type: ReviewTypeEnum.COMMENT,
     });
 
     if (!response) {
@@ -292,58 +365,58 @@ export class ReviewService {
     return !!editedResponse;
   }
 
-  async softDelete(id: string, user: User): Promise<boolean> {
-    let review: Review;
+  // async softDelete(id: string, user: User): Promise<boolean> {
+  //   let review: Review;
 
-    if (user.role === UserRole.ADMIN) {
-      review = await this.reviewRepository.findOneByCondition({
-        _id: transStringToObjectId(id),
-        type: ReviewTypeEnum.REVIEW,
-        parentId: null,
-        deleted_at: null,
-      });
-    } else {
-      review = await this.reviewRepository.findOneByCondition({
-        _id: transStringToObjectId(id),
-        senderId: user._id,
-        type: ReviewTypeEnum.REVIEW,
-        parentId: null,
-        deleted_at: null,
-      });
+  //   if (user.role === UserRole.ADMIN) {
+  //     review = await this.reviewRepository.findOneByCondition({
+  //       _id: transStringToObjectId(id),
+  //       type: ReviewTypeEnum.REVIEW,
+  //       parentId: null,
+  //       deleted_at: null,
+  //     });
+  //   } else {
+  //     review = await this.reviewRepository.findOneByCondition({
+  //       _id: transStringToObjectId(id),
+  //       senderId: user._id,
+  //       type: ReviewTypeEnum.REVIEW,
+  //       parentId: null,
+  //       deleted_at: null,
+  //     });
 
-      if (!review) {
-        throw new ReviewDeleteException(
-          "Can't delete this review. Review not found or not belong to user or already deleted or not a review.",
-        );
-      }
-    }
+  //     if (!review) {
+  //       throw new ReviewDeleteException(
+  //         "Can't delete this review. Review not found or not belong to user or already deleted or not a review.",
+  //       );
+  //     }
+  //   }
 
-    console.log('review', review);
+  //   console.log('review', review);
 
-    const transactionSession = await this.connection.startSession();
+  //   const transactionSession = await this.connection.startSession();
 
-    try {
-      transactionSession.startTransaction();
+  //   try {
+  //     transactionSession.startTransaction();
 
-      await this.businessService.updateRating(
-        review.businessId.toString(),
-        ReviewActionEnum.DELETE,
-        review.star.toString(),
-      );
+  //     await this.businessService.updateRating(
+  //       review.businessId.toString(),
+  //       ReviewActionEnum.DELETE,
+  //       review.star.toString(),
+  //     );
 
-      const deletedReview = await this.reviewRepository.softDelete(id);
+  //     const deletedReview = await this.reviewRepository.softDelete(id);
 
-      await transactionSession.commitTransaction();
-      transactionSession.endSession();
+  //     await transactionSession.commitTransaction();
+  //     transactionSession.endSession();
 
-      return !!deletedReview;
-    } catch (err) {
-      await transactionSession.abortTransaction();
-      transactionSession.endSession();
+  //     return !!deletedReview;
+  //   } catch (err) {
+  //     await transactionSession.abortTransaction();
+  //     transactionSession.endSession();
 
-      return false;
-    }
-  }
+  //     return false;
+  //   }
+  // }
 
   async hardDelete(id: string, user: User): Promise<boolean> {
     if (user.role !== UserRole.ADMIN) {
@@ -405,19 +478,10 @@ export class ReviewService {
     return !!(await this.reviewRepository.restore(review.id));
   }
 
-  async deleteResponses(id: string, userId: string): Promise<boolean> {
-    const review = await this.reviewRepository.findOneByCondition({
-      _id: id,
-      type: ReviewTypeEnum.REPLY,
-    });
+  async deleteComment(commentId: string, userId: string): Promise<boolean> {
+    const comment = await this.review2Repository.deleteComment(commentId);
 
-    if (!review) {
-      throw new ResponseNotFoundException(
-        "Can't delete this response. Response not found or not belong to user or not a response.",
-      );
-    }
-
-    return !!(await this.deleteWithChildren(id));
+    return !!comment;
   }
 
   async deleteWithChildren(id: string) {
