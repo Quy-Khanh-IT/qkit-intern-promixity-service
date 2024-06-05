@@ -18,7 +18,7 @@ export const ADMIN_SIDEBAR_OPTIONS: SidebarOptions = {
   MANAGE_BUSINESS: {
     key: '3',
     label: 'Manage business'
-  },
+  }
 }
 
 export const USER_SIDEBAR_OPTIONS: SidebarOptions = {

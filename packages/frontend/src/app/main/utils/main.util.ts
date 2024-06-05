@@ -42,7 +42,8 @@ export const directRoutes = (role: string, adminRoute: string, userRoute: string
   } else if (role === (RoleEnum._USER as string)) {
     return userRoute
   }
-  return ROUTE.ROOT
+  // return ROUTE.ROOT
+  return adminRoute
 }
 
 export const findKeyMenuBasedRoute = (role: string, routeValue: string): string => {

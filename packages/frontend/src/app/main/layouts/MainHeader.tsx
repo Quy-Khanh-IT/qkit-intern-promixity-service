@@ -65,7 +65,7 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
 
   const directRoutesObject = {
     logo: directRoutes(userInformation?.role, ROUTE.DASHBOARD, ROUTE.USER_PROFILE),
-    [ROUTE.USER_PROFILE]: ROUTE.USER_PROFILE
+    [ROUTE.ADMIN_PROFILE]: ROUTE.ADMIN_PROFILE
   }
 
   return (
