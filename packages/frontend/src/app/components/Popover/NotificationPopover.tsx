@@ -1,18 +1,15 @@
-import { NotificationOutlined } from '@ant-design/icons'
 import { Badge, Flex, Popover, Space, Tabs, TabsProps, Tooltip } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import StickyBox from 'react-sticky-box'
-import { toast } from 'react-toastify'
 
-import { useLazyGetAllNotificationsQuery } from '@/services/notification.service'
+import { UI_TEXT } from '@/constants'
+import { useLazyGetAllNotificationsQuery, useUpdateAllReadNotificationMutation } from '@/services/notification.service'
+import { BooleanEnum } from '@/types/enum'
 import { INotification } from '@/types/notification'
+import { IGetAllNotificationQuery } from '@/types/query'
+import { BellOutlined } from '@ant-design/icons'
 import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
-import { BellOutlined } from '@ant-design/icons'
-import { IGetAllNotificationQuery } from '@/types/query'
-import { UI_TEXT } from '@/constants'
-import { IPaginationResponse } from '@/types/pagination'
-import { BooleanEnum } from '@/types/enum'
 
 const ORIGIN_PAGE = 1
 const PAGE_SIZE = 4
@@ -22,7 +19,6 @@ const TAB_STEPS = {
   UNREAD: '1',
   READ: '2'
 }
-const firstPayload = { offset: ORIGIN_PAGE, limit: PAGE_SIZE } as IGetAllNotificationQuery
 
 const tabTitle = [
   <span key='all' className='tab-hover'>
@@ -40,20 +36,21 @@ const NotificationPopover = (): React.ReactNode => {
   const perPage = useRef<number>(PAGE_SIZE)
   const [initLoading, setInitLoading] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
-  const [loadMoreFull, setLoadMoreFull] = useState<boolean>(false)
+  const [loadMoreFull, setLoadMoreFull] = useState<boolean>(true)
   const tabKeyRef = useRef<string>(ORIGIN_TAB)
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [cacheData, setCacheData] = useState<INotification[]>([])
   const [notificationsData, setNotificationsData] = useState<INotification[]>([])
   const [itemCount, setItemCount] = useState<number>(0)
   const [getAllNotifications] = useLazyGetAllNotificationsQuery()
+  const [updateAllReadNotification] = useUpdateAllReadNotificationMutation()
 
-  // const fetchAllRead = async () => {
-  //   await updateAllReadNotification().unwrap().then()
-  // }
+  const fetchAllRead = async (): Promise<void> => {
+    await updateAllReadNotification()
+  }
 
   const clickAllRead = (e: React.MouseEvent<HTMLSpanElement>): void => {
-    // fetchAllRead()
+    fetchAllRead()
     const allReadBtn = document.querySelectorAll('.ant-list-item-action .read-btn')
     allReadBtn.forEach((item: Element) => {
       console.log(item)
@@ -71,10 +68,10 @@ const NotificationPopover = (): React.ReactNode => {
     </Flex>
   )
 
-  const fetchNotifications = async (page: number, take: number): Promise<void> => {
+  const getTabPayload = (offset: number = ORIGIN_PAGE, limit: number = perPage.current): IGetAllNotificationQuery => {
     const payload = {
-      offset: page,
-      limit: take
+      offset,
+      limit
     } as IGetAllNotificationQuery
 
     if (tabKeyRef.current === TAB_STEPS.UNREAD) {
@@ -83,15 +80,42 @@ const NotificationPopover = (): React.ReactNode => {
       payload.isRead = BooleanEnum._TRUE
     }
 
+    return payload
+  }
+
+  // load first and change tab
+  const loadFirstNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
+    setLoading(true)
     await getAllNotifications(payload)
       .unwrap()
       .then((res) => {
-        if (res.data.length === 0) {
+        setInitLoading(false)
+        if (res.data.length === 0 || res.totalRecords === perPage.current) {
           setLoadMoreFull(false)
-        } else {
-          const newData = cacheData.concat(res.data)
-          setCacheData(newData)
-          setNotificationsData(newData)
+        }
+        setNotificationsData(res.data)
+        setCacheData(res.data)
+        setItemCount(res.totalRecords)
+        setLoading(false)
+      })
+  }
+
+  const onLoadInterval = async (): Promise<void> => {
+    setLoading(true)
+    await loadFirstNotifications(getTabPayload())
+
+    window.dispatchEvent(new Event('resize'))
+  }
+
+  const fetchMoreNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
+    await getAllNotifications(payload)
+      .unwrap()
+      .then((res) => {
+        const newData = cacheData.concat(res.data)
+        setNotificationsData(newData)
+        setCacheData(newData)
+        if (res.totalRecords <= perPage.current) {
+          setLoadMoreFull(false)
         }
         setLoading(false)
       })
@@ -100,22 +124,9 @@ const NotificationPopover = (): React.ReactNode => {
   const onLoadMore = async (): Promise<void> => {
     setLoading(true)
     perPage.current = perPage.current + PAGE_SIZE
-    await fetchNotifications(perPage.current / PAGE_SIZE, PAGE_SIZE)
+    await fetchMoreNotifications(getTabPayload(perPage.current / PAGE_SIZE, PAGE_SIZE))
 
     window.dispatchEvent(new Event('resize'))
-  }
-
-  const onLoadInterval = async (): Promise<void> => {
-    setLoading(true)
-    await fetchNotifications(ORIGIN_PAGE, perPage.current)
-
-    window.dispatchEvent(new Event('resize'))
-  }
-
-  const loadWhenChangeTab = async (tabKey: string): Promise<void> => {
-    setLoading(true)
-    await fetchNotifications(ORIGIN_PAGE, PAGE_SIZE)
-    resetValues()
   }
 
   const items = tabTitle.map((item, i) => {
@@ -149,8 +160,7 @@ const NotificationPopover = (): React.ReactNode => {
       onChange={(key) => {
         tabKeyRef.current = key
         console.log('tabKeyRef.current', tabKeyRef.current, typeof tabKeyRef.current)
-        // onClose(false)
-        loadWhenChangeTab(key)
+        onClose(false)
       }}
       className='tab-list'
       renderTabBar={renderTabBar}
@@ -158,24 +168,9 @@ const NotificationPopover = (): React.ReactNode => {
       style={{ borderRadius: 16 }}
     />
   )
-  const loadFirstNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
-    setLoading(true)
-    await getAllNotifications(payload)
-      .unwrap()
-      .then((res) => {
-        setInitLoading(false)
-        if (res.data.length === 0) {
-          setLoadMoreFull(false)
-        }
-        setCacheData(res.data)
-        setNotificationsData(res.data)
-        setItemCount(res.totalRecords)
-        setLoading(false)
-      })
-  }
 
   useEffect(() => {
-    loadFirstNotifications(firstPayload)
+    loadFirstNotifications(getTabPayload())
     const timer = setInterval(() => {
       onLoadInterval()
     }, 60000)
@@ -194,8 +189,9 @@ const NotificationPopover = (): React.ReactNode => {
     if (setTabKeyBool) {
       tabKeyRef.current = ORIGIN_TAB
     }
-    loadFirstNotifications(firstPayload)
+
     resetValues()
+    loadFirstNotifications(getTabPayload())
 
     const popoverElement = document.querySelector('.ant-popover') as HTMLElement
     if (popoverElement) {
@@ -228,7 +224,7 @@ const NotificationPopover = (): React.ReactNode => {
                 setOpenModal(true)
               } else {
                 setOpenModal(false)
-                onClose()
+                onClose(true)
               }
             }}
           >

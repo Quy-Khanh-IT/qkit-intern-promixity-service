@@ -20,20 +20,24 @@ export const notificationApi = createApi({
         }
       },
       providesTags: ['NotificationList']
+    }),
+    updateReadNotification: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/notifications/${id}/read`,
+        method: 'PATCH'
+      })
+    }),
+    updateAllReadNotification: builder.mutation<void, void>({
+      query: () => ({
+        url: `/notifications/all/read`,
+        method: 'PATCH'
+      })
     })
-    // updateReadNotification: builder.mutation<boolean, string>({
-    //   query: (id) => ({
-    //     url: `notifications/${id}/read`,
-    //     method: 'PATCH'
-    //   })
-    // }),
-    // updateAllReadNotification: builder.mutation<boolean, void>({
-    //   query: () => ({
-    //     url: `notifications/all/read`,
-    //     method: 'PATCH'
-    //   })
-    // })
   })
 })
 
-export const { useLazyGetAllNotificationsQuery } = notificationApi
+export const {
+  useLazyGetAllNotificationsQuery,
+  useUpdateReadNotificationMutation,
+  useUpdateAllReadNotificationMutation
+} = notificationApi
