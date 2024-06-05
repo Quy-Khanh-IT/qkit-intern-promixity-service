@@ -1,22 +1,17 @@
 import React from 'react'
 import './search-item.scss'
-import { IBusiness, IDayOfWeek } from '@/types/business'
+import { IBusiness, IDayOfWeek, ISelectedBusiness } from '@/types/business'
 import { Image } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import StarRating from './StarRating'
+import ItemService from './search-item/ItemService'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
+import { RootState } from '@/redux/store'
 
 export default function SearchItem({ business }: { business: IBusiness }): React.ReactNode {
-  const renderServices = (): React.ReactNode => {
-    const maxServices = 3
-    const servicesToShow = business.services.slice(0, maxServices)
-    return servicesToShow.map((service, index) => (
-      <React.Fragment key={service.id}>
-        <div>{service.name}</div>
-        {index < servicesToShow.length - 1 && <div className='ms-1 me-1'>-</div>}
-      </React.Fragment>
-    ))
-  }
-
+  const dispatch = useDispatch()
+  const selectedBusinessId = useSelector((state: RootState) => state.selectedBusiness.selectedBusinessId)
   const getBusinessStatus = (): React.ReactNode => {
     const today: number = dayjs().day()
     const currentTime: Dayjs = dayjs()
@@ -131,10 +126,18 @@ export default function SearchItem({ business }: { business: IBusiness }): React
     return null
   }
 
+  const handleOnClick = (): void => {
+    const data: ISelectedBusiness = {
+      selectedBusinessId: business.id,
+      selectedBusinessData: business
+    }
+    dispatch(setSelectedBusiness(data))
+  }
+
   return (
     <div
-      onClick={() => console.log(business)}
-      className='business-detail-wrapper container pb-4 d-flex justify-content-between pt-4'
+      onClick={handleOnClick}
+      className={`business-detail-wrapper ${selectedBusinessId === business.id ? 'selected' : ''} container pb-4 d-flex justify-content-between pt-4`}
     >
       <div className='content-left pe-1'>
         <div className='business-title'>
@@ -148,7 +151,9 @@ export default function SearchItem({ business }: { business: IBusiness }): React
           <div className='business-address'>{business.addressLine}</div>
         </div>
         <div className='business-status-wrapper'>{getBusinessStatus()}</div>
-        <div className='mt-3 d-flex'>{renderServices()}</div>
+        <div className='mt-3 d-flex align-items-center'>
+          <ItemService services={business.services} />
+        </div>
       </div>
       <div className='content-right'>
         <Image
