@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setPosition, setZoom } from '@/redux/slices/map-props.slice'
 import L from 'leaflet'
 import { RootState } from '@/redux/store'
-import { MAP_RADIUS, MAP_ZOOM, ZOOM_BASE_ON_RADIUS } from '@/constants/map'
+import { MAP_ZOOM, ZOOM_BASE_ON_RADIUS } from '@/constants/map'
 
 const myIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/Proximity/search-location.png',

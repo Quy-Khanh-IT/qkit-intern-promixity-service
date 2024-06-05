@@ -1,3 +1,5 @@
+import { MenuProps } from 'antd'
+
 export const MAP_RADIUS = {
   LEVEL_ONE: 500,
   LEVEL_TWO: 1000,
@@ -46,3 +48,30 @@ export const LIMIT_BASE_ON_RADIUS = {
   [MAP_RADIUS.LEVEL_FIVE]: MAP_LIMIT_BUSINESS.LEVEL_FIVE,
   [MAP_RADIUS.LEVEL_SIX]: MAP_LIMIT_BUSINESS.LEVEL_SIX
 }
+
+export const DistanceMenu = [
+  {
+    label: '500 m',
+    key: 0.5
+  },
+  {
+    label: '1 km',
+    key: 1
+  },
+  {
+    label: '2 km',
+    key: 2
+  },
+  {
+    label: '5 km',
+    key: 5
+  },
+  {
+    label: '10 km',
+    key: 10
+  },
+  {
+    label: '20 km',
+    key: 20
+  }
+]

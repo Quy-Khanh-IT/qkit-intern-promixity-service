@@ -3,7 +3,7 @@
 .detail-container {
   position: fixed;
   top: 72px;
-  left: 512px;
+  left: 562px;
   background-color: $light;
   height: 90vh;
   border-radius: 16px;
@@ -11,6 +11,27 @@
   font-size: 13px;
   color: $gray;
   font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
+  max-width: 360px;
+
+  .close-btn {
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    z-index: 1000;
+    background-color: $light;
+    top: 8px;
+    right: 8px;
+    border-radius: 50%;
+
+    i {
+      font-size: 22px;
+      color: black;
+    }
+
+    &:hover {
+      background-color: $gray-hover;
+    }
+  }
 }
 
 .detail-thumb {
@@ -39,4 +60,35 @@
   &:hover {
     background-color: $gray-hover;
   }
+}
+
+.active {
+  color: $link-color;
+  border-bottom: 3px solid $link-color;
+}
+.service-wrapper {
+  color: black;
+  font-size: 14px;
+  border-bottom: 1px solid $gray-border;
+
+  &:hover {
+    background-color: $gray-hover !important;
+  }
+}
+
+.service-item {
+  i {
+    padding-right: 4px;
+    color: $open-color;
+  }
+}
+
+.detail-content-wrapper {
+  font-size: 13px;
+  color: black;
+}
+
+.detail-icon {
+  font-size: 20px;
+  color: $link-color;
 }

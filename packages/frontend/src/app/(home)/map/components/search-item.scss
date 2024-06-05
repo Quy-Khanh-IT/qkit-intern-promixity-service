@@ -9,6 +9,10 @@
   }
 }
 
+.selected {
+  background-color: $gray-hover !important;
+}
+
 .distance {
   color: $gray;
   font-size: 13px;

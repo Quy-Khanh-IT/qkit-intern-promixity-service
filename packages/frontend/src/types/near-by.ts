@@ -17,9 +17,10 @@ export interface IFindNearByPayLoad {
 }
 
 export interface IFindNearByResponse {
+  totalRecords: number
   pageSize: number
   currentPage: number
-  totalPage: number | null
+  totalPages: number | null
   data: IBusiness[] | []
   links: {
     first: string

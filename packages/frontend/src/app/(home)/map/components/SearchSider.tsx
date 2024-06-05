@@ -1,22 +1,11 @@
 'use client'
-
 import Sider from 'antd/es/layout/Sider'
 import './search-sider.scss'
 import { Spin, Tooltip } from 'antd'
 import { SearchList } from './SearchList'
-import { IBusiness } from '@/types/business'
+import { ISearchSider } from '@/types/map'
 
-export default function SearchSider({
-  collapsed,
-  businesses,
-  showSpinner,
-  onClose
-}: {
-  collapsed: boolean
-  businesses: IBusiness[] | [] | undefined
-  showSpinner: boolean
-  onClose: () => void
-}): React.ReactNode {
+export default function SearchSider(props: ISearchSider): React.ReactNode {
   const searchResultTooltip = (): React.ReactNode => {
     return (
       <div className='tooltip-wrapper p-2'>
@@ -36,11 +25,11 @@ export default function SearchSider({
         trigger={null}
         className=' h-100 search-sider '
         collapsible
-        collapsed={collapsed}
+        collapsed={props.collapsed}
         collapsedWidth={0}
-        width={500}
+        width={550}
       >
-        {showSpinner ? (
+        {props.showSpinner ? (
           <div className='d-flex justify-content-center align-items-center h-100'>
             <Spin size='large' />
           </div>
@@ -52,13 +41,14 @@ export default function SearchSider({
                 <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
                   <i className='fa-light fa-circle-info'></i>{' '}
                 </Tooltip>
+                <span className='total-results ms-1'>{props.totalResult ? `(${props.totalResult} results)` : ''}</span>
               </div>
-              <div onClick={onClose} className='close-btn me-2'>
+              <div onClick={props.onClose} className='close-btn me-2'>
                 <i className='fa-solid fa-x'></i>
               </div>
             </div>
             <div className='search-result-content mt-3'>
-              <SearchList businesses={businesses} />
+              <SearchList businesses={props.businesses} />
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import Map from './components'
 import { Layout, Image, Input, Checkbox, MenuProps, Dropdown, Button, Space } from 'antd'
 import './map.scss'
@@ -9,26 +9,28 @@ import SearchSider from './components/SearchSider'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
 import { setSearchPosition } from '@/redux/slices/map-props.slice'
-import { LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
+import { DistanceMenu, LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
 import SearchItemDetail from './components/SearchItemDetail'
+import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 
 export default function MapPage(): React.ReactNode {
   const position = useSelector((state: RootState) => state.mapProps.position)
   const zoom = useSelector((state: RootState) => state.mapProps.zoom)
+  const { selectedBusinessId, selectedBusinessData } = useSelector((state: RootState) => state.selectedBusiness)
   const { Header, Content } = Layout
   const { Search } = Input
   const [collapsed, setCollapsed] = useState<boolean>(true)
   const [searchText, setSearchText] = useState<string>('')
   const [isFly, setIsFly] = useState<boolean>(false)
   const dispatch = useDispatch()
-  const [distanceRadius, setDistanceRadius] = useState<number>(2)
+  const [distanceRadius, setDistanceRadius] = useState<number>(MAP_RADIUS.LEVEL_DEFAULT / 1000)
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
     longitude: position[1],
-    radius: 10,
+    radius: MAP_RADIUS.LEVEL_DEFAULT / 1000,
     q: '',
     limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT
   })
@@ -45,7 +47,6 @@ export default function MapPage(): React.ReactNode {
 
   const handleOnSearch = (): void => {
     setIsFly(true)
-    setCollapsed(true)
 
     const maxLimit: number = distanceRadius
       ? LIMIT_BASE_ON_RADIUS[distanceRadius === 0 ? MAP_RADIUS.LEVEL_ONE : distanceRadius * 1000]
@@ -97,34 +98,10 @@ export default function MapPage(): React.ReactNode {
   const handleCloseSider = (): void => {
     setCollapsed(true)
     dispatch(setSearchPosition(null))
+    dispatch(setSelectedBusiness({ selectedBusinessId: null, selectedBusinessData: null }))
   }
 
-  const items: MenuProps['items'] = [
-    {
-      label: '500 m',
-      key: 0.5
-    },
-    {
-      label: '1 km',
-      key: 1
-    },
-    {
-      label: '2 km',
-      key: 2
-    },
-    {
-      label: '5 km',
-      key: 5
-    },
-    {
-      label: '10 km',
-      key: 10
-    },
-    {
-      label: '20 km',
-      key: 20
-    }
-  ]
+  const items: MenuProps['items'] = DistanceMenu
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     setDistanceRadius(parseInt(e.key))
   }
@@ -142,6 +119,7 @@ export default function MapPage(): React.ReactNode {
   useEffect(() => {
     setCollapsed(true)
     dispatch(setSearchPosition(null))
+    dispatch(setSelectedBusiness({ selectedBusinessId: null, selectedBusinessData: null }))
   }, [clickPosition])
   return (
     <Layout className='vh-100'>
@@ -180,12 +158,13 @@ export default function MapPage(): React.ReactNode {
       </Header>
 
       <Layout>
-        {/* <SearchItemDetail /> */}
+        {selectedBusinessId ? <SearchItemDetail /> : ''}
         <SearchSider
           onClose={handleCloseSider}
           showSpinner={showSpinner}
           businesses={response?.data}
           collapsed={collapsed}
+          totalResult={response?.totalRecords}
         />
 
         <Content style={{ margin: '0 16px' }}>

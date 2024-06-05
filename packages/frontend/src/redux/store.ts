@@ -9,6 +9,7 @@ import { nearByApi } from '@/services/near-by.service'
 import { mapPropsSlice } from './slices/map-props.slice'
 import { businessApi } from '@/services/business.service'
 import { categoryApi } from '@/services/category.service'
+import { selectedBusinessSlice } from './slices/selected-business.slice'
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     [addressApi.reducerPath]: addressApi.reducer,
     [nearByApi.reducerPath]: nearByApi.reducer,
     mapProps: mapPropsSlice.reducer,
-    [categoryApi.reducerPath]: categoryApi.reducer
+    [categoryApi.reducerPath]: categoryApi.reducer,
+    selectedBusiness: selectedBusinessSlice.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
