@@ -1,0 +1,41 @@
+@import '@/sass/common/common.scss';
+
+.service-wrapper {
+  color: black;
+  font-size: 14px;
+  border-bottom: 1px solid $gray-border;
+
+  &:hover {
+    background-color: $gray-hover !important;
+  }
+}
+
+.service-item {
+  i {
+    padding-right: 4px;
+    color: $open-color;
+  }
+}
+
+.detail-main-content {
+  font-size: 13px;
+  color: black;
+  border-bottom: 1px solid $gray-border;
+}
+
+.detail-icon {
+  font-size: 20px;
+  color: $link-color;
+}
+
+.title {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.image-item {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}

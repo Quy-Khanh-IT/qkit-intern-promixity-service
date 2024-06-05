@@ -8,6 +8,10 @@
     opacity: 1;
   }
 }
+.detail-container-wrapper {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 
 .detail-container {
   position: fixed;
@@ -15,6 +19,7 @@
   left: 562px;
   background-color: $light;
   height: 90vh;
+
   border-radius: 16px;
   z-index: 999;
   font-size: 13px;
@@ -22,6 +27,7 @@
   font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
   max-width: 360px;
   animation: fadeIn 0.5s ease-in-out;
+
   .close-btn {
     position: absolute;
     height: 40px;
@@ -74,30 +80,4 @@
 .active {
   color: $link-color;
   border-bottom: 3px solid $link-color;
-}
-.service-wrapper {
-  color: black;
-  font-size: 14px;
-  border-bottom: 1px solid $gray-border;
-
-  &:hover {
-    background-color: $gray-hover !important;
-  }
-}
-
-.service-item {
-  i {
-    padding-right: 4px;
-    color: $open-color;
-  }
-}
-
-.detail-content-wrapper {
-  font-size: 13px;
-  color: black;
-}
-
-.detail-icon {
-  font-size: 20px;
-  color: $link-color;
 }

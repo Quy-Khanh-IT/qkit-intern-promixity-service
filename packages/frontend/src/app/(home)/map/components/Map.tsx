@@ -19,6 +19,10 @@ import { setPosition, setZoom } from '@/redux/slices/map-props.slice'
 import L from 'leaflet'
 import { RootState } from '@/redux/store'
 import { MAP_ZOOM, ZOOM_BASE_ON_RADIUS } from '@/constants/map'
+import { Image } from 'antd'
+import StarRating from './StarRating'
+import { IBusiness } from '@/types/business'
+import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 
 const myIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/Proximity/search-location.png',
@@ -114,9 +118,11 @@ const Map = (props: IMapProps): React.ReactNode => {
     return null
   }
 
-  useEffect(() => {}, [])
+  const handleClickPopUp = (business: IBusiness): void => {
+    dispatch(setSelectedBusiness({ selectedBusinessId: business.id, selectedBusinessData: business }))
+  }
   return (
-    <MapContainer zoomControl={false} center={center} zoom={props.zoom} className='vh-100 w-100'>
+    <MapContainer zoomControl={false} center={center} zoom={props.zoom} className='vh-100 w-100 map-container'>
       <TileLayer
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -155,7 +161,24 @@ const Map = (props: IMapProps): React.ReactNode => {
                   icon={restaurantMarker}
                   position={[business.location.coordinates[1], business.location.coordinates[0]]}
                 >
-                  <Popup className='mb-3'>{business.name}</Popup>
+                  <Popup className='mb-3 business-popup'>
+                    <div onClick={() => handleClickPopUp(business)}>
+                      <Image
+                        preview={false}
+                        src={business.images?.[0]?.url ? business.images?.[0]?.url : './images/default_business.png'}
+                        width={240}
+                        height={90}
+                        alt='business-image'
+                        className='popup-thumb'
+                        fallback='./images/default_business.png'
+                        style={{ overflow: 'hidden', position: 'relative' }}
+                      />
+                      <div className='popup-content-wrapper p-2'>
+                        <div className='popup-title'>{business.name}</div>
+                        <StarRating rating={business.overallRating} totalReview={business.totalReview} />
+                      </div>
+                    </div>
+                  </Popup>
                 </Marker>
               )
             })
