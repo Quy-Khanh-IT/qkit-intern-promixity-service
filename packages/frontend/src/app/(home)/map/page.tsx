@@ -22,6 +22,7 @@ export default function MapPage(): React.ReactNode {
   const dispatch = useDispatch()
   const [distanceRadius, setDistanceRadius] = useState<number>(2)
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
+  const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
@@ -45,26 +46,18 @@ export default function MapPage(): React.ReactNode {
     setIsFly(true)
     setCollapsed(true)
 
-    const limitLevels = {
-      [MAP_RADIUS.LEVEL_ONE]: MAP_LIMIT_BUSINESS.LEVEL_ONE,
-      [MAP_RADIUS.LEVEL_TWO]: MAP_LIMIT_BUSINESS.LEVEL_TWO,
-      [MAP_RADIUS.LEVEL_THREE]: MAP_LIMIT_BUSINESS.LEVEL_THREE,
-      [MAP_RADIUS.LEVEL_FOUR]: MAP_LIMIT_BUSINESS.LEVEL_FOUR,
-      [MAP_RADIUS.LEVEL_FIVE]: MAP_LIMIT_BUSINESS.LEVEL_FIVE,
-      [MAP_RADIUS.LEVEL_SIX]: MAP_LIMIT_BUSINESS.LEVEL_SIX
-    }
     const maxLimit: number = distanceRadius
-      ? limitLevels[distanceRadius === 0 ? MAP_RADIUS.LEVEL_ONE : distanceRadius * 1000]
+      ? LIMIT_BASE_ON_RADIUS[distanceRadius === 0 ? MAP_RADIUS.LEVEL_ONE : distanceRadius * 1000]
       : MAP_LIMIT_BUSINESS.LEVEL_DEFAULT
 
     const data: IFindNearByPayLoad = {
-      latitude: position[0],
-      longitude: position[1],
+      latitude: clickPosition ? clickPosition[0] : position[0],
+      longitude: clickPosition ? clickPosition[1] : position[1],
       radius: distanceRadius === 0 ? 0.5 : distanceRadius,
       q: searchText,
       limit: maxLimit
     }
-    dispatch(setSearchPosition(position))
+    dispatch(setSearchPosition(clickPosition ? clickPosition : position))
     setQueryData(data)
     setCollapsed(false)
     setShouldFetch(true)
@@ -72,6 +65,10 @@ export default function MapPage(): React.ReactNode {
 
   const handleStopFly = (): void => {
     setIsFly(false)
+  }
+
+  const handleSetClickPosition = (value: [number, number] | null): void => {
+    setClickPosition(value)
   }
 
   const [showSpinner, setShowSpinner] = useState<boolean>(false)
@@ -140,6 +137,11 @@ export default function MapPage(): React.ReactNode {
       handleOnSearch()
     }
   }, [distanceRadius])
+
+  useEffect(() => {
+    setCollapsed(true)
+    dispatch(setSearchPosition(null))
+  }, [clickPosition])
   return (
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>
@@ -148,6 +150,7 @@ export default function MapPage(): React.ReactNode {
         </div>
         <div className='search-wrapper d-flex justify-content-center align-items-center'>
           <Search
+            autoComplete='on'
             allowClear
             className='ml-2'
             placeholder='input search text'
@@ -176,6 +179,7 @@ export default function MapPage(): React.ReactNode {
       </Header>
 
       <Layout>
+        {/* <SearchItemDetail /> */}
         <SearchSider
           onClose={handleCloseSider}
           showSpinner={showSpinner}
@@ -184,14 +188,16 @@ export default function MapPage(): React.ReactNode {
         />
 
         <Content style={{ margin: '0 16px' }}>
-          <div className='h-100'>
+          <div className='h-100 w-100'>
             <Map
               radius={queryData.radius * 1000}
-              businesses={response?.data}
-              setStopFly={handleStopFly}
+              businesses={!collapsed ? response?.data : []}
+              handleSetStopFly={handleStopFly}
               isFly={isFly}
               zoom={zoom}
               position={position}
+              clickPosition={clickPosition}
+              handleSetClickPosition={handleSetClickPosition}
             />
           </div>
         </Content>

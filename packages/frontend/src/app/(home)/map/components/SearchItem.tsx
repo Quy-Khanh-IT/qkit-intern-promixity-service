@@ -3,26 +3,9 @@ import './search-item.scss'
 import { IBusiness, IDayOfWeek } from '@/types/business'
 import { Image } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
+import StarRating from './StarRating'
 
 export default function SearchItem({ business }: { business: IBusiness }): React.ReactNode {
-  const getStars = (rating: number): React.ReactNode => {
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating % 1 >= 0.5
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
-
-    return (
-      <>
-        {Array.from({ length: fullStars }, (_, index) => (
-          <i key={`full-${index}`} className='fa-solid fa-star star-fill'></i>
-        ))}
-        {hasHalfStar && <i className='fa-solid fa-star-half star-fill'></i>}
-        {Array.from({ length: emptyStars }, (_, index) => (
-          <i key={`empty-${index}`} className='fa-solid fa-star'></i>
-        ))}
-      </>
-    )
-  }
-
   const renderServices = (): React.ReactNode => {
     const maxServices = 3
     const servicesToShow = business.services.slice(0, maxServices)
@@ -149,17 +132,16 @@ export default function SearchItem({ business }: { business: IBusiness }): React
   }
 
   return (
-    <div className='business-detail-wrapper container pb-4 d-flex justify-content-between pt-4'>
-      <div className='content-left'>
+    <div
+      onClick={() => console.log(business)}
+      className='business-detail-wrapper container pb-4 d-flex justify-content-between pt-4'
+    >
+      <div className='content-left pe-1'>
         <div className='business-title'>
           {business.name}
-          <span className='distance'>{` - ${business._distance} m `}</span>
+          <span className='distance'>{` - ${business._distance}m `}</span>
         </div>
-        <div className='business-rating d-flex align-items-center mb-1 mt-1'>
-          <div className='rating-count'>{business.overallRating}</div>
-          <div className='rating-star '>{getStars(business.overallRating)}</div>
-          <div className='total-rating'>{`(${business.totalReview})`}</div>
-        </div>
+        <StarRating rating={business.overallRating} totalReview={business.totalReview} />
         <div className='d-flex mb-1'>
           <div className='business-category'>{business.category.name}</div>
           <div className='ms-1 me-1'>-</div>

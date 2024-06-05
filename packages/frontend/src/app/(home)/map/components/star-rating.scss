@@ -1,0 +1,21 @@
+@import '@/sass/common/common.scss';
+
+.business-rating {
+  font-size: 15px;
+  font-weight: 600;
+  color: $gray;
+  .rating-count {
+    margin-right: 4px;
+  }
+
+  .rating-star {
+    margin-right: 4px;
+    i {
+      color: $gray-bg;
+      margin-bottom: 4px;
+    }
+    .star-fill {
+      color: $star-color;
+    }
+  }
+}

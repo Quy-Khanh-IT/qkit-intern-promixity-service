@@ -1,0 +1,42 @@
+@import '@/sass/common/common.scss';
+
+.detail-container {
+  position: fixed;
+  top: 72px;
+  left: 512px;
+  background-color: $light;
+  height: 90vh;
+  border-radius: 16px;
+  z-index: 999;
+  font-size: 13px;
+  color: $gray;
+  font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
+}
+
+.detail-thumb {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.detail-content-wrapper {
+  height: calc(100% - 240px);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.detail-title {
+  color: black !important;
+}
+.menu-tab-list {
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid $gray-border;
+}
+
+.menu-title {
+  cursor: pointer;
+
+  &:hover {
+    background-color: $gray-hover;
+  }
+}

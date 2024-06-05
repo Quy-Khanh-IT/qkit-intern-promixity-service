@@ -1,5 +1,15 @@
 'use client'
-import { Circle, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvent } from 'react-leaflet'
+import {
+  Circle,
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  ZoomControl,
+  useMap,
+  useMapEvent,
+  useMapEvents
+} from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { IMapProps } from '@/types/map'
 import { useEffect, useState } from 'react'
@@ -8,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setPosition, setZoom } from '@/redux/slices/map-props.slice'
 import L from 'leaflet'
 import { RootState } from '@/redux/store'
-import { MAP_RADIUS, MAP_ZOOM } from '@/constants/map'
+import { MAP_RADIUS, MAP_ZOOM, ZOOM_BASE_ON_RADIUS } from '@/constants/map'
 
 const myIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/Proximity/search-location.png',
@@ -20,9 +30,9 @@ const restaurantMarker = L.icon({
   iconSize: [25, 25]
 })
 
-const Map = ({ position, zoom, businesses, isFly, setStopFly, radius }: IMapProps): React.ReactNode => {
-  const [center, setCenter] = useState<[number, number]>(position)
-  const [currentZoom, setCurrentZoom] = useState<number>(zoom)
+const Map = (props: IMapProps): React.ReactNode => {
+  const [center, setCenter] = useState<[number, number]>(props.position)
+  const [currentZoom, setCurrentZoom] = useState<number>(props.zoom)
   const searchPosition = useSelector((state: RootState) => state.mapProps.searchPosition)
   const dispatch = useDispatch()
 
@@ -44,20 +54,11 @@ const Map = ({ position, zoom, businesses, isFly, setStopFly, radius }: IMapProp
   const FlyToPosition = (): null => {
     const map = useMap()
 
-    const zoomLevels = {
-      [MAP_RADIUS.LEVEL_ONE]: MAP_ZOOM.LEVEL_ONE,
-      [MAP_RADIUS.LEVEL_TWO]: MAP_ZOOM.LEVEL_TWO,
-      [MAP_RADIUS.LEVEL_THREE]: MAP_ZOOM.LEVEL_THREE,
-      [MAP_RADIUS.LEVEL_FOUR]: MAP_ZOOM.LEVEL_FOUR,
-      [MAP_RADIUS.LEVEL_FIVE]: MAP_ZOOM.LEVEL_FIVE,
-      [MAP_RADIUS.LEVEL_SIX]: MAP_ZOOM.LEVEL_SIX
-    }
-
-    const flyZoom: number = radius ? zoomLevels[radius] : MAP_ZOOM.LEVEL_DEFAULT
+    const flyZoom: number = props.radius ? ZOOM_BASE_ON_RADIUS[props.radius] : MAP_ZOOM.LEVEL_DEFAULT
     useEffect(() => {
-      if (isFly && map) {
-        map.flyTo(position, flyZoom)
-        setStopFly?.()
+      if (props.isFly && map && searchPosition) {
+        map.flyTo(searchPosition, flyZoom)
+        props.handleSetStopFly?.()
       }
     }, [center, map])
     return null
@@ -77,17 +78,56 @@ const Map = ({ position, zoom, businesses, isFly, setStopFly, radius }: IMapProp
       fillOpacity: 0.1,
       weight: 2
     }
-    if (searchPosition && radius) return <Circle center={searchPosition} radius={radius} pathOptions={circleOption} />
+    if (searchPosition && props.radius)
+      return <Circle center={searchPosition} radius={props.radius} pathOptions={circleOption} />
     else return null
   }
 
+  const HandleClickMap = (): React.ReactNode => {
+    let timer: ReturnType<typeof setTimeout> | null = null
+
+    const map = useMapEvents({
+      click(e) {
+        if (timer) {
+          clearTimeout(timer)
+          timer = null
+        } else {
+          timer = setTimeout(() => {
+            if (!props.clickPosition) {
+              props.handleSetClickPosition?.([e.latlng.lat, e.latlng.lng])
+            } else {
+              props.handleSetClickPosition?.(null)
+            }
+            timer = null
+          }, 300)
+        }
+      },
+      dblclick() {}
+    })
+
+    return null
+  }
+
+  useEffect(() => {}, [])
   return (
-    <MapContainer center={center} zoom={zoom} className='vh-100 w-100'>
+    <MapContainer zoomControl={false} center={center} zoom={props.zoom} className='vh-100 w-100'>
       <TileLayer
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {zoom < 10 ? (
+      {props.zoom < 10 ? (
+        ''
+      ) : props.clickPosition ? (
+        <>
+          <Marker icon={myIcon} position={props.clickPosition}>
+            <Popup className='mb-3'>Your search position</Popup>
+          </Marker>
+          <SearchCircle />
+        </>
+      ) : (
+        ''
+      )}
+      {props.zoom < 10 ? (
         ''
       ) : searchPosition ? (
         <>
@@ -99,10 +139,10 @@ const Map = ({ position, zoom, businesses, isFly, setStopFly, radius }: IMapProp
       ) : (
         ''
       )}
-      {zoom < 10
+      {props.zoom < 10
         ? ''
-        : businesses && businesses.length > 0
-          ? businesses.map((business) => {
+        : props.businesses && props.businesses.length > 0
+          ? props.businesses.map((business) => {
               return (
                 <Marker
                   key={business.id}
@@ -115,7 +155,9 @@ const Map = ({ position, zoom, businesses, isFly, setStopFly, radius }: IMapProp
             })
           : ''}
       <CenterMarker />
+      <HandleClickMap />
       <FlyToPosition />
+      <ZoomControl position='topright' />
     </MapContainer>
   )
 }
