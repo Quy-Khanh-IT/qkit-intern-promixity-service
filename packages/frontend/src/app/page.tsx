@@ -11,6 +11,7 @@ export default function Home(): React.ReactNode {
   return (
     <main>
       <Header />
+
       <div style={{ position: 'relative', zIndex: 0 }} className='scroll-bar-1'>
         <HeroSection />
         <CredibilitySection />

@@ -34,8 +34,6 @@ export default function RootLayout({
         />
       </head>
       <body className={'vh-100'}>
-        {/* <Content>{children}</Content>
-         */}
         <ToastContainer
           position='bottom-right'
           autoClose={5000}
@@ -49,7 +47,6 @@ export default function RootLayout({
           theme='light'
           transition={Bounce}
         ></ToastContainer>
-        {/* <ScrollToTopButton /> */}
         <Suspense fallback={<LoaderArea />}>
           <Content>{children}</Content>
         </Suspense>

@@ -10,12 +10,10 @@ import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import './main.scss'
 import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
-import { directRoutes, findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
-import { ADMIN_SIDEBAR_OPTIONS } from './admin.constant'
-import { IUserInformation } from '@/types/user'
+import './main.scss'
+import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
@@ -29,9 +27,6 @@ export default function RootLayout({
 }>): React.ReactNode {
   const router = useRouter()
   const { userInformation } = useAuth()
-  // const [routeFlow, setRouteFlow] = useState<string>(
-  //   directRoutes(userInformation?.role, ROUTE.DASHBOARD, ROUTE.USER_PROFILE)
-  // )
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const containerControls = useAnimationControls()
   const contentControls = useAnimationControls()
@@ -40,32 +35,11 @@ export default function RootLayout({
   const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
     getPresentUrl() || ROUTE.DASHBOARD
-    // ROUTE.DASHBOARD
   )
 
   const [selectedMenuKey, setSelectedMenuKey] = useState<string>(
     findKeyMenuBasedRoute(userInformation?.role, routeValue as string)
   )
-
-  // const [selectedMenuKey, setSelectedMenuKey] = useState<string>(() => {
-  //   if (userInformation?.role) {
-  //     return findKeyMenuBasedRoute(userInformation?.role, routeValue as string) || '1'
-  //   }
-  //   return '1'
-  // })
-
-  // useEffect(() => {
-  //   const initialRouteValue = getPresentUrl() || directRoutes(userInformation?.role, ROUTE.DASHBOARD, ROUTE.USER_PROFILE) || ROUTE.USER_PROFILE
-  //   setRouteValue(initialRouteValue)
-  // }, [userInformation])
-
-  // useEffect(() => {
-  //   console.log('routeValue', routeValue)
-  //   if (routeValue) {
-  //     const foundKey: string = findKeyMenuBasedRoute(userInformation?.role, routeValue as string)
-  //     setSelectedMenuKey(foundKey)
-  //   }
-  // }, [routeValue])
 
   useEffect(() => {
     if (userInformation) {
@@ -113,83 +87,6 @@ export default function RootLayout({
     setRouteValue(routeValue)
     setSelectedMenuKey(e.key)
   }
-
-  // const router = useRouter()
-  // const { userInformation } = useAuth()
-  // const [collapsed, setCollapsed] = useState<boolean>(false)
-  // const containerControls = useAnimationControls()
-  // const contentControls = useAnimationControls()
-  // const screens = useBreakpoint()
-
-  // const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
-  //   StorageKey._ROUTE_VALUE,
-  //   getPresentUrl() || ROUTE.MANAGE_USER
-  // )
-  // const [selectedMenuKey, setSelectedMenuKey] = useState<unknown>(routeValue || ADMIN_SIDEBAR_OPTIONS.DASHBOARD.key)
-
-  // useEffect(() => {
-  //   console.log('routeValue', routeValue)
-  //   if (routeValue) {
-  //     if (routeValue === ROUTE.DASHBOARD) {
-  //       setSelectedMenuKey(ADMIN_SIDEBAR_OPTIONS.DASHBOARD.key)
-  //     } else if (routeValue === ROUTE.MANAGE_USER) {
-  //       setSelectedMenuKey(ADMIN_SIDEBAR_OPTIONS.MANAGE_USER.key)
-  //     } else if (routeValue === ROUTE.MANAGE_BUSINESS) {
-  //       setSelectedMenuKey(ADMIN_SIDEBAR_OPTIONS.MANAGE_BUSINESS.key)
-  //     } else if (routeValue === ROUTE.MANAGE_REVIEW) {
-  //       setSelectedMenuKey(ADMIN_SIDEBAR_OPTIONS.MANAGE_REVIEW.key)
-  //     } else {
-  //       setSelectedMenuKey(ADMIN_SIDEBAR_OPTIONS.DASHBOARD.key)
-  //     }
-  //   }
-  // }, [routeValue])
-
-  // const {
-  //   token: { colorBgContainer }
-  // } = theme.useToken()
-
-  // useEffect(() => {
-  //   Object.entries(screens)
-  //     .filter((screen) => !!screen[1])
-  //     .map((screen) => {
-  //       if (screen[0] === 'xs' || screen[0] === 'sm') {
-  //         setCollapsed(true)
-  //       } else {
-  //         setCollapsed(false)
-  //       }
-  //     })
-  // }, [screens])
-
-  // useEffect(() => {
-  //   const animate = async (): Promise<void> => {
-  //     if (collapsed) {
-  //       await containerControls.start('close')
-  //       await contentControls.start('open')
-  //     } else {
-  //       await containerControls.start('open')
-  //       await contentControls.start('close')
-  //     }
-  //   }
-
-  //   animate()
-  // }, [collapsed])
-
-  // const onMenuClick: MenuProps['onClick'] = (e) => {
-  //   if (e.key === ADMIN_SIDEBAR_OPTIONS.DASHBOARD.key) {
-  //     router.push(ROUTE.DASHBOARD)
-  //     setRouteValue(ROUTE.DASHBOARD)
-  //   } else if (e.key === ADMIN_SIDEBAR_OPTIONS.MANAGE_USER.key) {
-  //     router.push(ROUTE.MANAGE_USER)
-  //     setRouteValue(ROUTE.MANAGE_USER)
-  //   } else if (e.key === ADMIN_SIDEBAR_OPTIONS.MANAGE_BUSINESS.key) {
-  //     router.push(ROUTE.MANAGE_BUSINESS)
-  //     setRouteValue(ROUTE.MANAGE_BUSINESS)
-  //   } else if (e.key === ADMIN_SIDEBAR_OPTIONS.MANAGE_REVIEW.key) {
-  //     router.push(ROUTE.MANAGE_REVIEW)
-  //     setRouteValue(ROUTE.MANAGE_REVIEW)
-  //   }
-  //   setSelectedMenuKey(e.key)
-  // }
 
   return (
     <Row className='--admin-layout'>
