@@ -1,0 +1,85 @@
+@import "@/sass/common/common";
+
+.--notification-dropdown {
+  .ant-badge-count {
+    padding: 1px 5px 15.5px 5px;
+    border-radius: 64px;
+    height: 16px;
+  }
+
+  .tab-pane {
+    width: 40px !important;
+    text-align: center !important;
+  }
+
+  .ant-tabs-tab {
+    width: 40px !important;
+    text-align: center !important;
+
+    .ant-tabs-tab-btn {
+      display: block !important;
+      width: 100% !important;
+      text-align: center !important;
+    }
+  }
+
+  .ant-badge-multiple-words{
+    padding: 0px 6px 0px 6px !important;
+  }
+}
+
+.--popover-notification {
+  .ant-tabs-tab {
+    width: 40px !important;
+    text-align: center !important;
+
+    .ant-tabs-tab-btn {
+      display: block !important;
+      width: 100% !important;
+      text-align: center !important;
+    }
+  }
+
+  .ant-tabs-nav-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .ant-tabs-tab {
+    width: 100px;
+    justify-content: center;
+  }
+}
+
+.tab-hover {
+  &:active {
+    color: var(--ant-color-primary);
+  }
+  &:link {
+    color: var(--ant-color-primary);
+  }
+
+  &:visited {
+    color: var(--ant-color-primary);
+  }
+
+  &:hover {
+    color: var(--ant-color-primary);
+  }
+}
+
+#all-read-btn {
+  font-weight: 400;
+  margin-top: 1;
+  cursor: pointer;
+  font-size: 13;
+  color: $gray;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: $gray;
+  }
+}
+
+

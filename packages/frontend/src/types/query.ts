@@ -1,4 +1,4 @@
-import { RoleEnum, SortEnum } from './enum'
+import { BooleanEnum, RoleEnum, SortEnum } from './enum'
 
 interface IGelAllQuery {
   offset: number
@@ -23,4 +23,10 @@ export interface IGetAllBusinessQuery extends IGelAllQuery {
   // address
   starsRating: string[]
   status: string[]
+}
+
+export interface IGetAllNotificationQuery {
+  offset: number
+  limit: number
+  isRead: BooleanEnum
 }

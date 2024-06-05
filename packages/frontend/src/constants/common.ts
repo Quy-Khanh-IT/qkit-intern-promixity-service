@@ -8,6 +8,11 @@ export const PLACEHOLDER = {
   EMPTY_TEXT: 'N/A'
 }
 
+export const UI_TEXT = {
+  MARK_ALL_READ: 'Mark all as read',
+  DELETED_PERIOD: 'Your notifications will be deleted after 30 days.'
+}
+
 export const TOAST_MSG = {
   NO_AUTHORIZATION: 'No authorization',
   LOGIN_SUCCESS: 'Login successfully',

@@ -137,3 +137,23 @@ body {
 .gap-5 {
   gap: 3rem; /* 48px */
 }
+
+// only popover
+.ant-popover::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-radius: 4px;
+  border: 1px solid $gray-border;
+}
+.ant-popover::-webkit-scrollbar-track {
+  background-color: $gray-border;
+  opacity: 0.1 !important;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.ant-popover::-webkit-scrollbar-thumb {
+  background: $sub-color;
+  border-radius: 4px;
+  animation: animate 2s infinite linear;
+}

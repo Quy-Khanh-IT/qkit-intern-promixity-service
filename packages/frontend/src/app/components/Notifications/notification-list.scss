@@ -1,0 +1,17 @@
+@import "@/sass/common/common";
+
+.notification-item-list {
+  .notification-item {
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    padding: 12px !important;
+
+    .ant-list-item-action{
+      padding: 0 !important;
+    }
+
+    &:hover {
+      background-color: $gray-hover;
+    }
+  }
+}

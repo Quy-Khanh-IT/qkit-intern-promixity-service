@@ -13,6 +13,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import '../main.scss'
 import { directRoutes } from '../utils/main.util'
+import NotificationPopover from '@/app/components/Popover/NotificationPopover'
 
 const { Text } = Typography
 
@@ -110,12 +111,13 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
       </Col>
 
       <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
-        <Space className='me-4' size='large'>
-          <Tooltip title='Notifications'>
+        <Space className='me-4' size='small'>
+          {/* <Tooltip title='Notifications'>
             <Badge count={5} offset={[-6, 6]}>
               <BellOutlined style={{ fontSize: 24 }} className='action-button' />
             </Badge>
-          </Tooltip>
+          </Tooltip> */}
+          <NotificationPopover />
           <Dropdown menu={{ items }} placement='bottomRight' arrow>
             <div>
               <ImageCustom

@@ -60,7 +60,6 @@ const _MainSidebar: React.FC<IMainSidebarProps> = ({ userInformation, selectedMe
             ])
       ]
       setMenuItems(items)
-      console.log('items', items)
     }
   }, [userInformation])
 

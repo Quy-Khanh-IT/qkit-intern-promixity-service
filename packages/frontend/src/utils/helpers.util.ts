@@ -1,4 +1,5 @@
 import { LOCAL_ENDPOINT } from '@/constants'
+import { NotificationEnum } from '@/types/enum'
 
 export function formatDate(inputDate: string): string {
   const dateObj = new Date(inputDate)
@@ -27,8 +28,41 @@ export const getPresentUrl = (): string => {
   if (typeof window !== 'undefined') {
     const currentUrl = window.location.href
     const coreUrl = currentUrl && currentUrl.split(LOCAL_ENDPOINT || '')[1]
-    console.log('coreUrl', coreUrl)
     return coreUrl
   }
   return ''
+}
+
+export const getTimeHistory = (expiryTime: string): string => {
+  const currentDate = new Date()
+  const expiryDate = new Date(expiryTime)
+  const diffTime = Math.abs(currentDate.getTime() - expiryDate.getTime())
+
+  const diffSeconds = Math.floor((diffTime / 1000) % 60)
+  const diffMinutes = Math.floor((diffTime / 1000 / 60) % 60)
+  const diffHours = Math.floor((diffTime / (1000 * 60 * 60)) % 24)
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  const diffMonths = Math.floor(diffDays / 30)
+  const diffYears = Math.floor(diffDays / 365)
+
+  if (diffYears > 0) {
+    return `${diffYears} năm trước`
+  } else if (diffMonths > 0) {
+    return `${diffMonths} tháng trước`
+  } else if (diffDays > 0) {
+    return `${diffDays} ngày trước`
+  } else if (diffHours > 0) {
+    return `${diffHours} giờ trước`
+  } else if (diffMinutes > 0) {
+    return `${diffMinutes} phút trước`
+  } else {
+    return `${diffSeconds} giây trước`
+  }
+}
+
+export const convertNotificationType = (type: string): string => {
+  if (Object.values(NotificationEnum).includes(type as NotificationEnum)) {
+    return type.toUpperCase()
+  }
+  return NotificationEnum._NO_SPECIFIC_TYPE.toUpperCase()
 }
