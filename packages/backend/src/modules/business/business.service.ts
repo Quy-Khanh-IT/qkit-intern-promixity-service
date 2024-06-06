@@ -797,6 +797,8 @@ export class BusinessService {
       longitude: longitude.toString(),
     });
 
+    console.log('reverseData', reverseData);
+
     if (reverseData?.state === validateAddressDto.province) {
       // is a province (example: tỉnh Bình Dương)
       if (

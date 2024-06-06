@@ -26,6 +26,8 @@ export class AxiosService {
   constructor(private readonly httpService: HttpService) {}
 
   async testGet(url: string): Promise<any> {
+    console.log('url', url);
+
     const result = await firstValueFrom(
       this.httpService
         .get(url, {
@@ -41,7 +43,7 @@ export class AxiosService {
 
     console.log('result', result);
 
-    return result?.data;
+    return null;
   }
 
   async get(url: string): Promise<any> {
