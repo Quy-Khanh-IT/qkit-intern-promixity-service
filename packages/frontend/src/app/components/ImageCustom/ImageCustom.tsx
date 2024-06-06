@@ -21,7 +21,7 @@ const ImageCustom: React.FC<ImageCustomProps> = ({ width, height, src, className
         src={src}
         preview={preview}
         alt=''
-        placeholder={<Image preview={false} src={PLACEHOLDER.LOADING_IMAGE} width={200} alt='' />}
+        placeholder={<Image preview={false} src={PLACEHOLDER.LOADING_IMAGE} width={width} height={height} alt='' />}
         fallback={PLACEHOLDER.ERROR_IMAGE}
       />
     </div>

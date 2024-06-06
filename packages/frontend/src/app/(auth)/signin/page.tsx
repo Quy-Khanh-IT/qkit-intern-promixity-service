@@ -8,8 +8,11 @@ import { ErrorResponse } from '@/types/error'
 import { saveToLocalStorage } from '@/utils/local-storage.util'
 import DevQuote from '../components/DevQuote'
 import './signin.scss'
+import { useAuth } from '@/context/AuthContext'
+import { ILoginPayload } from '@/types/auth'
 
 export default function SignIn(): React.ReactNode {
+  const { onLogin } = useAuth()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
@@ -58,19 +61,11 @@ export default function SignIn(): React.ReactNode {
     }
   }
 
-  const SignIn = async (): Promise<void> => {
-    await loginUser({
+  const handleSignIn = (): void => {
+    onLogin({
       email,
       password
-    })
-  }
-
-  const handleSignIn = (): void => {
-    SignIn()
-      .then(() => {})
-      .catch(() => {
-        toastService.error('Login failed')
-      })
+    } as ILoginPayload)
   }
 
   const onChangeData = (value: string, type: string): void => {

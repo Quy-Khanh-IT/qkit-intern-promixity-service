@@ -9,12 +9,22 @@ export enum StatusEnum {
   _PENDING = 'pending',
   _REJECTED = 'rejected',
   _BANNED = 'banned',
-  _CLOSED = 'closed'
+  _CLOSED = 'closed',
+  _DELETED = 'deleted'
 }
 
 export enum SortEnum {
   _ASC = 'asc',
   _DESC = 'desc'
+}
+
+export enum SortEnumAlias {
+  _ASCEND = 'ascend',
+  _DESCEND = 'descend'
+}
+
+export enum TableActionEnum {
+  _SORT = 'sort'
 }
 
 export enum BooleanEnum {
@@ -31,4 +41,9 @@ export enum NotificationEnum {
   _BANNED_BUSINESS = 'banned_business',
   _CREATE_USER = 'create_user',
   _NO_SPECIFIC_TYPE = 'no_specific_type'
+}
+
+export enum UserOptionEnum {
+  _ACTIVE = 'active',
+  _DELETED = 'deleted'
 }

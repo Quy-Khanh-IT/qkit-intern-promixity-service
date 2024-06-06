@@ -34,8 +34,3 @@ function isSuccess(response: Response): boolean {
     response.status >= (HttpStatusCode.Ok as number) && response.status < (HttpStatusCode.MultipleChoices as number)
   )
 }
-
-export const GET_PROFILE_OPTIONS = {
-  ACTIVE: 'active',
-  DELETED: 'deleted'
-}

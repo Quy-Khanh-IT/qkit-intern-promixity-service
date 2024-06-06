@@ -6,6 +6,8 @@ export const ROUTE = {
 
   // Auth
   USER_LOGIN: '/signin',
+  USER_SIGNUP: '/signup',
+  USER_FORGOT_PASSWORD: '/forgot-password',
   ADMIN_LOGIN: '/admin-signin',
 
   // User

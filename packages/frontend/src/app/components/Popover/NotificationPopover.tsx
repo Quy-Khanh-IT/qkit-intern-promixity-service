@@ -89,7 +89,7 @@ const NotificationPopover = (): React.ReactNode => {
       .unwrap()
       .then((res) => {
         setInitLoading(false)
-        if (res.data.length === 0 || res.totalRecords === perPage.current) {
+        if (res.data.length === 0 || res.totalRecords <= perPage.current) {
           setLoadMoreFull(false)
         }
         setNotificationsData(res.data)

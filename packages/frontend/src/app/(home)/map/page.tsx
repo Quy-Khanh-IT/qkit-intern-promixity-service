@@ -1,19 +1,37 @@
 'use client'
-import React, { use, useEffect, useRef, useState } from 'react'
-import Map from './components'
-import { Layout, Image, Input, Checkbox, MenuProps, Dropdown, Button, Space } from 'antd'
-import './map.scss'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../../../redux/store'
-import SearchSider from './components/SearchSider'
+import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
+import { ROUTE, StorageKey } from '@/constants'
+import { DistanceMenu, LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
+import { useAuth } from '@/context/AuthContext'
+import { setSearchPosition } from '@/redux/slices/map-props.slice'
+import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
-import { setSearchPosition } from '@/redux/slices/map-props.slice'
-import { DistanceMenu, LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
+import { Button, Dropdown, Image, Input, Layout, MenuProps, Space, Typography } from 'antd'
+import Link from 'next/link'
+import React, { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../../redux/store'
+import Map from './components'
 import SearchItemDetail from './components/SearchItemDetail'
-import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
+import SearchSider from './components/SearchSider'
+import './map.scss'
+import { getFromLocalStorage } from '@/utils/local-storage.util'
+import { IUserInformation } from '@/types/user'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
+import { getPresentUrl } from '@/utils/helpers.util'
+
+const { Text } = Typography
 
 export default function MapPage(): React.ReactNode {
+  const { onLogout } = useAuth()
+  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
+  const [userImage, setUserImage] = useState<string>('')
+  const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
+    StorageKey._ROUTE_VALUE,
+    getPresentUrl() || ROUTE.MAP
+  )
+
   const position = useSelector((state: RootState) => state.mapProps.position)
   const zoom = useSelector((state: RootState) => state.mapProps.zoom)
   const { selectedBusinessId, selectedBusinessData } = useSelector((state: RootState) => state.selectedBusiness)
@@ -38,6 +56,16 @@ export default function MapPage(): React.ReactNode {
     ...(rating !== 0 ? { star: rating } : {}),
     ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
   })
+
+  // useEffect(() => {
+  //   console.log('userInformation', userInformation);
+  // }, [])
+
+  useEffect(() => {
+    if (storedUser) {
+      setUserImage(storedUser.image)
+    }
+  }, [storedUser])
 
   const {
     data: searchResponse,
@@ -108,12 +136,12 @@ export default function MapPage(): React.ReactNode {
     dispatch(setSelectedBusiness({ selectedBusinessId: null, selectedBusinessData: null }))
   }
 
-  const items: MenuProps['items'] = DistanceMenu
+  const distanceItems: MenuProps['items'] = DistanceMenu
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     setDistanceRadius(parseInt(e.key))
   }
   const menuProps = {
-    items,
+    distanceItems,
     onClick: handleMenuClick
   }
 
@@ -140,6 +168,38 @@ export default function MapPage(): React.ReactNode {
   const handleOnChangeCategory = (value: string): void => {
     setSelectedCategoryId(value)
   }
+
+  const handleLogout = (): void => {
+    onLogout()
+  }
+
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <Link href={ROUTE.USER_PROFILE} onClick={() => setRouteValue(ROUTE.USER_PROFILE)}>
+          <Text className='p-2'>Profile</Text>
+        </Link>
+      )
+    },
+    {
+      key: '2',
+      label: (
+        <Link href={ROUTE.MY_BUSINESS} onClick={() => setRouteValue(ROUTE.MY_BUSINESS)}>
+          <Text className='p-2'>My business</Text>
+        </Link>
+      )
+    },
+    {
+      key: '3',
+      label: (
+        <Text onClick={handleLogout} className='p-2  '>
+          Log out
+        </Text>
+      )
+    }
+  ]
+
   return (
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>
@@ -169,13 +229,28 @@ export default function MapPage(): React.ReactNode {
             </Button>
           </Dropdown>
         </div>
-        {/* user profile */}
-        <div>
-          <img
-            style={{ height: '40px', borderRadius: '50%' }}
-            src='https://th.bing.com/th/id/OIP.onRzx6Dli7KhCaT58tGZsgHaHa?rs=1&pid=ImgDetMain'
-            alt='avatar'
-          />
+        <div style={{ width: 100 }} className='d-flex justify-content-end'>
+          {userImage ? (
+            <>
+              <Dropdown menu={{ items }} placement='bottomRight' arrow>
+                <div>
+                  <ImageCustom
+                    width={40}
+                    height={40}
+                    src={userImage || ''}
+                    preview={false}
+                    className='--avatar-custom d-cursor'
+                  />
+                </div>
+              </Dropdown>
+            </>
+          ) : (
+            <>
+              <Link href={ROUTE.USER_LOGIN}>
+                <Button className='btn-primary'>Sign in</Button>
+              </Link>
+            </>
+          )}
         </div>
       </Header>
 

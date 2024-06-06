@@ -1,13 +1,12 @@
 'use client'
-import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
+import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
-import { GET_PROFILE_OPTIONS } from '@/constants/baseQuery'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -17,9 +16,10 @@ import {
   useUpdateUserRoleMutation
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
+import { TableActionEnum, UserOptionEnum } from '@/types/enum'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { compareDates, formatDate } from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -30,14 +30,22 @@ import {
   PaginationProps,
   Row,
   Select,
+  TableProps,
   Tag,
   Typography
 } from 'antd'
 import { RangePickerProps } from 'antd/es/date-picker'
-import { FilterDropdownProps } from 'antd/es/table/interface'
+import {
+  FilterDropdownProps,
+  FilterValue,
+  SorterResult,
+  TableCurrentDataSource,
+  TablePaginationConfig
+} from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
+import { MANAGE_BUSINESS_SORT_FIELDS } from '../manage-business/manage-business.const'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
 
@@ -87,7 +95,7 @@ const ManageUser = (): React.ReactNode => {
   const { data: privateProfileData } = useGetPrivateUserProfileQuery(
     {
       userId: selectedUser?.id || '',
-      userStatus: userOptionBoolean ? GET_PROFILE_OPTIONS.DELETED : GET_PROFILE_OPTIONS.ACTIVE
+      userStatus: userOptionBoolean ? UserOptionEnum._DELETED : UserOptionEnum._ACTIVE
     },
     { skip: !selectedUser }
   )
@@ -121,11 +129,20 @@ const ManageUser = (): React.ReactNode => {
     setCurrentPage(ORIGIN_PAGE)
   }
 
-  const mapQueryData = (_queryData: IGetAllUsersQuery, dataIndex: DataIndex, value: string): IGetAllUsersQuery => {
-    const queryDataTemp =
-      (dataIndex as string) === 'phoneNumber'
-        ? ({ ..._queryData, phone: value } as IGetAllUsersQuery)
-        : ({ ..._queryData, [dataIndex]: value } as IGetAllUsersQuery)
+  const mapQueryData = (
+    _queryData: IGetAllUsersQuery,
+    dataIndex: DataIndex,
+    values: string[] | string,
+    _action?: string
+  ): IGetAllUsersQuery => {
+    let queryDataTemp = {} as IGetAllUsersQuery
+    if ((dataIndex as string) === 'phoneNumber') {
+      queryDataTemp = { ..._queryData, phone: values } as IGetAllUsersQuery
+    } else if ((dataIndex as string) === 'created_at') {
+      queryDataTemp = { ..._queryData, sortBy: values } as IGetAllUsersQuery
+    } else {
+      queryDataTemp = { ..._queryData, [dataIndex]: values } as IGetAllUsersQuery
+    }
     return queryDataTemp
   }
 
@@ -157,7 +174,42 @@ const ManageUser = (): React.ReactNode => {
         return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys }) as IGetAllUsersQuery)
+      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys))
+    }
+  }
+
+  const onChangeSorter: TableProps<IUserInformation>['onChange'] = (
+    _pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<IUserInformation> | SorterResult<IUserInformation>[],
+    extra: TableCurrentDataSource<IUserInformation>
+  ) => {
+    if (extra?.action === (TableActionEnum._SORT as string)) {
+      const _queryDataTemp: IGetAllUsersQuery = { ...queryData }
+      Object.keys(_queryDataTemp).forEach((key: string) => {
+        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
+          delete _queryDataTemp[key as keyof IGetAllUsersQuery]
+        }
+      })
+
+      const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
+        if (sorterItem?.order) {
+          setQueryData((_prev) =>
+            mapQueryData(
+              _queryDataTemp,
+              sorterItem?.columnKey as DataIndex,
+              convertSortOrder(sorterItem?.order as string),
+              extra?.action
+            )
+          )
+        }
+      }
+
+      if (!Array.isArray(sorter)) {
+        updateQueryData(sorter)
+      } else {
+        sorter.forEach(updateQueryData)
+      }
     }
   }
 
@@ -413,6 +465,7 @@ const ManageUser = (): React.ReactNode => {
           total: usersData?.totalRecords ?? 0,
           onChange: onChangePagination
         }}
+        _onChange={onChangeSorter}
         className='--manage-user-table'
       />
       <ViewRowDetailsModal

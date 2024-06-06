@@ -157,3 +157,23 @@ body {
   border-radius: 4px;
   animation: animate 2s infinite linear;
 }
+
+// carousel
+.slick-slider{
+  .slick-dots{
+    li > button{
+      background-color: $main-color !important;
+
+      &::before{
+        color: $main-color !important;
+        left: 2.5px !important;
+      }
+    }
+  }
+
+  .slick-arrow{
+    &::after{
+      display: none !important;
+    }
+  }
+}

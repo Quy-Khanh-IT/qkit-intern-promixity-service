@@ -12,6 +12,7 @@ import { categoryApi } from '@/services/category.service'
 import { notificationApi } from '@/services/notification.service'
 import { selectedBusinessSlice } from './slices/selected-business.slice'
 import { serviceApi } from '@/services/service.service'
+import { statisticApi } from '@/services/statistic.service'
 
 export const store = configureStore({
   reducer: {
@@ -25,7 +26,8 @@ export const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     selectedBusiness: selectedBusinessSlice.reducer,
-    [serviceApi.reducerPath]: serviceApi.reducer
+    [serviceApi.reducerPath]: serviceApi.reducer,
+    [statisticApi.reducerPath]: statisticApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -39,6 +41,7 @@ export const store = configureStore({
       categoryApi.middleware,
       notificationApi.middleware,
       serviceApi.middleware,
+      statisticApi.middleware,
       rtkQueryErrorLogger
     )
 })

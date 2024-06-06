@@ -26,6 +26,7 @@ $link-color: #007bff;
 $open-color: #447f60;
 $close-color: #f357579c;
 $close-soon-color: #6464f0;
+$transparency: transparent;
 
 :export {
   mainColor: $main-color;
@@ -38,4 +39,5 @@ $close-soon-color: #6464f0;
   errorColor: $error;
   warningColor: $warning;
   starColor: $star-color;
+  transparency: $transparency;
 }

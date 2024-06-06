@@ -4,13 +4,17 @@ import React, { useEffect, useMemo } from 'react'
 import { subFrontFamily } from '@/configs/themes/light';
 import $ from 'jquery'
 import './chart.scss'
+import { useGetBusinessStatusStatisticQuery } from '@/services/statistic.service';
+import { IBusinessStatusStatistic } from '@/types/statistic';
 
 declare const CanvasJS: any;
 
-const generateChartFormat = () => ({
+const pieChartColor= ['#65aac2', '#7c659d', '#5cbdaa', '#a1ba65', '#b25752']
+
+const generateChartFormat = (data: IBusinessStatusStatistic) => ({
   animationEnabled: true,
   title: {
-    text: `Users (5023)`,
+    text: `Businesses (5023)`,
     fontFamily: subFrontFamily,
     fontSize: 24,
     fontWeight: 600
@@ -21,18 +25,19 @@ const generateChartFormat = () => ({
     showInLegend: true,
     legendText: "{label}",
     indexLabel: "{label}: #percent%",
-    dataPoints: [
-      { label: "Department Stores", y: 6492917 },
-      { label: "Discount Stores", y: 7380554 },
-      { label: "Stores for Men / Women", y: 1610846 },
-      { label: "Teenage Specialty Stores", y: 950875 },
-      { label: "All other outlets", y: 900000 }
-    ]
+    dataPoints: data.data.map((item, index) => ({
+      label: item.status,
+      y: item.total,
+      color: pieChartColor[index >= pieChartColor.length ? index % pieChartColor.length : index]
+    }))
   }]
 })
 
 const PieChart: React.FC = () => {
-  const chartFormat = useMemo(() => generateChartFormat(), []);
+  const {data: businessStatusStatisticData} = useGetBusinessStatusStatisticQuery()
+  const chartFormat = useMemo(() => {
+    return businessStatusStatisticData ? generateChartFormat(businessStatusStatisticData) : null;
+  }, [businessStatusStatisticData]);
 
   useEffect(() => {
     $(() => {

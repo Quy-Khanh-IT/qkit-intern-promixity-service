@@ -1,4 +1,5 @@
-import { BooleanEnum, RoleEnum, SortEnum } from './enum'
+import { IDayOfWeek } from './business'
+import { BooleanEnum, RoleEnum, SortEnum, StatusEnum, UserOptionEnum } from './enum'
 
 interface IGelAllQuery {
   offset: number
@@ -19,14 +20,26 @@ export interface IGetAllUsersQuery extends IGelAllQuery {
 
 export interface IGetAllBusinessQuery extends IGelAllQuery {
   name: string
+  phoneNumber: string
   categoryIds: string[]
-  // address
   starsRating: string[]
+  sortTotalReviewsBy: SortEnum
+  sortRatingBy: SortEnum
+  address: string
   status: string[]
+  dayOfWeek: IDayOfWeek[]
 }
 
 export interface IGetAllNotificationQuery {
   offset: number
   limit: number
   isRead: BooleanEnum
+}
+
+export interface IBusinessUserStatisticQuery {
+  timeline: string
+  year: number
+  month: number
+  statusBusiness: StatusEnum | 'all'
+  statusUser: UserOptionEnum | 'all'
 }
