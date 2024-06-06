@@ -1,7 +1,12 @@
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { IBusinessUserStatisticQuery } from '@/types/query'
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { IBusinessStatusStatistic, IBusinessUserStatistic, ICategoryStatistic } from '../types/statistic'
+import {
+  IBusinessStatusStatistic,
+  IBusinessStatusStatisticItem,
+  IBusinessUserStatistic,
+  ICategoryStatistic
+} from '../types/statistic'
 import qs from 'qs'
 
 export const statisticApi = createApi({
@@ -34,6 +39,15 @@ export const statisticApi = createApi({
           url: `/statistics/businesses/status`,
           method: 'GET'
         }
+      },
+      transformResponse: (response: IBusinessStatusStatistic): IBusinessStatusStatistic => {
+        const dataTemp: IBusinessStatusStatisticItem[] = [...response.data].sort((itemA, itemB) =>
+          itemA.status.localeCompare(itemB.status)
+        )
+        return {
+          ...response,
+          data: dataTemp
+        } as IBusinessStatusStatistic
       },
       providesTags: ['BusinessStatusStatistic']
     })

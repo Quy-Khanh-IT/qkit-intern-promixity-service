@@ -9,6 +9,8 @@ import { IBusinessStatusStatistic } from '@/types/statistic';
 
 declare const CanvasJS: any;
 
+const pieChartColor= ['#65aac2', '#7c659d', '#5cbdaa', '#a1ba65', '#b25752']
+
 const generateChartFormat = (data: IBusinessStatusStatistic) => ({
   animationEnabled: true,
   title: {
@@ -23,9 +25,10 @@ const generateChartFormat = (data: IBusinessStatusStatistic) => ({
     showInLegend: true,
     legendText: "{label}",
     indexLabel: "{label}: #percent%",
-    dataPoints: data.data.map(item => ({
+    dataPoints: data.data.map((item, index) => ({
       label: item.status,
-      y: item.total
+      y: item.total,
+      color: pieChartColor[index >= pieChartColor.length ? index % pieChartColor.length : index]
     }))
   }]
 })
