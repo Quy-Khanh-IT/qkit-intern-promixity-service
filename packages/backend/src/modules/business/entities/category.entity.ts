@@ -14,4 +14,7 @@ export class CategorySchema {
 
   @Prop({ required: true, trim: true })
   name: string;
+
+  @Prop({ required: true, trim: true })
+  linkURL: string;
 }

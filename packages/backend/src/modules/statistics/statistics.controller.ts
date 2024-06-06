@@ -30,4 +30,10 @@ export class StatisticsController {
     const data = plainToClass(StatisticUserBusinessDto, dataQuery);
     return await this.statisticsService.getBusinessUserStatistics(dataQuery);
   }
+
+  @Get('businesses/status')
+  @HttpCode(200)
+  async getBusinessStatusStatistics() {
+    return await this.statisticsService.getBusinessStatusStatistics();
+  }
 }

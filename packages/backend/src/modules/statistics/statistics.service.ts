@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PipelineStage } from 'mongoose';
 import { BusinessStatusEnum } from 'src/common/enums';
+import { StatusBusinessStatisticDto } from './dto/statistic-business-status.dto';
 import { StatisticCategoryResponseDto } from './dto/statistic-category.response.dto';
 import {
   BusinessStatusStatisticEnum,
@@ -53,6 +54,29 @@ export class StatisticsService {
     };
   }
 
+  async getBusinessStatusStatistics(): Promise<StatusBusinessStatisticDto> {
+    const status = await this.businessRepository.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          status: '$_id',
+          total: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    return {
+      total_status: status.length,
+      data: status,
+    };
+  }
+
   async getBusinessUserStatistics(dataQuery: StatisticUserBusinessDto) {
     if (dataQuery.timeline === 'month') {
       return await this.getMonthTimeLine(
@@ -93,7 +117,7 @@ export class StatisticsService {
     year: number,
     month: number,
     dataQuery: StatisticUserBusinessDto,
-  ) {
+  ): Promise<TimeLineResponseDto> {
     const baseMatchStage = {
       created_at: {
         $gte: new Date(`${year}-${month}-01`),
@@ -176,7 +200,7 @@ export class StatisticsService {
     return {
       total_business,
       total_user,
-      days: result,
+      data: result,
     };
   }
 
@@ -270,7 +294,7 @@ export class StatisticsService {
     return {
       total_business,
       total_user,
-      datas: months,
+      data: months,
     };
   }
 }

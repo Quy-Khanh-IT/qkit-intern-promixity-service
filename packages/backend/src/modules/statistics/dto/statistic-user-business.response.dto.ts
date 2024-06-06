@@ -1,7 +1,7 @@
 export class TimeLineResponseDto {
   total_business: number;
   total_user: number;
-  datas: Array<TimeLineObject>;
+  data: Array<TimeLineObject>;
 }
 
 export class TimeLineObject {
