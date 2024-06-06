@@ -1,19 +1,19 @@
 'use client'
 import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
+import NotificationPopover from '@/app/components/Popover/NotificationPopover'
 import { ROUTE, StorageKey } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import '@/sass/common/_common.scss'
 import { RoleEnum } from '@/types/enum'
 import { IUserInformation } from '@/types/user'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
-import { BellOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
-import { Badge, Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Tooltip, Typography } from 'antd'
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
+import { Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Typography } from 'antd'
 import { Header } from 'antd/es/layout/layout'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import '../main.scss'
 import { directRoutes } from '../utils/main.util'
-import NotificationPopover from '@/app/components/Popover/NotificationPopover'
 
 const { Text } = Typography
 

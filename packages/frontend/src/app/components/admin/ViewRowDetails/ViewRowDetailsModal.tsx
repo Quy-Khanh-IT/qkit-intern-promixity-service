@@ -1,11 +1,11 @@
+import { IBusinessImage } from '@/types/business'
 import { Button, Carousel, Descriptions, DescriptionsProps, Modal } from 'antd'
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { CarouselRef } from 'antd/es/carousel'
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import ImageCustom from '../../ImageCustom/ImageCustom'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
-import { IBusinessImage } from '@/types/business'
-import { CarouselRef } from 'antd/es/carousel'
 
 export interface ViewRowDetailsProps {
   title: string
