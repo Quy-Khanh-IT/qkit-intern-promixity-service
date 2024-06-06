@@ -1,4 +1,4 @@
-import { Button, Input, MenuProps, Space, Dropdown } from 'antd'
+import { Button, Input, Select } from 'antd'
 import React from 'react'
 import './address-form.scss'
 import { ICreateBusiness } from '@/types/business'
@@ -17,39 +17,13 @@ export default function AddressForm({
   listProvince: Province[] | []
   listDistrict: District[] | []
 }): React.ReactNode {
-  const provinceItems: MenuProps['items'] =
-    listProvince.length > 0
-      ? listProvince.map((item) => ({
-          key: item.code,
-          label: item.full_name
-        }))
-      : []
+  const filterOption = (input: string, option?: { label: string; value: string }): boolean =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
-  const districtItems: MenuProps['items'] =
-    listDistrict.length > 0
-      ? listDistrict.map((item) => ({
-          key: item.code,
-          label: item.full_name
-        }))
-      : []
-
-  const handleProvinceClick: MenuProps['onClick'] = (e) => {
-    handleOnChangeData('province', e.key)
+  const handleOnChangeProvince = (value: string): void => {
+    handleOnChangeData('province', value)
   }
 
-  const handleDistrictClick: MenuProps['onClick'] = (e) => {
-    handleOnChangeData('district', e.key)
-  }
-
-  const provinceProps = {
-    items: provinceItems,
-    onClick: handleProvinceClick
-  }
-
-  const districtProps = {
-    items: districtItems,
-    onClick: handleDistrictClick
-  }
   return (
     <div className='name-form-main'>
       <div className='name-form-header d-flex mt-5 w-100 container'>
@@ -68,27 +42,39 @@ export default function AddressForm({
           </div>
           <div className='input-wrapper mt-4'>
             <div className='input-label mb-2'>Province</div>
-            <Dropdown className='ms-2' menu={provinceProps}>
-              <Button className='btn-dropdown'>
-                <Space className='category-meu-wrapper'>
-                  <i className='fa-solid fa-angle-down'></i>
-                </Space>
-              </Button>
-            </Dropdown>
+            <Select
+              size='middle'
+              showSearch
+              placeholder='Select a province'
+              optionFilterProp='children'
+              filterOption={filterOption}
+              options={listProvince.map((item) => ({
+                value: item.code,
+                label: item.full_name
+              }))}
+              onChange={(value: string) => handleOnChangeProvince(value)}
+              value={listProvince.find((item) => item.code === data.province)?.full_name ?? ''}
+            />
           </div>
           <div className='input-wrapper mt-4'>
             <div className='input-label mb-2'>District</div>
-            <Dropdown className='ms-2' menu={districtProps}>
-              <Button className='btn-dropdown'>
-                <Space className='category-meu-wrapper'>
-                  <i className='fa-solid fa-angle-down'></i>
-                </Space>
-              </Button>
-            </Dropdown>
+            <Select
+              size='middle'
+              showSearch
+              placeholder='Select a district'
+              optionFilterProp='children'
+              filterOption={filterOption}
+              options={listDistrict.map((item) => ({
+                value: item.code,
+                label: item.full_name
+              }))}
+              onChange={(value: string) => handleOnChangeData('district', value)}
+              value={listDistrict.find((item) => item.code === data.district)?.full_name ?? ''}
+            />
           </div>
           <Button
             onClick={() => handleOnChangeStep('next')}
-            disabled={!data.categoryId}
+            disabled={!data.district}
             className='mt-4 btn-continue '
             type='primary'
           >

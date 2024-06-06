@@ -5,6 +5,17 @@
   .title {
     color: black;
   }
+
+  .ant-select {
+    height: 40px !important;
+    width: 100%;
+  }
+}
+
+.service-selector {
+  .ant-select-selector {
+    overflow-y: scroll;
+  }
 }
 
 .input-wrapper {

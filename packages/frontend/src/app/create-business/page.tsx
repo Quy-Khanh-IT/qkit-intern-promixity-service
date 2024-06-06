@@ -1,6 +1,6 @@
 'use client'
 import { Steps } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './create-business.scss'
 import NameForm from './components/NameForm'
 import { ICreateBusiness } from '@/types/business'
@@ -9,6 +9,7 @@ import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import CategoryForm from './components/CategoryFrom'
 import AddressForm from './components/AddressForm'
 import { useGetProvincesQuery, useGetDistrictByProvinceCodeQuery } from '@/services/address.service'
+import { useGetServicesQuery } from '@/services/service.service'
 
 export default function CreateBusiness(): React.ReactNode {
   const [currentStep, setCurrentStep] = useState<number>(0)
@@ -31,6 +32,7 @@ export default function CreateBusiness(): React.ReactNode {
   })
 
   const { data: getCategoryResponse } = useGetAllBusinessCategoriesQuery()
+  const { data: getServiceResponse } = useGetServicesQuery()
 
   const handleOnChangeData = (
     type: string,
@@ -106,7 +108,14 @@ export default function CreateBusiness(): React.ReactNode {
   }
 
   const { data: getProvinceResponse } = useGetProvincesQuery()
-  const { data: getDistrictResponse } = useGetDistrictByProvinceCodeQuery(data.province, { skip: data.province === '' })
+  const { data: getDistrictResponse, isSuccess: getDistrictIsSuccess } = useGetDistrictByProvinceCodeQuery(
+    data.province,
+    { skip: data.province === '' }
+  )
+
+  useEffect(() => {
+    handleOnChangeData('district', '')
+  }, [getDistrictIsSuccess])
 
   console.log(getProvinceResponse)
 
@@ -131,6 +140,7 @@ export default function CreateBusiness(): React.ReactNode {
             handleOnChangeData={handleOnChangeData}
             data={data}
             handleOnChangeStep={handleOnChangeStep}
+            listService={getServiceResponse && getServiceResponse.items.length > 0 ? getServiceResponse.items : []}
           />
         ) : currentStep === 3 ? (
           <AddressForm

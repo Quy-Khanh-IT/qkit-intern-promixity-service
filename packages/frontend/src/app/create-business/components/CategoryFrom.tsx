@@ -1,35 +1,23 @@
-import { Button, Dropdown, Input, MenuProps, Space } from 'antd'
+import { Button, Dropdown, Input, MenuProps, Select, Space } from 'antd'
 import React from 'react'
 import './category-form.scss'
-import { ICreateBusiness } from '@/types/business'
+import { ICreateBusiness, IService } from '@/types/business'
 
 export default function CategoryForm({
   handleOnChangeStep,
   data,
   handleOnChangeData,
-  listCategory
+  listCategory,
+  listService
 }: {
   handleOnChangeStep: (type: string) => void
   data: ICreateBusiness
   handleOnChangeData: (type: string, value: string | number | boolean | string[] | number[] | boolean[]) => void
   listCategory: { value: string; text: string }[] | []
+  listService: IService[] | []
 }): React.ReactNode {
-  const categoryItems: MenuProps['items'] =
-    listCategory.length > 0
-      ? listCategory.map((item) => ({
-          key: item.value,
-          label: item.text
-        }))
-      : []
-
-  const handleCategoryMenuClick: MenuProps['onClick'] = (e) => {
-    handleOnChangeData('categoryId', e.key)
-  }
-
-  const categoryProps = {
-    items: categoryItems,
-    onClick: handleCategoryMenuClick
-  }
+  const filterOption = (input: string, option?: { label: string; value: string }): boolean =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   return (
     <div className='name-form-main'>
@@ -45,16 +33,39 @@ export default function CategoryForm({
           <div className='mt-3'>Help customers discover your business by industry by adding a business type.</div>
           <div className='input-wrapper mt-4'>
             <div className='input-label mb-2'>Your business&apos;s category</div>
-            <Dropdown className='ms-2' menu={categoryProps}>
-              <Button className='btn-dropdown'>
-                <Space className='category-meu-wrapper'>
-                  {data.categoryId
-                    ? listCategory.find((item) => item.value === data.categoryId)?.text
-                    : 'Select category'}
-                  <i className='fa-solid fa-angle-down'></i>
-                </Space>
-              </Button>
-            </Dropdown>
+
+            <Select
+              showSearch
+              placeholder='Select a category'
+              optionFilterProp='children'
+              filterOption={filterOption}
+              options={[
+                ...listCategory.map((item) => ({
+                  value: item.value,
+                  label: item.text
+                }))
+              ]}
+              value={listCategory.find((item) => item.value === data.categoryId)?.text}
+              onChange={(value) => handleOnChangeData('categoryId', value)}
+            />
+          </div>
+          <div className='input-wrapper mt-4'>
+            <div className='input-label mb-2'>Your business&apos;s services</div>
+
+            <Select
+              className='service-selector'
+              style={{ height: '100% !important' }}
+              mode='multiple'
+              placeholder='Select service'
+              options={[
+                ...listService.map((item) => ({
+                  value: item.id,
+                  label: item.name
+                }))
+              ]}
+              value={data.serviceIds}
+              onChange={(value: string[]) => handleOnChangeData('serviceIds', value)}
+            />
           </div>
           <Button
             onClick={() => handleOnChangeStep('next')}
