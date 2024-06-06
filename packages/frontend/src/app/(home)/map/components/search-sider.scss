@@ -17,9 +17,6 @@
 .search-result-title {
   font-weight: 500;
   font-size: 18px;
-  i {
-    font-weight: 500;
-  }
 }
 
 .tooltip-wrapper {
@@ -44,4 +41,12 @@
       color: $link-color;
     }
   }
+}
+
+.total-results {
+  font-size: 12px;
+}
+
+.ant-dropdown-menu-title-content {
+  text-align: center;
 }

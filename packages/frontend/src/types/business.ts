@@ -72,3 +72,8 @@ export interface IService {
   description: string
   order: number
 }
+
+export interface ISelectedBusiness {
+  selectedBusinessId: string | null
+  selectedBusinessData: IBusiness | null
+}

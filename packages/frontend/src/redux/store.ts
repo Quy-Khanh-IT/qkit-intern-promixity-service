@@ -10,6 +10,7 @@ import { mapPropsSlice } from './slices/map-props.slice'
 import { businessApi } from '@/services/business.service'
 import { categoryApi } from '@/services/category.service'
 import { notificationApi } from '@/services/notification.service'
+import { selectedBusinessSlice } from './slices/selected-business.slice'
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +22,8 @@ export const store = configureStore({
     [nearByApi.reducerPath]: nearByApi.reducer,
     mapProps: mapPropsSlice.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
-    [notificationApi.reducerPath]: notificationApi.reducer
+    [notificationApi.reducerPath]: notificationApi.reducer,
+    selectedBusiness: selectedBusinessSlice.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
