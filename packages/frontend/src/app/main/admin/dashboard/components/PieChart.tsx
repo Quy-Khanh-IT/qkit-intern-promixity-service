@@ -10,7 +10,7 @@ declare const CanvasJS: any;
 const generateChartFormat = () => ({
   animationEnabled: true,
   title: {
-    text: `Users (5023)`,
+    text: `Businesses (5023)`,
     fontFamily: subFrontFamily,
     fontSize: 24,
     fontWeight: 600
@@ -22,11 +22,11 @@ const generateChartFormat = () => ({
     legendText: "{label}",
     indexLabel: "{label}: #percent%",
     dataPoints: [
-      { label: "Department Stores", y: 6492917 },
-      { label: "Discount Stores", y: 7380554 },
-      { label: "Stores for Men / Women", y: 1610846 },
-      { label: "Teenage Specialty Stores", y: 950875 },
-      { label: "All other outlets", y: 900000 }
+      { label: "Accepted", y: 6492917 },
+      { label: "Pending", y: 7380554 },
+      { label: "Rejected", y: 1610846 },
+      { label: "Banned", y: 950875 },
+      { label: "Closed", y: 900000 }
     ]
   }]
 })

@@ -53,7 +53,16 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
             )
           }
         ]
-      : []),
+      : [
+          {
+            key: '1',
+            label: (
+              <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)}>
+                <Text className='p-2'>Back to map</Text>
+              </Link>
+            )
+          }
+        ]),
     {
       key: '2',
       label: (
@@ -112,17 +121,12 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
 
       <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
         <Space className='me-4' size='small'>
-          {/* <Tooltip title='Notifications'>
-            <Badge count={5} offset={[-6, 6]}>
-              <BellOutlined style={{ fontSize: 24 }} className='action-button' />
-            </Badge>
-          </Tooltip> */}
           <NotificationPopover />
           <Dropdown menu={{ items }} placement='bottomRight' arrow>
             <div>
               <ImageCustom
-                width={36}
-                height={36}
+                width={40}
+                height={40}
                 src={userImage}
                 preview={false}
                 className='--avatar-custom d-cursor'

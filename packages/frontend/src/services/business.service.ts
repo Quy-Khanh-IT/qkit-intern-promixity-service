@@ -34,7 +34,8 @@ export const businessApi = createApi({
           const categoryName = item.category?.name
           return {
             ...item,
-            categoryName
+            categoryName,
+            overallRating: parseFloat(item.overallRating?.toFixed(1))
           } as IBusiness
         })
         return {

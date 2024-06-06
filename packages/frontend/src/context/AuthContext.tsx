@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
           router.push(ROUTE.DASHBOARD)
           setRouteValue(ROUTE.DASHBOARD)
         } else {
-          router.push(ROUTE.USER_PROFILE)
-          setRouteValue(ROUTE.USER_PROFILE)
+          router.push(ROUTE.MAP)
+          setRouteValue(ROUTE.MAP)
         }
       }
     } catch (err: unknown) {
