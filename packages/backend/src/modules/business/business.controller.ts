@@ -60,6 +60,13 @@ export class BusinessController {
     return await this.businessService.findAll(transferData);
   }
 
+  // @Get(':id/reviews')
+  // @ApiOperation({ summary: '[ALL]: get all reviews of business' })
+  // @HttpCode(200)
+  // async getReviewsByBusiness(@Param('id') id: string) {
+  //   return this.businessService.getReviews(id);
+  // }
+
   @Get('status')
   @ApiBearerAuth()
   @ApiOperation({ summary: '[ADMIN]: get business status' })

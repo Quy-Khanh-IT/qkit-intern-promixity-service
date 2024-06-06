@@ -1,69 +1,71 @@
-// import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-// import { Exclude, Expose, Transform } from 'class-transformer';
-// import { HydratedDocument, Types } from 'mongoose';
-// import { ReviewTypeEnum } from 'src/common/enums';
-// import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { HydratedDocument, Types } from 'mongoose';
+import { ReviewTypeEnum } from 'src/common/enums';
+import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
-// @Schema({
-//   timestamps: {
-//     createdAt: 'created_at',
-//     updatedAt: 'updated_at',
-//   },
-// })
-// export class Review extends BaseEntity {
-//   @Prop({ type: Types.ObjectId, ref: 'Review', default: null })
-//   @Exclude()
-//   parentId: Types.ObjectId;
+// Implement bucket model
 
-//   @Transform((value) => value.obj?.businessId?.toString(), {
-//     toClassOnly: true,
-//   })
-//   @Expose()
-//   parent_id?: string;
+@Schema({
+  _id: false,
+})
+export class UserSchema {
+  @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
+  @Exclude()
+  userId: Types.ObjectId;
 
-//   @Prop({ required: true, trim: true })
-//   content: string;
+  @Transform(
+    (value) => {
+      console.log('value', value);
 
-//   @Prop({ enum: [1, 2, 3, 4, 5], default: null })
-//   star: number | null;
+      return value.obj?.userId?.toString();
+    },
+    {
+      toClassOnly: true,
+    },
+  )
+  @Expose()
+  user_id?: string;
 
-//   @Prop({ enum: ReviewTypeEnum, required: true })
-//   type: ReviewTypeEnum;
+  @Prop({ trim: true })
+  firstName: string;
 
-//   @Prop({ type: Number, default: 0, max: 2 })
-//   depth: number;
+  @Prop({ trim: true, default: '' })
+  avatarUrl: string;
+}
 
-//   // @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-//   // @Exclude()
-//   // senderId: Types.ObjectId;
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+})
+export class Review extends BaseEntity {
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Business' })
+  @Exclude()
+  businessId: Types.ObjectId;
 
-//   // @Transform((value) => value.obj?.userId?.toString(), { toClassOnly: true })
-//   // @Expose()
-//   // sender_id?: string;
+  @Transform((value) => value.obj?.businessId?.toString(), {
+    toClassOnly: true,
+  })
+  @Expose()
+  business_id?: string;
 
-//   // @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-//   // @Exclude()
-//   // receiverId: Types.ObjectId;
+  @Prop({ required: true, trim: true, default: 0 })
+  page: number;
 
-//   // @Transform((value) => value.obj?.userId?.toString(), { toClassOnly: true })
-//   // @Expose()
-//   // receiver_id?: string;
+  @Prop({ required: true, type: UserSchema })
+  postBy: UserSchema;
 
-//   @Prop({ required: true, type: Types.ObjectId, ref: 'Business' })
-//   @Exclude()
-//   businessId: Types.ObjectId;
+  @Prop({ required: true, trim: true })
+  content: string;
 
-//   @Transform((value) => value.obj?.businessId?.toString(), {
-//     toClassOnly: true,
-//   })
-//   @Expose()
-//   business_id?: string;
-// }
+  @Prop({ enum: ReviewTypeEnum, required: true })
+  type: string;
 
-// export const ReviewSchema = SchemaFactory.createForClass(Review);
+  @Prop({ enum: [1, 2, 3, 4, 5], default: null })
+  star: number | null;
+}
 
-// export type ReviewDocument = HydratedDocument<Review>;
-
-// ReviewSchema.index({ businessId: 1 });
-// ReviewSchema.index({ receiverId: 1 });
-// ReviewSchema.index({ senderId: 1 });
+export const ReviewSchema = SchemaFactory.createForClass(Review);
+export type ReviewDocument = HydratedDocument<Review>;
