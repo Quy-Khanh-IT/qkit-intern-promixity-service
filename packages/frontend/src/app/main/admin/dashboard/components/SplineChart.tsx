@@ -74,7 +74,7 @@ const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusi
       name: 'Users',
       showInLegend: true,
       xValueFormatString: generateFormatDate(query),
-      yValueFormatString: '#,##0 units',
+      yValueFormatString: '#,##0 accounts',
       dataPoints: statisticData.data.map(item => {
         return ({
           x: convertDateSpline(query, item),
@@ -88,7 +88,7 @@ const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusi
       axisYType: 'secondary',
       showInLegend: true,
       xValueFormatString: generateFormatDate(query),
-      yValueFormatString: '#,##0 units',
+      yValueFormatString: '#,##0 enterprises',
       dataPoints: statisticData.data.map(item => ({
         x: convertDateSpline(query, item),
         y: item.total_business

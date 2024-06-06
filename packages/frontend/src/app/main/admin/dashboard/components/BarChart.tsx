@@ -28,7 +28,7 @@ const generateChartFormat = (data: ICategoryStatistic) => ({
   data: [
     {
       type: "bar",
-      toolTipContent: "{label}: {y} units",
+      toolTipContent: "{label}: {y} enterprises",
       dataPoints: data.categories.map(category => ({
         label: category.name,
         y: category.total_business,

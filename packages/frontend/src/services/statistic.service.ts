@@ -1,13 +1,13 @@
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { IBusinessUserStatisticQuery } from '@/types/query'
 import { createApi } from '@reduxjs/toolkit/query/react'
-import { IBusinessUserStatistic, ICategoryStatistic } from '../types/statistic'
+import { IBusinessStatusStatistic, IBusinessUserStatistic, ICategoryStatistic } from '../types/statistic'
 import qs from 'qs'
 
 export const statisticApi = createApi({
   reducerPath: 'statisticApi',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['CategoryStatistic', 'BusinessUserStatistic'],
+  tagTypes: ['CategoryStatistic', 'BusinessUserStatistic', 'BusinessStatusStatistic'],
   endpoints: (builder) => ({
     getCategoryStatistic: builder.query<ICategoryStatistic, void>({
       query: () => {
@@ -27,8 +27,21 @@ export const statisticApi = createApi({
         }
       },
       providesTags: ['BusinessUserStatistic']
+    }),
+    getBusinessStatusStatistic: builder.query<IBusinessStatusStatistic, void>({
+      query: () => {
+        return {
+          url: `/statistics/businesses/status`,
+          method: 'GET'
+        }
+      },
+      providesTags: ['BusinessStatusStatistic']
     })
   })
 })
 
-export const { useGetCategoryStatisticQuery, useLazyGetBusinessUserStatisticQuery } = statisticApi
+export const {
+  useGetCategoryStatisticQuery,
+  useLazyGetBusinessUserStatisticQuery,
+  useGetBusinessStatusStatisticQuery
+} = statisticApi

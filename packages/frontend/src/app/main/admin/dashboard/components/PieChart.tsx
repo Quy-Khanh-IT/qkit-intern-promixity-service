@@ -4,10 +4,12 @@ import React, { useEffect, useMemo } from 'react'
 import { subFrontFamily } from '@/configs/themes/light';
 import $ from 'jquery'
 import './chart.scss'
+import { useGetBusinessStatusStatisticQuery } from '@/services/statistic.service';
+import { IBusinessStatusStatistic } from '@/types/statistic';
 
 declare const CanvasJS: any;
 
-const generateChartFormat = () => ({
+const generateChartFormat = (data: IBusinessStatusStatistic) => ({
   animationEnabled: true,
   title: {
     text: `Businesses (5023)`,
@@ -21,18 +23,18 @@ const generateChartFormat = () => ({
     showInLegend: true,
     legendText: "{label}",
     indexLabel: "{label}: #percent%",
-    dataPoints: [
-      { label: "Accepted", y: 6492917 },
-      { label: "Pending", y: 7380554 },
-      { label: "Rejected", y: 1610846 },
-      { label: "Banned", y: 950875 },
-      { label: "Closed", y: 900000 }
-    ]
+    dataPoints: data.data.map(item => ({
+      label: item.status,
+      y: item.total
+    }))
   }]
 })
 
 const PieChart: React.FC = () => {
-  const chartFormat = useMemo(() => generateChartFormat(), []);
+  const {data: businessStatusStatisticData} = useGetBusinessStatusStatisticQuery()
+  const chartFormat = useMemo(() => {
+    return businessStatusStatisticData ? generateChartFormat(businessStatusStatisticData) : null;
+  }, [businessStatusStatisticData]);
 
   useEffect(() => {
     $(() => {
