@@ -64,8 +64,6 @@ export class ReviewRepository
       throw new ReviewNotFoundException();
     }
 
-    console.log('user', user);
-
     const newComment = await this.commentModel.create({
       reviewId: review._id,
       postBy: {
