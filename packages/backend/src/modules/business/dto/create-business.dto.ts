@@ -21,6 +21,7 @@ export class CreateBusinessDto {
   name: string;
 
   @IsString()
+  @IsOptional()
   @ApiPropertyOptional({ example: 'This is coffee shop' })
   description: string;
 
@@ -30,12 +31,14 @@ export class CreateBusinessDto {
   categoryId: string;
 
   @IsArray()
+  @IsOptional()
   @ApiPropertyOptional({
     example: ['665459a2a6b9b5c51c63efa9', '665459e2a6b9b5c51c63efab'],
   })
   serviceIds: string[];
 
   @IsPhoneNumber('VN')
+  @IsOptional()
   @ApiPropertyOptional({ example: '0816429333' })
   phoneNumber: string;
 
@@ -44,6 +47,7 @@ export class CreateBusinessDto {
   website: string;
 
   @IsArray()
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => DayOpenCloseTime)
   @ApiPropertyOptional({

@@ -3,6 +3,7 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { ResponseSchema } from './response.entity';
 
 // Implement bucket model
 
@@ -12,35 +13,8 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
     updatedAt: 'updated_at',
   },
 })
-export class ResponseSchema {
-  @Prop({ type: Types.ObjectId })
-  _id: Types.ObjectId | null;
-
-  @Prop()
-  reviewId: Types.ObjectId;
-
-  @Prop({ required: true, type: Object })
-  postBy: {
-    userId: Types.ObjectId;
-    firstName: string;
-    avatarUrl: string;
-  };
-
-  @Prop()
-  content: string;
-
-  @Prop()
-  depth: number;
-}
-
-@Schema({
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-  },
-})
 export class Comment extends BaseEntity {
-  @Prop({ type: Types.ObjectId, ref: 'Review', default: null })
+  @Prop({ type: Types.ObjectId, ref: 'Review' })
   @Exclude()
   reviewId: Types.ObjectId;
 
