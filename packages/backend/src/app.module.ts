@@ -2,6 +2,7 @@ import * as Joi from '@hapi/joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GlobalExceptionFilter } from './common/exception filter/global.exception-filter';
@@ -12,17 +13,17 @@ import { OtpModule } from './modules/otp/otp.module';
 import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AddressModule } from './modules/address/address.module';
 import { DistrictModule } from './modules/address/district.module';
 import { ProvinceModule } from './modules/address/province.module';
 import { CategoryModule } from './modules/category/category.module';
 import { NominatimOmsModule } from './modules/nominatim-osm/nominatim-osm.module';
-import { ServiceModule } from './modules/service/service.module';
-import { SeedService } from './seeds/seed.service';
-import { ReviewModule } from './modules/review/review.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ReviewModule } from './modules/review/review.module';
+import { ServiceModule } from './modules/service/service.module';
+import { StatisticsModule } from './modules/statistics/statistics.module';
+import { SeedService } from './seeds/seed.service';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     ProvinceModule,
     AddressModule,
     ReviewModule,
+    StatisticsModule,
     NotificationModule,
     EventEmitterModule.forRoot(),
   ],
