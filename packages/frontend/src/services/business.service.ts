@@ -19,7 +19,14 @@ export const businessApi = createApi({
       }),
       providesTags: ['BusinessInfo']
     }),
-
+    createBusiness: builder.mutation<IBusiness, IBusiness>({
+      query: (data) => ({
+        url: `/businesses`,
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['BusinessList']
+    }),
     // business
     getAllPrivateBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
       query: (params) => {
@@ -148,5 +155,6 @@ export const {
   useGetAllBusinessActionsQuery,
   useUpdateBusinessStatusMutation,
   useRestoreDeletedBusinessMutation,
-  useDeleteBusinessMutation
+  useDeleteBusinessMutation,
+  useCreateBusinessMutation
 } = businessApi
