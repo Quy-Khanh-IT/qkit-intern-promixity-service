@@ -1,3 +1,4 @@
+import { IDayOfWeek } from './business'
 import { BooleanEnum, RoleEnum, SortEnum } from './enum'
 
 interface IGelAllQuery {
@@ -19,10 +20,14 @@ export interface IGetAllUsersQuery extends IGelAllQuery {
 
 export interface IGetAllBusinessQuery extends IGelAllQuery {
   name: string
+  phoneNumber: string
   categoryIds: string[]
-  // address
   starsRating: string[]
+  sortTotalReviewsBy: SortEnum
+  sortRatingBy: SortEnum
+  address: string
   status: string[]
+  dayOfWeek: IDayOfWeek[]
 }
 
 export interface IGetAllNotificationQuery {

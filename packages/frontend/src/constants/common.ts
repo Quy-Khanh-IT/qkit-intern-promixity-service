@@ -39,5 +39,4 @@ export const MODAL_TEXT = {
 // public
 export const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL
 export const API_ENDPOINT_NEAR_BY = process.env.NEXT_PUBLIC_API_URL_NEAR_BY
-// local
 export const LOCAL_ENDPOINT = process.env.NEXT_PUBLIC_LOCALHOST_URL
