@@ -1,4 +1,5 @@
 export const DEFAULT_DATE_FORMAT = 'DD/MM/YYYY'
+export const DEFAULT_MONTH_FORMAT = 'MM/YYYY'
 
 export const PLACEHOLDER = {
   ALT_IMAGE: 'Failed to load image',

@@ -7,7 +7,6 @@ import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopu
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
-import { GET_PROFILE_OPTIONS } from '@/constants/baseQuery'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -17,7 +16,7 @@ import {
   useUpdateUserRoleMutation
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
-import { TableActionEnum } from '@/types/enum'
+import { TableActionEnum, UserOptionEnum } from '@/types/enum'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
@@ -96,7 +95,7 @@ const ManageUser = (): React.ReactNode => {
   const { data: privateProfileData } = useGetPrivateUserProfileQuery(
     {
       userId: selectedUser?.id || '',
-      userStatus: userOptionBoolean ? GET_PROFILE_OPTIONS.DELETED : GET_PROFILE_OPTIONS.ACTIVE
+      userStatus: userOptionBoolean ? UserOptionEnum._DELETED : UserOptionEnum._ACTIVE
     },
     { skip: !selectedUser }
   )

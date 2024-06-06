@@ -1,16 +1,18 @@
 /* eslint-disable */
 'use client'
-import React, { useEffect, useMemo } from 'react'
 import { subFrontFamily } from '@/configs/themes/light';
-import $ from 'jquery'
-import './chart.scss'
+import { useGetCategoryStatisticQuery } from '@/services/statistic.service';
+import { ICategoryStatistic } from '@/types/statistic';
+import $ from 'jquery';
+import React, { useEffect, useMemo } from 'react';
+import './chart.scss';
 
 declare const CanvasJS: any;
 
-const generateChartFormat = () => ({
+const generateChartFormat = (data: ICategoryStatistic) => ({
   animationEnabled: true,
   title: {
-    text: `Categories (6)`,
+    text: `Categories (${data.total_category})`,
     fontFamily: subFrontFamily,
     fontSize: 24,
     fontWeight: 600,
@@ -20,43 +22,41 @@ const generateChartFormat = () => ({
     interval: 1,
   },
   axisY: {
-    title: "items",
+    title: "Business Quantity",
     includeZero: true,
   },
   data: [
     {
       type: "bar",
       toolTipContent: "<b>{label}</b><br>Items: {y}",
-      dataPoints: [
-        { y: 21, label: "Video" },
-        { y: 25, label: "Dining" },
-        { y: 33, label: "Entertainment" },
-        { y: 36, label: "News" },
-        { y: 42, label: "Music" },
-        { y: 49, label: "Social Networking" },
-        { y: 50, label: "Maps/ Search" },
-        { y: 55, label: "Weather" },
-        { y: 61, label: "Games" }
-      ],
+      dataPoints: data.categories.map(category => ({
+        label: category.name,
+        y: category.total_business,
+      })),
     },
   ],
-})
+});
 
 const BarChart: React.FC = () => {
-  const chartFormat = useMemo(() => generateChartFormat(), []);
+  const { data: categoryStatisticData} = useGetCategoryStatisticQuery();
+  const chartFormat = useMemo(() => {
+    return categoryStatisticData ? generateChartFormat(categoryStatisticData) : null;
+  }, [categoryStatisticData]);
 
   useEffect(() => {
-    $(() => {
-      const _barChart = new CanvasJS.Chart('dashboard-bar-chart', chartFormat)
-      _barChart.render()
-    })
-  }, [chartFormat])
+    if (chartFormat) {
+      $(() => {
+        const _barChart = new CanvasJS.Chart('dashboard-bar-chart', chartFormat);
+        _barChart.render();
+      });
+    }
+  }, [chartFormat]);
 
   return (
     <>
       <div id='dashboard-bar-chart' className='chart' style={{ height: '350px', width: '100%' }}></div>
     </>
-  )
+  );
 }
 
-export default BarChart
+export default BarChart;

@@ -1,5 +1,4 @@
 import { createApi } from '@reduxjs/toolkit/query/react'
-
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { IPaginationResponse } from '@/types/pagination'
 import { INotification } from '@/types/notification'
