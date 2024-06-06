@@ -27,6 +27,7 @@ export default function MapPage(): React.ReactNode {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
   const [rating, setRating] = useState<number>(0)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
     latitude: position[0],
@@ -34,7 +35,8 @@ export default function MapPage(): React.ReactNode {
     radius: MAP_RADIUS.LEVEL_DEFAULT / 1000,
     q: '',
     limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT,
-    ...(rating !== 0 ? { star: rating } : {})
+    ...(rating !== 0 ? { star: rating } : {}),
+    ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
   })
 
   const {
@@ -60,7 +62,8 @@ export default function MapPage(): React.ReactNode {
       radius: distanceRadius === 0 ? 0.5 : distanceRadius,
       q: searchText,
       limit: maxLimit,
-      ...(rating !== 0 ? { star: rating } : {})
+      ...(rating !== 0 ? { star: rating } : {}),
+      ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
     }
     dispatch(setSearchPosition(clickPosition ? clickPosition : position))
     setQueryData(data)
@@ -118,7 +121,7 @@ export default function MapPage(): React.ReactNode {
     if (shouldFetch) {
       handleOnSearch()
     }
-  }, [distanceRadius, rating])
+  }, [distanceRadius, rating, selectedCategoryId])
 
   useEffect(() => {
     setCollapsed(true)
@@ -132,6 +135,10 @@ export default function MapPage(): React.ReactNode {
 
   const handleOnChangeRating = (value: string): void => {
     setRating(parseFloat(value))
+  }
+
+  const handleOnChangeCategory = (value: string): void => {
+    setSelectedCategoryId(value)
   }
   return (
     <Layout className='vh-100'>
@@ -182,7 +189,9 @@ export default function MapPage(): React.ReactNode {
           totalResult={searchResponse?.totalRecords}
           handleItemClick={handleItemClick}
           handleOnChangeRating={handleOnChangeRating}
+          handleOnChangeCategory={handleOnChangeCategory}
           rating={rating}
+          categoryId={selectedCategoryId}
         />
 
         <Content style={{ margin: '0 16px' }}>

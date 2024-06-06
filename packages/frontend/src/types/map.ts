@@ -22,6 +22,8 @@ export interface ISearchSider {
   handleItemClick: () => void
   rating: number
   handleOnChangeRating: (value: string) => void
+  categoryId: string | null
+  handleOnChangeCategory: (value: string) => void
 }
 
 export interface IMarkerProps {
