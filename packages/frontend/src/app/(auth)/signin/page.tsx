@@ -32,6 +32,7 @@ export default function SignIn(): React.ReactNode {
     if (isLoginSuccess) {
       toastService.success('Login success')
       saveToLocalStorage('auth', { accessToken: dataLogin.accessToken, refreshToken: dataLogin.refreshToken })
+      router.push('/map')
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse

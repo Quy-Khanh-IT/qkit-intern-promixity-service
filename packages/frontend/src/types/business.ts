@@ -33,6 +33,24 @@ export interface IBusiness {
   _distance: number
 }
 
+export interface ICreateBusiness {
+  name: string
+  description: string
+  categoryId: string
+  serviceIds: string[]
+  phoneNumber: string
+  website: string
+  dayOfWeek: IDayOfWeek[]
+  country: string
+  province: string
+  district: string
+  addressLine: string
+  fullAddress: string
+  location: {
+    coordinates: [number, number]
+  }
+}
+
 export interface IStar {
   star: string
   count: number
