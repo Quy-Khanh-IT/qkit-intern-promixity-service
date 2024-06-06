@@ -542,7 +542,7 @@ const ManageBusiness = (): React.ReactNode => {
       />
       <ViewRowDetailsModal
         title='Business details'
-        // imageData={privateProfileData?.image}
+        imageData={privateProfileData?.images}
         data={detailedItems}
         ref={refViewDetailsModal}
       />

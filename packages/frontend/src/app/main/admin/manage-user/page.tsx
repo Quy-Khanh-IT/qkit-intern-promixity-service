@@ -16,7 +16,6 @@ import {
   useRestoreDeletedUserMutation,
   useUpdateUserRoleMutation
 } from '@/services/user.service'
-import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { IGetAllUsersQuery } from '@/types/query'
@@ -181,12 +180,11 @@ const ManageUser = (): React.ReactNode => {
   }
 
   const onChangeSorter: TableProps<IUserInformation>['onChange'] = (
-    pagination: TablePaginationConfig,
-    filters: Record<string, FilterValue | null>,
-    sorter: SorterResult<IBusiness> | SorterResult<IBusiness>[],
-    extra: TableCurrentDataSource<IBusiness>
+    _pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<IUserInformation> | SorterResult<IUserInformation>[],
+    extra: TableCurrentDataSource<IUserInformation>
   ) => {
-    console.log(pagination, filters, sorter, extra)
     if (extra?.action === (TableActionEnum._SORT as string)) {
       const _queryDataTemp: IGetAllUsersQuery = { ...queryData }
       Object.keys(_queryDataTemp).forEach((key: string) => {
@@ -195,7 +193,7 @@ const ManageUser = (): React.ReactNode => {
         }
       })
 
-      const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
+      const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
         if (sorterItem?.order) {
           setQueryData((_prev) =>
             mapQueryData(
