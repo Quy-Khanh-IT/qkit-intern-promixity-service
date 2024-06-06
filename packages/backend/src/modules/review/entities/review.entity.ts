@@ -6,25 +6,12 @@ import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 // Implement bucket model
 
-@Schema({
-  _id: false,
-})
 export class UserSchema {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   @Exclude()
   userId: Types.ObjectId;
 
-  @Transform(
-    (value) => {
-      console.log('value', value);
-
-      return value.obj?.userId?.toString();
-    },
-    {
-      toClassOnly: true,
-    },
-  )
-  @Expose()
+  @Prop({ trim: true })
   user_id?: string;
 
   @Prop({ trim: true })
