@@ -1,6 +1,6 @@
 'use client'
-import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
+import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
@@ -20,8 +20,9 @@ import {
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
+import { TableActionEnum } from '@/types/enum'
 import { IGetAllBusinessQuery } from '@/types/query'
-import { compareDates, formatDate } from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -38,11 +39,17 @@ import {
   Typography
 } from 'antd'
 import { RangePickerProps } from 'antd/es/date-picker'
-import { FilterDropdownProps } from 'antd/es/table/interface'
+import {
+  FilterDropdownProps,
+  FilterValue,
+  SorterResult,
+  TableCurrentDataSource,
+  TablePaginationConfig
+} from 'antd/es/table/interface'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { generateStatusColor } from '../../utils/main.util'
-import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
+import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from './manage-business.const'
 import './manage-business.scss'
 
 const { Text } = Typography
@@ -124,16 +131,25 @@ const ManageBusiness = (): React.ReactNode => {
     setCurrentPage(ORIGIN_PAGE)
   }
 
-  const mapFilterQueryData = (
+  const mapQueryData = (
     _queryData: IGetAllBusinessQuery,
     dataIndex: DataIndex,
-    values: string[]
+    values: string[] | string,
+    action?: string
   ): IGetAllBusinessQuery => {
     let queryDataTemp = {} as IGetAllBusinessQuery
     if ((dataIndex as string) === 'overallRating') {
-      queryDataTemp = { ..._queryData, starsRating: values } as IGetAllBusinessQuery
+      if (action === (TableActionEnum._SORT as string)) {
+        queryDataTemp = { ..._queryData, sortRatingBy: values } as IGetAllBusinessQuery
+      } else {
+        queryDataTemp = { ..._queryData, starsRating: values } as IGetAllBusinessQuery
+      }
     } else if ((dataIndex as string) === 'categoryName') {
       queryDataTemp = { ..._queryData, categoryIds: values } as IGetAllBusinessQuery
+    } else if ((dataIndex as string) === 'totalReview') {
+      queryDataTemp = { ..._queryData, sortTotalReviewsBy: values } as IGetAllBusinessQuery
+    } else if ((dataIndex as string) === 'created_at') {
+      queryDataTemp = { ..._queryData, sortBy: values } as IGetAllBusinessQuery
     } else {
       queryDataTemp = { ..._queryData, [dataIndex]: values } as IGetAllBusinessQuery
     }
@@ -152,7 +168,7 @@ const ManageBusiness = (): React.ReactNode => {
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
-      setQueryData((prev) => ({ ...prev, [dataIndex]: selectedKeys[0] }) as IGetAllBusinessQuery)
+      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys[0]))
     }
   }
 
@@ -168,7 +184,42 @@ const ManageBusiness = (): React.ReactNode => {
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
-      setQueryData((prev) => mapFilterQueryData(prev, dataIndex, selectedKeys))
+      setQueryData((prev) => mapQueryData(prev, dataIndex, selectedKeys))
+    }
+  }
+
+  const onChangeSorter: TableProps<IBusiness>['onChange'] = (
+    _pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>,
+    sorter: SorterResult<IBusiness> | SorterResult<IBusiness>[],
+    extra: TableCurrentDataSource<IBusiness>
+  ) => {
+    if (extra?.action === (TableActionEnum._SORT as string)) {
+      const _queryDataTemp: IGetAllBusinessQuery = { ...queryData }
+      Object.keys(_queryDataTemp).forEach((key: string) => {
+        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
+          delete _queryDataTemp[key as keyof IGetAllBusinessQuery]
+        }
+      })
+
+      const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
+        if (sorterItem?.order) {
+          setQueryData((_prev) =>
+            mapQueryData(
+              _queryDataTemp,
+              sorterItem?.columnKey as DataIndex,
+              convertSortOrder(sorterItem?.order as string),
+              extra?.action
+            )
+          )
+        }
+      }
+
+      if (!Array.isArray(sorter)) {
+        updateQueryData(sorter)
+      } else {
+        sorter.forEach(updateQueryData)
+      }
     }
   }
 
@@ -297,10 +348,6 @@ const ManageBusiness = (): React.ReactNode => {
         selectCustom: RATING_SELECT_FILTERS,
         _handleFilter: handleFilter
       })
-      // onFilter: (value, record: IBusiness): boolean => {
-      //   const parseValue: number = parseInt(value as string)
-      //   return Math.floor(record.overallRating) === parseValue
-      // }
     },
     {
       title: MANAGE_BUSINESS_FIELDS.created_at,
@@ -454,10 +501,6 @@ const ManageBusiness = (): React.ReactNode => {
     }
   }
 
-  const onChangeSorter: TableProps<IBusiness>['onChange'] = (pagination, filters, sorter, extra) => {
-    console.log(pagination, filters, sorter, extra)
-  }
-
   return (
     <div className='--manage-business'>
       <Row className='pb-3'>
@@ -499,7 +542,7 @@ const ManageBusiness = (): React.ReactNode => {
       />
       <ViewRowDetailsModal
         title='Business details'
-        // imageData={privateProfileData?.image}
+        imageData={privateProfileData?.images}
         data={detailedItems}
         ref={refViewDetailsModal}
       />

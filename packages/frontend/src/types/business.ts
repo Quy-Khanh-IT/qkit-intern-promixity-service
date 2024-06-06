@@ -54,7 +54,7 @@ export interface IDayOfWeek {
   day: string
   openTime: string
   closeTime: string
-  order: number
+  order?: number
 }
 
 export interface IBusinessCategory {

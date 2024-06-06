@@ -1,13 +1,15 @@
-import { Button, Descriptions, DescriptionsProps, Modal } from 'antd'
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import { Button, Carousel, Descriptions, DescriptionsProps, Modal } from 'antd'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import ImageCustom from '../../ImageCustom/ImageCustom'
 import { IModalMethods } from '../modal'
 import '../modal.scss'
 import './view-row-details.scss'
+import { IBusinessImage } from '@/types/business'
+import { CarouselRef } from 'antd/es/carousel'
 
 export interface ViewRowDetailsProps {
   title: string
-  imageData?: string
+  imageData?: string | IBusinessImage[]
   data: DescriptionsProps['items']
 }
 
@@ -16,11 +18,14 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
   ref
 ) => {
   const [open, setOpen] = useState<boolean>(false)
-  const [src, setSrc] = useState<string | undefined>(imageData)
+  const carouselRef = useRef<CarouselRef | null>(null)
 
-  useEffect(() => {
-    setSrc(imageData)
-  }, [imageData])
+  const resetCarousel = (): void => {
+    // Reset to the first slide
+    if (carouselRef.current) {
+      carouselRef.current.goTo(0, true)
+    }
+  }
 
   useImperativeHandle<IModalMethods, IModalMethods>(ref, () => ({
     showModal: (): void => setOpen(true),
@@ -29,6 +34,7 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
 
   const handleCancel = (): void => {
     setOpen(false)
+    resetCarousel()
   }
 
   return (
@@ -47,7 +53,29 @@ const _ViewRowDetails: React.ForwardRefRenderFunction<IModalMethods, ViewRowDeta
         ]}
       >
         <div className='content-box d-flex flex-column gap-3'>
-          <ImageCustom width={200} height={200} src={src || ''} className='--avatar-custom d-flex align-self-center' />
+          {typeof imageData === 'string' ? (
+            <ImageCustom
+              width={200}
+              height={200}
+              src={imageData}
+              className='--avatar-custom d-flex align-self-center'
+            />
+          ) : (
+            <div style={{}}>
+              <Carousel ref={carouselRef} arrows infinite={false} className='--carousel-custom' slickGoTo={1} key={1}>
+                {imageData?.map((img: IBusinessImage, index) => (
+                  <ImageCustom
+                    key={index}
+                    circle={false}
+                    width={200}
+                    height={200}
+                    src={img.url}
+                    className='--avatar-custom d-flex align-self-center justify-content-center'
+                  />
+                ))}
+              </Carousel>
+            </div>
+          )}
           <Descriptions bordered items={data} size='small' layout='vertical' />
         </div>
       </Modal>

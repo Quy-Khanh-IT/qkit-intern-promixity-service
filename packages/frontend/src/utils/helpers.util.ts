@@ -1,5 +1,5 @@
 import { LOCAL_ENDPOINT } from '@/constants'
-import { NotificationEnum } from '@/types/enum'
+import { NotificationEnum, SortEnum, SortEnumAlias } from '@/types/enum'
 
 export function formatDate(inputDate: string): string {
   const dateObj = new Date(inputDate)
@@ -65,4 +65,13 @@ export const convertNotificationType = (type: string): string => {
     return type.toUpperCase()
   }
   return NotificationEnum._NO_SPECIFIC_TYPE.toUpperCase()
+}
+
+export const convertSortOrder = (order: string): string => {
+  if (order === (SortEnumAlias._ASCEND as string)) {
+    return SortEnum._ASC
+  } else if (order === (SortEnumAlias._DESCEND as string)) {
+    return SortEnum._DESC
+  }
+  return ''
 }

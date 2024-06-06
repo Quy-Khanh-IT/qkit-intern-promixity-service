@@ -17,6 +17,15 @@ export enum SortEnum {
   _DESC = 'desc'
 }
 
+export enum SortEnumAlias {
+  _ASCEND = 'ascend',
+  _DESCEND = 'descend'
+}
+
+export enum TableActionEnum {
+  _SORT = 'sort'
+}
+
 export enum BooleanEnum {
   _TRUE = 'true',
   _FALSE = 'false'

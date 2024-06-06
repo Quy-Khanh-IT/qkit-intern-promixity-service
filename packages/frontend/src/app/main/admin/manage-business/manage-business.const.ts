@@ -11,3 +11,9 @@ export const MANAGE_BUSINESS_FIELDS = {
   created_at: 'Created At',
   status: 'Status'
 }
+
+export const MANAGE_BUSINESS_SORT_FIELDS = {
+  SORT_BY: 'sortBy', // by date
+  SORT_BY_REVIEWS: 'sortTotalReviewsBy',
+  SORT_BY_RATING: 'sortRatingBy'
+}
