@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { plainToClass } from 'class-transformer';
@@ -33,7 +33,6 @@ import { NominatimOsmService } from '../nominatim-osm/nominatim-osm.service';
 import { ServiceService } from '../service/service.service';
 import { UploadFileService } from '../upload-file/upload-file.service';
 import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
 import { CreateBusinessDto, DayOpenCloseTime } from './dto/create-business.dto';
 import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -46,6 +45,8 @@ import { CreateBusinessEvent } from './events/create-business.event';
 import { RejectBusinessEvent } from './events/reject-business.event';
 import { RestoreBusinessEvent } from './events/restore-business.event';
 import { BusinessRepository } from './repository/business.repository';
+import { UserService } from '../user/user.service';
+import { ReviewService } from '../review/review.service';
 
 @Injectable()
 export class BusinessService {
@@ -56,6 +57,8 @@ export class BusinessService {
     private readonly uploadFileService: UploadFileService,
     private readonly businessRepository: BusinessRepository,
     private readonly nominatimOsmService: NominatimOsmService,
+    @Inject(forwardRef(() => ReviewService))
+    private readonly reviewService: ReviewService,
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -773,6 +776,15 @@ export class BusinessService {
     return business;
   }
 
+  // async getReviews(businessId: string) {
+  //   const business = await this.businessRepository.findOneById(businessId);
+
+  //   if (!business) {
+  //     throw new BusinessNotFoundException();
+  //   }
+
+  // }
+
   async validateAddress(
     validateAddressDto: ValidateAddressDto,
   ): Promise<boolean> {
@@ -818,85 +830,60 @@ export class BusinessService {
     // Check if address line is valid
     // create mark array which mark all character in road to true
     // then check if all character in address line is in mark array
-    const counts = {} as Object;
+    // const counts = {} as Object;
 
-    let splitReverseRoad = (reverseData?.address?.road as string).split(' ');
+    // let splitReverseRoad = (reverseData?.address?.road as string).split(' ');
 
-    if (splitReverseRoad.includes('Đường')) {
-      splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
-    }
+    // if (splitReverseRoad.includes('Đường')) {
+    //   splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
+    // }
 
-    const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
-      return acc.concat(item);
-    }, '');
+    // const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
+    //   return acc.concat(item);
+    // }, '');
 
-    splitReverseRoad = reverseRoadStr.split('');
+    // splitReverseRoad = reverseRoadStr.split('');
 
-    splitReverseRoad.forEach((element) => {
-      counts[element] = 0;
-    });
+    // splitReverseRoad.forEach((element) => {
+    //   counts[element] = 0;
+    // });
 
-    let slitAddressLine = validateAddressDto.addressLine.split(' ');
+    // let slitAddressLine = validateAddressDto.addressLine.split(' ');
 
-    if (slitAddressLine.includes('Đường')) {
-      slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
-    }
+    // if (slitAddressLine.includes('Đường')) {
+    //   slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
+    // }
 
-    const AddressLineStr = slitAddressLine.reduce((acc, item) => {
-      return acc.concat(item);
-    }, '');
+    // const AddressLineStr = slitAddressLine.reduce((acc, item) => {
+    //   return acc.concat(item);
+    // }, '');
 
-    slitAddressLine = AddressLineStr.split('');
+    // slitAddressLine = AddressLineStr.split('');
 
-    for (const char of slitAddressLine) {
-      if (!counts.hasOwnProperty(char)) {
-        return false;
-      } else {
-        counts[char] += 1;
-      }
-    }
+    // for (const char of slitAddressLine) {
+    //   if (!counts.hasOwnProperty(char)) {
+    //     return false;
+    //   } else {
+    //     counts[char] += 1;
+    //   }
+    // }
 
-    for (const key in counts) {
-      if (counts[key] === 0 || counts[key] > 1) {
-        if (counts[key] > 1) {
-          const countWord = splitReverseRoad.filter((item) => item == key);
+    // for (const key in counts) {
+    //   if (counts[key] === 0 || counts[key] > 1) {
+    //     if (counts[key] > 1) {
+    //       const countWord = splitReverseRoad.filter((item) => item == key);
 
-          if (countWord.length !== counts[key]) {
-            return false;
-          } else {
-            continue;
-          }
-        }
+    //       if (countWord.length !== counts[key]) {
+    //         return false;
+    //       } else {
+    //         continue;
+    //       }
+    //     }
 
-        return false;
-      }
-    }
+    //     return false;
+    //   }
+    // }
 
     return true;
   }
 }
-
-// "address": {
-//   "amenity": "Trường Đại học Y Khoa Phạm Ngọc Thạch",
-//   "house_number": "2",
-//   "road": "Dương Quang Trung",
-//   "quarter": "Phường 12",
-//   "suburb": "Quận 10",
-//   "city": "Thành phố Hồ Chí Minh",
-//   "ISO3166-2-lvl4": "VN-SG",
-//   "postcode": "72000",
-//   "country": "Việt Nam",
-//   "country_code": "vn"
-// },
-
-// "address": {
-//   "road": "Đường Tô Vĩnh Diện",
-//   "suburb": "Phường Đông Hòa",
-//   "city": "Dĩ An",
-//   "county": "Dĩ An",
-//   "state": "Tỉnh Bình Dương",
-//   "ISO3166-2-lvl4": "VN-57",
-//   "postcode": "00848",
-//   "country": "Việt Nam",
-//   "country_code": "vn"
-// },

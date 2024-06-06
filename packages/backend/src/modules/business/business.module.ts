@@ -12,6 +12,7 @@ import { BusinessController } from './business.controller';
 import { BusinessService } from './business.service';
 import { Business, BusinessSchema } from './entities/business.entity';
 import { BusinessRepository } from './repository/business.repository';
+import { ReviewModule } from '../review/review.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BusinessRepository } from './repository/business.repository';
     UploadFileModule,
     ServiceModule,
     CategoryModule,
+    forwardRef(() => ReviewModule),
   ],
   controllers: [BusinessController],
   providers: [BusinessService, BusinessRepository],

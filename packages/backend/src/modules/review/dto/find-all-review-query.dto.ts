@@ -10,10 +10,6 @@ export class FindAllReviewQuery extends QueryFilterBase {
   content: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ example: ['reply', 'review'] })
-  type: ReviewTypeEnum[];
-
-  @IsOptional()
   @ApiPropertyOptional({ required: false, example: ['3', '5'] })
   starsRating: string[];
 

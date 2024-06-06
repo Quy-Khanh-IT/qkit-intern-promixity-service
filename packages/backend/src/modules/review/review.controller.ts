@@ -33,7 +33,7 @@ import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { CommentDto } from './dto/reply-review.dto';
-import { Review } from './entities/review2.entity';
+import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 import { RoleGuard } from 'src/cores/guard/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -50,7 +50,7 @@ export class ReviewController {
   @ApiBearerAuth()
   @ApiOperation({
     summary:
-      '[ADMIN]: create a review which can react with combination of star and comment',
+      '[ADMIN]: manage reviews, filter reviews by businessId, userId, star',
   })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
@@ -63,8 +63,7 @@ export class ReviewController {
   @Get(':businessId/filter')
   @HttpCode(200)
   @ApiOperation({
-    summary:
-      '[ADMIN]: create a review which can react with combination of star and comment',
+    summary: '[ALL]: get reviews of business',
   })
   async findReviewBusiness(
     @Param('businessId') id: string,
@@ -75,10 +74,20 @@ export class ReviewController {
     return await this.reviewService.findReviewBusiness(id, transferData);
   }
 
+  @Get(':reviewId/comments')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: '[ALL]: get comments of a review',
+  })
+  async getCommentsByReview(@Param('reviewId') id: string) {
+    console.log('id', id);
+    const comments = await this.reviewService.getCommentsByReview(id);
+
+    return comments;
+  }
+
   @Get(':reviewId')
   @HttpCode(200)
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: '[ADMIN]: filter reviews',
   })
@@ -101,7 +110,7 @@ export class ReviewController {
   @ApiBody({
     type: CreateReviewDto,
   })
-  createPreview(
+  createReview(
     @Body(new ValidationPipe({ transform: true }))
     createReviewDto: CreateReviewDto,
     @Req() req: Request,
@@ -109,12 +118,12 @@ export class ReviewController {
     return this.reviewService.createReview(createReviewDto, req.user);
   }
 
-  @Post(':id/comment')
+  @Post(':reviewId/comment')
   @HttpCode(201)
   @ApiBearerAuth()
   @ApiOperation({
     summary:
-      '[ADMIN, USER, BUSINESS]: create a reply which can comment/reply only (id can be reviewId/commentId)',
+      '[ADMIN, USER, BUSINESS]: create a comment which can comment/reply on specific review',
   })
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
@@ -122,52 +131,52 @@ export class ReviewController {
     type: CommentDto,
   })
   CreateComment(
-    @Param('commentId') id: string,
+    @Param('reviewId') id: string,
     @Body() commentDto: CommentDto,
     @Req() req: Request,
   ) {
     return this.reviewService.CreateComment(commentDto, id, req.user);
   }
 
-  @Put(':reviewId')
-  @HttpCode(200)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary:
-      '[ADMIN, USER, BUSINESS]: edit a preview that was previously created',
-  })
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
-  @ApiBody({
-    type: EditReviewDto,
-  })
-  editPreview(
-    @Param('reviewId') id: string,
-    @Body() editReviewDto: EditReviewDto,
-    @Req() req: Request,
-  ) {
-    return this.reviewService.editReview(id, editReviewDto, req.user.id);
-  }
+  // @Put(':reviewId')
+  // @HttpCode(200)
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary:
+  //     '[ADMIN, USER, BUSINESS]: edit a preview that was previously created',
+  // })
+  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  // @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
+  // @ApiBody({
+  //   type: EditReviewDto,
+  // })
+  // editPreview(
+  //   @Param('reviewId') id: string,
+  //   @Body() editReviewDto: EditReviewDto,
+  //   @Req() req: Request,
+  // ) {
+  //   return this.reviewService.editReview(id, editReviewDto, req.user.id);
+  // }
 
-  @Put(':commentId')
-  @HttpCode(200)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary:
-      '[ADMIN, USER, BUSINESS]: create a review which can react with combination of star and comment',
-  })
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
-  @ApiBody({
-    type: EditResponseDto,
-  })
-  async editComment(
-    @Param('commentId') id: string,
-    @Body() editResponseDto: EditResponseDto,
-    @Req() req: Request,
-  ) {
-    return this.reviewService.editComment(id, editResponseDto, req.user.id);
-  }
+  // @Put(':commentId')
+  // @HttpCode(200)
+  // @ApiBearerAuth()
+  // @ApiOperation({
+  //   summary:
+  //     '[ADMIN, USER, BUSINESS]: create a review which can react with combination of star and comment',
+  // })
+  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  // @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
+  // @ApiBody({
+  //   type: EditResponseDto,
+  // })
+  // async editComment(
+  //   @Param('commentId') id: string,
+  //   @Body() editResponseDto: EditResponseDto,
+  //   @Req() req: Request,
+  // ) {
+  //   return this.reviewService.editComment(id, editResponseDto, req.user.id);
+  // }
 
   // @Delete(':reviewId')
   // @HttpCode(200)
@@ -193,25 +202,25 @@ export class ReviewController {
   //   }
   // }
 
-  @Patch(':id/restore')
-  @HttpCode(200)
-  @ApiBearerAuth()
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({
-    summary: '[ADMIN]: Restore a preview that was previously deleted',
-  })
-  async restore(@Param('id') id: string, @Req() req: Request) {
-    return this.reviewService.restoreReview(id);
-  }
+  // @Patch(':id/restore')
+  // @HttpCode(200)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  // @Roles(UserRole.ADMIN)
+  // @ApiOperation({
+  //   summary: '[ADMIN]: Restore a preview that was previously deleted',
+  // })
+  // async restore(@Param('id') id: string, @Req() req: Request) {
+  //   return this.reviewService.restoreReview(id);
+  // }
 
   @Delete(':commentId/comments')
   @ApiBearerAuth()
   @HttpCode(200)
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
   @ApiOperation({
-    summary: '[ADMIN, USER, BUSINESS]: delete a comment',
+    summary: '[ADMIN, USER, BUSINESS]: delete a comment which belongs to owner',
   })
   async deleteComment(@Param('commentId') id: string, @Req() req: Request) {
     return this.reviewService.deleteComment(id, req.user.id);
