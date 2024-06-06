@@ -4,9 +4,9 @@ import { subFrontFamily } from '@/configs/themes/light'
 import { IBusinessUserStatisticQuery } from '@/types/query'
 import { IBusinessUserStatistic, IBusinessUserStatisticItem } from '@/types/statistic'
 import $ from 'jquery'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import './chart.scss'
-import { STATISTIC_OPTIONS_VALUE } from '@/constants/statistic'
+import { CANVAS_DATE_FORMAT, STATISTIC_OPTIONS_VALUE } from '@/constants/statistic'
 
 declare const CanvasJS: any
 
@@ -22,6 +22,15 @@ const convertDateSpline = (query: IBusinessUserStatisticQuery, itemData: IBusine
     return new Date(query.year,itemData.time_index - 1, 1)
   }
   return new Date(2024,1,1)
+}
+
+const generateFormatDate = (query: IBusinessUserStatisticQuery): string => {
+  if(query.timeline === STATISTIC_OPTIONS_VALUE._MONTH){
+    return CANVAS_DATE_FORMAT._MONTH
+  }else if(query.timeline === STATISTIC_OPTIONS_VALUE._YEAR){
+    return CANVAS_DATE_FORMAT._YEAR
+  }
+  return ''
 }
 
 const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusinessUserStatisticQuery) => ({
@@ -64,12 +73,10 @@ const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusi
       type: 'spline',
       name: 'Users',
       showInLegend: true,
-      xValueFormatString: 'DD MMM YYYY',
+      xValueFormatString: generateFormatDate(query),
       yValueFormatString: '#,##0 units',
       dataPoints: statisticData.data.map(item => {
         return ({
-          // query.timeline === 'year' ? item.time_index : query.year
-          // x: new Date(query.year, item.time_index - 1, 1),
           x: convertDateSpline(query, item),
           y: item.total_user
         })
@@ -80,10 +87,9 @@ const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusi
       name: 'Businesses',
       axisYType: 'secondary',
       showInLegend: true,
-      xValueFormatString: 'DD MMM YYYY',
+      xValueFormatString: generateFormatDate(query),
       yValueFormatString: '#,##0 units',
       dataPoints: statisticData.data.map(item => ({
-        // x: new Date(query.year, item.time_index - 1, 1),
         x: convertDateSpline(query, item),
         y: item.total_business
       }))
