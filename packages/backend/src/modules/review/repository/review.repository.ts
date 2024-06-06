@@ -64,48 +64,7 @@ export class ReviewRepository
       throw new ReviewNotFoundException();
     }
 
-    // if (review.page === 1) {
-    //   let groupsComment = await this.commentModel.aggregate([
-    //     {
-    //       $match: {
-    //         reviewId: review._id,
-    //         page: { $ne: null },
-    //       },
-    //     },
-    //     {
-    //       $sort: {
-    //         page: -1,
-    //       },
-    //     },
-    //   ]);
-
-    //   console.log('groupsComment', groupsComment);
-
-    //   if (
-    //     groupsComment[0].replies.length === 0 &&
-    //     groupsComment[0].count === 0 &&
-    //     groupsComment[0].page === 1
-    //   ) {
-    //     const deleteGr = await this.commentModel.deleteOne({
-    //       reviewId: review._id,
-    //       page: review.page,
-    //     });
-
-    //     console.log('deleteGr', deleteGr);
-
-    //     // decrease page in review
-    //     const decreasePage = await this.reviewModel.updateOne(
-    //       {
-    //         _id: review._id,
-    //       },
-    //       {
-    //         $inc: { page: -1 },
-    //       },
-    //     );
-
-    //     console.log('decreasePage', decreasePage);
-    //   }
-    // }
+    console.log('user', user);
 
     const newComment = await this.commentModel.create({
       reviewId: review._id,
@@ -113,6 +72,7 @@ export class ReviewRepository
         userId: user._id,
         firstName: user.firstName,
         avatarUrl: '',
+        user_id: user._id.toString(),
       },
       content: dto.content,
       type: ReviewTypeEnum.COMMENT,

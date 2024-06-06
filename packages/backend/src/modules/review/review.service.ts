@@ -1,7 +1,7 @@
 import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import mongoose, { PipelineStage } from 'mongoose';
 import { ConfigKey } from 'src/common/constants';
 import { ReviewConstant } from 'src/common/constants/review.constant';
@@ -32,7 +32,7 @@ import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { CommentDto } from './dto/reply-review.dto';
-import { Review } from './entities/review.entity';
+import { Review, UserSchema } from './entities/review.entity';
 import { transStringToObjectId } from 'src/common/utils';
 import { User } from '../user/entities/user.entity';
 import { Business } from '../business/entities/business.entity';
@@ -40,7 +40,7 @@ import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query
 import { ReviewRepository } from './repository/review.repository';
 import { CommentRepository } from './repository/comment.repository';
 import { Comment } from './entities/comment.entity';
-import { ResponseSchema, UserSchema } from './entities/response.entity';
+import { ResponseSchema } from './entities/response.entity';
 
 @Injectable()
 export class ReviewService {
@@ -302,11 +302,15 @@ export class ReviewService {
   }
 
   async CreateComment(commentDto: CommentDto, reviewId: string, user: User) {
-    const comment = await this.reviewRepository.createComment(
+    let comment = await this.reviewRepository.createComment(
       commentDto,
       reviewId,
       user,
     );
+
+    comment.postBy = plainToInstance(UserSchema, comment.postBy, {
+      // excludeExtraneousValues: true,
+    });
 
     return plainToClass(Review, comment);
   }

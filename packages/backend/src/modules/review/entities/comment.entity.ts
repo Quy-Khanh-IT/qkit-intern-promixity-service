@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { ResponseSchema } from './response.entity';
+import { UserSchema } from './review.entity';
 
 // Implement bucket model
 
@@ -30,12 +31,9 @@ export class Comment extends BaseEntity {
   @Prop({ required: true, type: Number })
   _page: number;
 
-  @Prop({ required: true, type: Object })
-  postBy: {
-    userId: Types.ObjectId;
-    firstName: string;
-    avatarUrl: string;
-  };
+  @Prop({ required: true, type: UserSchema })
+  @Type(() => UserSchema)
+  postBy: UserSchema;
 
   @Prop({ default: 0, max: 5 })
   count: number;

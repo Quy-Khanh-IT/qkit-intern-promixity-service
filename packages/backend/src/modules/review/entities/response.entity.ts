@@ -10,14 +10,13 @@ import { HydratedDocument, Types } from 'mongoose';
 })
 export class UserSchema {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  //   @Exclude()
   userId: Types.ObjectId;
 
   @Transform((value) => value.obj?.userId?.toString(), {
     toClassOnly: true,
   })
   @Expose()
-  user_id?: string;
+  user_id: string;
 
   @Prop({ trim: true })
   firstName: string;
