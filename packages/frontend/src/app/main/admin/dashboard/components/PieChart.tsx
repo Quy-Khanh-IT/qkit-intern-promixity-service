@@ -14,7 +14,7 @@ const pieChartColor= ['#65aac2', '#7c659d', '#5cbdaa', '#a1ba65', '#b25752']
 const generateChartFormat = (data: IBusinessStatusStatistic) => ({
   animationEnabled: true,
   title: {
-    text: `Businesses (5023)`,
+    text: `Businesses (${data.total_status})`,
     fontFamily: subFrontFamily,
     fontSize: 24,
     fontWeight: 600
