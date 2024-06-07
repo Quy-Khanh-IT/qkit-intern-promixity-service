@@ -28,16 +28,28 @@ export default function WebsiteForm({
             serving customers for.
           </div>
           <div className='input-wrapper mt-4'>
-            <div className='input-label mb-2'>Your business website</div>
+            <div className='input-label mb-2'>
+              Your business&apos;s website <span className='required-input '>*</span>
+            </div>
             <Input
               value={data.website}
               onChange={(e) => handleOnChangeData('website', e.target.value)}
               placeholder='Business website'
             />
           </div>
+          <div className='input-wrapper mt-4'>
+            <div className='input-label mb-2'>
+              Your business&apos;s phone number <span className='required-input '>*</span>
+            </div>
+            <Input
+              value={data.phoneNumber}
+              onChange={(e) => handleOnChangeData('phoneNumber', e.target.value)}
+              placeholder='Business website'
+            />
+          </div>
           <Button
             onClick={() => handleOnChangeStep('next')}
-            disabled={!data.website}
+            disabled={!data.website || !data.phoneNumber}
             className='mt-4 btn-continue '
             type='primary'
           >

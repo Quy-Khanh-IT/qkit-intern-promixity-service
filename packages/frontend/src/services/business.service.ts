@@ -1,5 +1,5 @@
 import { baseQueryWithAuth } from '@/constants/baseQuery'
-import { IBusiness } from '@/types/business'
+import { IBusiness, ICreateBusiness } from '@/types/business'
 import { FilterOptions, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { IPaginationResponse } from '@/types/pagination'
 import { IGetAllBusinessQuery } from '@/types/query'
@@ -20,7 +20,7 @@ export const businessApi = createApi({
       providesTags: ['BusinessInfo']
     }),
 
-    createBusiness: builder.mutation<IBusiness, IBusiness>({
+    createBusiness: builder.mutation<IBusiness, ICreateBusiness>({
       query: (data) => ({
         url: `/businesses`,
         method: 'POST',

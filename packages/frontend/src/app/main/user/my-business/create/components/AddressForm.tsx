@@ -41,7 +41,9 @@ export default function AddressForm({
             <Input disabled value={'Việt Nam'} placeholder='Business country' />
           </div>
           <div className='input-wrapper mt-4'>
-            <div className='input-label mb-2'>Province</div>
+            <div className='input-label mb-2'>
+              Province <span className='required-input '>*</span>
+            </div>
             <Select
               size='middle'
               showSearch
@@ -57,7 +59,9 @@ export default function AddressForm({
             />
           </div>
           <div className='input-wrapper mt-4'>
-            <div className='input-label mb-2'>District</div>
+            <div className='input-label mb-2'>
+              District <span className='required-input '>*</span>
+            </div>
             <Select
               size='middle'
               showSearch

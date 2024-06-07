@@ -32,7 +32,9 @@ export default function CategoryForm({
           <h3 className='title'>Choose your business&apos;s category.</h3>
           <div className='mt-3'>Help customers discover your business by industry by adding a business type.</div>
           <div className='input-wrapper mt-4'>
-            <div className='input-label mb-2'>Your business&apos;s category</div>
+            <div className='input-label mb-2'>
+              Your business&apos;s category <span className='required-input '>*</span>
+            </div>
 
             <Select
               showSearch

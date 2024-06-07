@@ -30,3 +30,20 @@ export interface DistrictsQueryResponse {
   }
   isSuccess: boolean
 }
+
+export interface IAddressLinePayload {
+  q: string
+  countrycodes: string
+  addressdetails: number
+  limit: number
+  format: string
+}
+
+export interface IAddressLineResponse {
+  display_name: string
+  address: {
+    road: string
+  }
+  lat: string
+  lon: string
+}

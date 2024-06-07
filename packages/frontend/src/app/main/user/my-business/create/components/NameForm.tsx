@@ -2,6 +2,7 @@ import { Button, Input } from 'antd'
 import React, { useState } from 'react'
 import './name-form.scss'
 import { ICreateBusiness } from '@/types/business'
+import TextArea from 'antd/es/input/TextArea'
 
 export default function NameForm({
   handleOnChangeStep,
@@ -22,11 +23,23 @@ export default function NameForm({
           <h3 className='title'>Help customers find your business on Proximity Service, Maps and more.</h3>
           <div className='mt-3'>Enter some business information to get started</div>
           <div className='input-wrapper mt-4'>
-            <div className='input-label mb-2'>Business name</div>
+            <div className='input-label mb-2'>
+              Business name
+              <span className='required-input '>*</span>
+            </div>
             <Input
               value={data.name}
               onChange={(e) => handleOnChangeData('name', e.target.value)}
               placeholder='Enter business name'
+            />
+          </div>
+          <div className='input-wrapper mt-4'>
+            <div className='input-label mb-2'>Business description</div>
+            <TextArea
+              value={data.description}
+              onChange={(e) => handleOnChangeData('description', e.target.value)}
+              rows={4}
+              placeholder='Input your business description'
             />
           </div>
           <Button
