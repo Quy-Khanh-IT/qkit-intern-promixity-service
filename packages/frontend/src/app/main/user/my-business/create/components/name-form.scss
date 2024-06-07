@@ -1,0 +1,22 @@
+@import '@/sass/common/common.scss';
+.name-form-main {
+  font-size: 14px;
+  color: $gray;
+  .title {
+    color: black;
+  }
+}
+
+.input-wrapper {
+  .input-label {
+    font-weight: 500;
+    font-size: 16px;
+  }
+}
+
+.btn-continue {
+  span {
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
