@@ -47,7 +47,11 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
           {
             key: '1',
             label: (
-              <Link href={ROUTE.ADMIN_PROFILE} onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}>
+              <Link
+                href={ROUTE.ADMIN_PROFILE}
+                onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}
+                className='link-underline-none'
+              >
                 <Text className='p-2'>Profile</Text>
               </Link>
             )
@@ -57,7 +61,7 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
           {
             key: '1',
             label: (
-              <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)}>
+              <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)} className='link-underline-none'>
                 <Text className='p-2'>Back to map</Text>
               </Link>
             )
