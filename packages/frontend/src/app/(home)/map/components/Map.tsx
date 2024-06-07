@@ -16,23 +16,25 @@ import { useEffect, useState } from 'react'
 import './map.scss'
 import { useDispatch, useSelector } from 'react-redux'
 import { setPosition, setZoom } from '@/redux/slices/map-props.slice'
-import L from 'leaflet'
+import L, { Icon } from 'leaflet'
 import { RootState } from '@/redux/store'
 import { MAP_ZOOM, ZOOM_BASE_ON_RADIUS } from '@/constants/map'
 import { Image } from 'antd'
 import StarRating from './StarRating'
 import { IBusiness } from '@/types/business'
 import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
-
 const myIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/Proximity/search-location.png',
   iconSize: [25, 25]
 })
 
-const restaurantMarker = L.icon({
-  iconUrl: 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/Proximity/restaurant-marker.png',
-  iconSize: [25, 25]
-})
+const categoryIcon = (url: string): Icon => {
+  const myIcon = L.icon({
+    iconUrl: url,
+    iconSize: [25, 25]
+  })
+  return myIcon
+}
 
 const Map = (props: IMapProps): React.ReactNode => {
   const [center, setCenter] = useState<[number, number]>(props.position)
@@ -158,7 +160,7 @@ const Map = (props: IMapProps): React.ReactNode => {
               return (
                 <Marker
                   key={business.id}
-                  icon={restaurantMarker}
+                  icon={categoryIcon(business.category.linkURL)}
                   position={[business.location.coordinates[1], business.location.coordinates[0]]}
                 >
                   <Popup className='mb-3 business-popup'>

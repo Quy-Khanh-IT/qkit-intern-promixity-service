@@ -66,11 +66,22 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
                   filterOption={filterOption}
                   options={[
                     ...(getCategoryResponse && getCategoryResponse.filterOpts.length > 0
-                      ? getCategoryResponse.filterOpts.map((item) => ({
-                          value: item.value,
-                          label: item.text
-                        }))
-                      : [])
+                      ? [
+                          {
+                            label: 'All category',
+                            value: 'all'
+                          },
+                          ...getCategoryResponse.filterOpts.map((item) => ({
+                            value: item.value,
+                            label: item.text
+                          }))
+                        ]
+                      : [
+                          {
+                            label: 'All category',
+                            value: 'all'
+                          }
+                        ])
                   ]}
                   onChange={(value: string) => props.handleOnChangeCategory(value)}
                   value={props.categoryId}

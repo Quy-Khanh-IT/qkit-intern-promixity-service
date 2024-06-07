@@ -59,6 +59,7 @@ export interface IStar {
 export interface ICategory {
   name: string
   id: string
+  linkURL: string
 }
 
 export interface IBusinessImage {

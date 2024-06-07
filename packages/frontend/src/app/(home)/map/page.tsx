@@ -140,8 +140,8 @@ export default function MapPage(): React.ReactNode {
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     setDistanceRadius(parseInt(e.key))
   }
-  const menuProps = {
-    distanceItems,
+  const distanceMenuProps = {
+    items: distanceItems,
     onClick: handleMenuClick
   }
 
@@ -220,7 +220,7 @@ export default function MapPage(): React.ReactNode {
             onSearch={handleOnSearch}
             width={1000}
           />
-          <Dropdown className='ms-1' menu={menuProps}>
+          <Dropdown className='ms-1' menu={distanceMenuProps}>
             <Button className='btn-dropdown'>
               <Space>
                 {`Distance: ${distanceRadius === 0 ? `500m` : `${distanceRadius}km`}`}
