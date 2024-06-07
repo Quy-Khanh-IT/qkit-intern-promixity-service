@@ -29,16 +29,12 @@ export class AxiosService {
     console.log('url', url);
 
     const result = await firstValueFrom(
-      this.httpService
-        .get(url, {
-          httpAgent: getHost(),
-        })
-        .pipe(
-          catchError((error: AxiosError) => {
-            console.log('error', error);
-            throw 'An error happened!';
-          }),
-        ),
+      this.httpService.get(url).pipe(
+        catchError((error: AxiosError) => {
+          console.log('error', error);
+          throw 'An error happened!';
+        }),
+      ),
     );
 
     console.log('result', result);
