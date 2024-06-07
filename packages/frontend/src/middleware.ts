@@ -35,7 +35,7 @@ export function middleware(req: NextRequest): NextResponse {
 
     // User-specific route access
     if (userRoutes.includes(pathName)) {
-      if (role?.value === RoleEnum._USER) {
+      if (role?.value === RoleEnum._USER || RoleEnum._BUSINESS) {
         return NextResponse.next()
       } else {
         toast.error(TOAST_MSG.NO_AUTHORIZATION)
@@ -46,7 +46,7 @@ export function middleware(req: NextRequest): NextResponse {
     if (authRoutes.includes(pathName)) {
       if (role?.value === RoleEnum._ADMIN) {
         return returnNextResponse(ROUTE.DASHBOARD)
-      } else if (role?.value === RoleEnum._USER) {
+      } else if (role?.value === RoleEnum._USER || RoleEnum._BUSINESS) {
         return returnNextResponse(ROUTE.USER_PROFILE)
       }
     }

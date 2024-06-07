@@ -21,11 +21,16 @@ import { IUserInformation } from '@/types/user'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { getPresentUrl } from '@/utils/helpers.util'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useRouter } from 'next/navigation'
+import { DownOutlined, SmileOutlined } from '@ant-design/icons'
+import dynamic from 'next/dynamic'
 
 const { Text } = Typography
 
-export default function MapPage(): React.ReactNode {
+function MapPage(): React.ReactNode {
+  const [isClient, setIsClient] = useState<boolean>(false)
   const { onLogout } = useAuth()
+  const router = useRouter()
   // const storedUser = {} as IUserInformation
   const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
   const [userInformation, setUserInformation, removeUserInformation] = useLocalStorage(
@@ -180,29 +185,40 @@ export default function MapPage(): React.ReactNode {
   }
 
   const avatarMenuItems: MenuProps['items'] = [
+    // {
+    //   key: '1',
+    //   label: <span className='p-2'>Profile</span>,
+    //   onClick: (): void => {
+    //     setRouteValue(ROUTE.USER_PROFILE)
+    //     console.log('userInformation', ROUTE.USER_PROFILE);
+    //     router.push('/main/user/profile')
+    //   }
+    // },
     {
       key: '1',
       label: (
-        <Link href={ROUTE.USER_PROFILE} onClick={() => setRouteValue(ROUTE.USER_PROFILE)}>
-          <Text className='p-2'>Profile</Text>
+        <Link href={ROUTE.USER_PROFILE} className='p-2' onClick={() => setRouteValue(ROUTE.USER_PROFILE)}>
+          Profile
         </Link>
       )
+      // onClick: (): void => {
+      //   setRouteValue(ROUTE.USER_PROFILE)
+      //   console.log('userInformation', ROUTE.USER_PROFILE);
+      //   router.push('/main/user/profile')
+      // }
     },
     {
       key: '2',
-      label: (
-        <Link href={ROUTE.MY_BUSINESS} onClick={() => setRouteValue(ROUTE.MY_BUSINESS)}>
-          <Text className='p-2'>My business</Text>
-        </Link>
-      )
+      label: <span className='p-2'>My business</span>,
+      onClick: (): void => {
+        setRouteValue(ROUTE.MY_BUSINESS)
+        router.push(ROUTE.MY_BUSINESS)
+      }
     },
     {
       key: '3',
-      label: (
-        <Text onClick={handleLogout} className='p-2  '>
-          Log out
-        </Text>
-      )
+      label: <span className='p-2'>Log out</span>,
+      onClick: handleLogout
     }
   ]
 
@@ -293,3 +309,11 @@ export default function MapPage(): React.ReactNode {
     </Layout>
   )
 }
+
+const DynamicMapPage = dynamic(() => Promise.resolve(MapPage), { ssr: false })
+
+const MapPage2 = (): React.ReactNode => {
+  return <DynamicMapPage />
+}
+
+export default MapPage2
