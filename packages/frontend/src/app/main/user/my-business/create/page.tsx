@@ -153,7 +153,7 @@ export default function CreateBusiness(): React.ReactNode {
   useEffect(() => {
     if (isCreateBusinessSuccess) {
       toastService.success('Create Success')
-      router.push('/user/my-business')
+      router.push('main/user/my-business')
     }
     if (isCreateBusinessError) {
       const errorResponse = createBusinessError as ErrorResponse
