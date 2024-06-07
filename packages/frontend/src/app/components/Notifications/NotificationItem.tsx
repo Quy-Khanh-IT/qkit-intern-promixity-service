@@ -1,13 +1,14 @@
 import { INotification } from '@/types/notification'
-import { convertNotificationType, getTimeHistory } from '@/utils/helpers.util'
+import { convertNotificationType, getPresentUrl, getTimeHistory } from '@/utils/helpers.util'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, List, Skeleton, Space, Typography } from 'antd'
 import React from 'react'
 import variables from '@/sass/common/_variables.module.scss'
 import { useRouter } from 'next/navigation'
 import { useUpdateReadNotificationMutation } from '@/services/notification.service'
-import { ROUTE } from '@/constants'
+import { ROUTE, StorageKey } from '@/constants'
 import { RoleEnum } from '@/types/enum'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 
 const { mainColor } = variables
 
@@ -19,6 +20,10 @@ export interface INotificationItemProps {
 
 const NotificationItem: React.FC<INotificationItemProps> = ({ data, loading, setOpenModal }) => {
   const router = useRouter()
+  const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
+    StorageKey._ROUTE_VALUE,
+    getPresentUrl() || ROUTE.MAP
+  )
   const [updateReadNotification] = useUpdateReadNotificationMutation()
 
   const updateReadBtn = async (): Promise<void> => {
@@ -29,8 +34,10 @@ const NotificationItem: React.FC<INotificationItemProps> = ({ data, loading, set
     const splitType = data.type.split('_')
     if (splitType[splitType.length - 1] === (RoleEnum._USER as string)) {
       router.push(ROUTE.MANAGE_USER)
+      setRouteValue(ROUTE.MANAGE_USER)
     } else if (splitType[splitType.length - 1] === (RoleEnum._BUSINESS as string)) {
       router.push(ROUTE.MANAGE_BUSINESS)
+      setRouteValue(ROUTE.MANAGE_BUSINESS)
     }
     const iTag = e.currentTarget.querySelector('.ant-list-item-action .read-btn')
     if (iTag) {

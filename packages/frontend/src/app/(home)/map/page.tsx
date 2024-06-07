@@ -20,12 +20,18 @@ import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { IUserInformation } from '@/types/user'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { getPresentUrl } from '@/utils/helpers.util'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 
 const { Text } = Typography
 
 export default function MapPage(): React.ReactNode {
   const { onLogout } = useAuth()
+  // const storedUser = {} as IUserInformation
   const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
+  const [userInformation, setUserInformation, removeUserInformation] = useLocalStorage(
+    StorageKey._USER,
+    {} as IUserInformation
+  )
   const [userImage, setUserImage] = useState<string>('')
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
@@ -61,11 +67,11 @@ export default function MapPage(): React.ReactNode {
   //   console.log('userInformation', userInformation);
   // }, [])
 
-  useEffect(() => {
-    if (storedUser) {
-      setUserImage(storedUser.image)
-    }
-  }, [storedUser])
+  // useEffect(() => {
+  //   if (storedUser) {
+  //     setUserImage(storedUser.image)
+  //   }
+  // }, [storedUser])
 
   const {
     data: searchResponse,
@@ -173,7 +179,7 @@ export default function MapPage(): React.ReactNode {
     onLogout()
   }
 
-  const items: MenuProps['items'] = [
+  const avatarMenuItems: MenuProps['items'] = [
     {
       key: '1',
       label: (
@@ -230,14 +236,14 @@ export default function MapPage(): React.ReactNode {
           </Dropdown>
         </div>
         <div style={{ width: 100 }} className='d-flex justify-content-end'>
-          {userImage ? (
+          {userInformation && (userInformation as IUserInformation).isVerified ? (
             <>
-              <Dropdown menu={{ items }} placement='bottomRight' arrow>
+              <Dropdown menu={{ items: avatarMenuItems }} placement='bottomRight' arrow>
                 <div>
                   <ImageCustom
                     width={40}
                     height={40}
-                    src={userImage || ''}
+                    src={(userInformation as IUserInformation)?.image || ''}
                     preview={false}
                     className='--avatar-custom d-cursor'
                   />
