@@ -13,6 +13,8 @@ export const ROUTE = {
   // User
   USER_PROFILE: '/main/user/profile',
   MY_BUSINESS: '/main/user/my-business',
+  MY_BUSINESS_CREATE: '/main/user/my-business/create',
+
   // Admin
   DASHBOARD: '/main/admin/dashboard',
   MANAGE_USER: '/main/admin/manage-user',

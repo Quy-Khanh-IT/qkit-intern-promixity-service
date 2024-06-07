@@ -21,30 +21,30 @@ export const businessApi = createApi({
     }),
 
     // business
-    // getAllPrivateBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
-    //   query: (params) => {
-    //     const queryString = qs.stringify(params, { arrayFormat: 'repeat' })
-    //     return {
-    //       url: `/businesses/${id}?${queryString}`,
-    //       method: 'GET'
-    //     }
-    //   },
-    //   transformResponse: (response: IPaginationResponse<IBusiness>): IPaginationResponse<IBusiness> => {
-    //     const data: IBusiness[] = response.data.map((item: IBusiness) => {
-    //       const categoryName = item.category?.name
-    //       return {
-    //         ...item,
-    //         categoryName,
-    //         overallRating: parseFloat(item.overallRating?.toFixed(1))
-    //       } as IBusiness
-    //     })
-    //     return {
-    //       ...response,
-    //       data
-    //     } as IPaginationResponse<IBusiness>
-    //   },
-    //   providesTags: ['BusinessPrivateList']
-    // }),
+    getAllPrivateBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
+      query: (params) => {
+        const queryString = qs.stringify(params, { arrayFormat: 'repeat' })
+        return {
+          url: `/businesses/users?${queryString}`,
+          method: 'GET'
+        }
+      },
+      transformResponse: (response: IPaginationResponse<IBusiness>): IPaginationResponse<IBusiness> => {
+        const data: IBusiness[] = response.data.map((item: IBusiness) => {
+          const categoryName = item.category?.name
+          return {
+            ...item,
+            categoryName,
+            overallRating: parseFloat(item.overallRating?.toFixed(1))
+          } as IBusiness
+        })
+        return {
+          ...response,
+          data
+        } as IPaginationResponse<IBusiness>
+      },
+      providesTags: ['BusinessPrivateList']
+    }),
 
     // /admin
     getAllBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
@@ -143,6 +143,7 @@ export const businessApi = createApi({
 export const {
   useGetPrivateBusinessProfileQuery,
   useGetAllBusinessesQuery,
+  useGetAllPrivateBusinessesQuery,
   useGetAllBusinessStatusQuery,
   useGetAllBusinessActionsQuery,
   useUpdateBusinessStatusMutation,
