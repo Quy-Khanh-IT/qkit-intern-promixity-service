@@ -35,7 +35,7 @@ export class AxiosService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            console.log('error', error.response.data);
+            console.log('error', error);
             throw 'An error happened!';
           }),
         ),
@@ -43,7 +43,7 @@ export class AxiosService {
 
     console.log('result', result);
 
-    return null;
+    return result?.data ?? null;
   }
 
   async get(url: string): Promise<any> {

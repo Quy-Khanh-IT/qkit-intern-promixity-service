@@ -64,9 +64,9 @@ export class BusinessController {
   @Get('/users')
   @ApiBearerAuth()
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.BUSINESS, UserRole.ADMIN)
+  @Roles(UserRole.BUSINESS)
   @HttpCode(200)
-  @ApiOperation({ summary: '[ADMIN, BUSINESS]: get all user businesses' })
+  @ApiOperation({ summary: '[BUSINESS]: get all user businesses' })
   async getAllBusiness(
     @Query() data: FindAllUserBusinessQuery,
     @Req() req: Request,
@@ -87,10 +87,6 @@ export class BusinessController {
   // }
 
   @Get('status')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '[ADMIN]: get business status' })
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN)
   @HttpCode(200)
   getStatus() {
     return this.businessService.getStatus();
