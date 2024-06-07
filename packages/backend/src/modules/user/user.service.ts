@@ -33,7 +33,11 @@ import {
 } from 'src/common/exceptions/user.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import { hashString, verifyHash } from 'src/common/utils';
+import {
+  hashString,
+  transStringToObjectId,
+  verifyHash,
+} from 'src/common/utils';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 import TokenPayload from '../auth/key.payload';
 import { MailService } from '../mail/mail.service';
@@ -55,6 +59,8 @@ import { Business } from '../business/entities/business.entity';
 import { OtpService } from '../otp/otp.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetPublicProfileResponeDto } from './dto/get-public-profile.dto';
+import { FindAllUserBusinessQuery } from './dto/find-all-user-business.query.dto';
+import { DayOpenCloseTime } from '../business/dto/create-business.dto';
 
 @Injectable()
 export class UserService {
@@ -554,14 +560,6 @@ export class UserService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.userRepository.create(createUserDto);
     return user;
-  }
-
-  async getAllBusiness(
-    userId: string,
-  ): Promise<FindAllResponse<Business> | []> {
-    const businesses = await this.BusinessService.getAllByUser(userId);
-
-    return businesses;
   }
 
   async UpdateDate(userId: string) {
