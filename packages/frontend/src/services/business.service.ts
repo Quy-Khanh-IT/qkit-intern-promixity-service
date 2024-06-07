@@ -9,7 +9,7 @@ import qs from 'qs'
 export const businessApi = createApi({
   reducerPath: 'businessApi',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['BusinessInfo', 'BusinessList', 'Status'],
+  tagTypes: ['BusinessInfo', 'BusinessPrivateList', 'BusinessList', 'Status'],
   endpoints: (builder) => ({
     // /user
     getPrivateBusinessProfile: builder.query<IBusiness, string>({
@@ -19,6 +19,32 @@ export const businessApi = createApi({
       }),
       providesTags: ['BusinessInfo']
     }),
+
+    // business
+    // getAllPrivateBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
+    //   query: (params) => {
+    //     const queryString = qs.stringify(params, { arrayFormat: 'repeat' })
+    //     return {
+    //       url: `/businesses/${id}?${queryString}`,
+    //       method: 'GET'
+    //     }
+    //   },
+    //   transformResponse: (response: IPaginationResponse<IBusiness>): IPaginationResponse<IBusiness> => {
+    //     const data: IBusiness[] = response.data.map((item: IBusiness) => {
+    //       const categoryName = item.category?.name
+    //       return {
+    //         ...item,
+    //         categoryName,
+    //         overallRating: parseFloat(item.overallRating?.toFixed(1))
+    //       } as IBusiness
+    //     })
+    //     return {
+    //       ...response,
+    //       data
+    //     } as IPaginationResponse<IBusiness>
+    //   },
+    //   providesTags: ['BusinessPrivateList']
+    // }),
 
     // /admin
     getAllBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({

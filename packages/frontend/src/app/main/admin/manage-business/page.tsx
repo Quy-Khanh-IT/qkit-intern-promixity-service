@@ -273,7 +273,7 @@ const ManageBusiness = (): React.ReactNode => {
         ]
         return (
           <>
-            <Dropdown menu={{ items }} placement='bottom' trigger={['click']} arrow>
+            <Dropdown menu={{ items }} placement='bottom' trigger={['click']} arrow className='--action-dropdown'>
               <EllipsisOutlined style={{ fontSize: 15, cursor: 'pointer' }} />
             </Dropdown>
           </>

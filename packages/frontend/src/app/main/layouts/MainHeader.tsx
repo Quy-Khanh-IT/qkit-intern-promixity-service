@@ -126,7 +126,7 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
       <Col flex='auto' style={{ display: 'flex', justifyContent: 'end', alignItems: 'center' }}>
         <Space className='me-4' size='small'>
           <NotificationPopover />
-          <Dropdown menu={{ items }} placement='bottomRight' arrow>
+          <Dropdown menu={{ items }} placement='bottomRight' arrow className='--dropdown-avatar'>
             <div>
               <ImageCustom
                 width={40}

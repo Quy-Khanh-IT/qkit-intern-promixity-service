@@ -119,7 +119,13 @@ body {
 }
 
 .link-underline-none{
-  text-decoration: none;
+  text-decoration: none !important;
+}
+
+.ant-dropdown{
+  .ant-dropdown-menu-title-content{
+    text-align: start !important;
+  }
 }
 
 .gap-1 {
