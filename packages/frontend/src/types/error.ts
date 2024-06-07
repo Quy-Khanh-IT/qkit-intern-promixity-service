@@ -4,7 +4,9 @@ export interface ErrorResponse {
       [key: string]: string[]
     }
     message?: string
+    statusCode?: number
   }
+  status?: number
 }
 
 export interface RegisterDataErrors {

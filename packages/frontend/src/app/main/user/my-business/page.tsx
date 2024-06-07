@@ -56,6 +56,8 @@ import './my-business.scss'
 import Link from 'next/link'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { getPresentUrl } from '@/utils/helpers.util'
+import { HttpStatusCode } from 'axios'
+import { useRouter } from 'next/navigation'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -77,6 +79,7 @@ type DataIndex = keyof IBusiness
 type SearchIndex = keyof IGetAllBusinessQuery
 
 const MyBusiness = (): React.ReactNode => {
+  const router = useRouter()
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
     getPresentUrl() || ROUTE.MAP
@@ -120,8 +123,10 @@ const MyBusiness = (): React.ReactNode => {
   useEffect(() => {
     if (isErrorGetAllBusiness) {
       const errorResponse = errorGetAllBusiness as ErrorResponse
-      // if(errorResponse.)
-      console.log('errorGetAllBusiness', errorGetAllBusiness)
+      if (errorResponse?.data?.statusCode === HttpStatusCode.Forbidden) {
+        console.log('errorResponse.data.errors', errorResponse.data.errors)
+        router.push(ROUTE.MY_BUSINESS_CREATE)
+      }
     }
   }, [isErrorGetAllBusiness])
 
