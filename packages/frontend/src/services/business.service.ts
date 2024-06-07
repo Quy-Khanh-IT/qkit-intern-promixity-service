@@ -132,7 +132,7 @@ export const businessApi = createApi({
     }),
     updateBusinessStatus: builder.mutation<void, { type: string; id: string }>({
       query: (payload) => ({
-        url: `/businesses/${payload.id}/status?${payload.type}`,
+        url: `/businesses/${payload.id}/status?type=${payload.type}`,
         method: 'PATCH'
       }),
       invalidatesTags: ['BusinessList']
