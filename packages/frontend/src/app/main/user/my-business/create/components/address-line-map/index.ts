@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 
-const Map = dynamic(() => import('./AddressLineMap'), {
+const AddressLineMap = dynamic(() => import('./AddressLineMap'), {
   ssr: false
 })
 
-export default Map
+export default AddressLineMap

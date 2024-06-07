@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import './address-line-form.scss'
 import { ICreateBusiness } from '@/types/business'
 import { IAddressLinePayload } from '@/types/address'
-import AddressLineMap from './address-line-map/AddressLineMap'
+import AddressLineMap from './address-line-map'
 import { useGetAddressLineQuery } from '@/services/address-line.service'
 import { SearchProps } from 'antd/es/input'
 

@@ -1,3 +1,4 @@
+'use client'
 import { Button, Dropdown, Input, MenuProps, Select, Space } from 'antd'
 import React from 'react'
 import './category-form.scss'

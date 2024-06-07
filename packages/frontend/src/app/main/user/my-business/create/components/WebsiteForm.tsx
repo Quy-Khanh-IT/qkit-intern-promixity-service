@@ -1,3 +1,4 @@
+'use client'
 import { Button, Input } from 'antd'
 import React from 'react'
 import './website-form.scss'

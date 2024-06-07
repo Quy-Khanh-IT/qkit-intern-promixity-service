@@ -1,3 +1,4 @@
+'use client'
 import { Button, Input } from 'antd'
 import React, { useState } from 'react'
 import './name-form.scss'
