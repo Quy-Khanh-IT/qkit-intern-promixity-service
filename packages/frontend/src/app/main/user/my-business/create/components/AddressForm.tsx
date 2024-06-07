@@ -1,3 +1,4 @@
+'use client'
 import { Button, Input, Select } from 'antd'
 import React from 'react'
 import './address-form.scss'
