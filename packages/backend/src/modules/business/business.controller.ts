@@ -87,8 +87,6 @@ export class BusinessController {
   // }
 
   @Get('status')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: '[ADMIN]: get business status' })
   @HttpCode(200)
   getStatus() {
     return this.businessService.getStatus();
