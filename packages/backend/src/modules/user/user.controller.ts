@@ -39,6 +39,7 @@ import { UpdateGeneralInfoDto } from './dto/update-general-info.dto';
 import { UpdateGeneralInfoResponseDto } from './dto/update-general-info.response.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { FindAllUserBusinessQuery } from './dto/find-all-user-business.query.dto';
 
 @Controller('users')
 @ApiTags('User')
@@ -70,20 +71,6 @@ export class UserController {
     );
 
     return plainToClass(User, result);
-  }
-
-  @Get('/all/businesses')
-  @ApiBearerAuth()
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.BUSINESS, UserRole.ADMIN)
-  @HttpCode(200)
-  @ApiResponse({
-    status: 200,
-    description: 'User successfully get business.',
-  })
-  async getAllBusiness(@Req() req: Request) {
-    const result = await this.userService.getAllBusiness(req.user.id);
-    return result;
   }
 
   @UseGuards(JwtAccessTokenGuard)

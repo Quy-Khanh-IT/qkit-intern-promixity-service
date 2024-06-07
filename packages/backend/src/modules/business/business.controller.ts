@@ -42,6 +42,7 @@ import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
+import { FindAllUserBusinessQuery } from '../user/dto/find-all-user-business.query.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')
@@ -58,6 +59,24 @@ export class BusinessController {
     const transferData = plainToClass(FindAllBusinessQuery, data);
 
     return await this.businessService.findAll(transferData);
+  }
+
+  @Get('/users')
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.BUSINESS, UserRole.ADMIN)
+  @HttpCode(200)
+  @ApiOperation({ summary: '[ADMIN, BUSINESS]: get all user businesses' })
+  async getAllBusiness(
+    @Query() data: FindAllUserBusinessQuery,
+    @Req() req: Request,
+  ) {
+    const transferData = plainToClass(FindAllUserBusinessQuery, data);
+    const result = await this.businessService.getUserBusinesses(
+      req.user.id,
+      transferData,
+    );
+    return result;
   }
 
   // @Get(':id/reviews')

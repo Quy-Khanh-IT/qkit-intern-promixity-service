@@ -52,7 +52,7 @@ export class AxiosService {
 
     console.log('url', url);
 
-    const res = await firstValueFrom(
+    const res = firstValueFrom(
       this.httpService
         .get(url, {
           httpAgent: getHost(),

@@ -58,9 +58,9 @@ export class NominatimOsmService {
 
     const url = this.osmReverseApi + queryParams;
 
-    console.log('testGet');
-    // const data = await this.axiosService.processRetry(url);
-    const data = await this.axiosService.testGet(url);
+    console.log('processRetry');
+    const data = await this.axiosService.processRetry(url);
+    // const data = await this.axiosService.testGet(url);
 
     console.log('data', data);
 

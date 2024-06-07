@@ -47,6 +47,7 @@ import { RestoreBusinessEvent } from './events/restore-business.event';
 import { BusinessRepository } from './repository/business.repository';
 import { UserService } from '../user/user.service';
 import { ReviewService } from '../review/review.service';
+import { FindAllUserBusinessQuery } from '../user/dto/find-all-user-business.query.dto';
 
 @Injectable()
 export class BusinessService {
@@ -290,6 +291,8 @@ export class BusinessService {
       addressLine,
       location,
     });
+
+    console.log('isValid', isValid);
 
     if (!isValid) {
       throw new BusinessInvalidAddressException();
@@ -776,6 +779,10 @@ export class BusinessService {
     return business;
   }
 
+  getBusinessRepository(): BusinessRepository {
+    return this.businessRepository;
+  }
+
   // async getReviews(businessId: string) {
   //   const business = await this.businessRepository.findOneById(businessId);
 
@@ -784,6 +791,143 @@ export class BusinessService {
   //   }
 
   // }
+
+  async getUserBusinesses(
+    userId: string,
+    query: FindAllUserBusinessQuery,
+  ): Promise<PaginationResult<Business>> {
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/users/all/businesses`;
+
+    query.userId = userId;
+
+    const aggregateResult = await PaginationHelper.paginate(
+      URL,
+      query,
+      this.businessRepository,
+      this.configGetAllUserBusinessPipeLine,
+    );
+    const businesses = aggregateResult.data.map((business) =>
+      plainToClass(Business, business),
+    );
+
+    aggregateResult.data = businesses;
+
+    return aggregateResult as PaginationResult<Business>;
+  }
+
+  async configGetAllUserBusinessPipeLine(
+    query: FindAllUserBusinessQuery,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    if (query.userId) {
+      matchStage['userId'] = transStringToObjectId(query.userId);
+    }
+
+    if (query.name) {
+      matchStage['name'] = { $regex: query.name, $options: 'i' };
+    }
+
+    if (query.address) {
+      matchStage['fullAddress'] = { $regex: query.address, $options: 'i' };
+    }
+
+    if (query.status && query.status.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.status)) {
+        arr.push(query.status);
+      } else {
+        arr = query.status;
+      }
+
+      matchStage['status'] = {
+        $in: arr,
+      };
+    }
+
+    if (query.phoneNumber) {
+      matchStage['phoneNumber'] = { $regex: query.phoneNumber, $options: 'i' };
+    }
+
+    if (query.categoryIds && query.categoryIds.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.categoryIds)) {
+        arr.push(query.categoryIds);
+      } else {
+        arr = query.categoryIds;
+      }
+
+      matchStage['category._id'] = {
+        $in: arr.map((id) => transStringToObjectId(id)),
+      };
+    }
+
+    if (query.starsRating && query.starsRating.length > 0) {
+      const arrFilter = [];
+      Array.from(query.starsRating).forEach((star) => {
+        arrFilter.push({
+          overallRating: {
+            $gte: parseInt(star),
+            $lte: parseInt(star) + 0.9,
+          },
+        });
+      });
+
+      finalPipeline.push({
+        $match: {
+          $or: [...arrFilter],
+        },
+      });
+    }
+
+    if (query.dayOfWeek && query.dayOfWeek.length > 0) {
+      const days = JSON.parse(query.dayOfWeek) as DayOpenCloseTime[];
+
+      days.forEach((day) => {
+        finalPipeline.push({
+          $match: {
+            dayOfWeek: {
+              $elemMatch: {
+                day: day.day.toLowerCase(),
+                openTime: day.openTime,
+                closeTime: day.closeTime,
+              },
+            },
+          },
+        });
+      });
+    }
+
+    if (query.sortRatingBy) {
+      sortStage['overallRating'] = query.sortRatingBy === 'asc' ? 1 : -1;
+    }
+
+    if (query.sortTotalReviewsBy) {
+      sortStage['totalReview'] = query.sortTotalReviewsBy === 'asc' ? 1 : -1;
+    }
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query as FindAllUserBusinessQuery,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
+  }
 
   async validateAddress(
     validateAddressDto: ValidateAddressDto,
@@ -799,92 +943,129 @@ export class BusinessService {
 
     console.log('reverseData', reverseData);
 
-    if (reverseData?.state === validateAddressDto.province) {
-      // is a province (example: tỉnh Bình Dương)
-      if (
-        !(reverseData?.address?.county && validateAddressDto.district) ===
-          reverseData?.address?.county &&
-        !(reverseData?.address?.city && validateAddressDto.district) ===
-          reverseData?.address?.city &&
-        !(reverseData?.address?.state && validateAddressDto.province) ===
-          reverseData?.address?.state
-      ) {
-        return false;
-      }
-    } else if (
-      // is a city (example: Thành phố Hồ Chí Minh)
-      !(
-        (reverseData?.address?.country && validateAddressDto.country) ===
-        reverseData?.address?.country
-      ) &&
-      !(
-        (reverseData?.address?.suburb && validateAddressDto.district) ===
-        reverseData?.address?.suburb
-      ) &&
-      !(
-        (reverseData?.address?.city && validateAddressDto.province) ===
-        reverseData?.address?.city
-      )
-    ) {
-      return false;
-    }
+    // if (reverseData?.state === validateAddressDto.province) {
+    //   // is a province (example: tỉnh Bình Dương)
+
+    //   console.log('in 1');
+    //   if (
+    //     !(reverseData?.address?.county && validateAddressDto.district) ===
+    //       reverseData?.address?.county &&
+    //     !(reverseData?.address?.city && validateAddressDto.district) ===
+    //       reverseData?.address?.city &&
+    //     !(reverseData?.address?.state && validateAddressDto.province) ===
+    //       reverseData?.address?.state
+    //   ) {
+    //     return false;
+    //   }
+    // } else {
+    //   console.log('in 2');
+
+    //   console.log(
+    //     '(reverseData?.address?.country && validateAddressDto.country)',
+    //     reverseData?.address?.country && validateAddressDto.country,
+    //   );
+
+    //   console.log(
+    //     (reverseData?.address?.country && validateAddressDto.country) ===
+    //       reverseData?.address?.country,
+    //   );
+
+    //   console.log(
+    //     '(reverseData?.address?.suburb && validateAddressDto.district)',
+    //     reverseData?.address?.suburb && validateAddressDto.district,
+    //   );
+
+    //   console.log(
+    //     (reverseData?.address?.suburb && validateAddressDto.district) ===
+    //       reverseData?.address?.suburb,
+    //   );
+
+    //   if (
+    //     (reverseData?.address?.country && validateAddressDto.country) ===
+    //       reverseData?.address?.country &&
+    //     (reverseData?.address?.city && validateAddressDto.province) ===
+    //       reverseData?.address?.city &&
+    //     (reverseData?.address?.suburb && validateAddressDto.district) ===
+    //       reverseData?.address?.suburb
+    //   ) {
+    //     return false;
+    //   }
+    // }
 
     // Check if address line is valid
     // create mark array which mark all character in road to true
     // then check if all character in address line is in mark array
-    // const counts = {} as Object;
+    const counts = {} as Object;
 
-    // let splitReverseRoad = (reverseData?.address?.road as string).split(' ');
+    console.log('reverseData?.address?.road', reverseData?.address?.road);
 
-    // if (splitReverseRoad.includes('Đường')) {
-    //   splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
-    // }
+    let splitReverseRoad = (reverseData?.address?.road as string)
+      .toLocaleLowerCase()
+      .split(' ');
 
-    // const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
-    //   return acc.concat(item);
-    // }, '');
+    console.log('splitReverseRoad', splitReverseRoad);
 
-    // splitReverseRoad = reverseRoadStr.split('');
+    if (splitReverseRoad.includes('Đường')) {
+      splitReverseRoad = splitReverseRoad.filter((item) => item != 'Đường');
 
-    // splitReverseRoad.forEach((element) => {
-    //   counts[element] = 0;
-    // });
+      console.log('splitReverseRoad', splitReverseRoad);
+    }
 
-    // let slitAddressLine = validateAddressDto.addressLine.split(' ');
+    const reverseRoadStr = splitReverseRoad.reduce((acc, item) => {
+      return acc.concat(item);
+    }, '');
 
-    // if (slitAddressLine.includes('Đường')) {
-    //   slitAddressLine = slitAddressLine.filter((item) => item != 'Đường');
-    // }
+    console.log('reverseRoadStr', reverseRoadStr);
 
-    // const AddressLineStr = slitAddressLine.reduce((acc, item) => {
-    //   return acc.concat(item);
-    // }, '');
+    splitReverseRoad = reverseRoadStr.split('');
 
-    // slitAddressLine = AddressLineStr.split('');
+    splitReverseRoad.forEach((element) => {
+      counts[element] = 0;
+    });
 
-    // for (const char of slitAddressLine) {
-    //   if (!counts.hasOwnProperty(char)) {
-    //     return false;
-    //   } else {
-    //     counts[char] += 1;
-    //   }
-    // }
+    let slitAddressLine = validateAddressDto.addressLine
+      .toLocaleLowerCase()
+      .split(' ');
 
-    // for (const key in counts) {
-    //   if (counts[key] === 0 || counts[key] > 1) {
-    //     if (counts[key] > 1) {
-    //       const countWord = splitReverseRoad.filter((item) => item == key);
+    console.log('slitAddressLine', slitAddressLine);
 
-    //       if (countWord.length !== counts[key]) {
-    //         return false;
-    //       } else {
-    //         continue;
-    //       }
-    //     }
+    if (slitAddressLine.includes('đường')) {
+      slitAddressLine = slitAddressLine.filter((item) => item != 'đường');
 
-    //     return false;
-    //   }
-    // }
+      console.log('slitAddressLine', slitAddressLine);
+    }
+
+    const AddressLineStr = slitAddressLine.reduce((acc, item) => {
+      return acc.concat(item);
+    }, '');
+
+    console.log('AddressLineStr', AddressLineStr);
+
+    slitAddressLine = AddressLineStr.split('');
+
+    for (const char of slitAddressLine) {
+      if (!counts.hasOwnProperty(char)) {
+        return false;
+      } else {
+        counts[char] += 1;
+      }
+    }
+
+    for (const key in counts) {
+      if (counts[key] === 0 || counts[key] > 1) {
+        if (counts[key] > 1) {
+          const countWord = splitReverseRoad.filter((item) => item == key);
+
+          if (countWord.length !== counts[key]) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+
+        return false;
+      }
+    }
 
     return true;
   }
