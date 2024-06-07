@@ -26,7 +26,6 @@ export const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     [statisticApi.reducerPath]: statisticApi.reducer,
-   
     selectedBusiness: selectedBusinessSlice.reducer,
     [serviceApi.reducerPath]: serviceApi.reducer
   },
@@ -41,11 +40,8 @@ export const store = configureStore({
       nearByApi.middleware,
       categoryApi.middleware,
       notificationApi.middleware,
-<<<<<<< HEAD
       statisticApi.middleware,
-=======
       serviceApi.middleware,
->>>>>>> 3418471 (update service)
       rtkQueryErrorLogger
     )
 })
