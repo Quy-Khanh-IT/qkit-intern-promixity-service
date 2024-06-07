@@ -121,12 +121,7 @@ const ProfileComponent: React.FC = () => {
           <div className='profile-cover'>
             <Flex justify='center' style={{ marginBottom: '8px' }}>
               <div className='avatar-cover'>
-                <ImageCustom
-                  width={150}
-                  height={150}
-                  src={userProfile?.image || ''}
-                  className='d-flex align-self-center'
-                />
+                <ImageCustom width={150} height={150} src={userProfile?.image} className='d-flex align-self-center' />
                 <Tag color={generateRoleColor(userProfile?.role || '')} key={userProfile?.role} className='role'>
                   {userProfile?.role.toUpperCase()}
                 </Tag>
