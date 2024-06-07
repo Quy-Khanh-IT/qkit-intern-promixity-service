@@ -18,6 +18,7 @@ import { useCreateBusinessMutation } from '@/services/business.service'
 import { ToastService } from '@/services/toast.service'
 import { ErrorResponse } from '@/types/error'
 import { useRouter } from 'next/navigation'
+import { ROUTE } from '@/constants'
 
 export default function CreateBusiness(): React.ReactNode {
   const [currentStep, setCurrentStep] = useState<number>(0)
@@ -153,7 +154,7 @@ export default function CreateBusiness(): React.ReactNode {
   useEffect(() => {
     if (isCreateBusinessSuccess) {
       toastService.success('Create Success')
-      router.push('main/user/my-business')
+      router.push(ROUTE.MY_BUSINESS)
     }
     if (isCreateBusinessError) {
       const errorResponse = createBusinessError as ErrorResponse
