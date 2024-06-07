@@ -71,7 +71,7 @@ const AddressLineMap = ({
     handleOnChangeData('location', { coordinates: selectedPosition ? selectedPosition : [0, 0] })
   }, [selectedPosition])
   return (
-    <MapContainer zoomControl={false} center={center} zoom={19} className='w-100 map-container'>
+    <MapContainer zoomControl={false} center={center} zoom={19} className='w-100 map-container address-line-map'>
       <TileLayer
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
