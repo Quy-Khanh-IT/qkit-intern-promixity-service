@@ -89,8 +89,6 @@ export class BusinessController {
   @Get('status')
   @ApiBearerAuth()
   @ApiOperation({ summary: '[ADMIN]: get business status' })
-  @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  @Roles(UserRole.ADMIN)
   @HttpCode(200)
   getStatus() {
     return this.businessService.getStatus();
