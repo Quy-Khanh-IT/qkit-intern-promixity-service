@@ -11,17 +11,24 @@ const AdminLogin: React.FC = () => {
   const { onLogin } = useAuth()
   const [form] = Form.useForm()
   const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
+  const [disableLogin, setDisableLogin] = useState<boolean>(false)
 
-  const _handleLoadingLogin = (isLoading: boolean): void => {
-    setLoadingLogin(isLoading)
+  const _stopLoadingLogin = (): void => {
+    setLoadingLogin(false)
+    setTimeout(() => {
+      setDisableLogin(false)
+    }, 1000)
   }
 
-  const handleLogin: FormProps<ILoginPayload>['onFinish'] = (values) => {
+  const debounceLoginForm = debounce((values: ILoginPayload) => {
+    onLogin(values, _stopLoadingLogin)
+  }, 1000)
+
+  const _onFinish = (values: ILoginPayload): void => {
     setLoadingLogin(true)
-    onLogin(values, _handleLoadingLogin)
+    setDisableLogin(true)
+    debounceLoginForm(values)
   }
-
-  const debounceLogin = debounce((values: ILoginPayload) => handleLogin(values), 1000)
 
   return (
     <div className='--admin-sign-in-wrapper'>
@@ -42,7 +49,7 @@ const AdminLogin: React.FC = () => {
                 className='login-form w-100'
                 initialValues={{ remember: true }}
                 layout='vertical'
-                onFinish={debounceLogin}
+                onFinish={_onFinish}
               >
                 <h3 className='title' style={{ fontWeight: 700 }}>
                   Admin Login
@@ -65,7 +72,12 @@ const AdminLogin: React.FC = () => {
                     }}
                   />
                 </Form.Item>
-                <Button htmlType='submit' loading={loadingLogin} className='login-btn w-100 mt-4'>
+                <Button
+                  htmlType='submit'
+                  loading={loadingLogin}
+                  disabled={disableLogin}
+                  className='login-btn w-100 mt-4'
+                >
                   LOGIN
                 </Button>
               </Form>

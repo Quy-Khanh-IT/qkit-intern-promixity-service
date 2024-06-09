@@ -10,6 +10,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import StickyBox from 'react-sticky-box'
 import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
+import variables from '@/sass/common/_variables.module.scss'
+
+const {black } = variables
 
 const ORIGIN_PAGE = 1
 const PAGE_SIZE = 4
@@ -136,7 +139,7 @@ const NotificationPopover = (): React.ReactNode => {
         />
       ),
       forceRender: true,
-      style: { minHeight: 700, textColor: '#228154' }
+      style: { minHeight: 700, textColor: black }
     }
   })
 

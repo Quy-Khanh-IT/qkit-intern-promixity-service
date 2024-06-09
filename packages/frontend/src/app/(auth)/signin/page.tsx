@@ -20,8 +20,8 @@ export default function SignIn(): React.ReactNode {
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
 
-  const _handleLoadingLogin = (isLoading: boolean): void => {
-    setLoadingLogin(isLoading)
+  const _handleLoadingLogin = (): void => {
+    setLoadingLogin(false)
   }
 
   const [inputError, setInputError] = useState<{
@@ -154,9 +154,9 @@ export default function SignIn(): React.ReactNode {
                   Forget Password
                 </div>
               </div>
-              <Button loading={loadingLogin} style={{ color: 'white' }} onClick={handleSignIn} className='form-btn'>
+              <button style={{ color: 'white' }} onClick={handleSignIn} className='form-btn'>
                 Sign In
-              </Button>
+              </button>
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 {' '}
                 Do not have an account?{' '}
