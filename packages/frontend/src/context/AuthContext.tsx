@@ -25,8 +25,9 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     StorageKey._USER,
     {} as IUserInformation
   )
-  const [userId, setUserId, removeUserId] = useLocalStorage(StorageKey._USER_ID, '')
-  const [_authSession, setAuthSession, removeAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
+  const [_userId, setUserId, removeUserId] = useLocalStorage(StorageKey._USER_ID, '')
+  const [_userRole, setUserRole, _removeUserRole] = useLocalStorage(StorageKey._USER_ROLE, RoleEnum._USER as string)
+  const [_authSession, setAuthSession, _removeAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
 
   const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
 
@@ -38,7 +39,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       if (res) {
         setUserInformation(res)
         setUserId(userId)
-        setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
+        setUserRole(res.role as RoleEnum)
+        setCookieFromClient(StorageKey._USER_ROLE, res?.role as RoleEnum)
 
         if (res.role === (RoleEnum._ADMIN as string)) {
           router.push(ROUTE.DASHBOARD)
@@ -65,7 +67,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       if (res) {
         setUserInformation(res)
         setUserId(userId)
-        setCookieFromClient(StorageKey._ROLE, res?.role as RoleEnum)
+        setCookieFromClient(StorageKey._USER_ROLE, res?.role as RoleEnum)
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -96,16 +98,20 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       })
   }
 
-  const onLogout = (): void => {
-    router.push(ROUTE.ROOT)
+  const onLogout = (role: RoleEnum): void => {
     resetSession()
+    if (role === RoleEnum._ADMIN) {
+      router.push(ROUTE.ADMIN_LOGIN)
+    } else {
+      router.push(ROUTE.USER_LOGIN)
+    }
     window.location.reload()
   }
 
   const resetSession = (): void => {
     removeAccessToken()
     removeRefreshToken()
-    removeAuthSession()
+    setAuthSession(true)
     removeUserInformation()
     removeUserId()
     removeRouteValue()
@@ -117,7 +123,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       value={{
         onLogin,
         onLogout,
-        userId: userId as string,
         userInformation: userInformation as IUserInformation,
         fetchUserInformation,
         setRouteValue

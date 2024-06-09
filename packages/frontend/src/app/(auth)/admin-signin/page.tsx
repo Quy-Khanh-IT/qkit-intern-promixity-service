@@ -5,6 +5,7 @@ import { Col, Flex, Form, FormProps, Input } from 'antd'
 import React from 'react'
 import './admin-sign-in.scss'
 import { useAuth } from '@/context/AuthContext'
+import { debounce } from 'lodash-es'
 
 const AdminLogin: React.FC = () => {
   const { onLogin } = useAuth()
@@ -12,6 +13,8 @@ const AdminLogin: React.FC = () => {
   const handleLogin: FormProps<ILoginPayload>['onFinish'] = (values) => {
     onLogin(values)
   }
+
+  const debounceLogin = debounce((values: ILoginPayload) => handleLogin(values), 1000)
 
   return (
     <div className='--admin-sign-in-wrapper'>
@@ -31,7 +34,7 @@ const AdminLogin: React.FC = () => {
                 className='login-form w-100'
                 initialValues={{ remember: true }}
                 layout='vertical'
-                onFinish={handleLogin}
+                onFinish={debounceLogin}
               >
                 <h3 className='title' style={{ fontWeight: 700 }}>
                   Admin Login
@@ -41,7 +44,18 @@ const AdminLogin: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item name='password' label='Password' rules={VALIDATION.PASSWORD} className='mb-0 mt-2'>
-                  <Input.Password size='large' placeholder='Password' />
+                  <Input.Password
+                    size='large'
+                    placeholder='Password'
+                    onPaste={(e) => {
+                      e.preventDefault()
+                      return false
+                    }}
+                    onCopy={(e) => {
+                      e.preventDefault()
+                      return false
+                    }}
+                  />
                 </Form.Item>
                 <button className='login-btn w-100 mt-4'>LOGIN</button>
               </Form>

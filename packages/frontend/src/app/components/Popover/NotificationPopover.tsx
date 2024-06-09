@@ -1,13 +1,13 @@
-import { Badge, Flex, Popover, Space, Tabs, TabsProps, Tooltip } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
-import StickyBox from 'react-sticky-box'
-
 import { UI_TEXT } from '@/constants'
+import { fetchVersionOptions } from '@/constants/rtk-query'
 import { useLazyGetAllNotificationsQuery, useUpdateAllReadNotificationMutation } from '@/services/notification.service'
 import { BooleanEnum } from '@/types/enum'
 import { INotification } from '@/types/notification'
 import { IGetAllNotificationQuery } from '@/types/query'
 import { BellOutlined } from '@ant-design/icons'
+import { Badge, Flex, Popover, Space, Tabs, TabsProps, Tooltip } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import StickyBox from 'react-sticky-box'
 import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
 
@@ -42,7 +42,7 @@ const NotificationPopover = (): React.ReactNode => {
   const [cacheData, setCacheData] = useState<INotification[]>([])
   const [notificationsData, setNotificationsData] = useState<INotification[]>([])
   const [itemCount, setItemCount] = useState<number>(0)
-  const [getAllNotifications] = useLazyGetAllNotificationsQuery()
+  const [getAllNotifications] = useLazyGetAllNotificationsQuery(fetchVersionOptions)
   const [updateAllReadNotification] = useUpdateAllReadNotificationMutation()
 
   const fetchAllRead = async (): Promise<void> => {
@@ -97,13 +97,6 @@ const NotificationPopover = (): React.ReactNode => {
         setItemCount(res.totalRecords)
         setLoading(false)
       })
-  }
-
-  const onLoadInterval = async (): Promise<void> => {
-    setLoading(true)
-    await loadFirstNotifications(getTabPayload())
-
-    window.dispatchEvent(new Event('resize'))
   }
 
   const fetchMoreNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
@@ -169,13 +162,6 @@ const NotificationPopover = (): React.ReactNode => {
 
   useEffect(() => {
     loadFirstNotifications(getTabPayload())
-    const timer = setInterval(() => {
-      onLoadInterval()
-    }, 60000)
-
-    return (): void => {
-      clearInterval(timer)
-    }
   }, [])
 
   const resetValues = (): void => {

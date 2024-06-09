@@ -111,7 +111,16 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
           ]}
           className='mb-0 mt-2'
         >
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
         <Form.Item
           name='confirmPassword'
@@ -132,7 +141,16 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
           ]}
           validateTrigger={['onBlur']}
         >
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
 
         <Form.Item className='mb-0 mt-3'>

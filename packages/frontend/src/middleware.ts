@@ -9,7 +9,7 @@ import { adminRoutes, authRoutes, checkValidRoutes, userRoutes } from './middlew
 
 export function middleware(req: NextRequest): NextResponse {
   const token = cookies().get(StorageKey._ACCESS_TOKEN)
-  const role = cookies().get(StorageKey._ROLE)
+  const role = cookies().get(StorageKey._USER_ROLE)
   const pathName = req.nextUrl.pathname
   const referer: string = getReferer()
 
@@ -19,7 +19,11 @@ export function middleware(req: NextRequest): NextResponse {
 
   // Access protected routes without token
   if (checkValidRoutes(pathName) && !token) {
-    return NextResponse.redirect(new URL(ROUTE.USER_LOGIN, req.url))
+    if (role?.value === (RoleEnum._ADMIN as string)) {
+      return NextResponse.redirect(new URL(ROUTE.ADMIN_LOGIN, req.url))
+    } else if (pathName == ROUTE.USER_LOGIN) {
+      return NextResponse.redirect(new URL(ROUTE.USER_LOGIN, req.url))
+    }
   }
 
   if (token) {

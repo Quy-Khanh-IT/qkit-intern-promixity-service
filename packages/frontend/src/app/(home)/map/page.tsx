@@ -3,12 +3,17 @@ import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
 import { ROUTE, StorageKey } from '@/constants'
 import { DistanceMenu, LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
 import { useAuth } from '@/context/AuthContext'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { setSearchPosition } from '@/redux/slices/map-props.slice'
 import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
+import { IUserInformation } from '@/types/user'
+import { getPresentUrl } from '@/utils/helpers.util'
 import { Button, Dropdown, Image, Input, Layout, MenuProps, Space, Typography } from 'antd'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
@@ -16,28 +21,14 @@ import Map from './components'
 import SearchItemDetail from './components/SearchItemDetail'
 import SearchSider from './components/SearchSider'
 import './map.scss'
-import { getFromLocalStorage } from '@/utils/local-storage.util'
-import { IUserInformation } from '@/types/user'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
-import { getPresentUrl } from '@/utils/helpers.util'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { useRouter } from 'next/navigation'
-import { DownOutlined, SmileOutlined } from '@ant-design/icons'
-import dynamic from 'next/dynamic'
+import { RoleEnum } from '@/types/enum'
 
 const { Text } = Typography
 
 function MapPage(): React.ReactNode {
-  const [isClient, setIsClient] = useState<boolean>(false)
-  const { onLogout } = useAuth()
   const router = useRouter()
-  // const storedUser = {} as IUserInformation
-  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
-  const [userInformation, setUserInformation, removeUserInformation] = useLocalStorage(
-    StorageKey._USER,
-    {} as IUserInformation
-  )
-  const [userImage, setUserImage] = useState<string>('')
+  const { onLogout, userInformation } = useAuth()
+  const [userAvatar, setUserAvatar] = useState<string>('')
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
     getPresentUrl() || ROUTE.MAP
@@ -68,15 +59,11 @@ function MapPage(): React.ReactNode {
     ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
   })
 
-  // useEffect(() => {
-  //   console.log('userInformation', userInformation);
-  // }, [])
-
-  // useEffect(() => {
-  //   if (storedUser) {
-  //     setUserImage(storedUser.image)
-  //   }
-  // }, [storedUser])
+  useEffect(() => {
+    if (userInformation) {
+      setUserAvatar(userInformation.image)
+    }
+  }, [userInformation])
 
   const {
     data: searchResponse,
@@ -181,19 +168,10 @@ function MapPage(): React.ReactNode {
   }
 
   const handleLogout = (): void => {
-    onLogout()
+    onLogout(userInformation?.role as RoleEnum)
   }
 
   const avatarMenuItems: MenuProps['items'] = [
-    // {
-    //   key: '1',
-    //   label: <span className='p-2'>Profile</span>,
-    //   onClick: (): void => {
-    //     setRouteValue(ROUTE.USER_PROFILE)
-    //     console.log('userInformation', ROUTE.USER_PROFILE);
-    //     router.push('/main/user/profile')
-    //   }
-    // },
     {
       key: '1',
       label: (
@@ -201,11 +179,6 @@ function MapPage(): React.ReactNode {
           Profile
         </Link>
       )
-      // onClick: (): void => {
-      //   setRouteValue(ROUTE.USER_PROFILE)
-      //   console.log('userInformation', ROUTE.USER_PROFILE);
-      //   router.push('/main/user/profile')
-      // }
     },
     {
       key: '2',
@@ -252,14 +225,14 @@ function MapPage(): React.ReactNode {
           </Dropdown>
         </div>
         <div style={{ width: 100 }} className='d-flex justify-content-end'>
-          {userInformation && (userInformation as IUserInformation).isVerified ? (
+          {userInformation && userInformation.isVerified ? (
             <>
               <Dropdown menu={{ items: avatarMenuItems }} placement='bottomRight' arrow>
                 <div>
                   <ImageCustom
                     width={40}
                     height={40}
-                    src={(userInformation as IUserInformation)?.image || ''}
+                    src={userAvatar}
                     preview={false}
                     className='--avatar-custom d-cursor'
                   />
@@ -312,8 +285,8 @@ function MapPage(): React.ReactNode {
 
 const DynamicMapPage = dynamic(() => Promise.resolve(MapPage), { ssr: false })
 
-const MapPage2 = (): React.ReactNode => {
+const MapPageDynamic = (): React.ReactNode => {
   return <DynamicMapPage />
 }
 
-export default MapPage2
+export default MapPageDynamic

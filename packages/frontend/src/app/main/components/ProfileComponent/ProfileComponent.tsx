@@ -77,13 +77,21 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const ProfileComponent: React.FC = () => {
-  const { userId: storedUserId } = useAuth()
+  // const { userId: storedUserId } = useAuth()
+  const { userInformation } = useAuth()
+  const [storedUserId, setStoredUerId] = useState<string>(userInformation?.id)
   const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
   const changePasswordModalRef = useRef<IModalMethods | null>(null)
   const [_open, _setOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (userInformation) {
+      setStoredUerId(userInformation.id)
+    }
+  }, [userInformation])
 
   useEffect(() => {
     if (userProfile) {

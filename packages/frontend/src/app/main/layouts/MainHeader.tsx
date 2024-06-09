@@ -5,8 +5,6 @@ import { ROUTE, StorageKey } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import '@/sass/common/_common.scss'
 import { RoleEnum } from '@/types/enum'
-import { IUserInformation } from '@/types/user'
-import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Typography } from 'antd'
 import { Header } from 'antd/es/layout/layout'
@@ -14,6 +12,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import '../main.scss'
 import { directRoutes } from '../utils/main.util'
+import { removeFromSessionStorage } from '@/utils/session-storage.util'
 
 const { Text } = Typography
 
@@ -27,19 +26,21 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
   const {
     token: { colorBgContainer }
   } = theme.useToken()
-  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
-  const [userImage, setUserImage] = useState<string>('')
   const { onLogout, userInformation } = useAuth()
-
-  useEffect(() => {
-    if (storedUser) {
-      setUserImage(storedUser.image)
-    }
-  }, [storedUser])
+  const [userRole, setUserRole] = useState<string>('')
+  const [userAvatar, setUserAvatar] = useState<string>('')
 
   const handleLogout = (): void => {
-    onLogout()
+    removeFromSessionStorage(StorageKey._ROUTE_VALUE)
+    onLogout(userRole as RoleEnum)
   }
+
+  useEffect(() => {
+    if (userInformation) {
+      setUserAvatar(userInformation.image)
+      setUserRole(userInformation.role)
+    }
+  }, [userInformation])
 
   const items: MenuProps['items'] = [
     ...(userInformation?.role === (RoleEnum._ADMIN as string)
@@ -131,7 +132,7 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
               <ImageCustom
                 width={40}
                 height={40}
-                src={userImage}
+                src={userAvatar}
                 preview={false}
                 className='--avatar-custom d-cursor'
               />
