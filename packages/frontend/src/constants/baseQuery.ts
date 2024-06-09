@@ -19,14 +19,12 @@ export const baseQueryWithAuth = fetchBaseQuery({
     return headers
   },
   validateStatus(response: Response) {
-    // const userRole = cookies().get(StorageKey._USER_ROLE)
     const userRole = getFromLocalStorage(StorageKey._USER_ROLE) as string
     const checkProtectedRoute: boolean = checkValidRoutes(getPresentUrl())
 
     if (response.status === (HttpStatusCode.Unauthorized as number)) {
-      console.log('checkProtectedRoute', checkProtectedRoute, userRole);
       if (checkProtectedRoute) {
-        toast.error('Token is required ne')
+        toast.error('Token is required')
         if (userRole === (RoleEnum._ADMIN as string)) {
           window.location.href = ROUTE.ADMIN_LOGIN
         } else {

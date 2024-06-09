@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     }
   }, [])
 
-  const onLogin = async (loginPayload: ILoginPayload): Promise<void> => {
+  const onLogin = async (loginPayload: ILoginPayload, setLoading: (_isLoading: boolean) => void): Promise<void> => {
     await login(loginPayload)
       .unwrap()
       .then((res) => {
@@ -92,9 +92,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         getFirstUserInformation(res.userId)
       })
       .then(() => {
-        setTimeout(() => {
-          toast.success(TOAST_MSG.LOGIN_SUCCESS)
-        }, 1000)
+        setLoading(false)
+        toast.success(TOAST_MSG.LOGIN_SUCCESS)
       })
   }
 
@@ -105,13 +104,13 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     } else {
       router.push(ROUTE.USER_LOGIN)
     }
-    window.location.reload()
+    // window.location.reload()
   }
 
   const resetSession = (): void => {
     removeAccessToken()
     removeRefreshToken()
-    setAuthSession(true)
+    setAuthSession(false)
     removeUserInformation()
     removeUserId()
     removeRouteValue()

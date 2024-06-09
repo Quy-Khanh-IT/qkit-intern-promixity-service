@@ -1,17 +1,24 @@
 'use client'
 import { VALIDATION } from '@/constants'
 import { ILoginPayload } from '@/types/auth'
-import { Col, Flex, Form, FormProps, Input } from 'antd'
-import React from 'react'
+import { Button, Col, Flex, Form, FormProps, Input } from 'antd'
+import React, { useState } from 'react'
 import './admin-sign-in.scss'
 import { useAuth } from '@/context/AuthContext'
 import { debounce } from 'lodash-es'
 
 const AdminLogin: React.FC = () => {
   const { onLogin } = useAuth()
+  const [form] = Form.useForm()
+  const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
+
+  const _handleLoadingLogin = (isLoading: boolean): void => {
+    setLoadingLogin(isLoading)
+  }
 
   const handleLogin: FormProps<ILoginPayload>['onFinish'] = (values) => {
-    onLogin(values)
+    setLoadingLogin(true)
+    onLogin(values, _handleLoadingLogin)
   }
 
   const debounceLogin = debounce((values: ILoginPayload) => handleLogin(values), 1000)
@@ -31,6 +38,7 @@ const AdminLogin: React.FC = () => {
             <Col span={18} style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
               <Form
                 name='login'
+                form={form}
                 className='login-form w-100'
                 initialValues={{ remember: true }}
                 layout='vertical'
@@ -57,7 +65,9 @@ const AdminLogin: React.FC = () => {
                     }}
                   />
                 </Form.Item>
-                <button className='login-btn w-100 mt-4'>LOGIN</button>
+                <Button htmlType='submit' loading={loadingLogin} className='login-btn w-100 mt-4'>
+                  LOGIN
+                </Button>
               </Form>
             </Col>
           </Flex>

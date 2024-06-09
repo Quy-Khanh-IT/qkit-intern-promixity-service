@@ -7,7 +7,7 @@ export type ChildProps = {
 }
 
 export type UserContextType = {
-  onLogin: (_loginPayload: ILoginPayload) => void
+  onLogin: (_loginPayload: ILoginPayload, _setLoading: (_isLoading: boolean) => void) => void
   onLogout: (_role: RoleEnum) => void
   fetchUserInformation: (_userId: string) => Promise<void>
   userInformation: IUserInformation

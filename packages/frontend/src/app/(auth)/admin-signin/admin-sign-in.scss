@@ -135,13 +135,18 @@
 }
 
 .login-btn {
-  padding: 12px;
-  color: white;
-  background: linear-gradient(to right, #ff966d, #fa538d, #89379c);
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  margin-top: 10px;
+  padding: 12px !important;
+  color: black !important;
+  background: linear-gradient(to right, #ff966d, #fa538d, #89379c) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  margin-top: 10px !important;
+  height: unset !important;
+
+  &:hover{
+    opacity: 0.85 !important;
+  }
 }
 
 a {

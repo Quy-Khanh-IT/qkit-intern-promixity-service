@@ -10,6 +10,7 @@ import DevQuote from '../components/DevQuote'
 import './signin.scss'
 import { useAuth } from '@/context/AuthContext'
 import { ILoginPayload } from '@/types/auth'
+import { Button } from 'antd'
 
 export default function SignIn(): React.ReactNode {
   const { onLogin } = useAuth()
@@ -17,6 +18,11 @@ export default function SignIn(): React.ReactNode {
   const [password, setPassword] = useState<string>('')
 
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
+  const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
+
+  const _handleLoadingLogin = (isLoading: boolean): void => {
+    setLoadingLogin(isLoading)
+  }
 
   const [inputError, setInputError] = useState<{
     email: string
@@ -62,10 +68,13 @@ export default function SignIn(): React.ReactNode {
   }
 
   const handleSignIn = (): void => {
-    onLogin({
-      email,
-      password
-    } as ILoginPayload)
+    onLogin(
+      {
+        email,
+        password
+      } as ILoginPayload,
+      _handleLoadingLogin
+    )
   }
 
   const onChangeData = (value: string, type: string): void => {
@@ -145,9 +154,9 @@ export default function SignIn(): React.ReactNode {
                   Forget Password
                 </div>
               </div>
-              <button style={{ color: 'white' }} onClick={handleSignIn} className='form-btn'>
+              <Button loading={loadingLogin} style={{ color: 'white' }} onClick={handleSignIn} className='form-btn'>
                 Sign In
-              </button>
+              </Button>
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 {' '}
                 Do not have an account?{' '}
