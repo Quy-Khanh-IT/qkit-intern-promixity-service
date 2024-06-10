@@ -55,10 +55,10 @@ export default function RootLayout({
   useEffect(() => {
     if (userInformation) {
       const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
-      // const initialRouteValue = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
       setRouteValue(initialRouteValue)
 
-      const initialMenuKey = findKeyMenuBasedRoute(userInformation?.role, initialRouteValue) || ORIGIN_MENU_TAB
+      const initialMenuKey =
+        findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
       setSelectedMenuKey(initialMenuKey)
     }
   }, [userInformation])

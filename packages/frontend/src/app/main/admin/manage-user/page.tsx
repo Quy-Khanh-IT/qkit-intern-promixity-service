@@ -71,6 +71,11 @@ type DataIndex = keyof IUserInformation
 // For search
 type SearchIndex = keyof IGetAllUsersQuery
 
+const ORIGIN_DATA = {
+  offset: ORIGIN_PAGE,
+  limit: PAGE_SIZE
+} as IGetAllUsersQuery
+
 const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
   return qs.parse(searchParams, { ignoreQueryPrefix: true })
 }
@@ -87,14 +92,14 @@ const ManageUser = (): React.ReactNode => {
   // User data
   const [userOption, setUserOption] = useState<string>(ACTIVE_FETCH)
   const userOptionBoolean: boolean = useMemo<boolean>(() => userOption === DELETED_FETCH, [userOption])
-  // const [queryData, setQueryData] = useState<IGetAllUsersQuery>(
-  //   parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
-  // )
   const [queryData, setQueryData] = useState<IGetAllUsersQuery>({
     offset: currentPage,
     limit: PAGE_SIZE,
     isDeleted: userOptionBoolean
   } as IGetAllUsersQuery)
+  // const [queryData, setQueryData] = useState<IGetAllUsersQuery>(
+  //   parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
+  // )
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(
     parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
   )
@@ -123,11 +128,6 @@ const ManageUser = (): React.ReactNode => {
     const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
     const storedQueryValue: IGetAllUsersQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
     setQueryData(storedQueryValue)
-    console.log(
-      'storedQueryValue',
-      storedQueryValue,
-      parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
-    )
   }, [])
 
   useEffect(() => {
@@ -139,10 +139,6 @@ const ManageUser = (): React.ReactNode => {
     saveToSessionStorage(StorageKey._ROUTE_VALUE, newPathname)
   }, [queryData])
 
-  // useEffect(() => {
-  //   setQueryData(parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery)
-  // }, [searchParams])
-
   useEffect(() => {
     setQueryData(
       (prev) =>
@@ -152,7 +148,7 @@ const ManageUser = (): React.ReactNode => {
           isDeleted: userOptionBoolean
         }) as IGetAllUsersQuery
     )
-  }, [currentPage, userOptionBoolean])
+  }, [currentPage])
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
@@ -168,6 +164,13 @@ const ManageUser = (): React.ReactNode => {
 
   const onChangeSelection = (value: string): void => {
     setUserOption(value)
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: value === DELETED_FETCH
+        }) as IGetAllUsersQuery
+    )
     setCurrentPage(ORIGIN_PAGE)
   }
 

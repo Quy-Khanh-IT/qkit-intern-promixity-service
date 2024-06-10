@@ -37,6 +37,10 @@ const FilterPopupProps = <T, K extends keyof T>({
   }, [defaultValue])
 
   useEffect(() => {
+    console.log('checkedList', indeterminate, checkedList.current, checkedList.current.length > 0, checkedList.current.length < optionsData?.selectionOpts.length);
+  }, [checkedList.current])
+
+  useEffect(() => {
     if (optionsData) {
       setOptionsDataValue(optionsData.selectionOpts.map((option) => option.value))
     }

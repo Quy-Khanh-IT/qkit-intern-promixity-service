@@ -58,8 +58,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       } else {
         toast.error('An unknown error occurred')
       }
-    } finally {
-      console.log('finally login')
     }
   }, [])
 
