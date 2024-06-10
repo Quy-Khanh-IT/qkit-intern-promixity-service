@@ -14,9 +14,11 @@ import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
 import './main.scss'
 import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
+import { getFromSessionStorage } from '@/utils/session-storage.util'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
+const ORIGIN_MENU_TAB = '1'
 
 export const MAIN_HEADER_HEIGHT = 80
 export const overlayCardStyle: React.CSSProperties = {
@@ -46,12 +48,17 @@ export default function RootLayout({
     findKeyMenuBasedRoute(userInformation?.role, routeValue as string)
   )
 
+  const startSelectedMenu = (): void => {
+    setSelectedMenuKey(ORIGIN_MENU_TAB)
+  }
+
   useEffect(() => {
     if (userInformation) {
-      const initialRouteValue = getPresentUrl()
+      const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
+      // const initialRouteValue = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
       setRouteValue(initialRouteValue)
 
-      const initialMenuKey = findKeyMenuBasedRoute(userInformation?.role, initialRouteValue) || '1'
+      const initialMenuKey = findKeyMenuBasedRoute(userInformation?.role, initialRouteValue) || ORIGIN_MENU_TAB
       setSelectedMenuKey(initialMenuKey)
     }
   }, [userInformation])
@@ -87,9 +94,9 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
-    const routeValue = findRouteMenuBasedKey(userInformation?.role, e.key)
-    router.push(routeValue)
-    setRouteValue(routeValue)
+    const _routeValue = findRouteMenuBasedKey(userInformation?.role, e.key)
+    router.push(_routeValue)
+    setRouteValue(_routeValue)
     setSelectedMenuKey(e.key)
   }
 
@@ -115,7 +122,12 @@ export default function RootLayout({
           height: MAIN_HEADER_HEIGHT
         }}
       >
-        <MainHeader collapsed={collapsed} setCollapsed={setCollapsed} setRouteValue={setRouteValue} />
+        <MainHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          setRouteValue={setRouteValue}
+          startSelectedMenu={startSelectedMenu}
+        />
       </Col>
       <Col span={24} style={{ paddingTop: MAIN_HEADER_HEIGHT }}>
         <Row style={{ position: 'fixed', left: 0, right: 0, top: MAIN_HEADER_HEIGHT, zIndex: 99 }}>

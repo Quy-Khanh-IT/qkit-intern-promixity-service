@@ -108,7 +108,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     } else {
       router.push(ROUTE.USER_LOGIN)
     }
-    // window.location.reload()
   }
 
   const resetSession = (): void => {

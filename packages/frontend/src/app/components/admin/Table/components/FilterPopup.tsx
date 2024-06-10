@@ -10,12 +10,14 @@ interface IFilterPopupProps<K> {
   optionsData: IOptionsPipe
   filterCustom?: FilterOptions[]
   selectCustom?: SelectionOptions[]
+  defaultValue?: string[]
   _handleFilter: (_selectedKeys: string[], _confirm: FilterDropdownProps['confirm'], _dataIndex: K) => void
 }
 
 const CheckboxGroup = Checkbox.Group
 
 const FilterPopupProps = <T, K extends keyof T>({
+  defaultValue,
   dataIndex,
   optionsData,
   filterCustom,
@@ -23,12 +25,16 @@ const FilterPopupProps = <T, K extends keyof T>({
   _handleFilter
 }: IFilterPopupProps<K>): ColumnType<T> => {
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
-  const checkedList = useRef<string[]>([])
+  const checkedList = useRef<string[]>(defaultValue || [])
 
   const checkAll = useRef<boolean>(optionsData?.selectionOpts.length === checkedList.current.length)
   const indeterminate = useRef<boolean>(
-    checkedList.current.length > 0 && checkedList.current.length < optionsData.selectionOpts.length
+    checkedList.current.length > 0 && checkedList.current.length < optionsData?.selectionOpts.length
   )
+
+  useEffect(() => {
+    checkedList.current = defaultValue || []
+  }, [defaultValue])
 
   useEffect(() => {
     if (optionsData) {

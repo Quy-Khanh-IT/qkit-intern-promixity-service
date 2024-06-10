@@ -6,7 +6,7 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
+import { DEFAULT_DATE_FORMAT, LOCAL_ENDPOINT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -48,6 +48,10 @@ import { generateRoleColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_SORT_FIELDS } from '../manage-business/manage-business.const'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
+import { ReadonlyURLSearchParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import qs from 'qs'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 
 const { Text } = Typography
 const { RangePicker } = DatePicker
@@ -67,19 +71,33 @@ type DataIndex = keyof IUserInformation
 // For search
 type SearchIndex = keyof IGetAllUsersQuery
 
+const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
+  return qs.parse(searchParams, { ignoreQueryPrefix: true })
+}
+
 const ManageUser = (): React.ReactNode => {
+  const router = useRouter()
+  const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
+  const currentPathName = usePathname()
+  // Search
+  const searchParams = useSearchParams()
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
   // User data
   const [userOption, setUserOption] = useState<string>(ACTIVE_FETCH)
   const userOptionBoolean: boolean = useMemo<boolean>(() => userOption === DELETED_FETCH, [userOption])
+  // const [queryData, setQueryData] = useState<IGetAllUsersQuery>(
+  //   parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
+  // )
   const [queryData, setQueryData] = useState<IGetAllUsersQuery>({
     offset: currentPage,
     limit: PAGE_SIZE,
     isDeleted: userOptionBoolean
   } as IGetAllUsersQuery)
-  const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
+  const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(
+    parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
+  )
   const [selectedUser, setSelectedUser] = useState<IUserInformation | null>(null)
 
   // Modal
@@ -100,6 +118,30 @@ const ManageUser = (): React.ReactNode => {
     { skip: !selectedUser }
   )
   const { data: rolesData } = useGetAllRolesQuery()
+
+  useEffect(() => {
+    const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
+    const storedQueryValue: IGetAllUsersQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
+    setQueryData(storedQueryValue)
+    console.log(
+      'storedQueryValue',
+      storedQueryValue,
+      parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
+    )
+  }, [])
+
+  useEffect(() => {
+    const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
+    const params = new URLSearchParams(queryString).toString()
+
+    const newPathname = `${currentPathName}?${params}`
+    router.push(newPathname)
+    saveToSessionStorage(StorageKey._ROUTE_VALUE, newPathname)
+  }, [queryData])
+
+  // useEffect(() => {
+  //   setQueryData(parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery)
+  // }, [searchParams])
 
   useEffect(() => {
     setQueryData(
@@ -338,6 +380,7 @@ const ManageUser = (): React.ReactNode => {
         </Tag>
       ),
       ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
+        defaultValue: typeof queryData?.role === 'string' ? [queryData?.role] : queryData?.role || [],
         dataIndex: 'role',
         optionsData: rolesData as IOptionsPipe,
         _handleFilter: handleFilter

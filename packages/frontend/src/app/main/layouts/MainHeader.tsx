@@ -20,9 +20,10 @@ interface IMainHeaderProps {
   collapsed: boolean
   setCollapsed: (_collapsed: boolean) => void
   setRouteValue: (_value: string) => void
+  startSelectedMenu: () => void
 }
 
-const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRouteValue }) => {
+const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRouteValue, startSelectedMenu }) => {
   const {
     token: { colorBgContainer }
   } = theme.useToken()
@@ -95,7 +96,13 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
             }}
             className='h-100'
           >
-            <Link href={directRoutesObject.logo} onClick={() => setRouteValue(directRoutesObject.logo)}>
+            <Link
+              href={directRoutesObject.logo}
+              onClick={() => {
+                startSelectedMenu()
+                setRouteValue(directRoutesObject.logo)
+              }}
+            >
               <Image
                 src='/logo_light.png'
                 className='header-logo'

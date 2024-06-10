@@ -2,20 +2,20 @@ import { IDayOfWeek } from './business'
 import { BooleanEnum, RoleEnum, SortEnum, StatusEnum, UserOptionEnum } from './enum'
 
 interface IGelAllQuery {
-  offset: number
-  limit: number
+  offset?: number
+  limit?: number
   startDate?: string
   endDate?: string
-  sortBy: SortEnum
-  isDeleted: boolean
+  sortBy?: SortEnum
+  isDeleted?: boolean
 }
 
 export interface IGetAllUsersQuery extends IGelAllQuery {
-  email: string
-  firstName: string
-  lastName: string
-  phone: string
-  role: RoleEnum[]
+  email?: string
+  firstName?: string
+  lastName?: string
+  phone?: string
+  role?: RoleEnum[]
 }
 
 export interface IGetAllBusinessQuery extends IGelAllQuery {

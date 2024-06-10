@@ -1,4 +1,4 @@
-import { API_ENDPOINT, ROUTE, StorageKey } from '@/constants'
+import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { checkValidRoutes } from '@/middleware/middleware.util'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
@@ -8,6 +8,7 @@ import { getPresentUrl } from '../utils/helpers.util'
 import { IUserInformation } from '@/types/user'
 import { RoleEnum } from '@/types/enum'
 import cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
@@ -26,9 +27,9 @@ export const baseQueryWithAuth = fetchBaseQuery({
       if (checkProtectedRoute) {
         toast.error('Token is required')
         if (userRole === (RoleEnum._ADMIN as string)) {
-          window.location.href = ROUTE.ADMIN_LOGIN
+          window.location.href = LOCAL_ENDPOINT + ROUTE.ADMIN_LOGIN
         } else {
-          window.location.href = ROUTE.USER_LOGIN
+          window.location.href = LOCAL_ENDPOINT + ROUTE.USER_LOGIN
         }
         throw new Error('Token is required')
       }
