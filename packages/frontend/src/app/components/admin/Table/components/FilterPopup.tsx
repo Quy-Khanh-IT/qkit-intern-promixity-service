@@ -27,18 +27,17 @@ const FilterPopupProps = <T, K extends keyof T>({
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
   const checkedList = useRef<string[]>(defaultValue || [])
 
-  const checkAll = useRef<boolean>(optionsData?.selectionOpts.length === checkedList.current.length)
-  const indeterminate = useRef<boolean>(
-    checkedList.current.length > 0 && checkedList.current.length < optionsData?.selectionOpts.length
-  )
+  const checkAll = useRef<boolean>(false)
+  const indeterminate = useRef<boolean>(false)
 
   useEffect(() => {
     checkedList.current = defaultValue || []
-  }, [defaultValue])
 
-  useEffect(() => {
-    console.log('checkedList', indeterminate, checkedList.current, checkedList.current.length > 0, checkedList.current.length < optionsData?.selectionOpts.length);
-  }, [checkedList.current])
+    checkAll.current = optionsData?.selectionOpts.length === checkedList.current.length
+
+    indeterminate.current =
+      checkedList.current.length > 0 && checkedList.current.length < optionsData?.selectionOpts.length
+  }, [defaultValue, optionsData?.selectionOpts.length])
 
   useEffect(() => {
     if (optionsData) {
