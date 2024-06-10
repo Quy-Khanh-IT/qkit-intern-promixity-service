@@ -8,7 +8,7 @@ import { getPresentUrl } from '@/utils/helpers.util'
 import { Col, Grid, MenuProps, Row, theme } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
@@ -18,7 +18,11 @@ import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
 
-const HEADER_HEIGHT = 80
+export const MAIN_HEADER_HEIGHT = 80
+export const overlayCardStyle: React.CSSProperties = {
+  borderRadius: 8,
+  padding: 20
+}
 
 export default function RootLayout({
   children
@@ -26,6 +30,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>): React.ReactNode {
   const router = useRouter()
+  const currentPathName = usePathname()
   const { userInformation } = useAuth()
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const containerControls = useAnimationControls()
@@ -88,6 +93,11 @@ export default function RootLayout({
     setSelectedMenuKey(e.key)
   }
 
+  const overlayStyle: React.CSSProperties = {
+    background: colorBgContainer,
+    ...overlayCardStyle
+  }
+
   return (
     <Row className='--admin-layout'>
       <Col
@@ -102,13 +112,13 @@ export default function RootLayout({
           right: 0,
           top: 0,
           zIndex: 99,
-          height: HEADER_HEIGHT
+          height: MAIN_HEADER_HEIGHT
         }}
       >
         <MainHeader collapsed={collapsed} setCollapsed={setCollapsed} setRouteValue={setRouteValue} />
       </Col>
-      <Col span={24} style={{ paddingTop: HEADER_HEIGHT }}>
-        <Row style={{ position: 'fixed', left: 0, right: 0, top: HEADER_HEIGHT, zIndex: 99 }}>
+      <Col span={24} style={{ paddingTop: MAIN_HEADER_HEIGHT }}>
+        <Row style={{ position: 'fixed', left: 0, right: 0, top: MAIN_HEADER_HEIGHT, zIndex: 99 }}>
           <Col
             xs={collapsed ? 0 : 12}
             md={collapsed ? 0 : 6}
@@ -132,18 +142,16 @@ export default function RootLayout({
             <Content
               style={{
                 padding: 24,
-                minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
-                height: '1000px',
+                minHeight: `calc(100vh - ${MAIN_HEADER_HEIGHT}px)`,
                 backgroundColor: subColor2
               }}
+              className='scroll-bar-2'
             >
               <div
                 style={{
-                  background: colorBgContainer,
-                  borderRadius: 8,
-                  padding: 20,
+                  ...(currentPathName === ROUTE.DASHBOARD ? {} : overlayStyle),
                   // padding 24px vs 80px for header
-                  height: `calc(100vh - ${HEADER_HEIGHT}px - 48px)`
+                  height: `calc(100vh - ${MAIN_HEADER_HEIGHT}px - 48px)`
                 }}
               >
                 {children}

@@ -7,6 +7,7 @@ import $ from 'jquery'
 import React, { useEffect, useMemo } from 'react'
 import './chart.scss'
 import { CANVAS_DATE_FORMAT, STATISTIC_OPTIONS_VALUE } from '@/constants/statistic'
+import dynamic from 'next/dynamic'
 
 declare const CanvasJS: any
 
@@ -97,19 +98,25 @@ const generateChartFormat = (statisticData: IBusinessUserStatistic, query: IBusi
   ]
 })
 
-const SplineChart: React.FC<SplineChartProps> = ({dataProps, queryData}) => {
+const _SplineChart: React.FC<SplineChartProps> = ({dataProps, queryData}) => {
   const chartFormat = useMemo(() =>{
     return dataProps ? generateChartFormat(dataProps, queryData) : null
   }, [dataProps])
 
   useEffect(() => {
     $(() => {
-      const _splineChart = new CanvasJS.Chart('dashboard-spline-chart', chartFormat)
-      _splineChart.render()
+      const splineChartRender = new CanvasJS.Chart('dashboard-spline-chart', chartFormat)
+      splineChartRender.render()
     })
   }, [chartFormat])
 
   return <div id='dashboard-spline-chart' className='chart' style={{ height: '400px', width: '100%' }}></div>
+}
+
+const SplineChartDynamic = dynamic(() => Promise.resolve(_SplineChart), { ssr: false })
+
+const SplineChart: React.FC<SplineChartProps> = ({dataProps, queryData}): React.ReactNode => {
+  return <SplineChartDynamic dataProps={dataProps} queryData={queryData} />
 }
 
 export default SplineChart

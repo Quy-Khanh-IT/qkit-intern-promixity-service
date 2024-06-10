@@ -6,6 +6,7 @@ import { ICategoryStatistic } from '@/types/statistic';
 import $ from 'jquery';
 import React, { useEffect, useMemo } from 'react';
 import './chart.scss';
+import dynamic from 'next/dynamic';
 
 declare const CanvasJS: any;
 
@@ -37,7 +38,7 @@ const generateChartFormat = (data: ICategoryStatistic) => ({
   ],
 });
 
-const BarChart: React.FC = () => {
+const _BarChart: React.FC = () => {
   const { data: categoryStatisticData} = useGetCategoryStatisticQuery();
   const chartFormat = useMemo(() => {
     return categoryStatisticData ? generateChartFormat(categoryStatisticData) : null;
@@ -57,6 +58,12 @@ const BarChart: React.FC = () => {
       <div id='dashboard-bar-chart' className='chart' style={{ height: '350px', width: '100%' }}></div>
     </>
   );
+}
+
+const BarChartDynamic = dynamic(() => Promise.resolve(_BarChart), { ssr: false })
+
+const BarChart = (): React.ReactNode => {
+  return <BarChartDynamic />
 }
 
 export default BarChart;

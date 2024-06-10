@@ -6,6 +6,7 @@ import $ from 'jquery'
 import './chart.scss'
 import { useGetBusinessStatusStatisticQuery } from '@/services/statistic.service';
 import { IBusinessStatusStatistic } from '@/types/statistic';
+import dynamic from 'next/dynamic';
 
 declare const CanvasJS: any;
 
@@ -33,7 +34,7 @@ const generateChartFormat = (data: IBusinessStatusStatistic) => ({
   }]
 })
 
-const PieChart: React.FC = () => {
+const _PieChart: React.FC = () => {
   const {data: businessStatusStatisticData} = useGetBusinessStatusStatisticQuery()
   const chartFormat = useMemo(() => {
     return businessStatusStatisticData ? generateChartFormat(businessStatusStatisticData) : null;
@@ -41,8 +42,8 @@ const PieChart: React.FC = () => {
 
   useEffect(() => {
     $(() => {
-      const _pieChart = new CanvasJS.Chart('dashboard-pie-chart', chartFormat)
-      _pieChart.render()
+      const pieChartRender = new CanvasJS.Chart('dashboard-pie-chart', chartFormat)
+      pieChartRender.render()
     })
   }, [chartFormat])
 
@@ -51,6 +52,12 @@ const PieChart: React.FC = () => {
       <div id='dashboard-pie-chart' className='chart' style={{ height: '340px', width: '100%' }}></div>
     </>
   )
+}
+
+const PieChartDynamic = dynamic(() => Promise.resolve(_PieChart), { ssr: false })
+
+const PieChart = (): React.ReactNode => {
+  return <PieChartDynamic />
 }
 
 export default PieChart

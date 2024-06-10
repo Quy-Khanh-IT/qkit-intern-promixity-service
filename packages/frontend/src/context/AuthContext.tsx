@@ -12,7 +12,7 @@ import { IUserInformation } from '@/types/user'
 import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
 import Error from 'next/error'
 import { useRouter } from 'next/navigation'
-import React, { createContext, useCallback } from 'react'
+import React, { createContext, useCallback, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)

@@ -1,0 +1,13 @@
+@import "@/sass/common/common.scss";
+
+.--pie-chart-custom, .--bar-chart-custom{
+  @include xs {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  @include md {
+    flex: auto !important;
+    max-width: unset !important;
+  }
+}

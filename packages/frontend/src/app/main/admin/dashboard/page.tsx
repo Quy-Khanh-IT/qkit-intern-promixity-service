@@ -5,18 +5,23 @@ import { useLazyGetBusinessUserStatisticQuery } from '@/services/statistic.servi
 import { SelectionOptions } from '@/types/common'
 import { IBusinessUserStatisticQuery } from '@/types/query'
 import { IBusinessUserStatistic } from '@/types/statistic'
-import { Col, DatePicker, Row, Select } from 'antd'
+import { Col, DatePicker, Row, Select, theme } from 'antd'
 import { DatePickerProps } from 'antd/es/date-picker'
 import { Dayjs } from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import BarChart from './components/BarChart'
 import PieChart from './components/PieChart'
 import SplineChart from './components/SplineChart'
+import { overlayCardStyle } from '../../layout'
+import variables from '@/sass/common/_variables.module.scss'
+import './dashboard.scss'
 
 const splineOptions: SelectionOptions[] = [
   { value: STATISTIC_OPTIONS_VALUE._MONTH, label: 'By month' },
   { value: STATISTIC_OPTIONS_VALUE._YEAR, label: 'By year' }
 ]
+
+const { light } = variables
 
 const FIRST_PAYLOAD: IBusinessUserStatisticQuery = {
   timeline: 'year',
@@ -38,16 +43,14 @@ const Dashboard: React.FC = () => {
     getBusinessUserStatistic(queryData)
   }, [queryData, getBusinessUserStatistic])
 
-  const onChangeYearPicker: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log('onChangeYearPicker', date, dateString)
+  const onChangeYearPicker: DatePickerProps['onChange'] = (date, _dateString) => {
     setSelectedYear(date)
     const year: number = date?.year()
     setQueryData({ ...queryData, year, timeline: STATISTIC_OPTIONS_VALUE._YEAR })
     setSelectedMonth(null)
   }
 
-  const onChangeMonthPicker: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log('onChangeMonthPicker', date, dateString)
+  const onChangeMonthPicker: DatePickerProps['onChange'] = (date, _dateString) => {
     setSelectedMonth(date)
     const month: number = date?.month()
     setQueryData({ ...queryData, month, timeline: STATISTIC_OPTIONS_VALUE._MONTH })
@@ -55,15 +58,13 @@ const Dashboard: React.FC = () => {
   }
 
   const onChangeSelection = (value: string): void => {
-    console.log('selection', value)
     setSelectionStatistic(value)
   }
 
   return (
     <>
-      {/* <PieChart /> */}
-      <Row className='gap-5'>
-        <Row className='w-100 gap-2'>
+      <Row className='gap-4 pb-4'>
+        <Row className='w-100 gap-2' style={{ ...overlayCardStyle, backgroundColor: light }}>
           <Col span={24} className='d-flex justify-content-end gap-4'>
             {selectionStatistic === STATISTIC_OPTIONS_VALUE._YEAR ? (
               <DatePicker value={selectedYear} onChange={onChangeYearPicker} picker='year' style={{ height: 40 }} />
@@ -87,16 +88,21 @@ const Dashboard: React.FC = () => {
             <SplineChart dataProps={businessUserData as IBusinessUserStatistic} queryData={queryData} />
           </Col>
         </Row>
-        {/* <Col span={24}>
-        </Col> */}
-        <Col span={24} className='d-flex'>
-          <Col span={12}>
+
+        <Row className='d-flex justify-content-between flex-wrap gap-4 w-100'>
+          <Col
+            style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }}
+            className='--pie-chart-custom'
+          >
             <PieChart />
           </Col>
-          <Col span={12}>
+          <Col
+            style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }}
+            className='--bar-chart-custom'
+          >
             <BarChart />
           </Col>
-        </Col>
+        </Row>
       </Row>
     </>
   )
