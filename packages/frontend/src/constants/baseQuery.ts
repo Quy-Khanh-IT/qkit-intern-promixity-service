@@ -1,14 +1,11 @@
 import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { checkValidRoutes } from '@/middleware/middleware.util'
+import { RoleEnum } from '@/types/enum'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { HttpStatusCode } from 'axios'
 import { toast } from 'react-toastify'
 import { getPresentUrl } from '../utils/helpers.util'
-import { IUserInformation } from '@/types/user'
-import { RoleEnum } from '@/types/enum'
-import cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,

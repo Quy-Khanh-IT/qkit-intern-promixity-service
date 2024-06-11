@@ -18,7 +18,9 @@ export const TOAST_MSG = {
   NO_AUTHORIZATION: 'No authorization',
   LOGIN_SUCCESS: 'Login successfully',
   UPDATE_PROFILE_SUCCESS: 'Update profile successfully',
-  UPDATE_PASSWORD_SUCCESS: 'Update password successfully'
+  UPDATE_PASSWORD_SUCCESS: 'Update password successfully',
+
+  UNKNOWN_ERROR: 'An unexpected error occurred'
 }
 
 export const MODAL_TEXT = {

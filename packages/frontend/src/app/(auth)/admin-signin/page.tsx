@@ -1,15 +1,15 @@
 'use client'
 import { VALIDATION } from '@/constants'
+import { useAuth } from '@/context/AuthContext'
 import { ILoginPayload } from '@/types/auth'
-import { Button, Col, Flex, Form, FormProps, Input } from 'antd'
+import { Button, Col, Flex, Form, Input } from 'antd'
+import { debounce } from 'lodash-es'
 import React, { useState } from 'react'
 import './admin-sign-in.scss'
-import { useAuth } from '@/context/AuthContext'
-import { debounce } from 'lodash-es'
 
 const AdminLogin: React.FC = () => {
   const { onLogin } = useAuth()
-  const [form] = Form.useForm()
+  const [form] = Form.useForm<ILoginPayload>()
   const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
   const [disableLogin, setDisableLogin] = useState<boolean>(false)
 

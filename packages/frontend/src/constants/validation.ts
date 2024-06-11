@@ -14,7 +14,7 @@ export const VALIDATION = {
   ] as Rule[]
 }
 
-export const passwordValidator =
+export const newPasswordValidator =
   (getFieldValue: (_name: string) => string, checkField: string) =>
   async (_: RuleObject, value: string): Promise<void> => {
     if (!value) {
@@ -22,14 +22,6 @@ export const passwordValidator =
     }
     if (getFieldValue(checkField) === value) {
       return Promise.reject(new Error('New password must be different from the old password'))
-    }
-    if (value.length < 6 || value.length > 25) {
-      return Promise.reject(new Error('Password must be 6-25 characters long'))
-    }
-    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{6,25}$/.test(value)) {
-      return Promise.reject(
-        new Error('Password must include at least one uppercase letter, one number, and one special character')
-      )
     }
     return Promise.resolve()
   }

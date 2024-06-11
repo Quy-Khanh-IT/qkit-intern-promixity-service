@@ -2,8 +2,6 @@ import { ErrorResponse } from '@/types/error'
 import type { Middleware, MiddlewareAPI } from '@reduxjs/toolkit'
 import { isRejected, isRejectedWithValue } from '@reduxjs/toolkit'
 import { toast } from 'react-toastify'
-import { getFromLocalStorage } from './local-storage.util'
-import { LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 
 /**
  * Log a warning and show a toast!
@@ -30,7 +28,11 @@ const clarifyError = (error: ErrorResponse): string => {
 export const rtkQueryErrorLogger: Middleware = (_api: MiddlewareAPI) => (next) => (action) => {
   if (isRejectedWithValue(action)) {
     const errorData = action.payload as ErrorResponse
-    toast.error(clarifyError(errorData))
+
+    if (errorData.data && errorData.data?.errors && 'message' in errorData.data.errors) {
+      console.log('errorData', errorData)
+      toast.error(clarifyError(errorData))
+    }
   } else if (isRejected(action)) {
     toast.error('Serve is not responding', { toastId: 'default-error' })
   }

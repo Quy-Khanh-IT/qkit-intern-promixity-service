@@ -1,4 +1,4 @@
-import { confirmPasswordValidator, passwordValidator, TOAST_MSG, VALIDATION } from '@/constants'
+import { confirmPasswordValidator, newPasswordValidator, TOAST_MSG, VALIDATION } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import { useUpdatePasswordProfileMutation } from '@/services/user.service'
 import { IUpdatePasswordPayload } from '@/types/user'
@@ -7,6 +7,7 @@ import { Button, Flex, Form, Input, Space } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import './change-password-modal.scss'
+import { ErrorDataResponse, ErrorResponse } from '@/types/error'
 
 interface SubmitButtonProps extends ChangePasswordFormProps {
   form: FormInstance
@@ -43,17 +44,34 @@ const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ cl
       newPassword: values.newPassword,
       confirmPassword: values.confirmPassword
     }
-    await updatePasswordMutation({ userId: userInformation.id, passwordPayload: passwordPayload })
-      .unwrap()
-      .then(() => {
-        clearForm()
+
+    try {
+      const { error } = await updatePasswordMutation({ userId: userInformation.id, passwordPayload })
+
+      if (error) {
+        const errorInstance = error as ErrorResponse
+        if (errorInstance?.data) {
+          const apiErrors: ErrorDataResponse = errorInstance?.data?.errors || ({} as ErrorDataResponse)
+          if (Object.keys(apiErrors).length > 0) {
+            form.setFields(
+              Object.entries(apiErrors).map(([key, value]: [string, string[]]) => ({
+                name: key,
+                errors: value
+              }))
+            )
+          }
+        }
+      } else {
         toast.success(TOAST_MSG.UPDATE_PASSWORD_SUCCESS)
-      })
+        clearForm()
+      }
+    } catch (_error: unknown) {
+      toast.error(TOAST_MSG.UNKNOWN_ERROR)
+    }
   }
 
   const onSubmitForm = (): void => {
     handleChangePassword()
-    clearForm()
   }
 
   return (
@@ -83,12 +101,21 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
         className='change-password-modal pb-3 pt-3'
       >
         <Form.Item name='oldPassword' label='Password' rules={VALIDATION.PASSWORD} className='mb-0'>
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
         <Form.Item
           name='newPassword'
           label='New password'
-          rules={[{ validator: passwordValidator(form.getFieldValue, 'oldPassword') }]}
+          rules={[{ validator: newPasswordValidator(form.getFieldValue, 'oldPassword') }]}
           className='mb-0 mt-2'
         >
           <Input.Password

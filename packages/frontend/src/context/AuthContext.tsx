@@ -12,7 +12,7 @@ import { IUserInformation } from '@/types/user'
 import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
 import Error from 'next/error'
 import { useRouter } from 'next/navigation'
-import React, { createContext, useCallback, useEffect } from 'react'
+import React, { createContext, useCallback } from 'react'
 import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         const errorMessage = customError.data?.message
         toast.error(errorMessage)
       } else {
-        toast.error('An unknown error occurred')
+        toast.error(TOAST_MSG.UNKNOWN_ERROR)
       }
     }
   }, [])
@@ -75,12 +75,12 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         const errorMessage = customError.data?.message
         toast.error(errorMessage)
       } else {
-        toast.error('An unknown error occurred')
+        toast.error(TOAST_MSG.UNKNOWN_ERROR)
       }
     }
   }, [])
 
-  const onLogin = async (loginPayload: ILoginPayload, _stopLoading: () => void): Promise<void> => {
+  const onLogin = async (loginPayload: ILoginPayload, stopLoading: () => void): Promise<void> => {
     await login(loginPayload)
       .unwrap()
       .then((res) => {
@@ -94,8 +94,11 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       .then(() => {
         toast.success(TOAST_MSG.LOGIN_SUCCESS)
       })
+      .catch((err: unknown) => {
+        console.log('err login', err);
+      })
       .finally(() => {
-        _stopLoading()
+        stopLoading()
       })
   }
 

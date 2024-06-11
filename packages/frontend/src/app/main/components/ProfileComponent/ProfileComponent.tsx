@@ -9,7 +9,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import './profile-component.scss'
 import { IUpdateProfilePayload } from '@/types/user'
 import { toast } from 'react-toastify'
-import { MODAL_TEXT, TOAST_MSG } from '@/constants'
+import { MODAL_TEXT, TOAST_MSG, VALIDATION } from '@/constants'
 import ChangePasswordForm from '@/app/components/admin/ChangePassword/ChangePasswordForm'
 import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
 import { generateRoleColor } from '../../utils/main.util'
@@ -77,12 +77,11 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const ProfileComponent: React.FC = () => {
-  // const { userId: storedUserId } = useAuth()
   const { userInformation } = useAuth()
   const [storedUserId, setStoredUerId] = useState<string>(userInformation?.id)
   const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
-  const [form] = Form.useForm()
+  const [form] = Form.useForm<IUpdateProfilePayload>()
   const [isEditInfo, setIsEditInfo] = useState<boolean>(false)
   const changePasswordModalRef = useRef<IModalMethods | null>(null)
   const [_open, _setOpen] = useState<boolean>(false)
@@ -98,7 +97,6 @@ const ProfileComponent: React.FC = () => {
       form.setFieldsValue({
         firstName: userProfile.firstName,
         lastName: userProfile.lastName,
-        email: userProfile.email,
         phoneNumber: userProfile.phoneNumber
       })
     }
@@ -161,15 +159,7 @@ const ProfileComponent: React.FC = () => {
                 <Input value={userProfile?.lastName} />
               </Form.Item>
 
-              <Form.Item
-                name='email'
-                label='Email'
-                rules={[
-                  { required: true, message: 'Please enter your email' },
-                  { type: 'email', message: 'Email format is not valid' }
-                ]}
-                validateTrigger={['onBlur']}
-              >
+              <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} validateTrigger={['onBlur']}>
                 <Input disabled={true} />
               </Form.Item>
               <Form.Item
