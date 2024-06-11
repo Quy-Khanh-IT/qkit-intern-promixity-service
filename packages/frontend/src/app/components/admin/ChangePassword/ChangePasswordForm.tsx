@@ -1,4 +1,4 @@
-import { TOAST_MSG, VALIDATION } from '@/constants'
+import { confirmPasswordValidator, passwordValidator, TOAST_MSG, VALIDATION } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import { useUpdatePasswordProfileMutation } from '@/services/user.service'
 import { IUpdatePasswordPayload } from '@/types/user'
@@ -88,27 +88,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
         <Form.Item
           name='newPassword'
           label='New password'
-          rules={[
-            {
-              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-              validator(_, value: string) {
-                if (!value) {
-                  return Promise.reject(new Error('Please enter password'))
-                }
-                if (value?.length < 6 || value?.length > 25) {
-                  return Promise.reject(new Error('Password must be 6-25 characters long'))
-                }
-                if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{6,25}$/.test(value)) {
-                  return Promise.reject(
-                    new Error(
-                      'Password must include at least one uppercase letter, one number, and one special character'
-                    )
-                  )
-                }
-                return Promise.resolve()
-              }
-            }
-          ]}
+          rules={[{ validator: passwordValidator(form.getFieldValue, 'oldPassword') }]}
           className='mb-0 mt-2'
         >
           <Input.Password
@@ -124,21 +104,9 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
         </Form.Item>
         <Form.Item
           name='confirmPassword'
-          label='Confirm password'
+          label='Confirm new password'
           className='mb-0 mt-2'
-          rules={[
-            { required: true, message: 'Please confirm your password' },
-            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-            ({ getFieldValue }) => ({
-              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-              validator(_, value) {
-                if (!value || getFieldValue('newPassword') === value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(new Error('The confirmation password does not match!'))
-              }
-            })
-          ]}
+          rules={[{ validator: confirmPasswordValidator(form.getFieldValue, 'newPassword') }]}
           validateTrigger={['onBlur']}
         >
           <Input.Password

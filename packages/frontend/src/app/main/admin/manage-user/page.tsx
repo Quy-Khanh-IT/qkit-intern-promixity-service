@@ -82,7 +82,7 @@ const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
 
 const ManageUser = (): React.ReactNode => {
   const router = useRouter()
-  const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
+  const [_routeValue, _setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
   const currentPathName = usePathname()
   // Search
   const searchParams = useSearchParams()
@@ -323,6 +323,7 @@ const ManageUser = (): React.ReactNode => {
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'firstName',
         placeholder: MANAGE_USER_FIELDS.firstName,
+        defaultValue: queryData?.firstName ? [queryData?.firstName] : [],
         _handleSearch: handleSearch
       })
     },
@@ -334,6 +335,7 @@ const ManageUser = (): React.ReactNode => {
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'lastName',
         placeholder: MANAGE_USER_FIELDS.lastName,
+        defaultValue: queryData?.lastName ? [queryData?.lastName] : [],
         _handleSearch: handleSearch
       })
     },
@@ -344,6 +346,7 @@ const ManageUser = (): React.ReactNode => {
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'email',
         placeholder: MANAGE_USER_FIELDS.email,
+        defaultValue: queryData?.email ? [queryData?.email] : [],
         _handleSearch: handleSearch
       })
     },
@@ -355,6 +358,7 @@ const ManageUser = (): React.ReactNode => {
       ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
         dataIndex: 'phoneNumber',
         placeholder: MANAGE_USER_FIELDS.phoneNumber,
+        defaultValue: queryData?.phone ? [queryData?.phone] : [],
         _handleSearch: handleSearch
       })
     },

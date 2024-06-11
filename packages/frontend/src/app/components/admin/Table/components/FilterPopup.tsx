@@ -25,7 +25,7 @@ const FilterPopupProps = <T, K extends keyof T>({
   _handleFilter
 }: IFilterPopupProps<K>): ColumnType<T> => {
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
-  const checkedList = useRef<string[]>(defaultValue || [])
+  const checkedList = useRef<string[]>([])
 
   const checkAll = useRef<boolean>(false)
   const indeterminate = useRef<boolean>(false)
