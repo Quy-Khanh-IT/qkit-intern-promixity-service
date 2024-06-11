@@ -13,3 +13,13 @@ export class PaginationResult<T> {
   data: T[];
   links: PaginationLinks;
 }
+
+export class NotificationPaginationResult<T> {
+  totalRecords: number;
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+  totalUnreadRecords: number;
+  data: T[];
+  links: PaginationLinks;
+}

@@ -42,8 +42,6 @@ export class ResponseSchema {
 
   @Transform(
     (value) => {
-      console.log('value', value);
-
       return value.obj?.reviewId?.toString();
     },
     {

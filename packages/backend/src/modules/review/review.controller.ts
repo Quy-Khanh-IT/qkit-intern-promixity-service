@@ -32,13 +32,14 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { EditResponseDto } from './dto/edit-response.dto';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
-import { CommentDto } from './dto/reply-review.dto';
+import { CommentDto } from './dto/create-comment.dto';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 import { RoleGuard } from 'src/cores/guard/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
+import { CommentQuery } from './dto/comment-query.dto';
 
 @Controller('reviews')
 @ApiTags('reviews')
@@ -58,6 +59,17 @@ export class ReviewController {
     const transferData = plainToClass(FindAllReviewQuery, data);
 
     return await this.reviewService.findAll(transferData);
+  }
+
+  @Get('comments')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: '[ALL]',
+  })
+  async getComments(@Query() query: CommentQuery) {
+    const comments = await this.reviewService.getComments(query);
+
+    return comments;
   }
 
   @Get(':businessId/filter')
@@ -135,7 +147,27 @@ export class ReviewController {
     @Body() commentDto: CommentDto,
     @Req() req: Request,
   ) {
-    return this.reviewService.CreateComment(commentDto, id, req.user);
+    return this.reviewService.createComment(commentDto, id, req.user);
+  }
+
+  @Post(':commentId/response')
+  @HttpCode(201)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[ADMIN, USER, BUSINESS]: reply a comment which can comment on specific review',
+  })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
+  @ApiBody({
+    type: CommentDto,
+  })
+  create(
+    @Param('commentId') id: string,
+    @Body() commentDto: CommentDto,
+    @Req() req: Request,
+  ) {
+    return this.reviewService.createReply(id, commentDto, req.user);
   }
 
   // @Put(':reviewId')

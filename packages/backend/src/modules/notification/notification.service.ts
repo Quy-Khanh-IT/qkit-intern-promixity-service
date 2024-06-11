@@ -23,6 +23,7 @@ import {
 } from 'src/common/exceptions/notification.exception';
 import { User } from '../user/entities/user.entity';
 import { UserRole } from 'src/common/enums';
+import { transStringToObjectId } from 'src/common/utils';
 
 @Injectable()
 export class NotificationService {
@@ -130,6 +131,23 @@ export class NotificationService {
     return !!(await this.notificationRepository.update(notificationId, {
       isRead: true,
     }));
+  }
+
+  async getUnreadCount(user: User) {
+    let userId: string | null;
+
+    if (user.role === UserRole.ADMIN) {
+      userId = null;
+    } else {
+      userId = user.id;
+    }
+
+    const notifications = await this.notificationRepository.findAll({
+      isRead: false,
+      receiverId: userId,
+    });
+
+    return notifications.count;
   }
 
   @OnEvent(EventDispatcherEnum.CREATE_BUSINESS)

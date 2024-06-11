@@ -2,7 +2,10 @@ import * as moment from 'moment';
 import { PipelineStage } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { NoDateQueryFilterBase } from 'src/cores/pagination/base/no-date-query-filter.base';
-import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
+import {
+  NotificationPaginationResult,
+  PaginationResult,
+} from 'src/cores/pagination/base/pagination-result.base';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 import { BaseRepositoryAbstract } from 'src/cores/repository/base/repositoryAbstract.base';
 
@@ -122,6 +125,63 @@ export class PaginationHelper {
       pageSize: result[0]['count'],
       totalPages: result[0]['totalPages'],
       totalRecords: result[0]['totalRecords'],
+    };
+  }
+
+  static async NotificationPaginate<
+    T extends BaseEntity,
+    V extends NoDateQueryFilterBase,
+  >(
+    URL: string,
+    queryData: V,
+    repository: BaseRepositoryAbstract<T>,
+    createOptionalPipeline?: (queryData: V) => Promise<PipelineStage[]>,
+  ): Promise<NotificationPaginationResult<T>> {
+    let basePipeline: PipelineStage[] = [
+      {
+        $facet: {
+          data: [
+            { $skip: (queryData.offset - 1) * queryData.limit },
+            { $limit: queryData.limit },
+          ],
+          totalCount: [{ $count: 'total' }],
+        },
+      },
+
+      {
+        $project: {
+          data: 1,
+          count: { $size: '$data' },
+          totalRecords: { $arrayElemAt: ['$totalCount.total', 0] },
+          totalPages: {
+            $ceil: {
+              $divide: [
+                { $arrayElemAt: ['$totalCount.total', 0] },
+                queryData.limit,
+              ],
+            },
+          },
+        },
+      },
+    ];
+
+    if (createOptionalPipeline) {
+      const optionalPipeline: PipelineStage[] =
+        await createOptionalPipeline(queryData);
+      if (optionalPipeline && optionalPipeline.length > 0) {
+        basePipeline = [...optionalPipeline, ...basePipeline];
+      }
+    }
+
+    let result: any[] = await repository.aggregate(basePipeline);
+    return {
+      currentPage: queryData.offset,
+      data: result[0]['data'],
+      links: this.createLink(queryData, URL, result[0]['totalPages']),
+      pageSize: result[0]['count'],
+      totalPages: result[0]['totalPages'],
+      totalRecords: result[0]['totalRecords'],
+      totalUnreadRecords: result[0]['totalUnreadRecords'],
     };
   }
 }

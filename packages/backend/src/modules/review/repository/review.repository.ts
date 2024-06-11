@@ -5,7 +5,7 @@ import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositor
 import { ReviewRepositoryInterface } from '../interfaces/review-repo.interface';
 import { Review } from '../entities/review.entity';
 import { CreateReviewDto } from '../dto/create-review.dto';
-import { CommentDto } from '../dto/reply-review.dto';
+import { CommentDto } from '../dto/create-comment.dto';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import { ReviewConstant } from 'src/common/constants/review.constant';
@@ -54,7 +54,7 @@ export class ReviewRepository
 
     review.id = transObjectIdToString(review._id);
 
-    return review.toObject() as Review;
+    return review.toObject();
   }
 
   async createComment(dto: CommentDto, reviewId: string, user: User) {
@@ -62,6 +62,27 @@ export class ReviewRepository
 
     if (!review) {
       throw new ReviewNotFoundException();
+    }
+
+    let right: number;
+
+    const maxRightNum = await this.commentModel.findOne(
+      {
+        reviewId: review._id,
+        page: null,
+      },
+      {
+        right: 1,
+      },
+      {
+        sort: { right: -1 },
+      },
+    );
+
+    if (maxRightNum) {
+      right = maxRightNum.right + 1;
+    } else {
+      right = 1;
     }
 
     const newComment = await this.commentModel.create({
@@ -75,6 +96,8 @@ export class ReviewRepository
       content: dto.content,
       type: ReviewTypeEnum.COMMENT,
       page: null,
+      left: right,
+      right: right + 1,
       _page: review.page ? review.page : 1,
       replies: [],
     });
@@ -93,8 +116,6 @@ export class ReviewRepository
       },
     );
 
-    console.log('updateComment', updateComment);
-
     if (!updateComment.modifiedCount) {
       const rev = await this.reviewModel.findOneAndUpdate(
         {
@@ -108,7 +129,7 @@ export class ReviewRepository
       );
 
       if (rev) {
-        const comm = await this.commentModel.updateOne(
+        await this.commentModel.updateOne(
           {
             reviewId: review._id,
             page: rev.page,
