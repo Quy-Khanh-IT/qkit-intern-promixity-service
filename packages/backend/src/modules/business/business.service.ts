@@ -997,6 +997,10 @@ export class BusinessService {
     // then check if all character in address line is in mark array
     const counts = {} as Object;
 
+    // if(!reverseData?.address?.road) {
+    //   return false;
+    // }
+
     console.log('reverseData?.address?.road', reverseData?.address?.road);
 
     let splitReverseRoad = (reverseData?.address?.road as string)

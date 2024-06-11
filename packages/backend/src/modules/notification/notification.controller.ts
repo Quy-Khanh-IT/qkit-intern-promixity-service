@@ -25,6 +25,15 @@ import { Request } from 'express';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
+  @Get('unread-count')
+  @HttpCode(200)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.BUSINESS, UserRole.USER)
+  async getUnreadCount(@Req() req: Request) {
+    console.log('in');
+    return await this.notificationService.getUnreadCount(req.user);
+  }
+
   @Get(':id')
   @HttpCode(200)
   @UseGuards(JwtAccessTokenGuard, RoleGuard)
