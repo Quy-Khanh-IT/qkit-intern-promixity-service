@@ -53,18 +53,11 @@ export default function RootLayout({
 
   useEffect(() => {
     if (userInformation) {
-      // const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
-      // setRouteValue(routeValue as string)
-
       const initialMenuKey =
         findKeyMenuBasedRoute(userInformation?.role, (routeValue as string).split('?')[0]) || ORIGIN_MENU_TAB
       setSelectedMenuKey(initialMenuKey)
     }
   }, [userInformation, routeValue])
-
-  useEffect(() => {
-    console.log('routeValue', routeValue)
-  }, [routeValue])
 
   const {
     token: { colorBgContainer }
