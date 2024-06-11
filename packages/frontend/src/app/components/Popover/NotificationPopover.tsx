@@ -1,5 +1,6 @@
 import { UI_TEXT } from '@/constants'
 import { fetchVersionOptions } from '@/constants/rtk-query'
+import variables from '@/sass/common/_variables.module.scss'
 import {
   useGetNotificationsQuantityQuery,
   useLazyGetAllNotificationsQuery,
@@ -14,7 +15,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import StickyBox from 'react-sticky-box'
 import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
-import variables from '@/sass/common/_variables.module.scss'
 
 const { black } = variables
 
@@ -60,6 +60,7 @@ const NotificationPopover = (): React.ReactNode => {
   const clickAllRead = (e: React.MouseEvent<HTMLSpanElement>): void => {
     fetchAllRead()
     setItemCount(0)
+    loadFirstNotifications(getTabPayload())
     const allReadBtn = document.querySelectorAll('.ant-list-item-action .read-btn')
     allReadBtn.forEach((item: Element) => {
       item.classList.add('d-none')
@@ -96,7 +97,7 @@ const NotificationPopover = (): React.ReactNode => {
     return payload
   }
 
-  // load first and change tab
+  // load first and change tab, fetch interval tab
   const loadFirstNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
     setLoading(true)
     await getAllNotifications(payload)
@@ -179,6 +180,16 @@ const NotificationPopover = (): React.ReactNode => {
 
   useEffect(() => {
     loadFirstNotifications(getTabPayload())
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      loadFirstNotifications(getTabPayload())
+    }, 10000)
+
+    return (): void => {
+      clearTimeout(timer)
+    }
   }, [])
 
   const resetValues = (): void => {

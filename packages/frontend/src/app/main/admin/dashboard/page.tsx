@@ -15,6 +15,7 @@ import BarChart from './components/BarChart'
 import PieChart from './components/PieChart'
 import SplineChart from './components/SplineChart'
 import './dashboard.scss'
+import dynamic from 'next/dynamic'
 
 const splineOptions: SelectionOptions[] = [
   { value: STATISTIC_OPTIONS_VALUE._MONTH, label: 'By month' },
@@ -31,7 +32,7 @@ const FIRST_PAYLOAD: IBusinessUserStatisticQuery = {
   statusUser: 'all'
 }
 
-const Dashboard: React.FC = () => {
+const _Dashboard: React.FC = () => {
   const [queryData, setQueryData] = useState<IBusinessUserStatisticQuery>(FIRST_PAYLOAD)
   const [getBusinessUserStatistic, { data: businessUserData }] = useLazyGetBusinessUserStatisticQuery()
 
@@ -100,6 +101,12 @@ const Dashboard: React.FC = () => {
       </Row>
     </>
   )
+}
+
+const DashboardDynamic = dynamic(() => Promise.resolve(_Dashboard), { ssr: false })
+
+const Dashboard = (): React.ReactNode => {
+  return <DashboardDynamic />
 }
 
 export default Dashboard
