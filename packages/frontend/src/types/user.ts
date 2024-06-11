@@ -16,6 +16,7 @@ export interface IUserInformation {
 export interface IUpdateProfilePayload {
   firstName: string
   lastName: string
+  email: string
   phoneNumber: string
 }
 

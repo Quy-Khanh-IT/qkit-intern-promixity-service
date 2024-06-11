@@ -16,11 +16,13 @@ export const UI_TEXT = {
 
 export const TOAST_MSG = {
   NO_AUTHORIZATION: 'No authorization',
+  LOGIN_FAILED: 'Incorrect username or password',
   LOGIN_SUCCESS: 'Login successfully',
   UPDATE_PROFILE_SUCCESS: 'Update profile successfully',
   UPDATE_PASSWORD_SUCCESS: 'Update password successfully',
 
-  UNKNOWN_ERROR: 'An unexpected error occurred'
+  UNKNOWN_ERROR: 'An unexpected error occurred',
+  SERVER_NOT_RESPONDING: 'Server is not responding'
 }
 
 export const MODAL_TEXT = {
@@ -39,7 +41,7 @@ export const MODAL_TEXT = {
   CHANGE_PASSWORD_TITLE: 'Change Password'
 }
 
-// public
+// PUBLIC URL
 export const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL
 export const API_ENDPOINT_NEAR_BY = process.env.NEXT_PUBLIC_API_URL_NEAR_BY
 export const LOCAL_ENDPOINT = process.env.NEXT_PUBLIC_LOCALHOST_URL

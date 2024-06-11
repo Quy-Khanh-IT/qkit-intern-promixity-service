@@ -94,9 +94,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       .then(() => {
         toast.success(TOAST_MSG.LOGIN_SUCCESS)
       })
-      .catch((err: unknown) => {
-        console.log('err login', err);
-      })
       .finally(() => {
         stopLoading()
       })

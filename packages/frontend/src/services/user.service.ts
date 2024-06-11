@@ -35,7 +35,10 @@ export const userApi = createApi({
       },
       providesTags: ['UserInfo']
     }),
-    updatePrivateUserProfile: builder.mutation<IUserInformation, { userId: string; userData: IUpdateProfilePayload }>({
+    updatePrivateUserProfile: builder.mutation<
+      IUserInformation,
+      { userId: string; userData: Omit<IUpdateProfilePayload, 'email'> }
+    >({
       query: (payload) => ({
         url: `/users/${payload.userId}/profile`,
         method: 'PATCH',

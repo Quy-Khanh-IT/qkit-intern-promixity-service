@@ -1,5 +1,4 @@
 import { Rule } from 'antd/es/form'
-// validator-form.ts
 import { RuleObject } from 'antd/lib/form'
 import { StoreValue } from 'rc-field-form/lib/interface'
 
@@ -17,9 +16,6 @@ export const VALIDATION = {
 export const newPasswordValidator =
   (getFieldValue: (_name: string) => string, checkField: string) =>
   async (_: RuleObject, value: string): Promise<void> => {
-    if (!value) {
-      return Promise.reject(new Error('Please enter password'))
-    }
     if (getFieldValue(checkField) === value) {
       return Promise.reject(new Error('New password must be different from the old password'))
     }
@@ -29,9 +25,6 @@ export const newPasswordValidator =
 export const confirmPasswordValidator =
   (getFieldValue: (_name: string) => string, checkField: string) =>
   async (_: RuleObject, value: StoreValue): Promise<void> => {
-    if (!value) {
-      return Promise.reject(new Error('Please enter your new password'))
-    }
     if (getFieldValue(checkField) !== value) {
       return Promise.reject(new Error('The confirmation password does not match!'))
     }

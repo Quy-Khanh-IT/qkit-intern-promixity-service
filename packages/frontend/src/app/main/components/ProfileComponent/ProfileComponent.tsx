@@ -97,6 +97,7 @@ const ProfileComponent: React.FC = () => {
       form.setFieldsValue({
         firstName: userProfile.firstName,
         lastName: userProfile.lastName,
+        email: userProfile.email,
         phoneNumber: userProfile.phoneNumber
       })
     }

@@ -17,7 +17,7 @@ const AdminLogin: React.FC = () => {
     setLoadingLogin(false)
     setTimeout(() => {
       setDisableLogin(false)
-    }, 1000)
+    }, 10000)
   }
 
   const debounceLoginForm = debounce((values: ILoginPayload) => {

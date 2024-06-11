@@ -115,7 +115,10 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
         <Form.Item
           name='newPassword'
           label='New password'
-          rules={[{ validator: newPasswordValidator(form.getFieldValue, 'oldPassword') }]}
+          rules={[
+            { required: true, message: 'Please enter new password' },
+            { validator: newPasswordValidator(form.getFieldValue, 'oldPassword') }
+          ]}
           className='mb-0 mt-2'
         >
           <Input.Password
@@ -133,7 +136,10 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
           name='confirmPassword'
           label='Confirm new password'
           className='mb-0 mt-2'
-          rules={[{ validator: confirmPasswordValidator(form.getFieldValue, 'newPassword') }]}
+          rules={[
+            { required: true, message: 'Please confirm your new password' },
+            { validator: confirmPasswordValidator(form.getFieldValue, 'newPassword') }
+          ]}
           validateTrigger={['onBlur']}
         >
           <Input.Password
