@@ -71,7 +71,7 @@ const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ cl
 }
 
 const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm<IUpdatePasswordPayload>()
 
   return (
     <>

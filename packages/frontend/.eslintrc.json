@@ -70,7 +70,9 @@
         "useRef",
         "useMemo",
         "useCallback",
-        "useImperativeHandle"
+        "useImperativeHandle",
+        "useForm",
+        "useWatch"
         // useEffect and useLayoutEffect do not take generics, so they are not included
       ]
     ],
