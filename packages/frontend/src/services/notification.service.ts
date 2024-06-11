@@ -20,6 +20,13 @@ export const notificationApi = createApi({
       },
       providesTags: ['NotificationList']
     }),
+    getNotificationsQuantity: builder.query<number, 'object'>({
+      query: () => ({
+        url: '/notifications/unread-count',
+        method: 'GET'
+      }),
+      providesTags: ['NotificationList']
+    }),
     updateReadNotification: builder.mutation<void, string>({
       query: (id) => ({
         url: `/notifications/${id}/read`,
@@ -37,6 +44,7 @@ export const notificationApi = createApi({
 
 export const {
   useLazyGetAllNotificationsQuery,
+  useGetNotificationsQuantityQuery,
   useUpdateReadNotificationMutation,
   useUpdateAllReadNotificationMutation
 } = notificationApi

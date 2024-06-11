@@ -34,6 +34,7 @@ export interface IGetAllNotificationQuery {
   offset: number
   limit: number
   isRead: BooleanEnum
+  sortBy: SortEnum
 }
 
 export interface IBusinessUserStatisticQuery {

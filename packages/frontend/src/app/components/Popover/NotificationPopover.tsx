@@ -1,7 +1,11 @@
 import { UI_TEXT } from '@/constants'
 import { fetchVersionOptions } from '@/constants/rtk-query'
-import { useLazyGetAllNotificationsQuery, useUpdateAllReadNotificationMutation } from '@/services/notification.service'
-import { BooleanEnum } from '@/types/enum'
+import {
+  useGetNotificationsQuantityQuery,
+  useLazyGetAllNotificationsQuery,
+  useUpdateAllReadNotificationMutation
+} from '@/services/notification.service'
+import { BooleanEnum, SortEnum } from '@/types/enum'
 import { INotification } from '@/types/notification'
 import { IGetAllNotificationQuery } from '@/types/query'
 import { BellOutlined } from '@ant-design/icons'
@@ -46,6 +50,7 @@ const NotificationPopover = (): React.ReactNode => {
   const [notificationsData, setNotificationsData] = useState<INotification[]>([])
   const [itemCount, setItemCount] = useState<number>(0)
   const [getAllNotifications] = useLazyGetAllNotificationsQuery(fetchVersionOptions)
+  const { data: notificationsQuantity } = useGetNotificationsQuantityQuery('object', fetchVersionOptions)
   const [updateAllReadNotification] = useUpdateAllReadNotificationMutation()
 
   const fetchAllRead = async (): Promise<void> => {
@@ -54,6 +59,7 @@ const NotificationPopover = (): React.ReactNode => {
 
   const clickAllRead = (e: React.MouseEvent<HTMLSpanElement>): void => {
     fetchAllRead()
+    setItemCount(0)
     const allReadBtn = document.querySelectorAll('.ant-list-item-action .read-btn')
     allReadBtn.forEach((item: Element) => {
       item.classList.add('d-none')
@@ -70,10 +76,15 @@ const NotificationPopover = (): React.ReactNode => {
     </Flex>
   )
 
-  const getTabPayload = (offset: number = ORIGIN_PAGE, limit: number = perPage.current): IGetAllNotificationQuery => {
+  const getTabPayload = (
+    offset: number = ORIGIN_PAGE,
+    limit: number = perPage.current,
+    sortBy: SortEnum = SortEnum._DESC
+  ): IGetAllNotificationQuery => {
     const payload = {
       offset,
-      limit
+      limit,
+      sortBy
     } as IGetAllNotificationQuery
 
     if (tabKeyRef.current === TAB_STEPS.UNREAD) {
@@ -97,7 +108,6 @@ const NotificationPopover = (): React.ReactNode => {
         }
         setNotificationsData(res.data)
         setCacheData(res.data)
-        setItemCount(res.totalRecords)
         setLoading(false)
       })
   }
@@ -162,6 +172,10 @@ const NotificationPopover = (): React.ReactNode => {
       style={{ borderRadius: 16 }}
     />
   )
+
+  useEffect(() => {
+    setItemCount(notificationsQuantity || 0)
+  }, [notificationsQuantity])
 
   useEffect(() => {
     loadFirstNotifications(getTabPayload())
