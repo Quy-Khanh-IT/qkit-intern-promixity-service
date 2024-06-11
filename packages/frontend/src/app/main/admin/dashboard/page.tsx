@@ -1,19 +1,19 @@
 'use client'
 import { DEFAULT_MONTH_FORMAT } from '@/constants'
 import { STATISTIC_OPTIONS_VALUE } from '@/constants/statistic'
+import variables from '@/sass/common/_variables.module.scss'
 import { useLazyGetBusinessUserStatisticQuery } from '@/services/statistic.service'
 import { SelectionOptions } from '@/types/common'
 import { IBusinessUserStatisticQuery } from '@/types/query'
 import { IBusinessUserStatistic } from '@/types/statistic'
-import { Col, DatePicker, Row, Select, theme } from 'antd'
+import { Col, DatePicker, Row, Select } from 'antd'
 import { DatePickerProps } from 'antd/es/date-picker'
 import { Dayjs } from 'dayjs'
 import React, { useEffect, useState } from 'react'
+import { overlayCardStyle } from '../../layout'
 import BarChart from './components/BarChart'
 import PieChart from './components/PieChart'
 import SplineChart from './components/SplineChart'
-import { overlayCardStyle } from '../../layout'
-import variables from '@/sass/common/_variables.module.scss'
 import './dashboard.scss'
 
 const splineOptions: SelectionOptions[] = [
@@ -90,16 +90,10 @@ const Dashboard: React.FC = () => {
         </Row>
 
         <Row className='d-flex justify-content-between flex-wrap gap-4 w-100'>
-          <Col
-            style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }}
-            className='--pie-chart-custom'
-          >
+          <Col style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }} className='--pie-chart-custom'>
             <PieChart />
           </Col>
-          <Col
-            style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }}
-            className='--bar-chart-custom'
-          >
+          <Col style={{ ...overlayCardStyle, backgroundColor: light, flexGrow: 1 }} className='--bar-chart-custom'>
             <BarChart />
           </Col>
         </Row>

@@ -12,7 +12,7 @@ import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
 import variables from '@/sass/common/_variables.module.scss'
 
-const {black } = variables
+const { black } = variables
 
 const ORIGIN_PAGE = 1
 const PAGE_SIZE = 4

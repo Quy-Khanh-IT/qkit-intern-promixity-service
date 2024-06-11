@@ -31,8 +31,6 @@
   border-right: 1px solid $gray-border;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
-  // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
 
   @include xs{
     max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);

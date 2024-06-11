@@ -1,12 +1,12 @@
 'use client'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, LOCAL_ENDPOINT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -17,9 +17,11 @@ import {
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { TableActionEnum, UserOptionEnum } from '@/types/enum'
+import { IModalMethods } from '@/types/modal'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
 import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -42,16 +44,14 @@ import {
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_SORT_FIELDS } from '../manage-business/manage-business.const'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
-import { ReadonlyURLSearchParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
-import qs from 'qs'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
-import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 
 const { Text } = Typography
 const { RangePicker } = DatePicker

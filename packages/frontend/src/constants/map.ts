@@ -1,5 +1,3 @@
-import { MenuProps } from 'antd'
-
 export const MAP_RADIUS = {
   LEVEL_ONE: 500,
   LEVEL_TWO: 1000,

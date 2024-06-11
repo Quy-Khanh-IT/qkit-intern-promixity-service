@@ -1,6 +1,6 @@
 import { Button, Modal } from 'antd'
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import { IModalMethods } from '../modal'
+import { IModalMethods } from '@/types/modal'
 import '../modal.scss'
 import './confirm-modal.scss'
 

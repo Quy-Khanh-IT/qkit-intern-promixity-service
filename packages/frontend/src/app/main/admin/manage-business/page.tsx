@@ -1,7 +1,7 @@
 'use client'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { IModalMethods } from '@/app/components/admin/modal'
+import { IModalMethods } from '@/types/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
@@ -452,7 +452,7 @@ const ManageBusiness = (): React.ReactNode => {
       span: 2,
       children: formatDate(privateProfileData?.created_at || '')
     }
-    // date of week & images
+    // date of week
   ]
 
   const options = [

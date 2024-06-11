@@ -1,6 +1,6 @@
 'use client'
 import ChangePasswordModal from '@/app/components/admin/ConfirmModal/ConfirmModal'
-import { IModalMethods } from '@/app/components/admin/modal'
+import { IModalMethods } from '@/types/modal'
 import { useAuth } from '@/context/AuthContext'
 import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } from '@/services/user.service'
 import type { FormInstance } from 'antd'

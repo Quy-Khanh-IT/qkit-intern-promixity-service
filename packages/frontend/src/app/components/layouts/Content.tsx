@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import LoaderArea from '../LoaderArea/LoaderArea'
 import StoreProvider from '../StoreProvider'
-import { AuthProvider } from '../../../context/AuthContext'
+import { AuthProvider } from '@/context/AuthContext'
 
 interface IContentLayout {
   children: React.ReactNode

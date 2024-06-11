@@ -1,30 +1,23 @@
 'use client'
-import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
-import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
-import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
+import { DEFAULT_DATE_FORMAT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import variables from '@/sass/common/_variables.module.scss'
 import {
-  useDeleteBusinessMutation,
-  useGetAllBusinessActionsQuery,
   useGetAllBusinessStatusQuery,
   useGetAllPrivateBusinessesQuery,
-  useGetPrivateBusinessProfileQuery,
-  useRestoreDeletedBusinessMutation,
-  useUpdateBusinessStatusMutation
+  useGetPrivateBusinessProfileQuery
 } from '@/services/business.service'
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
-import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
+import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
 import { IGetAllBusinessQuery } from '@/types/query'
-import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
-import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined, PlusOutlined } from '@ant-design/icons'
+import { compareDates, convertSortOrder, formatDate, getPresentUrl } from '@/utils/helpers.util'
+import { EllipsisOutlined, FolderViewOutlined, PlusOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -48,16 +41,14 @@ import {
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
+import { HttpStatusCode } from 'axios'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from '../../admin/manage-business/manage-business.const'
 import { generateStatusColor } from '../../utils/main.util'
 import './my-business.scss'
-import Link from 'next/link'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
-import { getPresentUrl } from '@/utils/helpers.util'
-import { HttpStatusCode } from 'axios'
-import { useRouter } from 'next/navigation'
 
 const { Text } = Typography
 const { starColor } = variables

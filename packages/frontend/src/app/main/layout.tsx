@@ -14,7 +14,6 @@ import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
 import './main.scss'
 import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
-import { getFromSessionStorage } from '@/utils/session-storage.util'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
