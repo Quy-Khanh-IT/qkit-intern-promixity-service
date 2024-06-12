@@ -49,13 +49,19 @@ const SearchPopupProps = <T, K extends keyof T>({
                 setSelectedKeys(value)
                 searchValueRef.current = value
               }}
-              onPressEnter={() => _handleSearch(selectedKeys as string[], confirm, dataIndex)}
+              onPressEnter={() => {
+                _handleSearch(selectedKeys as string[], confirm, dataIndex)
+                close()
+              }}
               style={{ marginBottom: 8, display: 'block' }}
             />
             <Space>
               <Button
                 type='primary'
-                onClick={() => _handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                onClick={() => {
+                  _handleSearch(selectedKeys as string[], confirm, dataIndex)
+                  close()
+                }}
                 icon={<SearchOutlined />}
                 size='small'
                 style={{ width: 90 }}
