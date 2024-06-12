@@ -51,24 +51,33 @@ export default function RootLayout({
     setSelectedMenuKey(ORIGIN_MENU_TAB)
   }
 
-  // useEffect(() => {
-  //   if (userInformation) {
-  //     // const initialMenuKey =
-  //     //   findKeyMenuBasedRoute(userInformation?.role, (routeValue as string).split('?')[0]) || ORIGIN_MENU_TAB
-  //     // setSelectedMenuKey(initialMenuKey)
-  //   }
-  // }, [userInformation, ])
-
   useEffect(() => {
     if (userInformation) {
-      const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
-      setRouteValue(initialRouteValue)
+      if (process.env.NODE_ENV === 'production') {
+        const initialMenuKey =
+          findKeyMenuBasedRoute(userInformation?.role, (routeValue as string).split('?')[0]) || ORIGIN_MENU_TAB
+        setSelectedMenuKey(initialMenuKey)
+      } else {
+        const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
+        setRouteValue(initialRouteValue)
 
-      const initialMenuKey =
-        findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
-      setSelectedMenuKey(initialMenuKey)
+        const initialMenuKey =
+          findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
+        setSelectedMenuKey(initialMenuKey)
+      }
     }
   }, [userInformation])
+
+  // useEffect(() => {
+  //   if (userInformation) {
+  //     const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
+  //     setRouteValue(initialRouteValue)
+
+  //     const initialMenuKey =
+  //       findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
+  //     setSelectedMenuKey(initialMenuKey)
+  //   }
+  // }, [userInformation])
 
   const {
     token: { colorBgContainer }
