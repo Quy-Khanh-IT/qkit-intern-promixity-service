@@ -20,7 +20,7 @@ import {
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
-import { TableActionEnum } from '@/types/enum'
+import { SortEnumAlias, TableActionEnum } from '@/types/enum'
 import { IGetAllBusinessQuery } from '@/types/query'
 import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
@@ -52,7 +52,6 @@ import { generateStatusColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from './manage-business.const'
 import './manage-business.scss'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import qs from 'qs'
 
@@ -100,7 +99,9 @@ const ManageBusiness = (): React.ReactNode => {
     limit: PAGE_SIZE,
     isDeleted: businessOptionBoolean
   } as IGetAllBusinessQuery)
-  const { data: businessesData, isFetching: isLoadingBusinesses } = useGetAllBusinessesQuery(queryData)
+  const { data: businessesData, isFetching: isLoadingBusinesses } = useGetAllBusinessesQuery(
+    parseSearchParamsToObject(searchParams.toString()) as IGetAllBusinessQuery
+  )
   const [selectedBusiness, setSelectedBusiness] = useState<IBusiness | null>(null)
 
   // Modal
@@ -127,7 +128,6 @@ const ManageBusiness = (): React.ReactNode => {
   }, [])
 
   useEffect(() => {
-    console.log('queryData', queryData)
     const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
     const params = new URLSearchParams(queryString).toString()
 
@@ -161,6 +161,13 @@ const ManageBusiness = (): React.ReactNode => {
 
   const onChangeSelection = (value: string): void => {
     setBusinessOption(value)
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: value === DELETED_FETCH
+        }) as IGetAllBusinessQuery
+    )
     setCurrentPage(ORIGIN_PAGE)
   }
 
@@ -200,7 +207,7 @@ const ManageBusiness = (): React.ReactNode => {
     } else if ((dataIndex as string) === 'created_at') {
       delete queryDataTemp.sortBy
     } else {
-      delete queryDataTemp[dataIndex as keyof IGetAllBusinessQuery]
+      delete queryDataTemp[dataIndex as SearchIndex]
     }
     return queryDataTemp
   }
@@ -241,13 +248,17 @@ const ManageBusiness = (): React.ReactNode => {
     sorter: SorterResult<IBusiness> | SorterResult<IBusiness>[],
     extra: TableCurrentDataSource<IBusiness>
   ) => {
+    console.log('sorter extra', sorter, extra)
+
     if (extra?.action === (TableActionEnum._SORT as string)) {
       const _queryDataTemp: IGetAllBusinessQuery = { ...queryData }
       Object.keys(_queryDataTemp).forEach((key: string) => {
         if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as keyof IGetAllBusinessQuery]
+          delete _queryDataTemp[key as SearchIndex]
         }
       })
+
+      console.log('_queryDataTemp', _queryDataTemp)
 
       const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
         if (sorterItem?.order) {
@@ -332,7 +343,7 @@ const ManageBusiness = (): React.ReactNode => {
       dataIndex: 'name',
       key: 'name',
       width: 160,
-      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+      ...SearchPopupProps<IBusiness, DataIndex>({
         dataIndex: 'name',
         placeholder: MANAGE_BUSINESS_FIELDS.name,
         defaultValue: queryData?.name ? [queryData?.name] : [],
@@ -344,7 +355,7 @@ const ManageBusiness = (): React.ReactNode => {
       dataIndex: 'categoryName',
       key: 'category',
       width: 150,
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'categoryName',
         optionsData: businessCategoriesData as IOptionsPipe,
         defaultValue: queryData?.categoryIds || [],
@@ -355,7 +366,7 @@ const ManageBusiness = (): React.ReactNode => {
       title: MANAGE_BUSINESS_FIELDS.fullAddress,
       dataIndex: 'fullAddress',
       key: 'fullAddress',
-      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+      ...SearchPopupProps<IBusiness, DataIndex>({
         dataIndex: 'fullAddress',
         placeholder: MANAGE_BUSINESS_FIELDS.fullAddress,
         defaultValue: queryData?.address ? [queryData?.address] : [],
@@ -369,6 +380,7 @@ const ManageBusiness = (): React.ReactNode => {
       key: 'totalReview',
       width: 150,
       showSorterTooltip: false,
+      sortOrder: queryData?.sortTotalReviewsBy as SortEnumAlias | undefined,
       sorter: {
         compare: (a, b) => a.totalReview - b.totalReview,
         multiple: 2 // higher priority
@@ -387,11 +399,12 @@ const ManageBusiness = (): React.ReactNode => {
         </Flex>
       ),
       showSorterTooltip: false,
+      sortOrder: queryData?.sortRatingBy as SortEnumAlias | undefined,
       sorter: {
         compare: (businessA: IBusiness, businessB: IBusiness) => businessA.overallRating - businessB.overallRating,
         multiple: 1
       },
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'overallRating',
         optionsData: statusData as IOptionsPipe,
         defaultValue: queryData?.starsRating || [],
@@ -409,6 +422,7 @@ const ManageBusiness = (): React.ReactNode => {
         return <Text>{formatDate(createdDate)}</Text>
       },
       showSorterTooltip: false,
+      sortOrder: queryData?.sortBy as SortEnumAlias | undefined,
       sorter: {
         compare: (businessA: IBusiness, businessB: IBusiness) =>
           compareDates(businessA.created_at, businessB.created_at),
@@ -426,7 +440,7 @@ const ManageBusiness = (): React.ReactNode => {
           {status.toUpperCase()}
         </Tag>
       ),
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'status',
         optionsData: statusData as IOptionsPipe,
         defaultValue: queryData?.status || [],

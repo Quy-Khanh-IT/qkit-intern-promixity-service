@@ -51,13 +51,24 @@ export default function RootLayout({
     setSelectedMenuKey(ORIGIN_MENU_TAB)
   }
 
+  // useEffect(() => {
+  //   if (userInformation) {
+  //     // const initialMenuKey =
+  //     //   findKeyMenuBasedRoute(userInformation?.role, (routeValue as string).split('?')[0]) || ORIGIN_MENU_TAB
+  //     // setSelectedMenuKey(initialMenuKey)
+  //   }
+  // }, [userInformation, ])
+
   useEffect(() => {
     if (userInformation) {
+      const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
+      setRouteValue(initialRouteValue)
+
       const initialMenuKey =
-        findKeyMenuBasedRoute(userInformation?.role, (routeValue as string).split('?')[0]) || ORIGIN_MENU_TAB
+        findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
       setSelectedMenuKey(initialMenuKey)
     }
-  }, [userInformation, routeValue])
+  }, [userInformation])
 
   const {
     token: { colorBgContainer }
@@ -91,9 +102,12 @@ export default function RootLayout({
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
     const _routeValue = findRouteMenuBasedKey(userInformation?.role, e.key)
+    setSelectedMenuKey(e.key)
     router.push(_routeValue)
     setRouteValue(_routeValue)
-    setSelectedMenuKey(e.key)
+    // setInterval(() => {
+    //   console.log('routeValue', _routeValue);
+    // }, 1000)
   }
 
   const overlayStyle: React.CSSProperties = {

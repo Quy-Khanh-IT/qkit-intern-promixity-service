@@ -73,5 +73,5 @@ export const convertSortOrder = (order: string): string => {
   } else if (order === (SortEnumAlias._DESCEND as string)) {
     return SortEnum._DESC
   }
-  return ''
+  return order
 }

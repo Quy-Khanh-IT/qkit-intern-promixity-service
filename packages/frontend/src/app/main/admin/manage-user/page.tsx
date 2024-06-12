@@ -6,7 +6,6 @@ import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopu
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -16,7 +15,7 @@ import {
   useUpdateUserRoleMutation
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
-import { TableActionEnum, UserOptionEnum } from '@/types/enum'
+import { SortEnumAlias, TableActionEnum, UserOptionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
@@ -41,6 +40,7 @@ import {
   FilterDropdownProps,
   FilterValue,
   SorterResult,
+  SortOrder,
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
@@ -196,7 +196,7 @@ const ManageUser = (): React.ReactNode => {
     } else if ((dataIndex as string) === 'created_at') {
       delete queryDataTemp.sortBy
     } else {
-      delete queryDataTemp[dataIndex as keyof IGetAllUsersQuery]
+      delete queryDataTemp[dataIndex as SearchIndex]
     }
     return queryDataTemp
   }
@@ -221,7 +221,6 @@ const ManageUser = (): React.ReactNode => {
     _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
-    console.log('selectedKeys', selectedKeys)
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
         const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, dataIndex)
@@ -238,13 +237,17 @@ const ManageUser = (): React.ReactNode => {
     sorter: SorterResult<IUserInformation> | SorterResult<IUserInformation>[],
     extra: TableCurrentDataSource<IUserInformation>
   ) => {
+    console.log('sorter', sorter, extra)
+
     if (extra?.action === (TableActionEnum._SORT as string)) {
       const _queryDataTemp: IGetAllUsersQuery = { ...queryData }
       Object.keys(_queryDataTemp).forEach((key: string) => {
         if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as keyof IGetAllUsersQuery]
+          delete _queryDataTemp[key as SearchIndex]
         }
       })
+
+      console.log('onChangeSorter', _queryDataTemp)
 
       const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
         if (sorterItem?.order) {
@@ -329,7 +332,7 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'firstName',
       key: 'firstName',
       width: 160,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'firstName',
         placeholder: MANAGE_USER_FIELDS.firstName,
         defaultValue: queryData?.firstName ? [queryData?.firstName] : [],
@@ -341,7 +344,7 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'lastName',
       key: 'lastName',
       width: 160,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'lastName',
         placeholder: MANAGE_USER_FIELDS.lastName,
         defaultValue: queryData?.lastName ? [queryData?.lastName] : [],
@@ -352,7 +355,7 @@ const ManageUser = (): React.ReactNode => {
       title: MANAGE_USER_FIELDS.email,
       dataIndex: 'email',
       key: 'email',
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'email',
         placeholder: MANAGE_USER_FIELDS.email,
         defaultValue: queryData?.email ? [queryData?.email] : [],
@@ -364,7 +367,7 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       width: 200,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'phoneNumber',
         placeholder: MANAGE_USER_FIELDS.phoneNumber,
         defaultValue: queryData?.phone ? [queryData?.phone] : [],
@@ -380,6 +383,7 @@ const ManageUser = (): React.ReactNode => {
         return <Text>{formatDate(createdDate)}</Text>
       },
       showSorterTooltip: false,
+      // sortOrder: queryData?.sortBy as SortEnumAlias | undefined,
       sorter: {
         compare: (userA: IUserInformation, userB: IUserInformation) => compareDates(userA.created_at, userB.created_at)
       }
@@ -395,7 +399,7 @@ const ManageUser = (): React.ReactNode => {
           {role?.toUpperCase()}
         </Tag>
       ),
-      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
+      ...FilterPopupProps<IUserInformation, DataIndex>({
         defaultValue: queryData?.role || [],
         dataIndex: 'role',
         optionsData: rolesData as IOptionsPipe,
