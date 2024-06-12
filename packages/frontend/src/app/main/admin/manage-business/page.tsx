@@ -248,28 +248,24 @@ const ManageBusiness = (): React.ReactNode => {
     sorter: SorterResult<IBusiness> | SorterResult<IBusiness>[],
     extra: TableCurrentDataSource<IBusiness>
   ) => {
-    console.log('sorter extra', sorter, extra)
-
     if (extra?.action === (TableActionEnum._SORT as string)) {
-      const _queryDataTemp: IGetAllBusinessQuery = { ...queryData }
-      Object.keys(_queryDataTemp).forEach((key: string) => {
-        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as SearchIndex]
-        }
-      })
-
-      console.log('_queryDataTemp', _queryDataTemp)
-
       const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
+        console.log('sorterItem?.order', sorterItem?.order)
         if (sorterItem?.order) {
-          setQueryData((_prev) =>
+          setQueryData((prev) =>
             mapQueryData(
-              _queryDataTemp,
+              prev,
               sorterItem?.columnKey as DataIndex,
               convertSortOrder(sorterItem?.order as string),
               extra?.action
             )
           )
+        } else {
+          setQueryData((prev) => {
+            const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
+            console.log('queryTemp', queryTemp)
+            return { ...queryTemp } as IGetAllBusinessQuery
+          })
         }
       }
 
@@ -380,9 +376,8 @@ const ManageBusiness = (): React.ReactNode => {
       key: 'totalReview',
       width: 150,
       showSorterTooltip: false,
-      sortOrder: queryData?.sortTotalReviewsBy as SortEnumAlias | undefined,
       sorter: {
-        compare: (a, b) => a.totalReview - b.totalReview,
+        compare: (businessA: IBusiness, businessB: IBusiness) => businessA.totalReview - businessB.totalReview,
         multiple: 2 // higher priority
       }
     },
@@ -399,7 +394,6 @@ const ManageBusiness = (): React.ReactNode => {
         </Flex>
       ),
       showSorterTooltip: false,
-      sortOrder: queryData?.sortRatingBy as SortEnumAlias | undefined,
       sorter: {
         compare: (businessA: IBusiness, businessB: IBusiness) => businessA.overallRating - businessB.overallRating,
         multiple: 1
@@ -422,7 +416,6 @@ const ManageBusiness = (): React.ReactNode => {
         return <Text>{formatDate(createdDate)}</Text>
       },
       showSorterTooltip: false,
-      sortOrder: queryData?.sortBy as SortEnumAlias | undefined,
       sorter: {
         compare: (businessA: IBusiness, businessB: IBusiness) =>
           compareDates(businessA.created_at, businessB.created_at),

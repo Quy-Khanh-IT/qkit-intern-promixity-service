@@ -240,25 +240,23 @@ const ManageUser = (): React.ReactNode => {
     console.log('sorter', sorter, extra)
 
     if (extra?.action === (TableActionEnum._SORT as string)) {
-      const _queryDataTemp: IGetAllUsersQuery = { ...queryData }
-      Object.keys(_queryDataTemp).forEach((key: string) => {
-        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as SearchIndex]
-        }
-      })
-
-      console.log('onChangeSorter', _queryDataTemp)
-
       const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
+        console.log('sorterItem?.order', sorterItem?.order)
         if (sorterItem?.order) {
-          setQueryData((_prev) =>
+          setQueryData((prev) =>
             mapQueryData(
-              _queryDataTemp,
+              prev,
               sorterItem?.columnKey as DataIndex,
               convertSortOrder(sorterItem?.order as string),
               extra?.action
             )
           )
+        } else {
+          setQueryData((prev) => {
+            const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
+            console.log('queryTemp', queryTemp)
+            return { ...queryTemp } as IGetAllUsersQuery
+          })
         }
       }
 
@@ -383,7 +381,6 @@ const ManageUser = (): React.ReactNode => {
         return <Text>{formatDate(createdDate)}</Text>
       },
       showSorterTooltip: false,
-      // sortOrder: queryData?.sortBy as SortEnumAlias | undefined,
       sorter: {
         compare: (userA: IUserInformation, userB: IUserInformation) => compareDates(userA.created_at, userB.created_at)
       }
