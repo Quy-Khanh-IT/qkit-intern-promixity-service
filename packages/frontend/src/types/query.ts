@@ -19,15 +19,15 @@ export interface IGetAllUsersQuery extends IGelAllQuery {
 }
 
 export interface IGetAllBusinessQuery extends IGelAllQuery {
-  name: string
-  phoneNumber: string
-  categoryIds: string[]
-  starsRating: string[]
-  sortTotalReviewsBy: SortEnum
-  sortRatingBy: SortEnum
-  address: string
-  status: string[]
-  dayOfWeek: IDayOfWeek[]
+  name?: string
+  phoneNumber?: string
+  categoryIds?: string[]
+  starsRating?: string[]
+  sortTotalReviewsBy?: SortEnum
+  sortRatingBy?: SortEnum
+  address?: string
+  status?: string[]
+  dayOfWeek?: IDayOfWeek[]
 }
 
 export interface IGetAllNotificationQuery {

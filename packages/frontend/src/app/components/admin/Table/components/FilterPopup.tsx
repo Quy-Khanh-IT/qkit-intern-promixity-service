@@ -67,7 +67,7 @@ const FilterPopupProps = <T, K extends keyof T>({
 
   return {
     filters: filterCustom ?? optionsData?.filterOpts,
-    filterDropdown: ({ setSelectedKeys, confirm, clearFilters }): React.ReactNode => (
+    filterDropdown: ({ setSelectedKeys, confirm, clearFilters, close }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()} className='d-flex flex-column gap-2'>
         <Checkbox
           indeterminate={indeterminate.current}
@@ -80,6 +80,7 @@ const FilterPopupProps = <T, K extends keyof T>({
           options={selectCustom ?? optionsData?.selectionOpts}
           value={checkedList.current}
           onChange={(list: string[]) => {
+            console.log('list', list)
             checkedList.current = list
             setSelectedKeys(list)
             if (list.length === 0) {
@@ -104,7 +105,10 @@ const FilterPopupProps = <T, K extends keyof T>({
           </Button>
           <Button
             type='primary'
-            onClick={() => _handleFilter(checkedList.current, confirm, dataIndex)}
+            onClick={() => {
+              _handleFilter(checkedList.current, confirm, dataIndex)
+              close()
+            }}
             size='small'
             style={{ width: 90 }}
             className='btn-primary-small'

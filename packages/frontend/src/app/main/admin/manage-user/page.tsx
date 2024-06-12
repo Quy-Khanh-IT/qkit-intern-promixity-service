@@ -82,7 +82,6 @@ const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
 
 const ManageUser = (): React.ReactNode => {
   const router = useRouter()
-  const [_routeValue, _setRouteValue, _removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
   const currentPathName = usePathname()
   // Search
   const searchParams = useSearchParams()
@@ -97,9 +96,7 @@ const ManageUser = (): React.ReactNode => {
     limit: PAGE_SIZE,
     isDeleted: userOptionBoolean
   } as IGetAllUsersQuery)
-  // const [queryData, setQueryData] = useState<IGetAllUsersQuery>(
-  //   parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
-  // )
+
   const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(
     parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
   )
@@ -131,6 +128,7 @@ const ManageUser = (): React.ReactNode => {
   }, [])
 
   useEffect(() => {
+    console.log('selectedKeys useEffect', queryData)
     const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
     const params = new URLSearchParams(queryString).toString()
 
@@ -191,6 +189,18 @@ const ManageUser = (): React.ReactNode => {
     return queryDataTemp
   }
 
+  const deleteUnSelectedField = (_queryData: IGetAllUsersQuery, dataIndex: DataIndex): IGetAllUsersQuery => {
+    const queryDataTemp = { ..._queryData } as IGetAllUsersQuery
+    if ((dataIndex as string) === 'phoneNumber') {
+      delete queryDataTemp.phone
+    } else if ((dataIndex as string) === 'created_at') {
+      delete queryDataTemp.sortBy
+    } else {
+      delete queryDataTemp[dataIndex as keyof IGetAllUsersQuery]
+    }
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
     _confirm: FilterDropdownProps['confirm'],
@@ -198,8 +208,7 @@ const ManageUser = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllUsersQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
@@ -212,10 +221,10 @@ const ManageUser = (): React.ReactNode => {
     _confirm: FilterDropdownProps['confirm'],
     dataIndex: DataIndex
   ): void => {
+    console.log('selectedKeys', selectedKeys)
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllUsersQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
@@ -387,7 +396,7 @@ const ManageUser = (): React.ReactNode => {
         </Tag>
       ),
       ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
-        defaultValue: typeof queryData?.role === 'string' ? [queryData?.role] : queryData?.role || [],
+        defaultValue: queryData?.role || [],
         dataIndex: 'role',
         optionsData: rolesData as IOptionsPipe,
         _handleFilter: handleFilter
@@ -480,7 +489,7 @@ const ManageUser = (): React.ReactNode => {
 
   return (
     <div className='--manage-user'>
-      <Row className='pb-3'>
+      <Row className='mb-3' style={{ height: 36 }}>
         <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select

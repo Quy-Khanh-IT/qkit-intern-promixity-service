@@ -16,11 +16,15 @@
   overflow: hidden;
 
   @include xs{
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+    height: calc(100vh - 80px - 48px - 40px - 104px - 104px);
   }
 
   @media screen and (min-width: 468px) {
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+    height: calc(100vh - 80px - 48px - 40px - 52px - 52px);
+  }
+
+  .ant-skeleton-paragraph{
+    margin-top: 0 !important;
   }
 }
 
@@ -33,11 +37,13 @@
   border-top-right-radius: 8px;
 
   @include xs{
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+    // max-height: calc(100vh - 80px - 48px - 40px - 50px - 88px);
+    max-height: 100% !important;
   }
 
   @media screen and (min-width: 468px) {
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+    // max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+    max-height: 100% !important;
   }
 
   .ant-table-filter-trigger{
@@ -78,6 +84,7 @@
 }
 
 .row-pagination{
+  height: 36px;
   margin-top: 16px;
 
   .table-pagination {

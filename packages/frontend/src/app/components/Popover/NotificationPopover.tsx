@@ -26,6 +26,7 @@ const TAB_STEPS = {
   UNREAD: '1',
   READ: '2'
 }
+const INTERVAL_FETCH_DATA = 20000
 
 const tabTitle = [
   <span key='all' className='tab-hover'>
@@ -185,7 +186,7 @@ const NotificationPopover = (): React.ReactNode => {
   useEffect(() => {
     const timer = setInterval(() => {
       loadFirstNotifications(getTabPayload())
-    }, 10000)
+    }, INTERVAL_FETCH_DATA)
 
     return (): void => {
       clearTimeout(timer)

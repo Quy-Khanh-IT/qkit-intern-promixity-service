@@ -6,7 +6,7 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
 import variables from '@/sass/common/_variables.module.scss'
 import {
   useDeleteBusinessMutation,
@@ -51,6 +51,10 @@ import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '.
 import { generateStatusColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from './manage-business.const'
 import './manage-business.scss'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
+import qs from 'qs'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -71,7 +75,20 @@ type DataIndex = keyof IBusiness
 // For search
 type SearchIndex = keyof IGetAllBusinessQuery
 
+const ORIGIN_DATA = {
+  offset: ORIGIN_PAGE,
+  limit: PAGE_SIZE
+} as IGetAllBusinessQuery
+
+const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
+  return qs.parse(searchParams, { ignoreQueryPrefix: true })
+}
+
 const ManageBusiness = (): React.ReactNode => {
+  const router = useRouter()
+  const currentPathName = usePathname()
+  // Search
+  const searchParams = useSearchParams()
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
@@ -102,6 +119,22 @@ const ManageBusiness = (): React.ReactNode => {
   const { data: statusData } = useGetAllBusinessStatusQuery()
   const { data: actionsData } = useGetAllBusinessActionsQuery()
   const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
+
+  useEffect(() => {
+    const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
+    const storedQueryValue: IGetAllBusinessQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
+    setQueryData(storedQueryValue)
+  }, [])
+
+  useEffect(() => {
+    console.log('queryData', queryData)
+    const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
+    const params = new URLSearchParams(queryString).toString()
+
+    const newPathname = `${currentPathName}?${params}`
+    router.push(newPathname)
+    saveToSessionStorage(StorageKey._ROUTE_VALUE, newPathname)
+  }, [queryData])
 
   useEffect(() => {
     setQueryData(
@@ -156,6 +189,22 @@ const ManageBusiness = (): React.ReactNode => {
     return queryDataTemp
   }
 
+  const deleteUnSelectedField = (_queryData: IGetAllBusinessQuery, dataIndex: DataIndex): IGetAllBusinessQuery => {
+    const queryDataTemp = { ..._queryData } as IGetAllBusinessQuery
+    if ((dataIndex as string) === 'overallRating') {
+      delete queryDataTemp.sortRatingBy
+    } else if ((dataIndex as string) === 'categoryName') {
+      delete queryDataTemp.categoryIds
+    } else if ((dataIndex as string) === 'totalReview') {
+      delete queryDataTemp.sortTotalReviewsBy
+    } else if ((dataIndex as string) === 'created_at') {
+      delete queryDataTemp.sortBy
+    } else {
+      delete queryDataTemp[dataIndex as keyof IGetAllBusinessQuery]
+    }
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
     _confirm: FilterDropdownProps['confirm'],
@@ -163,8 +212,7 @@ const ManageBusiness = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllBusinessQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
@@ -179,8 +227,7 @@ const ManageBusiness = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllBusinessQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
@@ -288,6 +335,7 @@ const ManageBusiness = (): React.ReactNode => {
       ...SearchPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'name',
         placeholder: MANAGE_BUSINESS_FIELDS.name,
+        defaultValue: queryData?.name ? [queryData?.name] : [],
         _handleSearch: handleSearch
       })
     },
@@ -299,6 +347,7 @@ const ManageBusiness = (): React.ReactNode => {
       ...FilterPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'categoryName',
         optionsData: businessCategoriesData as IOptionsPipe,
+        defaultValue: queryData?.categoryIds || [],
         _handleFilter: handleFilter
       })
     },
@@ -309,6 +358,7 @@ const ManageBusiness = (): React.ReactNode => {
       ...SearchPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'fullAddress',
         placeholder: MANAGE_BUSINESS_FIELDS.fullAddress,
+        defaultValue: queryData?.address ? [queryData?.address] : [],
         _handleSearch: handleSearch
       })
     },
@@ -344,6 +394,7 @@ const ManageBusiness = (): React.ReactNode => {
       ...FilterPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'overallRating',
         optionsData: statusData as IOptionsPipe,
+        defaultValue: queryData?.starsRating || [],
         filterCustom: RATING_OPTIONS_FILTERS,
         selectCustom: RATING_SELECT_FILTERS,
         _handleFilter: handleFilter
@@ -378,6 +429,7 @@ const ManageBusiness = (): React.ReactNode => {
       ...FilterPopupProps<IBusiness, keyof IBusiness>({
         dataIndex: 'status',
         optionsData: statusData as IOptionsPipe,
+        defaultValue: queryData?.status || [],
         _handleFilter: handleFilter
       })
     }
@@ -503,7 +555,7 @@ const ManageBusiness = (): React.ReactNode => {
 
   return (
     <div className='--manage-business'>
-      <Row className='pb-3'>
+      <Row className='mb-3' style={{ height: 36 }}>
         <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select

@@ -54,7 +54,13 @@ const AdminLogin: React.FC = () => {
                 <h3 className='title' style={{ fontWeight: 700 }}>
                   Admin Login
                 </h3>
-                <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} className='mb-0'>
+                <Form.Item
+                  name='email'
+                  label='Email'
+                  rules={VALIDATION.EMAIL}
+                  className='mb-0'
+                  validateTrigger={['onBlur']}
+                >
                   <Input size='large' placeholder='user@gmail.com' className='input-email' />
                 </Form.Item>
 

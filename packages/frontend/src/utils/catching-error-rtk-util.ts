@@ -34,7 +34,9 @@ export const rtkQueryErrorLogger: Middleware = (_api: MiddlewareAPI) => (next) =
       toast.error(clarifyError(errorData))
     }
   } else if (isRejected(action)) {
-    toast.error(TOAST_MSG.SERVER_NOT_RESPONDING, { toastId: 'default-error' })
+    if (action?.error?.name !== 'ConditionError') {
+      toast.error(TOAST_MSG.SERVER_NOT_RESPONDING, { toastId: 'default-error' })
+    }
   }
 
   return next(action)
