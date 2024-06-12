@@ -5,7 +5,7 @@ import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopu
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -120,8 +120,10 @@ const ManageUser = (): React.ReactNode => {
   const { data: rolesData } = useGetAllRolesQuery()
 
   useEffect(() => {
-    const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
+    const routeTemp = getFromSessionStorage(StorageKey._ROUTE_VALUE)
+    const storedPathName: string = routeTemp ? (routeTemp as string) : ROUTE.MANAGE_USER
     const storedQueryValue: IGetAllUsersQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
+    storedQueryValue.limit = PAGE_SIZE
     setQueryData(storedQueryValue)
   }, [])
 

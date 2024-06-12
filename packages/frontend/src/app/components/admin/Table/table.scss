@@ -16,11 +16,11 @@
   overflow: hidden;
 
   @include xs{
-    height: calc(100vh - 80px - 48px - 40px - 104px - 104px);
+    max-height: calc(100vh - 80px - 48px - 40px - 104px - 104px) !important;
   }
 
   @media screen and (min-width: 468px) {
-    height: calc(100vh - 80px - 48px - 40px - 52px - 52px);
+    max-height: calc(100vh - 80px - 48px - 40px - 52px - 52px) !important;
   }
 
   .ant-skeleton-paragraph{
@@ -37,13 +37,11 @@
   border-top-right-radius: 8px;
 
   @include xs{
-    // max-height: calc(100vh - 80px - 48px - 40px - 50px - 88px);
-    max-height: 100% !important;
+    max-height: calc(100vh - 80px - 48px - 40px - 104px - 104px) !important;
   }
 
   @media screen and (min-width: 468px) {
-    // max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
-    max-height: 100% !important;
+    max-height: calc(100vh - 80px - 48px - 40px - 52px - 52px) !important;
   }
 
   .ant-table-filter-trigger{

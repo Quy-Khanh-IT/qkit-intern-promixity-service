@@ -68,17 +68,6 @@ export default function RootLayout({
     }
   }, [userInformation])
 
-  // useEffect(() => {
-  //   if (userInformation) {
-  //     const initialRouteValue = getPresentUrl() || ROUTE.DASHBOARD
-  //     setRouteValue(initialRouteValue)
-
-  //     const initialMenuKey =
-  //       findKeyMenuBasedRoute(userInformation?.role, initialRouteValue.split('?')[0]) || ORIGIN_MENU_TAB
-  //     setSelectedMenuKey(initialMenuKey)
-  //   }
-  // }, [userInformation])
-
   const {
     token: { colorBgContainer }
   } = theme.useToken()
