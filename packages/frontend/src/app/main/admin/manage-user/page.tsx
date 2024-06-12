@@ -15,7 +15,7 @@ import {
   useUpdateUserRoleMutation
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
-import { SortEnumAlias, TableActionEnum, UserOptionEnum } from '@/types/enum'
+import { TableActionEnum, UserOptionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
@@ -40,7 +40,6 @@ import {
   FilterDropdownProps,
   FilterValue,
   SorterResult,
-  SortOrder,
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
@@ -49,7 +48,6 @@ import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
-import { MANAGE_BUSINESS_SORT_FIELDS } from '../manage-business/manage-business.const'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
 
@@ -128,7 +126,6 @@ const ManageUser = (): React.ReactNode => {
   }, [])
 
   useEffect(() => {
-    console.log('selectedKeys useEffect', queryData)
     const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
     const params = new URLSearchParams(queryString).toString()
 
@@ -237,11 +234,8 @@ const ManageUser = (): React.ReactNode => {
     sorter: SorterResult<IUserInformation> | SorterResult<IUserInformation>[],
     extra: TableCurrentDataSource<IUserInformation>
   ) => {
-    console.log('sorter', sorter, extra)
-
     if (extra?.action === (TableActionEnum._SORT as string)) {
       const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
-        console.log('sorterItem?.order', sorterItem?.order)
         if (sorterItem?.order) {
           setQueryData((prev) =>
             mapQueryData(
@@ -254,7 +248,6 @@ const ManageUser = (): React.ReactNode => {
         } else {
           setQueryData((prev) => {
             const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
-            console.log('queryTemp', queryTemp)
             return { ...queryTemp } as IGetAllUsersQuery
           })
         }

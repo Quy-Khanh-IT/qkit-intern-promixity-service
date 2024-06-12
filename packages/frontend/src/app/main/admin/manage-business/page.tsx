@@ -250,7 +250,6 @@ const ManageBusiness = (): React.ReactNode => {
   ) => {
     if (extra?.action === (TableActionEnum._SORT as string)) {
       const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
-        console.log('sorterItem?.order', sorterItem?.order)
         if (sorterItem?.order) {
           setQueryData((prev) =>
             mapQueryData(
@@ -263,7 +262,6 @@ const ManageBusiness = (): React.ReactNode => {
         } else {
           setQueryData((prev) => {
             const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
-            console.log('queryTemp', queryTemp)
             return { ...queryTemp } as IGetAllBusinessQuery
           })
         }

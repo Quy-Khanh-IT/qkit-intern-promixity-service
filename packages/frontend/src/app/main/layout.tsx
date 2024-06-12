@@ -105,9 +105,6 @@ export default function RootLayout({
     setSelectedMenuKey(e.key)
     router.push(_routeValue)
     setRouteValue(_routeValue)
-    // setInterval(() => {
-    //   console.log('routeValue', _routeValue);
-    // }, 1000)
   }
 
   const overlayStyle: React.CSSProperties = {

@@ -80,7 +80,6 @@ const FilterPopupProps = <T, K extends keyof T>({
           options={selectCustom ?? optionsData?.selectionOpts}
           value={checkedList.current}
           onChange={(list: string[]) => {
-            console.log('list', list)
             checkedList.current = list
             setSelectedKeys(list)
             if (list.length === 0) {
