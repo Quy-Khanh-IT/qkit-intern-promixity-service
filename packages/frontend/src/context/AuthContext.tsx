@@ -27,12 +27,11 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   )
   const [_userId, setUserId, removeUserId] = useLocalStorage(StorageKey._USER_ID, '')
   const [_userRole, setUserRole, _removeUserRole] = useLocalStorage(StorageKey._USER_ROLE, RoleEnum._USER as string)
-  const [authSession, setAuthSession, _removeAuthSession] = useLocalStorage<boolean>(StorageKey._AUTHENTICATED, false)
+  const [_authSession, setAuthSession, _removeAuthSession] = useLocalStorage<boolean>(StorageKey._AUTHENTICATED, false)
 
   const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
 
   const [login] = useLoginUserMutation()
-  const currentPathName = usePathname()
 
   const getFirstUserInformation = async (userId: string): Promise<void> => {
     try {
@@ -52,7 +51,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         }
       }
     } catch (err: unknown) {
-      console.log('da vo getFirstUserInformation')
       if (err instanceof Error) {
         const customError = err as ErrorResponse
         const errorMessage = customError.data?.message
@@ -73,7 +71,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         setCookieFromClient(StorageKey._USER_ROLE, res?.role as RoleEnum)
       }
     } catch (err: unknown) {
-      console.log('da vo fetchUserInformation')
       if (err instanceof Error) {
         const customError = err as ErrorResponse
         const errorMessage = customError.data?.message
@@ -84,31 +81,11 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     }
   }
 
-  // useEffect(() => {
-  //   if (currentPathName) {
-  //     setRouteValue(currentPathName)
-  //   }
-  // }, [currentPathName])
-  // useEffect(() => {
-  //   if (!authSession) {
-  //     onLogout(userInformation?.role as RoleEnum)
-  //   }
-  // }, [authSession])
-
-  // useEffect(() => {
-  //   // console.log('userInformation', userInformation);
-  //   if (userInformation) {
-  //     fetchUserInformation(userInformation?.id)
-  //   }
-  // }, [userInformation])
-
   useEffect(() => {
     if (userInformation) {
       fetchUserInformation(userInformation?.id)
     }
   }, [])
-
-
 
   const onLogin = async (loginPayload: ILoginPayload, stopLoading: () => void): Promise<void> => {
     await login(loginPayload)

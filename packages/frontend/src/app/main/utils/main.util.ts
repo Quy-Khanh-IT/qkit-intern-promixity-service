@@ -74,7 +74,6 @@ export const findRouteMenuBasedKey = (role: string, key: string): string => {
     const foundOption = Object.entries(options).find(([_routeAlias, objectValue]: [string, SidebarOption]) => {
       return objectValue.key === key
     })
-    console.log('foundOption', foundOption)
     return foundOption ? ROUTE[foundOption[0] as keyof typeof ROUTE] : undefined
   }
 
@@ -92,7 +91,6 @@ export const findRouteMenuBasedKey = (role: string, key: string): string => {
     }
   } else if (role === (RoleEnum._BUSINESS as string)) {
     const businessRoute = findRoute(USER_SIDEBAR_OPTIONS)
-    console.log('businessRoute', businessRoute)
     if (businessRoute) routeValue = businessRoute
   }
 
