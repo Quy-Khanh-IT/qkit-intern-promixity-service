@@ -155,6 +155,7 @@ export default function CreateBusiness(): React.ReactNode {
     if (isCreateBusinessSuccess) {
       toastService.success('Create Success')
       router.push(ROUTE.MY_BUSINESS)
+      window.location.reload()
     }
     if (isCreateBusinessError) {
       const errorResponse = createBusinessError as ErrorResponse

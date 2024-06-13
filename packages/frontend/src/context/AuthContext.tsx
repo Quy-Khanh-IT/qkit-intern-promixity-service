@@ -11,8 +11,8 @@ import { ErrorResponse } from '@/types/error'
 import { IUserInformation } from '@/types/user'
 import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
 import Error from 'next/error'
-import { useRouter } from 'next/navigation'
-import React, { createContext, useCallback } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import React, { createContext, useCallback, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
 const AuthContext = createContext<UserContextType>({} as UserContextType)
@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
 
   const [login] = useLoginUserMutation()
+  const currentPathName = usePathname()
 
   const getFirstUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
     try {
@@ -80,6 +81,18 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     }
   }, [])
 
+  useEffect(() => {
+    if (currentPathName) {
+      setRouteValue(currentPathName)
+    }
+  }, [currentPathName])
+
+  useEffect(() => {
+    if (userInformation) {
+      fetchUserInformation(userInformation?.id)
+    }
+  }, [])
+
   const onLogin = async (loginPayload: ILoginPayload, stopLoading: () => void): Promise<void> => {
     await login(loginPayload)
       .unwrap()
@@ -123,7 +136,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       value={{
         onLogin,
         onLogout,
-        userInformation: userInformation as IUserInformation,
+        userInformation: userInformation,
         fetchUserInformation,
         setRouteValue
       }}

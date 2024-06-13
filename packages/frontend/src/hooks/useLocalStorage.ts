@@ -1,22 +1,15 @@
-import { useState } from 'react'
 import { getFromLocalStorage, removeFromLocalStorage, saveToLocalStorage } from '@/utils/local-storage.util'
-import { IUserInformation } from '@/types/user'
+import { useState } from 'react'
 
-export const useLocalStorage = (
-  key: string,
-  initialValue: string | IUserInformation | boolean
-): [unknown, (_value: string | boolean | IUserInformation | number) => void, () => void] => {
-  const [storedValue, setStoredValue] = useState<unknown>(() => {
-    try {
-      return getFromLocalStorage(key)
-    } catch (error) {
-      console.warn(`Error reading localStorage key “${key}”:`, error)
-    }
+export function useLocalStorage<T>(key: string, initialValue: T): [T, (_value: T) => void, () => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    const value = getFromLocalStorage<T>(key)
+    return value !== null && value !== undefined ? value : initialValue
   })
 
-  const setValue = (value: string | boolean | IUserInformation | number): void => {
+  const setValue = (value: T): void => {
     try {
-      saveToLocalStorage(key, value)
+      saveToLocalStorage<T>(key, value)
       setStoredValue(value)
     } catch (error) {
       console.warn(`Error setting localStorage key “${key}”:`, error)

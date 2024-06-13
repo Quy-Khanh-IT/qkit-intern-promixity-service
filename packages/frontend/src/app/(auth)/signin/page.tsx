@@ -10,9 +10,8 @@ import DevQuote from '../components/DevQuote'
 import './signin.scss'
 import { useAuth } from '@/context/AuthContext'
 import { ILoginPayload } from '@/types/auth'
-import { Button } from 'antd'
 
-export default function SignIn(): React.ReactNode {
+const SignIn = (): React.ReactNode => {
   const { onLogin } = useAuth()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -20,7 +19,7 @@ export default function SignIn(): React.ReactNode {
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
 
-  const _handleLoadingLogin = (): void => {
+  const handleLoadingLogin = (): void => {
     setLoadingLogin(false)
   }
 
@@ -73,7 +72,7 @@ export default function SignIn(): React.ReactNode {
         email,
         password
       } as ILoginPayload,
-      _handleLoadingLogin
+      handleLoadingLogin
     )
   }
 
@@ -183,3 +182,5 @@ export default function SignIn(): React.ReactNode {
     </div>
   )
 }
+
+export default SignIn

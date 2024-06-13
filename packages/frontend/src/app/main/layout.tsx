@@ -99,10 +99,9 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
-    const _routeValue = findRouteMenuBasedKey(userInformation?.role, e.key)
+    const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
-    router.push(_routeValue)
-    setRouteValue(_routeValue)
+    router.push(routeValueTemp)
   }
 
   const overlayStyle: React.CSSProperties = {
