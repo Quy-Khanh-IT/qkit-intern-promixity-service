@@ -8,6 +8,8 @@ import {
 } from 'src/cores/pagination/base/pagination-result.base';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 import { BaseRepositoryAbstract } from 'src/cores/repository/base/repositoryAbstract.base';
+import { CommentFilter } from 'src/modules/review/dto/comment-filter.dto';
+import { transStringToObjectId } from '../utils';
 
 export class PaginationHelper {
   private static createLink(queryData: any, URL: string, totalPage: number) {
@@ -40,7 +42,7 @@ export class PaginationHelper {
   public static configureBaseQueryFilter(
     matchStage: Record<string, any>,
     sortStage: Record<string, any>,
-    data: QueryFilterBase | NoDateQueryFilterBase,
+    data: QueryFilterBase | NoDateQueryFilterBase | CommentFilter,
   ): { matchStage: Record<string, any>; sortStage: Record<string, any> } {
     if (data?.startDate) {
       matchStage['created_at'] = {
@@ -74,7 +76,7 @@ export class PaginationHelper {
 
   static async paginate<
     T extends BaseEntity,
-    V extends QueryFilterBase | NoDateQueryFilterBase,
+    V extends QueryFilterBase | NoDateQueryFilterBase | CommentFilter,
   >(
     URL: string,
     queryData: V,
@@ -128,22 +130,27 @@ export class PaginationHelper {
     };
   }
 
-  static async NotificationPaginate<
-    T extends BaseEntity,
-    V extends NoDateQueryFilterBase,
-  >(
+  static async commentPaginate<T extends BaseEntity, V extends CommentFilter>(
+    reviewId: string,
     URL: string,
     queryData: V,
     repository: BaseRepositoryAbstract<T>,
     createOptionalPipeline?: (queryData: V) => Promise<PipelineStage[]>,
-  ): Promise<NotificationPaginationResult<T>> {
+  ): Promise<PaginationResult<T>> {
+    console.log('queryData', queryData);
     let basePipeline: PipelineStage[] = [
       {
+        $sort: { page: 1 },
+      },
+      {
+        $match: {
+          reviewId: transStringToObjectId(reviewId),
+          page: { $ne: null },
+        },
+      },
+      {
         $facet: {
-          data: [
-            { $skip: (queryData.offset - 1) * queryData.limit },
-            { $limit: queryData.limit },
-          ],
+          data: [{ $skip: queryData.offset - 1 }, { $limit: 1 }],
           totalCount: [{ $count: 'total' }],
         },
       },
@@ -181,7 +188,6 @@ export class PaginationHelper {
       pageSize: result[0]['count'],
       totalPages: result[0]['totalPages'],
       totalRecords: result[0]['totalRecords'],
-      totalUnreadRecords: result[0]['totalUnreadRecords'],
     };
   }
 }

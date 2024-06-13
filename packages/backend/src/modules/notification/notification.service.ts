@@ -1,29 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBusinessEvent } from '../business/events/create-business.event';
-import { OnEvent } from '@nestjs/event-emitter';
-import { UserService } from '../user/user.service';
-import { NotificationRepository } from './repository/notification.repository';
-import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
-import { ConfigKey } from 'src/common/constants';
 import { ConfigService } from '@nestjs/config';
-import { PaginationHelper } from 'src/common/helper';
+import { OnEvent } from '@nestjs/event-emitter';
 import { plainToClass } from 'class-transformer';
 import { PipelineStage } from 'mongoose';
-import { Notification } from './entities/notification.entity';
-import { NoDateQueryFilterBase } from 'src/cores/pagination/base/no-date-query-filter.base';
-import { FindAllNotificationQuery } from './dto/find-all-notification-query';
-import { createNotificationDto } from './dto/create-notification.dto';
-import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
-import { CloseBusinessEvent } from '../business/events/close-business.event';
-import { RejectBusinessEvent } from '../business/events/reject-business.event';
-import { BannedBusinessEvent } from '../business/events/banned-business.event';
-import {
-  NotificationNotBelongException,
-  NotificationNotFoundException,
-} from 'src/common/exceptions/notification.exception';
-import { User } from '../user/entities/user.entity';
+import { ConfigKey } from 'src/common/constants';
 import { UserRole } from 'src/common/enums';
-import { transStringToObjectId } from 'src/common/utils';
+import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
+import { NotificationNotFoundException } from 'src/common/exceptions/notification.exception';
+import { PaginationHelper } from 'src/common/helper';
+import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
+
+import { BannedBusinessEvent } from '../business/events/banned-business.event';
+import { CloseBusinessEvent } from '../business/events/close-business.event';
+import { CreateBusinessEvent } from '../business/events/create-business.event';
+import { RejectBusinessEvent } from '../business/events/reject-business.event';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { createNotificationDto } from './dto/create-notification.dto';
+import { FindAllNotificationQuery } from './dto/find-all-notification-query';
+import { Notification } from './entities/notification.entity';
+import { NotificationRepository } from './repository/notification.repository';
 
 @Injectable()
 export class NotificationService {

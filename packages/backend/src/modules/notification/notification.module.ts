@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { NotificationService } from './notification.service';
-import { NotificationController } from './notification.controller';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+
+import { UserModule } from '../user/user.module';
 import {
   Notification,
   NotificationSchema,
 } from './entities/notification.entity';
-import { AutoIncrementID } from '@typegoose/auto-increment';
-import { UserModule } from '../user/user.module';
+import { NotificationController } from './notification.controller';
+import { NotificationService } from './notification.service';
 import { NotificationRepository } from './repository/notification.repository';
 
 @Module({

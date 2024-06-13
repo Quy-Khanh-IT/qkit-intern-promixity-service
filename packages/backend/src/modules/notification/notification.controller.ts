@@ -3,21 +3,21 @@ import {
   Get,
   HttpCode,
   Param,
-  UseGuards,
-  Query,
   Patch,
+  Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-
-import { NotificationService } from './notification.service';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
+import { Request } from 'express';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { RoleGuard } from 'src/cores/guard/role.guard';
-import { UserRole } from 'src/common/enums';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { plainToClass } from 'class-transformer';
+
 import { FindAllNotificationQuery } from './dto/find-all-notification-query';
-import { Request } from 'express';
+import { NotificationService } from './notification.service';
 
 @Controller('notifications')
 @ApiTags('notification')
