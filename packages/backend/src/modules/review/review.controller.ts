@@ -6,40 +6,29 @@ import {
   HttpCode,
   Param,
   Post,
-  Put,
   Query,
   Req,
   UseGuards,
   UseInterceptors,
   ValidationPipe,
-  Patch,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
-import { DeleteActionEnum, UserRole } from 'src/common/enums';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { RoleGuard } from 'src/cores/guard/role.guard';
 import { StarSerializeInterceptor } from 'src/cores/interceptors/star.interceptor';
 
-import { CreateReviewDto } from './dto/create-review.dto';
-import { EditResponseDto } from './dto/edit-response.dto';
-import { EditReviewDto } from './dto/edit-review.dto';
-import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
+import { CommentFilter } from './dto/comment-filter.dto';
+import { CommentQuery } from './dto/comment-query.dto';
 import { CommentDto } from './dto/create-comment.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
+import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
-import { RoleGuard } from 'src/cores/guard/role.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
-import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
-import { CommentQuery } from './dto/comment-query.dto';
 
 @Controller('reviews')
 @ApiTags('reviews')
@@ -59,6 +48,25 @@ export class ReviewController {
     const transferData = plainToClass(FindAllReviewQuery, data);
 
     return await this.reviewService.findAll(transferData);
+  }
+
+  @Get(':reviewId/commentssss')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: '[ALL]: get comments of a review',
+  })
+  async getCommentsByReview(
+    @Param('reviewId') id: string,
+    @Query() query: CommentFilter,
+  ) {
+    const transferData = plainToClass(CommentFilter, query);
+
+    const comments = await this.reviewService.getCommentsByReview(
+      id,
+      transferData,
+    );
+
+    return comments;
   }
 
   @Get('comments')
@@ -86,22 +94,10 @@ export class ReviewController {
     return await this.reviewService.findReviewBusiness(id, transferData);
   }
 
-  @Get(':reviewId/comments')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: '[ALL]: get comments of a review',
-  })
-  async getCommentsByReview(@Param('reviewId') id: string) {
-    console.log('id', id);
-    const comments = await this.reviewService.getCommentsByReview(id);
-
-    return comments;
-  }
-
   @Get(':reviewId')
   @HttpCode(200)
   @ApiOperation({
-    summary: '[ADMIN]: filter reviews',
+    summary: '[ADMIN]',
   })
   async findById(@Param('reviewId') id: string) {
     const review: Review = await this.reviewService.findById(id);

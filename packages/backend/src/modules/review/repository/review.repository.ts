@@ -1,19 +1,17 @@
 import { InjectModel } from '@nestjs/mongoose';
+import { plainToClass } from 'class-transformer';
 import { Model } from 'mongoose';
+import { ReviewTypeEnum } from 'src/common/enums';
+import { ReviewNotFoundException } from 'src/common/exceptions/review.exception';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { User } from 'src/modules/user/entities/user.entity';
 
 import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositoryAbstract.base';
-import { ReviewRepositoryInterface } from '../interfaces/review-repo.interface';
-import { Review } from '../entities/review.entity';
-import { CreateReviewDto } from '../dto/create-review.dto';
 import { CommentDto } from '../dto/create-comment.dto';
-import { ReviewTypeEnum } from 'src/common/enums';
-import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
-import { ReviewConstant } from 'src/common/constants/review.constant';
-import { User } from 'src/modules/user/entities/user.entity';
-import { ReviewNotFoundException } from 'src/common/exceptions/review.exception';
+import { CreateReviewDto } from '../dto/create-review.dto';
 import { Comment } from '../entities/comment.entity';
-import { plainToClass } from 'class-transformer';
-import { UserSchema } from '../entities/response.entity';
+import { Review } from '../entities/review.entity';
+import { ReviewRepositoryInterface } from '../interfaces/review-repo.interface';
 
 export class ReviewRepository
   extends BaseRepositoryAbstract<Review>
@@ -160,7 +158,7 @@ export class ReviewRepository
     console.log('deleteComment', deleteComment);
 
     //get last group comment which contain replies
-    let groupsComment = await this.commentModel.aggregate([
+    const groupsComment = await this.commentModel.aggregate([
       {
         $match: {
           reviewId: deleteComment.reviewId,
@@ -177,7 +175,7 @@ export class ReviewRepository
     console.log('groupsComment[0]', groupsComment[0]);
 
     //replace deleted comment by last comment in replies
-    let newestCommentInGroup =
+    const newestCommentInGroup =
       groupsComment[0].replies[groupsComment[0].count - 1];
 
     console.log('newestCommentInGroup', newestCommentInGroup);

@@ -1,6 +1,4 @@
-import { ApiPropertyOptional, PickType } from '@nestjs/swagger';
-
-import { CreateReviewDto } from './create-review.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { StarEnum } from 'src/common/enums';
 

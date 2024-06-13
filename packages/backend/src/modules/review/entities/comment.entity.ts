@@ -3,7 +3,7 @@ import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { ResponseSchema } from './response.entity';
+
 import { UserSchema } from './review.entity';
 
 // Implement bucket model
@@ -19,9 +19,14 @@ export class Comment extends BaseEntity {
   @Exclude()
   reviewId: Types.ObjectId;
 
-  @Transform((value) => value.obj?.reviewId?.toString(), {
-    toClassOnly: true,
-  })
+  @Transform(
+    (value) => {
+      return value.obj?.reviewId?.toString();
+    },
+    {
+      toClassOnly: true,
+    },
+  )
   @Expose()
   review_id?: string;
 
@@ -31,8 +36,6 @@ export class Comment extends BaseEntity {
 
   @Transform(
     (value) => {
-      // console.log('value', value);
-
       return value.obj?.parentId?.toString();
     },
     {

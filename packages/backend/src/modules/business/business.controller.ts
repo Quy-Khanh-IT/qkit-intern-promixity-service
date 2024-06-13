@@ -20,7 +20,6 @@ import {
   ApiConsumes,
   ApiOperation,
   ApiQuery,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
@@ -36,13 +35,13 @@ import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { RoleGuard } from 'src/cores/guard/role.guard';
 
 import { NoContentResponseDto } from '../user/dto/change-password.response.dto';
+import { FindAllUserBusinessQuery } from '../user/dto/find-all-user-business.query.dto';
 import { BusinessService } from './business.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { FindAllBusinessQuery } from './dto/find-all-business-query.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { UpdateInformationDto } from './dto/update-information.dto';
 import { Business } from './entities/business.entity';
-import { FindAllUserBusinessQuery } from '../user/dto/find-all-user-business.query.dto';
 
 @Controller('businesses')
 @ApiTags('businesses')

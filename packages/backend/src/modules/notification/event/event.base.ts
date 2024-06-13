@@ -1,10 +1,10 @@
-import { NotificationTypeEnum } from 'src/common/enums/notification.enum';
-import { BaseEventDto } from '../dto/base-event.dto';
-import { CreateBusinessEventDto } from 'src/modules/business/dto/create-business-event.dto';
 import {
-  NOTIFICATION_TITLES,
   NOTIFICATION_CONTENTS,
+  NOTIFICATION_TITLES,
 } from 'src/common/constants/event.constant';
+import { NotificationTypeEnum } from 'src/common/enums/notification.enum';
+
+import { BaseEventDto } from '../dto/base-event.dto';
 
 // Base event class that requires specific type
 export abstract class BaseEvent {

@@ -1,16 +1,15 @@
 import { InjectModel } from '@nestjs/mongoose';
+import { plainToClass } from 'class-transformer';
 import { Model } from 'mongoose';
+import { ReviewTypeEnum } from 'src/common/enums';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
+import { User } from 'src/modules/user/entities/user.entity';
 
 import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositoryAbstract.base';
-import { Comment } from '../entities/comment.entity';
-import { CommentRepositoryInterface } from '../interfaces/comment-repo.interface';
-import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
-import { plainToClass } from 'class-transformer';
 import { CommentDto } from '../dto/create-comment.dto';
-import { ReviewTypeEnum } from 'src/common/enums';
-import { User } from 'src/modules/user/entities/user.entity';
+import { Comment } from '../entities/comment.entity';
 import { UserSchema } from '../entities/review.entity';
-import { repl } from '@nestjs/core';
+import { CommentRepositoryInterface } from '../interfaces/comment-repo.interface';
 
 export class CommentRepository
   extends BaseRepositoryAbstract<Comment>
@@ -130,17 +129,5 @@ export class CommentRepository
     });
   }
 
-  async getCommentsByReview(reviewId: string): Promise<any> {
-    const comment = await this.commentModel
-      .find({
-        reviewId: transStringToObjectId(reviewId),
-        page: 2,
-      })
-      .lean()
-      .exec();
-
-    return comment;
-    // { replies: 1 },
-    // { sort: { 'replies.created_at': -1 } },
-  }
+  async getCommentsByReview(reviewId: string): Promise<any> {}
 }
