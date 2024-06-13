@@ -27,14 +27,14 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   )
   const [_userId, setUserId, removeUserId] = useLocalStorage(StorageKey._USER_ID, '')
   const [_userRole, setUserRole, _removeUserRole] = useLocalStorage(StorageKey._USER_ROLE, RoleEnum._USER as string)
-  const [_authSession, setAuthSession, _removeAuthSession] = useLocalStorage(StorageKey._AUTHENTICATED, false)
+  const [authSession, setAuthSession, _removeAuthSession] = useLocalStorage<boolean>(StorageKey._AUTHENTICATED, false)
 
   const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
 
   const [login] = useLoginUserMutation()
   const currentPathName = usePathname()
 
-  const getFirstUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
+  const getFirstUserInformation = async (userId: string): Promise<void> => {
     try {
       const res: IUserInformation = await getMyProfile(userId)
       if (res) {
@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         }
       }
     } catch (err: unknown) {
+      console.log('da vo getFirstUserInformation')
       if (err instanceof Error) {
         const customError = err as ErrorResponse
         const errorMessage = customError.data?.message
@@ -60,17 +61,19 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         toast.error(TOAST_MSG.UNKNOWN_ERROR)
       }
     }
-  }, [])
+  }
 
-  const fetchUserInformation = useCallback<(_: string) => Promise<void>>(async (userId: string): Promise<void> => {
+  const fetchUserInformation = async (userId: string): Promise<void> => {
     try {
       const res: IUserInformation = await getMyProfile(userId)
       if (res) {
         setUserInformation(res)
         setUserId(userId)
+        setUserRole(res.role as RoleEnum)
         setCookieFromClient(StorageKey._USER_ROLE, res?.role as RoleEnum)
       }
     } catch (err: unknown) {
+      console.log('da vo fetchUserInformation')
       if (err instanceof Error) {
         const customError = err as ErrorResponse
         const errorMessage = customError.data?.message
@@ -79,19 +82,33 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
         toast.error(TOAST_MSG.UNKNOWN_ERROR)
       }
     }
-  }, [])
+  }
 
-  useEffect(() => {
-    if (currentPathName) {
-      setRouteValue(currentPathName)
-    }
-  }, [currentPathName])
+  // useEffect(() => {
+  //   if (currentPathName) {
+  //     setRouteValue(currentPathName)
+  //   }
+  // }, [currentPathName])
+  // useEffect(() => {
+  //   if (!authSession) {
+  //     onLogout(userInformation?.role as RoleEnum)
+  //   }
+  // }, [authSession])
+
+  // useEffect(() => {
+  //   // console.log('userInformation', userInformation);
+  //   if (userInformation) {
+  //     fetchUserInformation(userInformation?.id)
+  //   }
+  // }, [userInformation])
 
   useEffect(() => {
     if (userInformation) {
       fetchUserInformation(userInformation?.id)
     }
   }, [])
+
+
 
   const onLogin = async (loginPayload: ILoginPayload, stopLoading: () => void): Promise<void> => {
     await login(loginPayload)

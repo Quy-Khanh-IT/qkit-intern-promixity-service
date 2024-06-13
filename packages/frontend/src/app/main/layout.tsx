@@ -102,6 +102,7 @@ export default function RootLayout({
     const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
     router.push(routeValueTemp)
+    setRouteValue(routeValueTemp)
   }
 
   const overlayStyle: React.CSSProperties = {

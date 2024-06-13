@@ -24,7 +24,7 @@ const AdminLogin: React.FC = () => {
     onLogin(values, _stopLoadingLogin)
   }, 1000)
 
-  const _onFinish = (values: ILoginPayload): void => {
+  const onFinishForm = (values: ILoginPayload): void => {
     setLoadingLogin(true)
     setDisableLogin(true)
     debounceLoginForm(values)
@@ -49,7 +49,7 @@ const AdminLogin: React.FC = () => {
                 className='login-form w-100'
                 initialValues={{ remember: true }}
                 layout='vertical'
-                onFinish={_onFinish}
+                onFinish={onFinishForm}
               >
                 <h3 className='title' style={{ fontWeight: 700 }}>
                   Admin Login
