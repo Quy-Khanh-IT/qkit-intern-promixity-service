@@ -2,6 +2,7 @@
 import { ROUTE, StorageKey, TOAST_MSG } from '@/constants'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
+import { checkValidRoutes } from '@/middleware/middleware.util'
 import { useLoginUserMutation } from '@/services/auth.service'
 import { getMyProfile } from '@/services/user.service'
 import { ILoginPayload } from '@/types/auth'
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const [_routeValue, setRouteValue, removeRouteValue] = useSessionStorage(StorageKey._ROUTE_VALUE, '')
 
   const [login] = useLoginUserMutation()
+  const presentPath = usePathname()
 
   const getFirstUserInformation = async (userId: string): Promise<void> => {
     try {
@@ -82,7 +84,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   }
 
   useEffect(() => {
-    if (userInformation) {
+    if (checkValidRoutes(presentPath) && userInformation) {
       fetchUserInformation(userInformation?.id)
     }
   }, [])

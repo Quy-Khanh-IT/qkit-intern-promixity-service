@@ -10,7 +10,7 @@ export interface IMapProps {
   businesses?: IBusiness[]
   radius?: number
   clickPosition?: [number, number] | null
-  handleSetClickPosition?: (value: [number, number] | null) => void
+  handleSetClickPosition?: (_value: [number, number] | null) => void
 }
 
 export interface ISearchSider {
@@ -21,9 +21,9 @@ export interface ISearchSider {
   totalResult: number | undefined
   handleItemClick: () => void
   rating: number
-  handleOnChangeRating: (value: string) => void
+  handleOnChangeRating: (_value: string) => void
   categoryId: string | null
-  handleOnChangeCategory: (value: string) => void
+  handleOnChangeCategory: (_value: string) => void
 }
 
 export interface IMarkerProps {

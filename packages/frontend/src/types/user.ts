@@ -26,6 +26,15 @@ export interface IUpdatePasswordPayload {
   confirmPassword: string
 }
 
+export interface IUpdateImageResponse {
+  id: string
+  pathFile: string
+  mimetype: string
+  bytes: number
+  lastMod: string
+  secureUrl: string
+}
+
 export interface RoleFiltered {
   label: string
   value: string

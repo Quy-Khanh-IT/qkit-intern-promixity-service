@@ -3,16 +3,21 @@ import ChangePasswordModal from '@/app/components/admin/ConfirmModal/ConfirmModa
 import { IModalMethods } from '@/types/modal'
 import { useAuth } from '@/context/AuthContext'
 import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } from '@/services/user.service'
-import type { FormInstance } from 'antd'
-import { Button, Flex, Form, Input, Space, Tag, Typography } from 'antd'
+import type { FormInstance, UploadFile } from 'antd'
+import { Button, Flex, Form, Input, Space, Tag, Typography, Upload } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import './profile-component.scss'
 import { IUpdateProfilePayload } from '@/types/user'
 import { toast } from 'react-toastify'
-import { MODAL_TEXT, TOAST_MSG, VALIDATION } from '@/constants'
+import { API_ENDPOINT, MODAL_TEXT, StorageKey, TOAST_MSG, VALIDATION } from '@/constants'
 import ChangePasswordForm from '@/app/components/admin/ChangePassword/ChangePasswordForm'
 import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
 import { generateRoleColor } from '../../utils/main.util'
+import { EditOutlined } from '@ant-design/icons'
+import { getFromLocalStorage } from '@/utils/local-storage.util'
+import { UploadChangeParam } from 'antd/es/upload'
+import { RcFile, UploadProps } from 'antd/lib/upload'
+import { IUpdateImageResponse } from '../../../../types/user'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance
@@ -77,8 +82,9 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 }
 
 const ProfileComponent: React.FC = () => {
-  const { userInformation } = useAuth()
+  const { userInformation, fetchUserInformation } = useAuth()
   const [storedUserId, setStoredUerId] = useState<string>(userInformation?.id)
+  const [storedAvatar, setStoredAvatar] = useState<string>(userInformation?.image)
   const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm<IUpdateProfilePayload>()
@@ -86,9 +92,43 @@ const ProfileComponent: React.FC = () => {
   const changePasswordModalRef = useRef<IModalMethods | null>(null)
   const [_open, _setOpen] = useState<boolean>(false)
 
+  const handleUploadSingleImage = (info: UploadChangeParam<UploadFile<{ isSuccess: boolean }>>): void => {
+    if (info.file.status !== 'uploading') {
+      console.log('Uploading')
+    }
+    if (info.file.status === 'done') {
+      if (info?.file?.response && Object.keys(info?.file?.response).length) {
+        toast.success(TOAST_MSG.UPLOAD_IMAGE_SUCCESS)
+        fetchUserInformation(storedUserId)
+      }
+    } else if (info.file.status === 'error') {
+      toast.error(TOAST_MSG.UPLOAD_IMAGE_FAILED)
+    }
+  }
+
+  const uploadSingleImage: UploadProps = {
+    name: 'image',
+    action: API_ENDPOINT + `/users/${storedUserId}/avatar`,
+    headers: {
+      authorization: 'Bearer ' + getFromLocalStorage<string>(StorageKey._ACCESS_TOKEN)
+    },
+    onChange: handleUploadSingleImage,
+    beforeUpload: (file: RcFile): boolean => {
+      const isValidFile = file.type === 'image/jpeg' || file.type === 'image/png'
+      if (!isValidFile) {
+        toast.error(TOAST_MSG.ONLY_UPLOAD_SPECIFIC_TYPE)
+      }
+      return isValidFile
+    },
+    method: 'PATCH',
+    multiple: false,
+    showUploadList: false
+  }
+
   useEffect(() => {
     if (userInformation) {
       setStoredUerId(userInformation.id)
+      setStoredAvatar(userInformation.image)
     }
   }, [userInformation])
 
@@ -128,10 +168,13 @@ const ProfileComponent: React.FC = () => {
           <div className='profile-cover'>
             <Flex justify='center' style={{ marginBottom: '8px' }}>
               <div className='avatar-cover'>
-                <ImageCustom width={150} height={150} src={userProfile?.image} className='d-flex align-self-center' />
+                <ImageCustom width={150} height={150} src={storedAvatar} className='d-flex align-self-center' />
                 <Tag color={generateRoleColor(userProfile?.role || '')} key={userProfile?.role} className='role'>
                   {userProfile?.role.toUpperCase()}
                 </Tag>
+                <Upload {...uploadSingleImage} accept='image/png, image/jpeg'>
+                  <EditOutlined style={{ fontSize: 20, cursor: 'pointer' }} className='--edit-avatar-icon' />
+                </Upload>
               </div>
             </Flex>
             <Form

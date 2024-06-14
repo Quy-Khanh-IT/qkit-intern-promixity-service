@@ -20,6 +20,9 @@ export const TOAST_MSG = {
   LOGIN_SUCCESS: 'Login successfully',
   UPDATE_PROFILE_SUCCESS: 'Update profile successfully',
   UPDATE_PASSWORD_SUCCESS: 'Update password successfully',
+  UPLOAD_IMAGE_FAILED: 'Upload image failed',
+  UPLOAD_IMAGE_SUCCESS: 'Upload image successfully',
+  ONLY_UPLOAD_SPECIFIC_TYPE: 'Only upload JPG/PNG file!',
 
   UNKNOWN_ERROR: 'An unexpected error occurred',
   SERVER_NOT_RESPONDING: 'Server is not responding'
