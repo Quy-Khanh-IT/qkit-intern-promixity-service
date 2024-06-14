@@ -57,8 +57,6 @@ import { RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.const
 import { MANAGE_BUSINESS_FIELDS } from '../../admin/manage-business/manage-business.const'
 import { generateStatusColor } from '../../utils/main.util'
 import './my-business.scss'
-import emitter from '@/utils/event-emitter'
-import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 import { RootState } from '@/redux/store'
 import { useSelector } from 'react-redux'
 
