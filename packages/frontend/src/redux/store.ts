@@ -14,6 +14,7 @@ import { selectedBusinessSlice } from './slices/selected-business.slice'
 import { serviceApi } from '@/services/service.service'
 import { statisticApi } from '@/services/statistic.service'
 import { addressLineApi } from '@/services/address-line.service'
+import { sidebarPropsSlice } from './slices/sidebar.slice'
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     [addressApi.reducerPath]: addressApi.reducer,
     [nearByApi.reducerPath]: nearByApi.reducer,
     mapProps: mapPropsSlice.reducer,
+    selectedSidebarTab: sidebarPropsSlice.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
     selectedBusiness: selectedBusinessSlice.reducer,

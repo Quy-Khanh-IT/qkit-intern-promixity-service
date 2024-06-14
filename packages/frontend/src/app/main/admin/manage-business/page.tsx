@@ -6,6 +6,7 @@ import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopu
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, StorageKey } from '@/constants'
+import { RootState } from '@/redux/store'
 import variables from '@/sass/common/_variables.module.scss'
 import {
   useDeleteBusinessMutation,
@@ -50,12 +51,11 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { generateStatusColor } from '../../utils/main.util'
 import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
 import './manage-business.scss'
-import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
-import emitter from '@/utils/event-emitter'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -108,6 +108,9 @@ const ManageBusiness = (): React.ReactNode => {
   const refRestoreModal = useRef<IModalMethods | null>(null)
   const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
 
+  // Redux
+  const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
+
   // Other
   const [deleteBusinessMutation] = useDeleteBusinessMutation()
   const [updateBusinessStatusMutation] = useUpdateBusinessStatusMutation()
@@ -120,24 +123,14 @@ const ManageBusiness = (): React.ReactNode => {
   const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
 
   useEffect(() => {
-    const handleEvent = (emitValue: string): void => {
-      if (emitValue === EMITTER_VALUE.CLICK) {
-        setQueryData(
-          (_prev) =>
-            ({
-              ...ORIGIN_DATA,
-              isDeleted: businessOptionBoolean
-            }) as IGetAllBusinessQuery
-        )
-      }
-    }
-
-    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-
-    return (): void => {
-      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-    }
-  }, [])
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: businessOptionBoolean
+        }) as IGetAllBusinessQuery
+    )
+  }, [sidebarTabState])
 
   useEffect(() => {
     const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string

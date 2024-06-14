@@ -59,6 +59,8 @@ import { generateStatusColor } from '../../utils/main.util'
 import './my-business.scss'
 import emitter from '@/utils/event-emitter'
 import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
+import { RootState } from '@/redux/store'
+import { useSelector } from 'react-redux'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -115,25 +117,18 @@ const MyBusiness = (): React.ReactNode => {
   const { data: statusData } = useGetAllBusinessStatusQuery()
   const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
 
+  // Redux
+  const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
+
   useEffect(() => {
-    const handleEvent = (emitValue: string): void => {
-      if (emitValue === EMITTER_VALUE.CLICK) {
-        setQueryData(
-          (_prev) =>
-            ({
-              ...ORIGIN_DATA,
-              isDeleted: businessOptionBoolean
-            }) as IGetAllBusinessQuery
-        )
-      }
-    }
-
-    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-
-    return (): void => {
-      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-    }
-  }, [])
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: businessOptionBoolean
+        }) as IGetAllBusinessQuery
+    )
+  }, [sidebarTabState])
 
   useEffect(() => {
     const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string

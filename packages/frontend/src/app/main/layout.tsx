@@ -1,21 +1,21 @@
 'use client'
-import { ROUTE, StorageKey } from '@/constants'
+import { LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
+import { setSidebarTab } from '@/redux/slices/sidebar.slice'
 import '@/sass/common/_common.scss'
 import variables from '@/sass/common/_variables.module.scss'
 import { getPresentUrl } from '@/utils/helpers.util'
 import { Col, Grid, MenuProps, Row, theme } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
 import './main.scss'
 import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
-import emitter from '@/utils/event-emitter'
-import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
@@ -32,13 +32,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>): React.ReactNode {
-  const router = useRouter()
   const currentPathName = usePathname()
   const { userInformation } = useAuth()
   const [collapsed, setCollapsed] = useState<boolean>(false)
   const containerControls = useAnimationControls()
   const contentControls = useAnimationControls()
   const screens = useBreakpoint()
+  const dispatch = useDispatch()
 
   const [routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
@@ -101,11 +101,12 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
-    emitter.emit(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, EMITTER_VALUE.CLICK)
     const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
-    router.push(routeValueTemp)
+    dispatch(setSidebarTab())
+    window.location.href = LOCAL_ENDPOINT + routeValueTemp
     setRouteValue(routeValueTemp)
+    console.log('da emit', routeValueTemp)
   }
 
   const overlayStyle: React.CSSProperties = {

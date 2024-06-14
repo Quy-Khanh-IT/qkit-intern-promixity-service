@@ -6,6 +6,7 @@ import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopu
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
+import { RootState } from '@/redux/store'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -46,12 +47,11 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
-import emitter from '@/utils/event-emitter'
-import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 
 const { Text } = Typography
 const { RangePicker } = DatePicker
@@ -104,6 +104,9 @@ const ManageUser = (): React.ReactNode => {
   const refRestoreModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
 
+  // Redux
+  const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
+
   // Other
   const [deleteUserMutation] = useDeleteUserMutation()
   const [updateUserRoleMutation] = useUpdateUserRoleMutation()
@@ -118,24 +121,14 @@ const ManageUser = (): React.ReactNode => {
   const { data: rolesData } = useGetAllRolesQuery()
 
   useEffect(() => {
-    const handleEvent = (emitValue: string): void => {
-      if (emitValue === EMITTER_VALUE.CLICK) {
-        setQueryData(
-          (_prev) =>
-            ({
-              ...ORIGIN_DATA,
-              isDeleted: userOptionBoolean
-            }) as IGetAllUsersQuery
-        )
-      }
-    }
-
-    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-
-    return (): void => {
-      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
-    }
-  }, [])
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: userOptionBoolean
+        }) as IGetAllUsersQuery
+    )
+  }, [sidebarTabState])
 
   useEffect(() => {
     const routeTemp = getFromSessionStorage(StorageKey._ROUTE_VALUE)
