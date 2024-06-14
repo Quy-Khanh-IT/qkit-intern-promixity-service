@@ -1,7 +1,6 @@
 'use client'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import ModerateModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { IModalMethods } from '@/types/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
@@ -20,9 +19,11 @@ import {
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
-import { SortEnumAlias, TableActionEnum } from '@/types/enum'
+import { TableActionEnum } from '@/types/enum'
+import { IModalMethods } from '@/types/modal'
 import { IGetAllBusinessQuery } from '@/types/query'
-import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -46,14 +47,15 @@ import {
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { generateStatusColor } from '../../utils/main.util'
-import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from './manage-business.const'
+import { MANAGE_BUSINESS_FIELDS } from './manage-business.const'
 import './manage-business.scss'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
-import qs from 'qs'
+import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
+import emitter from '@/utils/event-emitter'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -78,10 +80,6 @@ const ORIGIN_DATA = {
   offset: ORIGIN_PAGE,
   limit: PAGE_SIZE
 } as IGetAllBusinessQuery
-
-const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
-  return qs.parse(searchParams, { ignoreQueryPrefix: true })
-}
 
 const ManageBusiness = (): React.ReactNode => {
   const router = useRouter()
@@ -120,6 +118,26 @@ const ManageBusiness = (): React.ReactNode => {
   const { data: statusData } = useGetAllBusinessStatusQuery()
   const { data: actionsData } = useGetAllBusinessActionsQuery()
   const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
+
+  useEffect(() => {
+    const handleEvent = (emitValue: string): void => {
+      if (emitValue === EMITTER_VALUE.CLICK) {
+        setQueryData(
+          (_prev) =>
+            ({
+              ...ORIGIN_DATA,
+              isDeleted: businessOptionBoolean
+            }) as IGetAllBusinessQuery
+        )
+      }
+    }
+
+    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+
+    return (): void => {
+      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+    }
+  }, [])
 
   useEffect(() => {
     const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string

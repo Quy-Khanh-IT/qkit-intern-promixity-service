@@ -84,7 +84,7 @@ const EditSubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = (
 const ProfileComponent: React.FC = () => {
   const { userInformation, fetchUserInformation } = useAuth()
   const [storedUserId, setStoredUerId] = useState<string>(userInformation?.id)
-  const [storedAvatar, setStoredAvatar] = useState<string>(userInformation?.image)
+  const [storedAvatar, setStoredAvatar] = useState<string>('')
   const { data: userProfile } = useGetPrivateUserProfileQuery({ userId: storedUserId })
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false)
   const [form] = Form.useForm<IUpdateProfilePayload>()

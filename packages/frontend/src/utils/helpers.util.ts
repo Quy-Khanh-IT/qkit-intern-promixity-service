@@ -1,5 +1,6 @@
 import { LOCAL_ENDPOINT } from '@/constants'
 import { NotificationEnum, SortEnum, SortEnumAlias } from '@/types/enum'
+import qs from 'qs'
 
 export function formatDate(inputDate: string): string {
   const dateObj = new Date(inputDate)
@@ -74,4 +75,8 @@ export const convertSortOrder = (order: string): string => {
     return SortEnum._DESC
   }
   return order
+}
+
+export const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
+  return qs.parse(searchParams, { ignoreQueryPrefix: true })
 }

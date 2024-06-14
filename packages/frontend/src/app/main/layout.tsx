@@ -14,6 +14,8 @@ import MainHeader from './layouts/MainHeader'
 import MainSidebar from './layouts/MainSidebar'
 import './main.scss'
 import { findKeyMenuBasedRoute, findRouteMenuBasedKey } from './utils/main.util'
+import emitter from '@/utils/event-emitter'
+import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 
 const { useBreakpoint } = Grid
 const { subColor2 } = variables
@@ -99,6 +101,7 @@ export default function RootLayout({
   }, [collapsed])
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
+    emitter.emit(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, EMITTER_VALUE.CLICK)
     const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
     router.push(routeValueTemp)

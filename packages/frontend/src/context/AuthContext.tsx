@@ -115,6 +115,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     } else {
       router.push(ROUTE.USER_LOGIN)
     }
+    toast.success(TOAST_MSG.LOGOUT_SUCCESS)
   }
 
   const resetSession = (): void => {

@@ -19,7 +19,7 @@ import { TableActionEnum, UserOptionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
 import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
@@ -50,6 +50,8 @@ import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
+import emitter from '@/utils/event-emitter'
+import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 
 const { Text } = Typography
 const { RangePicker } = DatePicker
@@ -73,10 +75,6 @@ const ORIGIN_DATA = {
   offset: ORIGIN_PAGE,
   limit: PAGE_SIZE
 } as IGetAllUsersQuery
-
-const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => {
-  return qs.parse(searchParams, { ignoreQueryPrefix: true })
-}
 
 const ManageUser = (): React.ReactNode => {
   const router = useRouter()
@@ -118,6 +116,26 @@ const ManageUser = (): React.ReactNode => {
     { skip: !selectedUser }
   )
   const { data: rolesData } = useGetAllRolesQuery()
+
+  useEffect(() => {
+    const handleEvent = (emitValue: string): void => {
+      if (emitValue === EMITTER_VALUE.CLICK) {
+        setQueryData(
+          (_prev) =>
+            ({
+              ...ORIGIN_DATA,
+              isDeleted: userOptionBoolean
+            }) as IGetAllUsersQuery
+        )
+      }
+    }
+
+    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+
+    return (): void => {
+      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+    }
+  }, [])
 
   useEffect(() => {
     const routeTemp = getFromSessionStorage(StorageKey._ROUTE_VALUE)

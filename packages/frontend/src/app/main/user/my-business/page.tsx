@@ -2,6 +2,7 @@
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
+import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
 import { DEFAULT_DATE_FORMAT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
 import { useSessionStorage } from '@/hooks/useSessionStorage'
 import variables from '@/sass/common/_variables.module.scss'
@@ -14,10 +15,17 @@ import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
-import { ErrorResponse } from '@/types/error'
+import { IModalMethods } from '@/types/modal'
 import { IGetAllBusinessQuery } from '@/types/query'
-import { compareDates, convertSortOrder, formatDate, getPresentUrl } from '@/utils/helpers.util'
-import { EllipsisOutlined, FolderViewOutlined, PlusOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
+import {
+  compareDates,
+  convertSortOrder,
+  formatDate,
+  getPresentUrl,
+  parseSearchParamsToObject
+} from '@/utils/helpers.util'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
+import { EllipsisOutlined, FolderViewOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
   Col,
@@ -41,14 +49,16 @@ import {
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
-import { HttpStatusCode } from 'axios'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import qs from 'qs'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
-import { MANAGE_BUSINESS_FIELDS, MANAGE_BUSINESS_SORT_FIELDS } from '../../admin/manage-business/manage-business.const'
+import { MANAGE_BUSINESS_FIELDS } from '../../admin/manage-business/manage-business.const'
 import { generateStatusColor } from '../../utils/main.util'
 import './my-business.scss'
+import emitter from '@/utils/event-emitter'
+import { EMITTER_EVENT, EMITTER_VALUE } from '@/constants/event-emitter'
 
 const { Text } = Typography
 const { starColor } = variables
@@ -61,16 +71,21 @@ const ACTIVE_FETCH = '1'
 const DELETED_FETCH = '2'
 
 const VIEW_DETAILS_OPTION = 1
-const MODERATE_OPTION = 2
-const RESTORE_OPTION = 2
-const DELETE_OPTION = 3
 
 type DataIndex = keyof IBusiness
 // For search
 type SearchIndex = keyof IGetAllBusinessQuery
 
+const ORIGIN_DATA = {
+  offset: ORIGIN_PAGE,
+  limit: PAGE_SIZE
+} as IGetAllBusinessQuery
+
 const MyBusiness = (): React.ReactNode => {
   const router = useRouter()
+  const currentPathName = usePathname()
+  // Search
+  const searchParams = useSearchParams()
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
     getPresentUrl() || ROUTE.MAP
@@ -86,40 +101,54 @@ const MyBusiness = (): React.ReactNode => {
     limit: PAGE_SIZE,
     isDeleted: businessOptionBoolean
   } as IGetAllBusinessQuery)
-  const {
-    data: businessesData,
-    isFetching: isLoadingBusinesses,
-    isError: isErrorGetAllBusiness,
-    error: errorGetAllBusiness
-  } = useGetAllPrivateBusinessesQuery(queryData)
+  const { data: businessesData, isFetching: isLoadingBusinesses } = useGetAllPrivateBusinessesQuery(
+    parseSearchParamsToObject(searchParams.toString()) as IGetAllBusinessQuery
+  )
   const [selectedBusiness, setSelectedBusiness] = useState<IBusiness | null>(null)
 
   // Modal
-  // const refViewDetailsModal = useRef<IModalMethods | null>(null)
-  // const refModerateModal = useRef<IModalMethods | null>(null)
-  // const refRestoreModal = useRef<IModalMethods | null>(null)
-  // const refDeleteBusinessModal = useRef<IModalMethods | null>(null)
+  const refViewDetailsModal = useRef<IModalMethods | null>(null)
 
-  // Other
-  // const [deleteBusinessMutation] = useDeleteBusinessMutation()
-  // const [updateBusinessStatusMutation] = useUpdateBusinessStatusMutation()
-  // const [restoreDeletedBusinessMutation] = useRestoreDeletedBusinessMutation()
   const { data: privateProfileData } = useGetPrivateBusinessProfileQuery(selectedBusiness?.id || '', {
     skip: !selectedBusiness
   })
   const { data: statusData } = useGetAllBusinessStatusQuery()
-  // const { data: actionsData } = useGetAllBusinessActionsQuery()
   const { data: businessCategoriesData } = useGetAllBusinessCategoriesQuery()
 
   useEffect(() => {
-    if (isErrorGetAllBusiness) {
-      const errorResponse = errorGetAllBusiness as ErrorResponse
-      if (errorResponse?.data?.statusCode === HttpStatusCode.Forbidden) {
-        console.log('errorResponse.data.errors', errorResponse.data.errors)
-        router.push(ROUTE.MY_BUSINESS_CREATE)
+    const handleEvent = (emitValue: string): void => {
+      if (emitValue === EMITTER_VALUE.CLICK) {
+        setQueryData(
+          (_prev) =>
+            ({
+              ...ORIGIN_DATA,
+              isDeleted: businessOptionBoolean
+            }) as IGetAllBusinessQuery
+        )
       }
     }
-  }, [isErrorGetAllBusiness])
+
+    emitter.on(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+
+    return (): void => {
+      emitter.off(EMITTER_EVENT.SIDEBAR_CLICK_EVENT, handleEvent)
+    }
+  }, [])
+
+  useEffect(() => {
+    const storedPathName: string = getFromSessionStorage(StorageKey._ROUTE_VALUE) as string
+    const storedQueryValue: IGetAllBusinessQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
+    setQueryData(storedQueryValue)
+  }, [])
+
+  useEffect(() => {
+    const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
+    const params = new URLSearchParams(queryString).toString()
+
+    const newPathname = `${currentPathName}?${params}`
+    router.push(newPathname)
+    saveToSessionStorage(StorageKey._ROUTE_VALUE, newPathname)
+  }, [queryData])
 
   useEffect(() => {
     setQueryData(
@@ -133,19 +162,20 @@ const MyBusiness = (): React.ReactNode => {
   }, [currentPage, businessOptionBoolean])
 
   const handleModal = (selectedOpt: number): void => {
-    // if (selectedOpt === VIEW_DETAILS_OPTION) {
-    //   refViewDetailsModal.current?.showModal()
-    // } else if (selectedOpt === MODERATE_OPTION && businessOptionBoolean === false) {
-    //   refModerateModal.current?.showModal()
-    // } else if (selectedOpt === RESTORE_OPTION && businessOptionBoolean === true) {
-    //   refRestoreModal.current?.showModal()
-    // } else if (selectedOpt === DELETE_OPTION) {
-    //   refDeleteBusinessModal.current?.showModal()
-    // }
+    if (selectedOpt === VIEW_DETAILS_OPTION) {
+      refViewDetailsModal.current?.showModal()
+    }
   }
 
   const onChangeSelection = (value: string): void => {
     setBusinessOption(value)
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: value === DELETED_FETCH
+        }) as IGetAllBusinessQuery
+    )
     setCurrentPage(ORIGIN_PAGE)
   }
 
@@ -174,6 +204,22 @@ const MyBusiness = (): React.ReactNode => {
     return queryDataTemp
   }
 
+  const deleteUnSelectedField = (_queryData: IGetAllBusinessQuery, dataIndex: DataIndex): IGetAllBusinessQuery => {
+    const queryDataTemp = { ..._queryData } as IGetAllBusinessQuery
+    if ((dataIndex as string) === 'overallRating') {
+      delete queryDataTemp.sortRatingBy
+    } else if ((dataIndex as string) === 'categoryName') {
+      delete queryDataTemp.categoryIds
+    } else if ((dataIndex as string) === 'totalReview') {
+      delete queryDataTemp.sortTotalReviewsBy
+    } else if ((dataIndex as string) === 'created_at') {
+      delete queryDataTemp.sortBy
+    } else {
+      delete queryDataTemp[dataIndex as SearchIndex]
+    }
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
     _confirm: FilterDropdownProps['confirm'],
@@ -181,8 +227,7 @@ const MyBusiness = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllBusinessQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
@@ -197,8 +242,7 @@ const MyBusiness = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllBusinessQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllBusinessQuery
       })
     } else {
@@ -213,23 +257,21 @@ const MyBusiness = (): React.ReactNode => {
     extra: TableCurrentDataSource<IBusiness>
   ) => {
     if (extra?.action === (TableActionEnum._SORT as string)) {
-      const _queryDataTemp: IGetAllBusinessQuery = { ...queryData }
-      Object.keys(_queryDataTemp).forEach((key: string) => {
-        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as keyof IGetAllBusinessQuery]
-        }
-      })
-
       const updateQueryData = (sorterItem: SorterResult<IBusiness>): void => {
         if (sorterItem?.order) {
-          setQueryData((_prev) =>
+          setQueryData((prev) =>
             mapQueryData(
-              _queryDataTemp,
+              prev,
               sorterItem?.columnKey as DataIndex,
               convertSortOrder(sorterItem?.order as string),
               extra?.action
             )
           )
+        } else {
+          setQueryData((prev) => {
+            const queryTemp: IGetAllBusinessQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
+            return { ...queryTemp } as IGetAllBusinessQuery
+          })
         }
       }
 
@@ -259,34 +301,6 @@ const MyBusiness = (): React.ReactNode => {
             label: <span>View Details</span>,
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
-          },
-          ...(businessOption === ACTIVE_FETCH
-            ? [
-                {
-                  key: 'Moderate',
-                  label: <span>Moderate</span>,
-                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => handleModal(2)
-                }
-              ]
-            : [
-                {
-                  key: 'Restore',
-                  label: <span>Restore</span>,
-                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: (): void => handleModal(2)
-                }
-              ]),
-          {
-            key: 'Delete ',
-            label: <span className={businessOptionBoolean ? 'error-modal-title' : ''}>Delete</span>,
-            icon: (
-              <i
-                className={`fa-regular fa-trash ${businessOptionBoolean ? 'error-modal-title' : 'delete-icon'}`}
-                style={{ fontSize: 15, cursor: 'pointer' }}
-              ></i>
-            ),
-            onClick: (): void => handleModal(3)
           }
         ]
         return (
@@ -303,9 +317,10 @@ const MyBusiness = (): React.ReactNode => {
       dataIndex: 'name',
       key: 'name',
       width: 160,
-      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+      ...SearchPopupProps<IBusiness, DataIndex>({
         dataIndex: 'name',
         placeholder: MANAGE_BUSINESS_FIELDS.name,
+        defaultValue: queryData?.name ? [queryData?.name] : [],
         _handleSearch: handleSearch
       })
     },
@@ -314,9 +329,10 @@ const MyBusiness = (): React.ReactNode => {
       dataIndex: 'categoryName',
       key: 'category',
       width: 150,
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'categoryName',
         optionsData: businessCategoriesData as IOptionsPipe,
+        defaultValue: queryData?.categoryIds || [],
         _handleFilter: handleFilter
       })
     },
@@ -324,9 +340,10 @@ const MyBusiness = (): React.ReactNode => {
       title: MANAGE_BUSINESS_FIELDS.fullAddress,
       dataIndex: 'fullAddress',
       key: 'fullAddress',
-      ...SearchPopupProps<IBusiness, keyof IBusiness>({
+      ...SearchPopupProps<IBusiness, DataIndex>({
         dataIndex: 'fullAddress',
         placeholder: MANAGE_BUSINESS_FIELDS.fullAddress,
+        defaultValue: queryData?.address ? [queryData?.address] : [],
         _handleSearch: handleSearch
       })
     },
@@ -359,9 +376,10 @@ const MyBusiness = (): React.ReactNode => {
         compare: (businessA: IBusiness, businessB: IBusiness) => businessA.overallRating - businessB.overallRating,
         multiple: 1
       },
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'overallRating',
         optionsData: statusData as IOptionsPipe,
+        defaultValue: queryData?.starsRating || [],
         filterCustom: RATING_OPTIONS_FILTERS,
         selectCustom: RATING_SELECT_FILTERS,
         _handleFilter: handleFilter
@@ -393,9 +411,10 @@ const MyBusiness = (): React.ReactNode => {
           {status.toUpperCase()}
         </Tag>
       ),
-      ...FilterPopupProps<IBusiness, keyof IBusiness>({
+      ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'status',
         optionsData: statusData as IOptionsPipe,
+        defaultValue: queryData?.status || [],
         _handleFilter: handleFilter
       })
     }
@@ -484,24 +503,6 @@ const MyBusiness = (): React.ReactNode => {
     }
   ]
 
-  // const handleDecentralizeRole = (type: string): void => {
-  //   updateBusinessStatusMutation({ type, id: selectedBusiness?.id ?? '' })
-  //   refModerateModal.current?.hideModal()
-  // }
-
-  // const handleDeleteBusiness = (): void => {
-  //   deleteBusinessMutation({
-  //     type: businessOptionBoolean ? DELETE_OPTIONS.HARD : DELETE_OPTIONS.SOFT,
-  //     id: selectedBusiness?.id ?? ''
-  //   })
-  //   refDeleteBusinessModal.current?.hideModal()
-  // }
-
-  // const handleRestoreBusiness = (): void => {
-  //   restoreDeletedBusinessMutation(selectedBusiness?.id ?? '')
-  //   refRestoreModal.current?.hideModal()
-  // }
-
   const onChangePagination: PaginationProps['onChange'] = (page) => {
     setCurrentPage(page)
   }
@@ -567,66 +568,12 @@ const MyBusiness = (): React.ReactNode => {
         _onChange={onChangeSorter}
         className='--manage-business-table'
       />
-      {/* <ViewRowDetailsModal
+      <ViewRowDetailsModal
         title='Business details'
         imageData={privateProfileData?.images}
         data={detailedItems}
         ref={refViewDetailsModal}
       />
-      <ModerateModal
-        selectionOptions={actionsData as SelectionOptions[]}
-        presentOption={selectedBusiness?.status || ''}
-        ref={refModerateModal}
-        title={'Decentralize'}
-        specificInfo={
-          <>
-            <Text>
-              {selectedBusiness?.name}
-              {selectedBusiness?.website && '-' + selectedBusiness?.website}
-            </Text>
-          </>
-        }
-        handleConfirm={handleDecentralizeRole}
-      >
-        <Text>Email:</Text>
-        <Text>Role:</Text>
-      </ModerateModal>
-
-      <RestoreModal
-        title={MODAL_TEXT.RESTORE_USER_TITLE}
-        content={
-          <>
-            <Text className='d-inline'>{MODAL_TEXT.RESTORE_USER}</Text>
-            {' ('}
-            <Text className='d-inline' strong>
-              {selectedBusiness?.name}
-              {selectedBusiness?.website && '-' + selectedBusiness?.website}
-            </Text>{' '}
-            {')'}
-          </>
-        }
-        handleConfirm={handleRestoreBusiness}
-        ref={refRestoreModal}
-      />
-
-      <DeleteModal
-        title={MODAL_TEXT.DELETE_USER_TITLE}
-        content={
-          <>
-            <Text className='d-inline' strong type={businessOptionBoolean ? 'danger' : undefined}>
-              {businessOptionBoolean ? MODAL_TEXT.DELETE_USER_PERMANENT : MODAL_TEXT.DELETE_USER_TEMPORARY}
-            </Text>
-            {' ('}
-            <Text className='d-inline' strong>
-              {selectedBusiness?.name}
-              {selectedBusiness?.website && '-' + selectedBusiness?.website}
-            </Text>
-            {')'}
-          </>
-        }
-        handleConfirm={handleDeleteBusiness}
-        ref={refDeleteBusinessModal}
-      /> */}
     </div>
   )
 }
