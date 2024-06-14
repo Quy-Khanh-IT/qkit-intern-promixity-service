@@ -22,8 +22,14 @@ import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
-import { IGetAllBusinessQuery } from '@/types/query'
-import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
+import { IGetAllBusinessQuery, IGetAllUsersQuery } from '@/types/query'
+import {
+  compareDates,
+  convertSortOrder,
+  // encodeUrIValues,
+  formatDate,
+  parseSearchParamsToObject
+} from '@/utils/helpers.util'
 import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
@@ -139,6 +145,36 @@ const ManageBusiness = (): React.ReactNode => {
   }, [])
 
   useEffect(() => {
+    // const queryParams = Object.keys(queryData)
+    //   .filter((key: string) => queryData[key as SearchIndex] !== undefined && queryData[key as SearchIndex] !== null)
+    //   .map((key) => `${key}=${encodeURIComponent(queryData[key as SearchIndex])}`)
+    //   .join('&')
+    // const decodeQuery = { ...queryData } as IGetAllBusinessQuery
+    // Object.keys(decodeQuery).forEach((key: string) => {
+    //   const valueIndex = decodeQuery[key as SearchIndex]
+    //   if (valueIndex === undefined || valueIndex === null) return
+    //   if (Array.isArray(valueIndex)) {
+    //     return valueIndex.map((item) => encodeURIComponent(item))
+    //   } else {
+    //     return encodeURIComponent(valueIndex)
+    //   }
+    // })
+
+    const decodeQuery = { ...queryData } as IGetAllBusinessQuery
+
+    Object.keys(decodeQuery).forEach((key: string) => {
+      const valueIndex = decodeQuery[key as SearchIndex]
+
+      if (valueIndex === undefined || valueIndex === null) {
+        decodeQuery[key as SearchIndex] = valueIndex
+      } else if (Array.isArray(valueIndex)) {
+        Object.assign(decodeQuery, { [key]: valueIndex.map((item) => encodeURIComponent(item)) })
+      } else {
+        Object.assign(decodeQuery, { [key]: encodeURIComponent(valueIndex) })
+      }
+    })
+
+    console.log('decodeQuery', decodeQuery)
     const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
     const params = new URLSearchParams(queryString).toString()
 
@@ -197,6 +233,8 @@ const ManageBusiness = (): React.ReactNode => {
       }
     } else if ((dataIndex as string) === 'categoryName') {
       queryDataTemp = { ..._queryData, categoryIds: values } as IGetAllBusinessQuery
+    } else if ((dataIndex as string) === 'fullAddress') {
+      queryDataTemp = { ..._queryData, address: values } as IGetAllBusinessQuery
     } else if ((dataIndex as string) === 'totalReview') {
       queryDataTemp = { ..._queryData, sortTotalReviewsBy: values } as IGetAllBusinessQuery
     } else if ((dataIndex as string) === 'created_at') {
@@ -213,6 +251,8 @@ const ManageBusiness = (): React.ReactNode => {
       delete queryDataTemp.sortRatingBy
     } else if ((dataIndex as string) === 'categoryName') {
       delete queryDataTemp.categoryIds
+    } else if ((dataIndex as string) === 'fullAddress') {
+      delete queryDataTemp.address
     } else if ((dataIndex as string) === 'totalReview') {
       delete queryDataTemp.sortTotalReviewsBy
     } else if ((dataIndex as string) === 'created_at') {

@@ -40,7 +40,7 @@ export interface ICreateBusiness {
   serviceIds: string[]
   phoneNumber: string
   website: string
-  dayOfWeek: IDayOfWeek[]
+  // dayOfWeek: IDayOfWeek[]
   country: string
   province: string
   district: string
