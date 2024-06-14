@@ -27,7 +27,7 @@ export interface IGetAllBusinessQuery extends IGelAllQuery {
   sortRatingBy?: SortEnum
   address?: string
   status?: string[]
-  // dayOfWeek?: IDayOfWeek[]
+  dayOfWeek?: IDayOfWeek[]
 }
 
 export interface IGetAllNotificationQuery {

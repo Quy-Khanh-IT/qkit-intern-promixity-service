@@ -22,7 +22,7 @@ import { IBusiness } from '@/types/business'
 import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
-import { IGetAllBusinessQuery, IGetAllUsersQuery } from '@/types/query'
+import { IGetAllBusinessQuery } from '@/types/query'
 import {
   compareDates,
   convertSortOrder,
@@ -145,36 +145,6 @@ const ManageBusiness = (): React.ReactNode => {
   }, [])
 
   useEffect(() => {
-    // const queryParams = Object.keys(queryData)
-    //   .filter((key: string) => queryData[key as SearchIndex] !== undefined && queryData[key as SearchIndex] !== null)
-    //   .map((key) => `${key}=${encodeURIComponent(queryData[key as SearchIndex])}`)
-    //   .join('&')
-    // const decodeQuery = { ...queryData } as IGetAllBusinessQuery
-    // Object.keys(decodeQuery).forEach((key: string) => {
-    //   const valueIndex = decodeQuery[key as SearchIndex]
-    //   if (valueIndex === undefined || valueIndex === null) return
-    //   if (Array.isArray(valueIndex)) {
-    //     return valueIndex.map((item) => encodeURIComponent(item))
-    //   } else {
-    //     return encodeURIComponent(valueIndex)
-    //   }
-    // })
-
-    const decodeQuery = { ...queryData } as IGetAllBusinessQuery
-
-    Object.keys(decodeQuery).forEach((key: string) => {
-      const valueIndex = decodeQuery[key as SearchIndex]
-
-      if (valueIndex === undefined || valueIndex === null) {
-        decodeQuery[key as SearchIndex] = valueIndex
-      } else if (Array.isArray(valueIndex)) {
-        Object.assign(decodeQuery, { [key]: valueIndex.map((item) => encodeURIComponent(item)) })
-      } else {
-        Object.assign(decodeQuery, { [key]: encodeURIComponent(valueIndex) })
-      }
-    })
-
-    console.log('decodeQuery', decodeQuery)
     const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
     const params = new URLSearchParams(queryString).toString()
 
