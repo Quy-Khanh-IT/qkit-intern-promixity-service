@@ -1,13 +1,13 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { BusinessModule } from '../business/business.module';
+import { Comment, CommentSchema } from './entities/comment.entity';
 import { Review, ReviewSchema } from './entities/review.entity';
+import { CommentRepository } from './repository/comment.repository';
+import { ReviewRepository } from './repository/review.repository';
 import { ReviewController } from './review.controller';
 import { ReviewService } from './review.service';
-import { Comment, CommentSchema } from './entities/comment.entity';
-import { ReviewRepository } from './repository/review.repository';
-import { CommentRepository } from './repository/comment.repository';
 
 @Module({
   imports: [

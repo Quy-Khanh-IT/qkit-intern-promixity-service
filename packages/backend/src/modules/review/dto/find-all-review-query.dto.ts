@@ -1,6 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
-import { ReviewTypeEnum } from 'src/common/enums';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 
 export class FindAllReviewQuery extends QueryFilterBase {

@@ -32,7 +32,7 @@ export class NoDateQueryFilterBase {
 
   endDate: null;
 
-  sortBy: null;
+  sortBy: string;
 
   isDeleted: null;
 }

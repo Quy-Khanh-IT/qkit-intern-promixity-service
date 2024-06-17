@@ -2,9 +2,14 @@ import * as moment from 'moment';
 import { PipelineStage } from 'mongoose';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 import { NoDateQueryFilterBase } from 'src/cores/pagination/base/no-date-query-filter.base';
-import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
+import {
+  NotificationPaginationResult,
+  PaginationResult,
+} from 'src/cores/pagination/base/pagination-result.base';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 import { BaseRepositoryAbstract } from 'src/cores/repository/base/repositoryAbstract.base';
+import { CommentFilter } from 'src/modules/review/dto/comment-filter.dto';
+import { transStringToObjectId } from '../utils';
 
 export class PaginationHelper {
   private static createLink(queryData: any, URL: string, totalPage: number) {
@@ -37,7 +42,7 @@ export class PaginationHelper {
   public static configureBaseQueryFilter(
     matchStage: Record<string, any>,
     sortStage: Record<string, any>,
-    data: QueryFilterBase | NoDateQueryFilterBase,
+    data: QueryFilterBase | NoDateQueryFilterBase | CommentFilter,
   ): { matchStage: Record<string, any>; sortStage: Record<string, any> } {
     if (data?.startDate) {
       matchStage['created_at'] = {
@@ -71,7 +76,7 @@ export class PaginationHelper {
 
   static async paginate<
     T extends BaseEntity,
-    V extends QueryFilterBase | NoDateQueryFilterBase,
+    V extends QueryFilterBase | NoDateQueryFilterBase | CommentFilter,
   >(
     URL: string,
     queryData: V,
@@ -85,6 +90,67 @@ export class PaginationHelper {
             { $skip: (queryData.offset - 1) * queryData.limit },
             { $limit: queryData.limit },
           ],
+          totalCount: [{ $count: 'total' }],
+        },
+      },
+
+      {
+        $project: {
+          data: 1,
+          count: { $size: '$data' },
+          totalRecords: { $arrayElemAt: ['$totalCount.total', 0] },
+          totalPages: {
+            $ceil: {
+              $divide: [
+                { $arrayElemAt: ['$totalCount.total', 0] },
+                queryData.limit,
+              ],
+            },
+          },
+        },
+      },
+    ];
+
+    if (createOptionalPipeline) {
+      const optionalPipeline: PipelineStage[] =
+        await createOptionalPipeline(queryData);
+      if (optionalPipeline && optionalPipeline.length > 0) {
+        basePipeline = [...optionalPipeline, ...basePipeline];
+      }
+    }
+
+    let result: any[] = await repository.aggregate(basePipeline);
+    return {
+      currentPage: queryData.offset,
+      data: result[0]['data'],
+      links: this.createLink(queryData, URL, result[0]['totalPages']),
+      pageSize: result[0]['count'],
+      totalPages: result[0]['totalPages'],
+      totalRecords: result[0]['totalRecords'],
+    };
+  }
+
+  static async commentPaginate<T extends BaseEntity, V extends CommentFilter>(
+    reviewId: string,
+    URL: string,
+    queryData: V,
+    repository: BaseRepositoryAbstract<T>,
+    createOptionalPipeline?: (queryData: V) => Promise<PipelineStage[]>,
+  ): Promise<PaginationResult<T>> {
+    console.log('queryData', queryData);
+    let basePipeline: PipelineStage[] = [
+      {
+        $sort: { page: 1 },
+      },
+      {
+        $match: {
+          reviewId: transStringToObjectId(reviewId),
+          page: { $ne: null },
+        },
+      },
+      {
+        $facet: {
+          data: [{ $skip: queryData.offset - 1 }, { $limit: 1 }],
           totalCount: [{ $count: 'total' }],
         },
       },

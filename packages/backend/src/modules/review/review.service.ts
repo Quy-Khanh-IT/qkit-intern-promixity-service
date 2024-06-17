@@ -1,46 +1,35 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import mongoose, { PipelineStage } from 'mongoose';
 import { ConfigKey } from 'src/common/constants';
-import { ReviewConstant } from 'src/common/constants/review.constant';
-import {
-  BusinessStatusEnum,
-  ReviewActionEnum,
-  ReviewTypeEnum,
-  StarEnum,
-  UserRole,
-} from 'src/common/enums';
+import { BusinessStatusEnum, ReviewActionEnum } from 'src/common/enums';
 import {
   BusinessNotFoundException,
   BusinessStatusException,
 } from 'src/common/exceptions/business.exception';
 import {
   ResponseNotFoundException,
-  ReviewDeleteException,
   ReviewForbiddenException,
   ReviewNotFoundException,
-  ReviewUnauthorizeException,
 } from 'src/common/exceptions/review.exception';
 import { PaginationHelper } from 'src/common/helper';
+import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 
 import { BusinessService } from '../business/business.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { EditResponseDto } from './dto/edit-response.dto';
-import { EditReviewDto } from './dto/edit-review.dto';
-import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
-import { CommentDto } from './dto/reply-review.dto';
-import { Review, UserSchema } from './entities/review.entity';
-import { transStringToObjectId } from 'src/common/utils';
 import { User } from '../user/entities/user.entity';
-import { Business } from '../business/entities/business.entity';
+import { CommentFilter } from './dto/comment-filter.dto';
+import { CommentQuery } from './dto/comment-query.dto';
+import { CommentDto } from './dto/create-comment.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { FindAllBusinessReviewQuery } from './dto/find-all-business-review-query.dto';
-import { ReviewRepository } from './repository/review.repository';
-import { CommentRepository } from './repository/comment.repository';
+import { FindAllReviewQuery } from './dto/find-all-review-query.dto';
 import { Comment } from './entities/comment.entity';
-import { ResponseSchema } from './entities/response.entity';
+import { Review, UserSchema } from './entities/review.entity';
+import { CommentRepository } from './repository/comment.repository';
+import { ReviewRepository } from './repository/review.repository';
 
 @Injectable()
 export class ReviewService {
@@ -63,9 +52,13 @@ export class ReviewService {
       this.configGetAllReviewPipeLine,
     );
 
-    const reviews = aggregateResult.data.map((review) =>
-      plainToClass(Review, review),
-    );
+    const reviews = aggregateResult.data.map((review) => {
+      review.postBy = plainToClass(UserSchema, review.postBy);
+
+      return {
+        ...plainToClass(Review, review),
+      };
+    });
 
     aggregateResult.data = reviews;
 
@@ -87,11 +80,73 @@ export class ReviewService {
       this.configGetAllBusinessReviewPipeLine,
     );
 
-    const reviews = aggregateResult.data.map((review) =>
-      plainToClass(Review, review),
-    );
+    const reviews = aggregateResult.data.map(async (review) => {
+      review.postBy = plainToClass(UserSchema, review.postBy);
 
-    aggregateResult.data = reviews;
+      let reps = await this.getCommentsByReview(
+        transObjectIdToString(review._id),
+        {
+          offset: 1,
+          limit: 1,
+        } as CommentFilter,
+      );
+
+      console.log('reps', reps);
+
+      reps.data = reps.data[0].replies;
+
+      console.log('reps', reps);
+
+      if (Array.isArray(reps.data)) {
+        for (const i in reps.data) {
+          const reviewId = reps.data[i].review_id;
+          const id = reps.data[i].id;
+
+          const reply = await this.getComments({
+            reviewId: reviewId,
+            parentCommentId: id,
+          } as CommentQuery);
+
+          reps.data[i].replies = {
+            ...reply,
+          };
+        }
+      }
+
+      // let newReps = {
+      //   currentPage: 1,
+      //   replies: [
+      //     {
+      //       page: 1,
+      //       data: [],
+      //     },
+      //   ],
+      //   links: {
+      //     first:
+      //       'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=1&limit=1',
+      //     previous: null,
+      //     next: 'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=2&limit=1',
+      //     last: 'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=2&limit=1',
+      //   },
+      //   pageSize: 1,
+      //   totalPages: 2,
+      //   totalRecords: 2,
+      // };
+
+      // const replies = await this.getComments({
+      //   reviewId: reps.review_id,
+      //   parentCommentId: reps.id,
+      // } as CommentQuery);
+
+      return {
+        ...plainToClass(Review, review),
+        reply: {
+          ...reps,
+        },
+      };
+    });
+
+    aggregateResult.data = await Promise.all(reviews);
 
     return aggregateResult;
   }
@@ -225,36 +280,71 @@ export class ReviewService {
   async findById(id: string): Promise<Review> {
     const review = await this.reviewRepository.findOneById(id);
 
-    console.log('review', review);
-
     return plainToClass(Review, review);
   }
 
-  async getCommentsByReview(reviewId: string): Promise<any> {
-    // const review = await this.reviewRepository.findOneById(reviewId);
+  async getCommentsByReview(
+    reviewId: string,
+    data: CommentFilter,
+  ): Promise<any> {
+    const URL = `http://localhost:${this.configService.get<string>(ConfigKey.PORT)}/reviews/${reviewId}/comments`;
 
-    // if (!review) {
-    //   throw new ReviewNotFoundException();
-    // }
+    const aggregateResult = await PaginationHelper.commentPaginate(
+      reviewId,
+      URL,
+      data,
+      this.commentRepository,
+      this.configGetCommentsByReviewPipeLine,
+    );
 
-    // console.log('review', review);
+    const comments = aggregateResult.data.map((comment) => {
+      if (Array.isArray(comment.replies)) {
+        comment.replies = comment.replies.map((rep) => {
+          rep.postBy = plainToClass(UserSchema, rep.postBy);
 
-    // const rev = await this.commentRepository.findOneByCondition({
-    //   reviewId: transStringToObjectId(reviewId),
-    //   page: 1,
-    // });
+          rep = plainToClass(Comment, rep);
 
-    const rev = await this.commentRepository.getCommentsByReview(reviewId);
+          return {
+            ...rep,
+          };
+        });
+      }
 
-    const replies = rev[0].replies.map((item) => {
-      item.postBy = plainToClass(UserSchema, item.postBy);
-
-      return plainToClass(ResponseSchema, item);
+      return {
+        ...plainToClass(Comment, comment),
+      };
     });
 
-    rev[0].replies = replies;
+    aggregateResult.data = comments;
 
-    return plainToClass(Comment, rev);
+    return aggregateResult;
+  }
+
+  async configGetCommentsByReviewPipeLine(
+    query: CommentFilter,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query as CommentFilter,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
   }
 
   async createReview(createReviewDto: CreateReviewDto, user: User) {
@@ -277,7 +367,7 @@ export class ReviewService {
     try {
       transactionSession.startTransaction();
 
-      let review = await this.reviewRepository.createReview(
+      const review = await this.reviewRepository.createReview(
         createReviewDto,
         user,
       );
@@ -301,18 +391,89 @@ export class ReviewService {
     }
   }
 
-  async CreateComment(commentDto: CommentDto, reviewId: string, user: User) {
-    let comment = await this.reviewRepository.createComment(
+  async createComment(commentDto: CommentDto, reviewId: string, user: User) {
+    const comment = await this.reviewRepository.createComment(
       commentDto,
       reviewId,
       user,
     );
 
-    comment.postBy = plainToInstance(UserSchema, comment.postBy, {
-      // excludeExtraneousValues: true,
-    });
+    comment.postBy = plainToInstance(UserSchema, comment.postBy);
 
     return plainToClass(Review, comment);
+  }
+
+  async createReply(
+    parentCommentId: string,
+    commentDto: CommentDto,
+    user: User,
+  ) {
+    const reply = await this.commentRepository.createReply(
+      parentCommentId,
+      commentDto,
+      user,
+    );
+
+    return reply;
+  }
+
+  async getComments(query: CommentQuery): Promise<Comment> {
+    const reviewId = query.reviewId;
+
+    const review = await this.reviewRepository.findOneById(reviewId);
+
+    if (!review) {
+      throw new ReviewNotFoundException();
+    }
+
+    const comments = await this.commentRepository.getComments(
+      reviewId,
+      query.parentCommentId,
+    );
+
+    return this.buildNestedComments(comments)[0];
+  }
+
+  buildNestedComments(comments: Array<Comment>) {
+    const commentMap: { [key: string]: Comment } = {};
+
+    // Initialize the map
+    comments.forEach((comment) => {
+      commentMap[comment.id] = { ...comment, replies: [] };
+    });
+
+    const nestedComments: Comment[] = [];
+
+    comments.forEach((comment) => {
+      if (comment.parent_id) {
+        commentMap[comment.parent_id]?.replies?.push(commentMap[comment.id]);
+      } else {
+        nestedComments.push(commentMap[comment.id]);
+      }
+    });
+
+    for (const key in commentMap) {
+      nestedComments.push({
+        ...commentMap[key],
+        id: key,
+      });
+    }
+
+    const finalData = [];
+
+    let min = 0;
+    let max = 0;
+
+    nestedComments.forEach((comment) => {
+      if (comment.left > min && comment.right > max) {
+        min = comment.left;
+        max = comment.right;
+
+        finalData.push(comment);
+      }
+    });
+
+    return JSON.parse(JSON.stringify(finalData, null, 2));
   }
 
   // async editReview(
@@ -527,8 +688,6 @@ export class ReviewService {
 
   //   return !!(await this.reviewRepository.hardDelete(id));
   // }
-
-  async getReviewsByBusinessId(businessId: string) {}
 
   async restore() {}
 }
