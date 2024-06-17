@@ -90,7 +90,6 @@ export default function AddressLineForm({
           )}
           <Button
             onClick={() => {
-              console.log('cucdata ne', data)
               handleOnChangeStep('next')
             }}
             disabled={

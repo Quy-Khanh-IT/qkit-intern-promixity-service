@@ -21,11 +21,21 @@ export const businessApi = createApi({
     }),
 
     createBusiness: builder.mutation<IBusiness, ICreateBusiness>({
-      query: (data) => ({
-        url: `/businesses`,
-        method: 'POST',
-        body: data
-      }),
+      query: (data) => {
+        const { location, ...rest } = data
+        const [lat, lng] = location.coordinates
+        const body = {
+          ...rest,
+          location: {
+            coordinates: [lng, lat]
+          }
+        }
+        return {
+          url: `/businesses`,
+          method: 'POST',
+          body
+        }
+      },
       invalidatesTags: ['BusinessList']
     }),
     // business
