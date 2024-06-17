@@ -96,3 +96,9 @@ export interface ISelectedBusiness {
   selectedBusinessId: string | null
   selectedBusinessData: IBusiness | null
 }
+
+export interface ITimeOption {
+  timeOpenType: string
+  day: string
+  openTime: string
+}

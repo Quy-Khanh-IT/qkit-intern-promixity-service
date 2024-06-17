@@ -1,11 +1,12 @@
 'use client'
 import Sider from 'antd/es/layout/Sider'
 import './search-sider.scss'
-import { Button, Dropdown, MenuProps, Select, Space, Spin, Tooltip } from 'antd'
+import { Select, Spin, Tooltip } from 'antd'
 import { SearchList } from './SearchList'
 import { ISearchSider } from '@/types/map'
 import { RatingMenu } from '@/constants/map'
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
+import TimeFilter from './TimeFilter'
 
 export default function SearchSider(props: ISearchSider): React.ReactNode {
   const { data: getCategoryResponse } = useGetAllBusinessCategoriesQuery()
@@ -41,51 +42,64 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
           </div>
         ) : (
           <div className='search-result-wrapper w-100 h-100 search-result-wrapper scroll-bar-2 pt-2'>
-            <div className='search-result-title mt-2 d-flex justify-content-between align-items-center'>
+            <div className='search-result-title mt-2 d-flex  justify-content-between align-items-center'>
               <div className='ms-2'>
-                Results{' '}
-                <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
-                  <i className='fa-light fa-circle-info'></i>{' '}
-                </Tooltip>
-                <span className='total-results ms-1'>{props.totalResult ? `(${props.totalResult} results)` : ''}</span>
-                <Select
-                  className=' ms-2'
-                  showSearch
-                  placeholder='Select a star'
-                  optionFilterProp='children'
-                  filterOption={filterOption}
-                  options={RatingMenu}
-                  onChange={(value: string) => props.handleOnChangeRating(value)}
-                  value={props.rating.toString()}
-                />
-                <Select
-                  className=' ms-2'
-                  showSearch
-                  placeholder='Select a category'
-                  optionFilterProp='children'
-                  filterOption={filterOption}
-                  options={[
-                    ...(getCategoryResponse && getCategoryResponse.filterOpts.length > 0
-                      ? [
-                          {
-                            label: 'All category',
-                            value: 'all'
-                          },
-                          ...getCategoryResponse.filterOpts.map((item) => ({
-                            value: item.value,
-                            label: item.text
-                          }))
-                        ]
-                      : [
-                          {
-                            label: 'All category',
-                            value: 'all'
-                          }
-                        ])
-                  ]}
-                  onChange={(value: string) => props.handleOnChangeCategory(value)}
-                  value={props.categoryId}
-                />
+                <div className='mb-2 d-flex align-items-center'>
+                  <Select
+                    className=''
+                    showSearch
+                    placeholder='Select a star'
+                    optionFilterProp='children'
+                    filterOption={filterOption}
+                    options={RatingMenu}
+                    onChange={(value: string) => props.handleOnChangeRating(value)}
+                    value={props.rating.toString()}
+                  />
+                  <Select
+                    className=' ms-2'
+                    showSearch
+                    placeholder='Select a category'
+                    optionFilterProp='children'
+                    filterOption={filterOption}
+                    options={[
+                      ...(getCategoryResponse && getCategoryResponse.filterOpts.length > 0
+                        ? [
+                            {
+                              label: 'All category',
+                              value: 'all'
+                            },
+                            ...getCategoryResponse.filterOpts.map((item) => ({
+                              value: item.value,
+                              label: item.text
+                            }))
+                          ]
+                        : [
+                            {
+                              label: 'All category',
+                              value: 'all'
+                            }
+                          ])
+                    ]}
+                    onChange={(value: string) => props.handleOnChangeCategory(value)}
+                    value={props.categoryId ? props.categoryId : 'all'}
+                  />
+                  <div className='ms-2'>
+                    <TimeFilter
+                      handleOnChangeTimeOption={props.handleOnChangeTimeOption}
+                      timeOption={props.timeOption}
+                      handleOnApplyTimeFilter={props.handleOnApplyTimeFilter}
+                    />
+                  </div>
+                </div>
+                <div>
+                  Results{' '}
+                  <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
+                    <i className='fa-light fa-circle-info'></i>{' '}
+                  </Tooltip>
+                  <span className='total-results ms-1'>
+                    {props.totalResult ? `(${props.totalResult} results)` : ''}
+                  </span>
+                </div>
               </div>
               <div onClick={props.onClose} className='close-btn me-2'>
                 <i className='fa-solid fa-x'></i>
