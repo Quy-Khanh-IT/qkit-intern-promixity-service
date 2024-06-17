@@ -1,4 +1,4 @@
-import { IBusiness } from './business'
+import { IBusiness, ITimeOption } from './business'
 import { Icon } from 'leaflet'
 
 export interface IMapProps {
@@ -24,6 +24,15 @@ export interface ISearchSider {
   handleOnChangeRating: (_value: string) => void
   categoryId: string | null
   handleOnChangeCategory: (_value: string) => void
+  handleOnChangeTimeOption: (_type: string, _value: string) => void
+  timeOption: ITimeOption
+  handleOnApplyTimeFilter: () => void
+}
+
+export interface ITimeFilterProps {
+  handleOnChangeTimeOption: (_type: string, _value: string) => void
+  timeOption: ITimeOption
+  handleOnApplyTimeFilter: () => void
 }
 
 export interface IMarkerProps {

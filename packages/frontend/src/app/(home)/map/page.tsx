@@ -22,6 +22,7 @@ import SearchItemDetail from './components/SearchItemDetail'
 import SearchSider from './components/SearchSider'
 import './map.scss'
 import { RoleEnum } from '@/types/enum'
+import { ITimeOption } from '@/types/business'
 
 const { Text } = Typography
 
@@ -47,6 +48,14 @@ function MapPage(): React.ReactNode {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
   const [rating, setRating] = useState<number>(0)
+
+  const [timeOption, setTimeOption] = useState<ITimeOption>({
+    timeOpenType: 'every_time',
+    day: 'monday',
+    openTime: '01:00'
+  })
+  const [isApplyTimeFilter, setIsApplyTimeFilter] = useState<number>(1)
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
@@ -56,7 +65,8 @@ function MapPage(): React.ReactNode {
     q: '',
     limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT,
     ...(rating !== 0 ? { star: rating } : {}),
-    ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
+    ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {}),
+    ...timeOption
   })
 
   useEffect(() => {
@@ -89,7 +99,8 @@ function MapPage(): React.ReactNode {
       q: searchText,
       limit: maxLimit,
       ...(rating !== 0 ? { star: rating } : {}),
-      ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
+      ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {}),
+      ...timeOption
     }
     dispatch(setSearchPosition(clickPosition ? clickPosition : position))
     setQueryData(data)
@@ -147,7 +158,7 @@ function MapPage(): React.ReactNode {
     if (shouldFetch) {
       handleOnSearch()
     }
-  }, [distanceRadius, rating, selectedCategoryId])
+  }, [distanceRadius, rating, selectedCategoryId, isApplyTimeFilter])
 
   useEffect(() => {
     setCollapsed(true)
@@ -165,6 +176,17 @@ function MapPage(): React.ReactNode {
 
   const handleOnChangeCategory = (value: string): void => {
     setSelectedCategoryId(value)
+  }
+
+  const handleOnChangeTimeOption = (type: string, value: string): void => {
+    setTimeOption({
+      ...timeOption,
+      [type]: value
+    })
+  }
+
+  const handleOnApplyTimeFilter = (): void => {
+    setIsApplyTimeFilter(isApplyTimeFilter + 1)
   }
 
   const handleLogout = (): void => {
@@ -262,6 +284,9 @@ function MapPage(): React.ReactNode {
           handleOnChangeCategory={handleOnChangeCategory}
           rating={rating}
           categoryId={selectedCategoryId}
+          handleOnChangeTimeOption={handleOnChangeTimeOption}
+          timeOption={timeOption}
+          handleOnApplyTimeFilter={handleOnApplyTimeFilter}
         />
 
         <Content style={{ margin: '0 16px' }}>
