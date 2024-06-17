@@ -171,8 +171,6 @@ export default function CreateBusiness(): React.ReactNode {
     }
     return ''
   }
-
-  console.log('data bth', data)
   return (
     <div className='h-100 w-100 create-business-container'>
       <div className=' mt-3 process-bar-container'>
