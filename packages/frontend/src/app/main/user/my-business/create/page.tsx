@@ -89,7 +89,6 @@ export default function CreateBusiness(): React.ReactNode {
 
   const handleOnChangeStep = (type: string): void => {
     if (type === 'next') {
-      console.log('step hien tai', currentStep)
       const nextStep = currentStep + 1 > stepList.length - 1 ? stepList.length - 1 : currentStep + 1
       const currentStepList = [...stepList]
 
@@ -106,10 +105,10 @@ export default function CreateBusiness(): React.ReactNode {
       setStepList(currentStepList)
       setCurrentStep(nextStep)
       if (nextStep === 5) {
-        const payload: ICreateBusiness = data
+        const payload: ICreateBusiness = { ...data }
         payload.province = getProvinceName(data.province)
         payload.district = getDistrictName(data.district)
-        payload.location.coordinates = [data.location.coordinates[1], data.location.coordinates[0]]
+
         createBusiness(payload)
       }
     } else if (type === 'back') {
@@ -173,6 +172,7 @@ export default function CreateBusiness(): React.ReactNode {
     return ''
   }
 
+  console.log('data bth', data)
   return (
     <div className='h-100 w-100 create-business-container'>
       <div className=' mt-3 process-bar-container'>
