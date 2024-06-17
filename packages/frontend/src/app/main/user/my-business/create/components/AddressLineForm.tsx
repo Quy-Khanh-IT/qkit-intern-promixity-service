@@ -101,7 +101,7 @@ export default function AddressLineForm({
             className='mt-4 btn-continue '
             type='primary'
           >
-            Continue
+            Finish
           </Button>
         </div>
         <div className='content-right w-50  d-flex justify-content-center  container'>
