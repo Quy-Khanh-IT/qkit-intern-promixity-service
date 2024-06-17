@@ -19,6 +19,7 @@ import { ToastService } from '@/services/toast.service'
 import { ErrorResponse } from '@/types/error'
 import { useRouter } from 'next/navigation'
 import { ROUTE } from '@/constants'
+import OpenTimeForm from './components/OpenTimeForm'
 
 export default function CreateBusiness(): React.ReactNode {
   const [currentStep, setCurrentStep] = useState<number>(0)
@@ -104,7 +105,7 @@ export default function CreateBusiness(): React.ReactNode {
 
       setStepList(currentStepList)
       setCurrentStep(nextStep)
-      if (nextStep === 5) {
+      if (nextStep === 6) {
         const payload: ICreateBusiness = { ...data }
         payload.province = getProvinceName(data.province)
         payload.district = getDistrictName(data.district)
@@ -202,6 +203,8 @@ export default function CreateBusiness(): React.ReactNode {
             listService={getServiceResponse && getServiceResponse.items.length > 0 ? getServiceResponse.items : []}
           />
         ) : currentStep === 3 ? (
+          <OpenTimeForm handleOnChangeData={handleOnChangeData} data={data} handleOnChangeStep={handleOnChangeStep} />
+        ) : currentStep === 4 ? (
           <AddressForm
             listProvince={getProvinceResponse && getProvinceResponse.items.length > 0 ? getProvinceResponse.items : []}
             listDistrict={getDistrictResponse && getDistrictResponse.items.length > 0 ? getDistrictResponse.items : []}
@@ -209,7 +212,7 @@ export default function CreateBusiness(): React.ReactNode {
             data={data}
             handleOnChangeStep={handleOnChangeStep}
           />
-        ) : currentStep === 4 ? (
+        ) : currentStep === 5 ? (
           <AddressLineForm
             handleOnChangeData={handleOnChangeData}
             data={data}
