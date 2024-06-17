@@ -28,6 +28,7 @@ import {
 import { transObjectIdToString, verifyHash } from 'src/common/utils';
 import { MailService } from '../mail/mail.service';
 import { OtpService } from '../otp/otp.service';
+import { Requests } from '../request/entities/request.entity';
 import { RequestService } from '../request/request.service';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
@@ -133,10 +134,37 @@ export class AuthService {
       action: 'login',
     });
 
+    const newRefreshToken: Requests = {
+      token: pairToken[1],
+      expiredAt: Dayjs()
+        .add(
+          this.configService.get<number>(
+            ConfigKey.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+          ),
+          'seconds',
+        )
+        .toDate(),
+      used: false,
+      metaData: {},
+      type: TypeRequests.REFRESH_TOKEN,
+      userId: user._id,
+    };
+
+    const isSavedRefreshToken =
+      await this.requestService.findOneAndReplaceWithUserId(
+        user._id.toString(),
+        newRefreshToken,
+      );
+
+    if (!isSavedRefreshToken) {
+      throw new InternalServerErrorException('Save refresh token failed');
+    }
+
     return {
       accessToken: pairToken[0],
       refreshToken: pairToken[1],
       userId: user.id,
+      expiredAt: newRefreshToken.expiredAt,
     };
   }
 
@@ -155,6 +183,46 @@ export class AuthService {
       );
     }
     throw new UnVerifiedUser(jwt);
+  }
+
+  async refreshToken(user: User): Promise<LoginResponseDto> {
+    const userIdString = user.id ? user.id : user._id.toString();
+    const pairToken = await this.JWTTokenService.genNewPairToken({
+      user_id: userIdString,
+      action: 'login',
+    });
+    const newRefreshToken: Requests = {
+      token: pairToken[1],
+      expiredAt: Dayjs()
+        .add(
+          this.configService.get<number>(
+            ConfigKey.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+          ),
+          'seconds',
+        )
+        .toDate(),
+      used: false,
+      metaData: {},
+      type: TypeRequests.REFRESH_TOKEN,
+      userId: user._id,
+    };
+
+    const isSavingRefreshToken =
+      await this.requestService.findOneAndReplaceWithUserId(
+        userIdString,
+        newRefreshToken,
+      );
+
+    if (!isSavingRefreshToken) {
+      throw new InternalServerErrorException('Save refresh token failed');
+    }
+
+    return {
+      accessToken: pairToken[0],
+      refreshToken: pairToken[1],
+      userId: userIdString,
+      expiredAt: newRefreshToken.expiredAt,
+    };
   }
 
   public async requestResetPassword(

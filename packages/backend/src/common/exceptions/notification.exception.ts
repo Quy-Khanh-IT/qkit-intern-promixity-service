@@ -1,7 +1,7 @@
-import { ERRORS_DICTIONARY, ERROR_MESSAGES, ERROR_CODES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
+import { BaseBusinessException } from './base/base-message.exception';
 
-export class NotificationNotFoundException extends BaseException {
+export class NotificationNotFoundException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.NOTIFICATION_NOT_FOUND,
@@ -11,7 +11,7 @@ export class NotificationNotFoundException extends BaseException {
   }
 }
 
-export class NotificationNotBelongException extends BaseException {
+export class NotificationNotBelongException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.NOTIFICATION_NOT_BELONG,

@@ -1,7 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId, Types } from 'mongoose';
+import { HydratedDocument, ObjectId,Types } from 'mongoose';
+
 import { TypeRequests } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { User } from 'src/modules/user/entities/user.entity';
 
 export type RequestDocument = HydratedDocument<Requests>;
 
@@ -14,7 +16,7 @@ export class Requests extends BaseEntity {
   @Prop({ required: true, trim: true })
   token: string;
 
-  @Prop({ required: true, trim: true, type: Types.ObjectId })
+  @Prop({ required: true, trim: true, type: Types.ObjectId, ref: User.name })
   userId: ObjectId;
   //host/users/requeset-reset-email
   @Prop({

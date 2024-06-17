@@ -7,9 +7,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiHeader,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthConstant } from 'src/common/constants/auth.constant';
+import { JwtRefreshTokenGuard } from 'src/cores/guard/jwt-refresh-token.guard';
 import { JwtRequestTokenGuard } from 'src/cores/guard/jwt-reset-password-token.guard';
 import { JwtVerifyTokenGuard } from 'src/cores/guard/jwt-verify-token.guard';
 import { MailService } from '../mail/mail.service';
@@ -84,6 +91,18 @@ export class AuthController {
   })
   async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto | void> {
     return await this.authService.login(loginDto);
+  }
+
+  @Post('refreshToken')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @UseGuards(JwtRefreshTokenGuard)
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully refresh token.',
+  })
+  async refreshToken(@Req() req: Request) {
+    return await this.authService.refreshToken(req.user);
   }
 
   @Post('reset-password')

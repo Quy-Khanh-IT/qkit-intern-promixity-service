@@ -1,8 +1,8 @@
-import { ERRORS_DICTIONARY, ERROR_MESSAGES, ERROR_CODES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
+import { BaseBusinessException } from './base/base-message.exception';
 
 // Review
-export class ReviewForbiddenException extends BaseException {
+export class ReviewForbiddenException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.REVIEW_FORBIDDEN;
     const errorMessage =
@@ -12,7 +12,7 @@ export class ReviewForbiddenException extends BaseException {
   }
 }
 
-export class ReviewNotFoundException extends BaseException {
+export class ReviewNotFoundException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.REVIEW_NOT_FOUND;
     const errorMessage =
@@ -22,7 +22,7 @@ export class ReviewNotFoundException extends BaseException {
   }
 }
 
-export class ReviewUnauthorizeException extends BaseException {
+export class ReviewUnauthorizeException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.REVIEW_UNAUTHORIZED;
     const errorMessage =
@@ -32,7 +32,7 @@ export class ReviewUnauthorizeException extends BaseException {
   }
 }
 
-export class ReviewDeleteException extends BaseException {
+export class ReviewDeleteException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.REVIEW_CAN_NOT_DELETE;
     const errorMessage =
@@ -43,7 +43,7 @@ export class ReviewDeleteException extends BaseException {
 }
 
 // Response
-export class ResponseNotFoundException extends BaseException {
+export class ResponseNotFoundException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.RESPONSE_NOT_FOUND;
     const errorMessage =
@@ -53,7 +53,7 @@ export class ResponseNotFoundException extends BaseException {
   }
 }
 
-export class ResponseDepthExceedException extends BaseException {
+export class ResponseDepthExceedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.REVIEW_DEPTH_EXCEED,

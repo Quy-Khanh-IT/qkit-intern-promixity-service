@@ -14,6 +14,7 @@ import { RequestModule } from './modules/request/request.module';
 import { UploadFileModule } from './modules/upload-file/upload-file.module';
 import { UserModule } from './modules/user/user.module';
 
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AddressModule } from './modules/address/address.module';
 import { DistrictModule } from './modules/address/district.module';
 import { ProvinceModule } from './modules/address/province.module';
@@ -52,6 +53,12 @@ import { SeedService } from './seeds/seed.service';
     StatisticsModule,
     NotificationModule,
     EventEmitterModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [

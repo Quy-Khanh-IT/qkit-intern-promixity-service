@@ -1,7 +1,7 @@
 import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { BaseBusinessException } from './base/base-message.exception';
 
-export class FileExceedException extends BaseException {
+export class FileExceedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.UPLOAD_FILE_SIZE_EXCEEDED,
@@ -11,7 +11,7 @@ export class FileExceedException extends BaseException {
   }
 }
 
-export class FileTypeException extends BaseException {
+export class FileTypeException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.UPLOAD_FILE_TYPE_INVALID,

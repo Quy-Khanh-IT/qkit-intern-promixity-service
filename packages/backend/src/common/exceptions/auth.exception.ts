@@ -1,7 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
-import { BaseException } from './base/base-message.exception';
-export class EmailExistedException extends BaseException {
+import { BaseBusinessException } from './base/base-message.exception';
+export class EmailExistedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_EMAIL_EXISTED,
@@ -11,7 +11,17 @@ export class EmailExistedException extends BaseException {
   }
 }
 
-export class PhoneExistedException extends BaseException {
+export class InvalidRefreshTokenException extends BaseBusinessException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.AUTH_INVALID_REFRESH_TOKEN,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.AUTH_INVALID_REFRESH_TOKEN],
+      401,
+    );
+  }
+}
+
+export class PhoneExistedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_PHONE_EXISTED,
@@ -34,7 +44,7 @@ export class UnVerifiedUser extends HttpException {
   }
 }
 
-export class EmailNotExistedException extends BaseException {
+export class EmailNotExistedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,
@@ -44,7 +54,7 @@ export class EmailNotExistedException extends BaseException {
   }
 }
 
-export class WrongCredentialsException extends BaseException {
+export class WrongCredentialsException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_WRONG_CREDENTIALS,
@@ -54,7 +64,7 @@ export class WrongCredentialsException extends BaseException {
   }
 }
 
-export class ContentNotMatchException extends BaseException {
+export class ContentNotMatchException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_CONTENT_NOT_MATCH,
@@ -64,7 +74,7 @@ export class ContentNotMatchException extends BaseException {
   }
 }
 
-export class UnauthorizedException extends BaseException {
+export class UnauthorizedException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_UNAUTHORIZED_EXCEPTION,
@@ -74,7 +84,7 @@ export class UnauthorizedException extends BaseException {
   }
 }
 
-export class TokenExpiredException extends BaseException {
+export class TokenExpiredException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_TOKEN_EXPIRED,
@@ -84,7 +94,7 @@ export class TokenExpiredException extends BaseException {
   }
 }
 
-export class InvalidTokenException extends BaseException {
+export class InvalidTokenException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_INVALID_TOKEN,
@@ -94,7 +104,7 @@ export class InvalidTokenException extends BaseException {
   }
 }
 
-export class PasswordNotMatchException extends BaseException {
+export class PasswordNotMatchException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_PASSWORD_NOT_MATCH,
@@ -104,7 +114,7 @@ export class PasswordNotMatchException extends BaseException {
   }
 }
 
-export class TokenResetExceededLimitException extends BaseException {
+export class TokenResetExceededLimitException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_TOKEN_RESET_EXEEDED_LIMIT,
@@ -114,7 +124,7 @@ export class TokenResetExceededLimitException extends BaseException {
   }
 }
 
-export class OTPNotMatchException extends BaseException {
+export class OTPNotMatchException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.AUTH_OTP_NOT_MATCH,

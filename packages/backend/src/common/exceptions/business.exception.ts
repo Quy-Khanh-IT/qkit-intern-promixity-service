@@ -1,7 +1,7 @@
-import { ERRORS_DICTIONARY, ERROR_MESSAGES, ERROR_CODES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
+import { BaseBusinessException } from './base/base-message.exception';
 
-export class BusinessNotFoundException extends BaseException {
+export class BusinessNotFoundException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.BUSINESS_NOT_FOUND,
@@ -11,7 +11,7 @@ export class BusinessNotFoundException extends BaseException {
   }
 }
 
-export class BusinessUnauthorizedException extends BaseException {
+export class BusinessUnauthorizedException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.BUSINESS_UNAUTHORIZED;
     const errorMessage =
@@ -21,7 +21,7 @@ export class BusinessUnauthorizedException extends BaseException {
   }
 }
 
-export class BusinessStatusException extends BaseException {
+export class BusinessStatusException extends BaseBusinessException {
   constructor(message?: string) {
     const errorDictionary = ERRORS_DICTIONARY.BUSINESS_INVALID_STATUS_ACTION;
     const errorMessage =
@@ -32,7 +32,7 @@ export class BusinessStatusException extends BaseException {
   }
 }
 
-export class BusinessInvalidException extends BaseException {
+export class BusinessInvalidException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.BUSINESS_FORBIDDEN,
@@ -42,7 +42,7 @@ export class BusinessInvalidException extends BaseException {
   }
 }
 
-export class BusinessInvalidAddressException extends BaseException {
+export class BusinessInvalidAddressException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.BUSINESS_INVALID_ADDRESS,
@@ -52,7 +52,7 @@ export class BusinessInvalidAddressException extends BaseException {
   }
 }
 
-export class BusinessNotBelongException extends BaseException {
+export class BusinessNotBelongException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.BUSINESS_NOT_BELONG,

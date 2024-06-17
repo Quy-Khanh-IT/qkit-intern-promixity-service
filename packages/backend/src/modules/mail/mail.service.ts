@@ -27,6 +27,14 @@ export class MailService {
     });
   }
 
+  async sendDeletedUserMail(email: string) {
+    this.mailerService.sendMail({
+      to: email,
+      subject: 'Check your account on Proximity Service now!',
+      template: './deleted-user',
+    });
+  }
+
   async sendResetPasswordMail(
     email: string,
     subject: string,

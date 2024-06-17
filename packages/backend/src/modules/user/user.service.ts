@@ -33,11 +33,7 @@ import {
 } from 'src/common/exceptions/user.exception';
 import { PaginationHelper } from 'src/common/helper';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
-import {
-  hashString,
-  transStringToObjectId,
-  verifyHash,
-} from 'src/common/utils';
+import { hashString, verifyHash } from 'src/common/utils';
 import { PaginationResult } from 'src/cores/pagination/base/pagination-result.base';
 import TokenPayload from '../auth/key.payload';
 import { MailService } from '../mail/mail.service';
@@ -55,12 +51,9 @@ import { User } from './entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 
 import { BusinessService } from '../business/business.service';
-import { Business } from '../business/entities/business.entity';
 import { OtpService } from '../otp/otp.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetPublicProfileResponeDto } from './dto/get-public-profile.dto';
-import { FindAllUserBusinessQuery } from './dto/find-all-user-business.query.dto';
-import { DayOpenCloseTime } from '../business/dto/create-business.dto';
 
 @Injectable()
 export class UserService {
@@ -531,25 +524,26 @@ export class UserService {
 
   async processSoftDelete(adminId: string, deleteUserId: string) {
     const user = await this.userRepository.findOneById(deleteUserId);
-    if (user.role === UserRole.ADMIN) {
-      throw new UserConflictAdminException();
-    }
     if (!user) {
       throw new UserNotFoundException();
+    }
+    if (user.role === UserRole.ADMIN) {
+      throw new UserConflictAdminException();
     }
     if (adminId === deleteUserId) {
       throw new UserConflictAdminException();
     }
+    this.mailService.sendDeletedUserMail(user.email);
     return this.softDeleteById(deleteUserId);
   }
 
   async processHardDelete(adminId: string, deleteUserId: string) {
     const user = await this.findOneDeleteById(deleteUserId);
-    if (user.role === UserRole.ADMIN) {
-      throw new UserConflictAdminException();
-    }
     if (!user) {
       throw new UserNotFoundException(); //
+    }
+    if (user.role === UserRole.ADMIN) {
+      throw new UserConflictAdminException();
     }
     if (adminId === deleteUserId) {
       throw new UserConflictAdminException();

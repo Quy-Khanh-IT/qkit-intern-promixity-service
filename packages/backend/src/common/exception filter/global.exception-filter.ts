@@ -40,9 +40,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       statusCode: status,
       message,
-      errors: {
-        ...exception.response,
-      },
+      errors:
+        exception.response instanceof Object
+          ? { ...exception.response }
+          : exception.response,
       stack:
         this.config_service.get(ConfigKey.PROJECT_ENVIRONMENT) !== 'prod'
           ? exception.stack

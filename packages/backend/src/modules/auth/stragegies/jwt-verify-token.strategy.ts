@@ -9,7 +9,7 @@ import { UserService } from 'src/modules/user/user.service';
 import TokenPayload from '../key.payload';
 
 @Injectable()
-export class JwtVeiryEmailStrategy extends PassportStrategy(
+export class JwtVerifyEmailStrategy extends PassportStrategy(
   Strategy,
   'jwt-verify-email',
 ) {

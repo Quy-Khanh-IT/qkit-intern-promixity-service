@@ -31,6 +31,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.3.1",
+    "@nestjs/throttler": "^5.2.0",
     "@typegoose/auto-increment": "^4.4.0",
     "@types/hapi__joi": "^17.1.14",
     "@types/mongoose-delete": "^1.0.4",
