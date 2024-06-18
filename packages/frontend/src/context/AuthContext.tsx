@@ -11,17 +11,20 @@ import { RoleEnum } from '@/types/enum'
 import { ErrorResponse } from '@/types/error'
 import { IUserInformation } from '@/types/user'
 import { clearCookiesFromClient, setCookieFromClient } from '@/utils/cookies.util'
+import { getTimeUntilExpiry } from '@/utils/helpers.util'
 import Error from 'next/error'
 import { usePathname, useRouter } from 'next/navigation'
-import React, { createContext, useCallback, useEffect } from 'react'
+import React, { createContext, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
+const TIME_GET_REFRESH_TOKEN = 10 * 60 * 1000
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
 export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   const router = useRouter()
-  const [_accessToken, setAccessToken, removeAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
-  const [_refreshToken, setRefreshToken, removeRefreshToken] = useLocalStorage(StorageKey._REFRESH_TOKEN, '')
+  const [accessToken, setAccessToken, removeAccessToken] = useLocalStorage(StorageKey._ACCESS_TOKEN, '')
+  const [refreshToken, setRefreshToken, removeRefreshToken] = useLocalStorage(StorageKey._REFRESH_TOKEN, '')
+  const [expiredTime, setExpiredTime, removeExpiredTime] = useLocalStorage(StorageKey._EXPIRED_TIME, '')
   const [userInformation, setUserInformation, removeUserInformation] = useLocalStorage(
     StorageKey._USER,
     {} as IUserInformation
@@ -83,11 +86,58 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     }
   }
 
+  // const fetchRefreshToken = async (): Promise<void> => {
+  //   await refreshTokenAPI(refreshToken)
+  //     .unwrap()
+  //     .then((res) => {
+  //       setAccessToken(res.accessToken)
+  //       setRefreshToken(res.refreshToken)
+  //       setExpiredTime(res.expiredTime)
+  //       decodedToken.current = JWTManager.decodedToken(res.accessToken)
+  //     })
+  // }
+
   useEffect(() => {
     if (checkValidRoutes(presentPath) && userInformation) {
       fetchUserInformation(userInformation?.id)
     }
   }, [])
+
+  // useEffect(() => {
+  //   const checkTokenValid = (): void => {
+  //     const remainingTime = getTimeUntilExpiry(new Date(expiredTime).getTime())
+  //     if (accessToken) {
+  //       if (remainingTime > TIME_GET_REFRESH_TOKEN) {
+  //         setTimeout(fetchRefreshToken, remainingTime - TIME_GET_REFRESH_TOKEN)
+  //       } else {
+  //         resetSession()
+  //         router.push(ROUTE.ROOT)
+  //         toast.info(TOAST_MSG.SESSION_EXPIRED)
+  //       }
+  //     }
+  //     return remainingTime
+  //   }
+
+  //   const setTokenValidityCheck = (time: number): NodeJS.Timeout | null => {
+  //     if (time > 0) {
+  //       const timeoutId = setTimeout(() => {
+  //         const newRemainingTime = checkTokenValid()
+  //         setTokenValidityCheck(newRemainingTime)
+  //       }, time)
+  //       return timeoutId
+  //     }
+  //     return null
+  //   }
+
+  //   const initialRemainingTime = checkTokenValid()
+  //   const initialTimeoutId = setTokenValidityCheck(initialRemainingTime)
+
+  //   return () => {
+  //     if (initialTimeoutId) {
+  //       clearTimeout(initialTimeoutId)
+  //     }
+  //   }
+  // }, [accessToken, refreshToken])
 
   const onLogin = async (loginPayload: ILoginPayload, stopLoading: () => void): Promise<void> => {
     await login(loginPayload)
@@ -95,6 +145,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       .then((res) => {
         setAccessToken(res.accessToken)
         setRefreshToken(res.refreshToken)
+        setExpiredTime(res.expiredAt)
         setAuthSession(true)
         setCookieFromClient(StorageKey._ACCESS_TOKEN, res.accessToken)
 
@@ -122,6 +173,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     removeAccessToken()
     removeRefreshToken()
     setAuthSession(false)
+    removeExpiredTime()
     removeUserInformation()
     removeUserId()
     removeRouteValue()

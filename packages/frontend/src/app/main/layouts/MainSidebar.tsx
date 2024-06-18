@@ -6,8 +6,9 @@ import { AreaChartOutlined, UserOutlined } from '@ant-design/icons'
 import { Flex, Menu, MenuProps, theme } from 'antd'
 import Sider from 'antd/es/layout/Sider'
 import React, { useEffect, useState } from 'react'
-import { ADMIN_SIDEBAR_OPTIONS, USER_SIDEBAR_OPTIONS } from '../admin.constant'
+import { ADMIN_SIDEBAR_OPTIONS, BUSINESS_SIDEBAR_OPTIONS, USER_SIDEBAR_OPTIONS } from '../admin.constant'
 import '../main.scss'
+import { SidebarOptionsRender } from '@/types/menu'
 
 interface IMainSidebarProps {
   userInformation: IUserInformation
@@ -24,41 +25,58 @@ const _MainSidebar: React.FC<IMainSidebarProps> = ({ userInformation, selectedMe
 
   useEffect(() => {
     if (userInformation) {
-      const items = [
-        ...(userInformation.role === (RoleEnum._ADMIN as string)
-          ? [
-              {
-                ...ADMIN_SIDEBAR_OPTIONS.DASHBOARD,
-                icon: <AreaChartOutlined />
-              },
-              {
-                ...ADMIN_SIDEBAR_OPTIONS.MANAGE_USER,
-                icon: <UserOutlined />
-              },
-              {
-                ...ADMIN_SIDEBAR_OPTIONS.MANAGE_BUSINESS,
-                icon: (
-                  <Flex style={{ width: 14, height: 16 }} justify='center'>
-                    <i className='fa-light fa-building'></i>
-                  </Flex>
-                )
-              }
-            ]
-          : [
-              {
-                ...USER_SIDEBAR_OPTIONS.USER_PROFILE,
-                icon: <UserOutlined />
-              },
-              {
-                ...USER_SIDEBAR_OPTIONS.MY_BUSINESS,
-                icon: (
-                  <Flex style={{ width: 14, height: 16 }} justify='center'>
-                    <i className='fa-light fa-building'></i>
-                  </Flex>
-                )
-              }
-            ])
-      ]
+      let items: SidebarOptionsRender[] = []
+
+      if (userInformation.role === (RoleEnum._ADMIN as string)) {
+        items = [
+          {
+            ...ADMIN_SIDEBAR_OPTIONS.DASHBOARD,
+            icon: <AreaChartOutlined />
+          },
+          {
+            ...ADMIN_SIDEBAR_OPTIONS.MANAGE_USER,
+            icon: <UserOutlined />
+          },
+          {
+            ...ADMIN_SIDEBAR_OPTIONS.MANAGE_BUSINESS,
+            icon: (
+              <Flex style={{ width: 14, height: 16 }} justify='center'>
+                <i className='fa-light fa-building'></i>
+              </Flex>
+            )
+          }
+        ]
+      } else if (userInformation.role === (RoleEnum._BUSINESS as string)) {
+        items = [
+          {
+            ...BUSINESS_SIDEBAR_OPTIONS.USER_PROFILE,
+            icon: <UserOutlined />
+          },
+          {
+            ...BUSINESS_SIDEBAR_OPTIONS.MY_BUSINESS,
+            icon: (
+              <Flex style={{ width: 14, height: 16 }} justify='center'>
+                <i className='fa-light fa-building'></i>
+              </Flex>
+            )
+          }
+        ]
+      } else {
+        items = [
+          {
+            ...USER_SIDEBAR_OPTIONS.USER_PROFILE,
+            icon: <UserOutlined />
+          },
+          {
+            ...USER_SIDEBAR_OPTIONS.MY_BUSINESS_CREATE,
+            icon: (
+              <Flex style={{ width: 14, height: 16 }} justify='center'>
+                <i className='fa-light fa-building'></i>
+              </Flex>
+            )
+          }
+        ]
+      }
       setMenuItems(items)
     }
   }, [userInformation])

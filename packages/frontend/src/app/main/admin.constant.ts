@@ -21,7 +21,7 @@ export const ADMIN_SIDEBAR_OPTIONS: SidebarOptions = {
   }
 }
 
-export const USER_SIDEBAR_OPTIONS: SidebarOptions = {
+export const BUSINESS_SIDEBAR_OPTIONS: SidebarOptions = {
   USER_PROFILE: {
     key: '1',
     label: 'My profile'
@@ -29,6 +29,17 @@ export const USER_SIDEBAR_OPTIONS: SidebarOptions = {
   MY_BUSINESS: {
     key: '2',
     label: 'My business'
+  }
+}
+
+export const USER_SIDEBAR_OPTIONS: SidebarOptions = {
+  USER_PROFILE: {
+    key: '1',
+    label: 'My profile'
+  },
+  MY_BUSINESS_CREATE: {
+    key: '2',
+    label: 'Create business'
   }
 }
 

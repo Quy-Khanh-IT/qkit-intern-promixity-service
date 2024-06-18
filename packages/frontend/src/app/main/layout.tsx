@@ -106,7 +106,6 @@ export default function RootLayout({
     dispatch(setSidebarTab())
     window.location.href = LOCAL_ENDPOINT + routeValueTemp
     setRouteValue(routeValueTemp)
-    console.log('da emit', routeValueTemp)
   }
 
   const overlayStyle: React.CSSProperties = {

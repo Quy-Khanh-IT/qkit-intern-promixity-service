@@ -36,6 +36,7 @@ export interface ILoginResponse {
   accessToken: string
   refreshToken: string
   userId: string
+  expiredAt: string
 }
 
 export interface ISignUpProps {

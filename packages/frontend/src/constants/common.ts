@@ -19,6 +19,8 @@ export const TOAST_MSG = {
   LOGIN_FAILED: 'Incorrect username or password',
   LOGIN_SUCCESS: 'Login successfully',
   LOGOUT_SUCCESS: 'Logout successfully',
+  SESSION_EXPIRED: 'Session expired. Please login again',
+
   UPDATE_PROFILE_SUCCESS: 'Update profile successfully',
   UPDATE_PASSWORD_SUCCESS: 'Update password successfully',
   UPLOAD_IMAGE_FAILED: 'Upload image failed',
