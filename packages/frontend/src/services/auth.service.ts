@@ -1,4 +1,4 @@
-import { baseQueryWithAuth, prepareHeadersForRefresh } from '@/constants/baseQuery'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
 import {
   IForgotPasswordPayload,
   ILoginPayload,

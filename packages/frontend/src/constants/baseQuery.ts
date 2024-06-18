@@ -21,7 +21,6 @@ export const baseQueryWithAuth = fetchBaseQuery({
     }
     return headers
   },
-  // credentials: 'include',
   validateStatus(response: Response) {
     const userRole = getFromLocalStorage(StorageKey._USER_ROLE) as string
     const checkProtectedRoute: boolean = checkValidRoutes(getPresentUrl())
@@ -45,12 +44,4 @@ function isSuccess(response: Response): boolean {
   return (
     response.status >= (HttpStatusCode.Ok as number) && response.status < (HttpStatusCode.MultipleChoices as number)
   )
-}
-
-export const prepareHeadersForRefresh = (refreshToken: string): Headers => {
-  const headers = new Headers()
-  if (refreshToken) {
-    headers.set('Authorization', `Bearer ${String(refreshToken)}`)
-  }
-  return headers
 }

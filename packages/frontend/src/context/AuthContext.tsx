@@ -17,7 +17,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import React, { createContext, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
-const TIME_GET_REFRESH_TOKEN = 120000 // 10 * 60 * 1000
+const TIME_GET_REFRESH_TOKEN = 10 * 60 * 1000
 const AuthContext = createContext<UserContextType>({} as UserContextType)
 
 export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
@@ -93,6 +93,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       .then((res) => {
         setAccessToken(res.accessToken)
         setRefreshToken(res.refreshToken)
+        setCookieFromClient(StorageKey._ACCESS_TOKEN, res.accessToken)
         setExpiredTime(res.expiredAt)
       })
   }
@@ -100,8 +101,6 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
   useEffect(() => {
     if (checkValidRoutes(presentPath) && userInformation) {
       fetchUserInformation(userInformation?.id)
-      console.log('da chay refresh trong useEffect')
-      fetchRefreshToken()
     }
   }, [])
 
@@ -109,9 +108,8 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
     const checkTokenValid = (): number => {
       const remainingTime = getTimeUntilExpiry(new Date(expiredTime).getTime())
       if (accessToken) {
-        console.log('remainingTime', remainingTime, remainingTime - TIME_GET_REFRESH_TOKEN)
         if (remainingTime > TIME_GET_REFRESH_TOKEN) {
-          setTimeout(fetchRefreshToken, remainingTime - TIME_GET_REFRESH_TOKEN)
+          setTimeout(fetchRefreshToken, 2000)
         } else {
           resetStorage()
           window.location.href = LOCAL_ENDPOINT + ROUTE.ROOT

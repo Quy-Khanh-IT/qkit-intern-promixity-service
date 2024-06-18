@@ -85,6 +85,7 @@ export const getTimeUntilExpiry = (expiryTime: number): number => {
   const currentDate = new Date()
   const currentServerTime = new Date(currentDate.getTime())
   const expiryDate = new Date(expiryTime)
+  console.log('currentServerTime', currentServerTime, expiryDate)
   if (currentServerTime <= expiryDate) {
     return Math.floor(expiryDate.getTime() - currentServerTime.getTime())
   } else {
