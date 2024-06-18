@@ -2,20 +2,26 @@ import { API_ENDPOINT, LOCAL_ENDPOINT, ROUTE, StorageKey } from '@/constants'
 import { checkValidRoutes } from '@/middleware/middleware.util'
 import { RoleEnum } from '@/types/enum'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
-import { fetchBaseQuery } from '@reduxjs/toolkit/query'
+import { BaseQueryApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
 import { HttpStatusCode } from 'axios'
 import { toast } from 'react-toastify'
 import { getPresentUrl } from '../utils/helpers.util'
 
 export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: API_ENDPOINT,
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, api: Pick<BaseQueryApi, 'getState' | 'extra' | 'endpoint' | 'type' | 'forced'>) => {
     const token = getFromLocalStorage(StorageKey._ACCESS_TOKEN)
-    if (token) {
-      headers.set('Authorization', `Bearer ${String(token)}`)
+    const refreshToken = getFromLocalStorage(StorageKey._REFRESH_TOKEN)
+    if (api.endpoint === 'refreshToken') {
+      headers.set('Authorization', `Bearer ${String(refreshToken)}`)
+    } else {
+      if (token) {
+        headers.set('Authorization', `Bearer ${String(token)}`)
+      }
     }
     return headers
   },
+  // credentials: 'include',
   validateStatus(response: Response) {
     const userRole = getFromLocalStorage(StorageKey._USER_ROLE) as string
     const checkProtectedRoute: boolean = checkValidRoutes(getPresentUrl())
@@ -39,4 +45,12 @@ function isSuccess(response: Response): boolean {
   return (
     response.status >= (HttpStatusCode.Ok as number) && response.status < (HttpStatusCode.MultipleChoices as number)
   )
+}
+
+export const prepareHeadersForRefresh = (refreshToken: string): Headers => {
+  const headers = new Headers()
+  if (refreshToken) {
+    headers.set('Authorization', `Bearer ${String(refreshToken)}`)
+  }
+  return headers
 }

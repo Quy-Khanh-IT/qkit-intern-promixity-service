@@ -1,4 +1,4 @@
-import { baseQueryWithAuth } from '@/constants/baseQuery'
+import { baseQueryWithAuth, prepareHeadersForRefresh } from '@/constants/baseQuery'
 import {
   IForgotPasswordPayload,
   ILoginPayload,
@@ -44,6 +44,15 @@ export const authApi = createApi({
         }
       })
     }),
+    refreshToken: builder.mutation<ILoginResponse, string>({
+      query: (refreshToken) => ({
+        url: '/auth/refreshToken',
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${refreshToken}`
+        }
+      })
+    }),
     resetPassword: builder.mutation<void, IResetPasswordPayload>({
       query: (body) => ({
         url: '/auth/reset-password',
@@ -68,6 +77,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useVerifyEmailMutation,
+  useRefreshTokenMutation,
   useResetPasswordMutation,
   useForgotPasswordMutation
 } = authApi
