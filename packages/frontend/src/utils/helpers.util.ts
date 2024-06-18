@@ -81,49 +81,13 @@ export const parseSearchParamsToObject = (searchParams: string): qs.ParsedQs => 
   return qs.parse(searchParams, { ignoreQueryPrefix: true })
 }
 
-// export const encodeUrIValues = <T extends Record<string, any>>(obj: T): T => {
-//   const encodedObj = {} as T;
-
-//   for (const key in obj) {
-//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-//       const value = obj[key];
-//       if (Array.isArray(value)) {
-//         encodedObj[key] = value.map(v => encodeURIComponent(String(v))) as T[typeof key];
-//       } else {
-//         encodedObj[key] = encodeURIComponent(String(value)) as T[typeof key];
-//       }
-//     }
-//   }
-
-//   return encodedObj;
-// };
-
-// export const encodeUrIValues = <T>(obj: T): T => {
-//   const encodedObj: Partial<T> = {}
-//   for (const key in obj) {
-//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-//       const value = obj[key]
-//       if (Array.isArray(value)) {
-//         encodedObj[key] = value.map((v: string | number | boolean) => encodeURIComponent(String(v))) as T[typeof key]
-//       } else {
-//         encodedObj[key] = encodeURIComponent(String(value)) as T[typeof key]
-//       }
-//     }
-//   }
-//   return encodedObj as T
-// }
-
-// export const encodeUrIValues = <T>(obj: T): T => {
-//   const encodedObj: Partial<T> = {}
-//   for (const key in obj) {
-//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-//       const value = obj[key]
-//       if (Array.isArray(value)) {
-//         encodedObj[key] = value.map((v: string | number | boolean) => encodeURIComponent(String(v))) as T[typeof key]
-//       } else {
-//         encodedObj[key] = encodeURIComponent(String(value)) as T[typeof key]
-//       }
-//     }
-//   }
-//   return encodedObj as T
-// }
+export const getTimeUntilExpiry = (expiryTime: number): number => {
+  const currentDate = new Date()
+  const currentServerTime = new Date(currentDate.getTime())
+  const expiryDate = new Date(expiryTime)
+  if (currentServerTime <= expiryDate) {
+    return Math.floor(expiryDate.getTime() - currentServerTime.getTime())
+  } else {
+    return 0
+  }
+}

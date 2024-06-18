@@ -4,6 +4,7 @@ export enum StorageKey {
   _USER_ROLE = 'USER_ROLE',
   _ACCESS_TOKEN = 'ACCESS_TOKEN',
   _REFRESH_TOKEN = 'REFRESH_TOKEN',
+  _EXPIRED_TIME = 'EXPIRED_TIME',
   _AUTHENTICATED = 'authenticated',
   _ROUTE_VALUE = 'ROUTE_VALUE'
 }

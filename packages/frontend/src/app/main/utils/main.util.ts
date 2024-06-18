@@ -1,7 +1,7 @@
 import { ROUTE } from '@/constants'
 import { ColorConstant } from '@/types/common'
 import { RoleEnum, StatusEnum } from '@/types/enum'
-import { ADMIN_SIDEBAR_OPTIONS, USER_SIDEBAR_OPTIONS } from '../admin.constant'
+import { ADMIN_SIDEBAR_OPTIONS, BUSINESS_SIDEBAR_OPTIONS, USER_SIDEBAR_OPTIONS } from '../admin.constant'
 import { SidebarOption, SidebarOptions } from '@/types/menu'
 
 export const generateRoleColor = (role: string): string => {
@@ -51,7 +51,7 @@ export const findKeyMenuBasedRoute = (role: string, routeValue: string): string 
   const findKey = (options: SidebarOptions): string | undefined => {
     const foundOption = Object.entries(options).find(([routeAlias, _objectValue]: [string, SidebarOption]) => {
       const routeTemp: string = ROUTE[routeAlias as keyof typeof ROUTE]
-      return routeTemp === routeValue
+      return routeTemp.includes(routeValue)
     })
     return foundOption ? foundOption[1].key : undefined
   }
@@ -59,7 +59,10 @@ export const findKeyMenuBasedRoute = (role: string, routeValue: string): string 
   if (role === (RoleEnum._ADMIN as string)) {
     const adminKey = findKey(ADMIN_SIDEBAR_OPTIONS)
     if (adminKey) key = adminKey
-  } else if (role === (RoleEnum._USER as string) || role === (RoleEnum._BUSINESS as string)) {
+  } else if (role === (RoleEnum._BUSINESS as string)) {
+    const userKey = findKey(BUSINESS_SIDEBAR_OPTIONS)
+    if (userKey) key = userKey
+  } else if (role === (RoleEnum._USER as string)) {
     const userKey = findKey(USER_SIDEBAR_OPTIONS)
     if (userKey) key = userKey
   }
@@ -80,18 +83,12 @@ export const findRouteMenuBasedKey = (role: string, key: string): string => {
   if (role === (RoleEnum._ADMIN as string)) {
     const adminRoute = findRoute(ADMIN_SIDEBAR_OPTIONS)
     if (adminRoute) routeValue = adminRoute
+  } else if (role === (RoleEnum._BUSINESS as string)) {
+    const businessRoute = findRoute(BUSINESS_SIDEBAR_OPTIONS)
+    if (businessRoute) routeValue = businessRoute
   } else if (role === (RoleEnum._USER as string)) {
     const userRoute = findRoute(USER_SIDEBAR_OPTIONS)
-    if (userRoute) {
-      if (userRoute === ROUTE.MY_BUSINESS) {
-        routeValue = ROUTE.MY_BUSINESS_CREATE
-      } else {
-        routeValue = userRoute
-      }
-    }
-  } else if (role === (RoleEnum._BUSINESS as string)) {
-    const businessRoute = findRoute(USER_SIDEBAR_OPTIONS)
-    if (businessRoute) routeValue = businessRoute
+    if (userRoute) routeValue = userRoute
   }
 
   return routeValue
