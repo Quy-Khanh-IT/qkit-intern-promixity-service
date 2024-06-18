@@ -105,7 +105,8 @@ export default function CreateBusiness(): React.ReactNode {
 
       setStepList(currentStepList)
       setCurrentStep(nextStep)
-      if (nextStep === 6) {
+
+      if (currentStep + 1 === 6) {
         const payload: ICreateBusiness = { ...data }
         payload.province = getProvinceName(data.province)
         payload.district = getDistrictName(data.district)
