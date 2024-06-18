@@ -175,14 +175,14 @@ export default function CreateBusiness(): React.ReactNode {
   }
   return (
     <div className='h-100 w-100 create-business-container'>
-      <div className=' mt-3 process-bar-container'>
+      <div className=' mt-2 process-bar-container'>
         <div className='create-business-title d-flex justify-content-center mb-2'>
           <h2>Create Business</h2>
         </div>
         <Steps progressDot current={currentStep} size='small' items={stepList} />
         {currentStep > 0 ? (
           <Button onClick={() => handleOnChangeStep('back')} className='ms-5 mt-5'>
-            Back <i className='fa-solid fa-chevron-left ms-2'></i>
+            Back <i className='fa-solid fa-chevron-left ms-1'></i>
           </Button>
         ) : (
           ''
