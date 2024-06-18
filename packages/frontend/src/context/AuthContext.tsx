@@ -109,7 +109,7 @@ export const AuthProvider = ({ children }: ChildProps): React.ReactNode => {
       const remainingTime = getTimeUntilExpiry(new Date(expiredTime).getTime())
       if (accessToken) {
         if (remainingTime > TIME_GET_REFRESH_TOKEN) {
-          setTimeout(fetchRefreshToken, 2000)
+          setTimeout(fetchRefreshToken, remainingTime - TIME_GET_REFRESH_TOKEN)
         } else {
           resetStorage()
           window.location.href = LOCAL_ENDPOINT + ROUTE.ROOT
