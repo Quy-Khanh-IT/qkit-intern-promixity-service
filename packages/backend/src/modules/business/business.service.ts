@@ -97,7 +97,7 @@ export class BusinessService {
     }
 
     if (query.address) {
-      matchStage['fullAddress'] = { $regex: query.address, $options: 'i' };
+      matchStage['addressLine'] = { $regex: query.address, $options: 'i' };
     }
 
     if (query.status && query.status.length > 0) {
