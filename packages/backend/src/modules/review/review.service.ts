@@ -129,20 +129,6 @@ export class ReviewService {
     let sortStage: Record<string, any> = {};
     const finalPipeline: PipelineStage[] = [];
 
-    if (query.starsRating && query.starsRating.length > 0) {
-      let arr = [];
-
-      if (!Array.isArray(query.starsRating)) {
-        arr.push(query.starsRating);
-      } else {
-        arr = query.starsRating;
-      }
-
-      matchStage['star'] = {
-        $in: arr,
-      };
-    }
-
     if (query.businessId) {
       matchStage['businessId'] = transStringToObjectId(query.businessId);
     }
@@ -157,9 +143,11 @@ export class ReviewService {
       }
 
       matchStage['star'] = {
-        $in: arr,
+        $in: arr.map((star) => parseInt(star)),
       };
     }
+
+    console.log('matchStage', matchStage);
 
     const result = PaginationHelper.configureBaseQueryFilter(
       matchStage,
