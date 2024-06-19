@@ -4,6 +4,7 @@
   color: black;
   font-size: 14px;
   border-bottom: 1px solid $gray-border;
+  cursor: pointer;
 
   &:hover {
     background-color: $gray-hover !important;
