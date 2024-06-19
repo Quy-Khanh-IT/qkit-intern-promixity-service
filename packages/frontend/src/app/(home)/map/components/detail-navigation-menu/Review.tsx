@@ -22,7 +22,7 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
           <div className='rating-detail-wrapper d-flex flex-column align-items-center justify-content-center'>
             <div className='rating-detail'>{business.overallRating.toFixed(1)}</div>
             <div className='business-rating d-flex flex-column align-items-center mb-1'>
-              <div className='rating-star '>
+              <div className='rating-star d-flex align-items-center'>
                 {Array.from({ length: fullStars }, (_, index) => (
                   <i key={`full-${index}`} className='fa-solid fa-star star-fill'></i>
                 ))}
