@@ -3,7 +3,7 @@ import { Button, Steps } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 import './create-business.scss'
 
-import { ICreateBusiness } from '@/types/business'
+import { ICreateBusiness, IDayOfWeek } from '@/types/business'
 
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 
@@ -40,6 +40,16 @@ export default function CreateBusiness(): React.ReactNode {
     location: {
       coordinates: [0, 0]
     }
+  })
+
+  const [openTimes, setOpenTimes] = useState<{ [key: string]: { isOpen: boolean; open: string; close: string } }>({
+    Monday: { isOpen: false, open: '', close: '' },
+    Tuesday: { isOpen: false, open: '', close: '' },
+    Wednesday: { isOpen: false, open: '', close: '' },
+    Thursday: { isOpen: false, open: '', close: '' },
+    Friday: { isOpen: false, open: '', close: '' },
+    Saturday: { isOpen: false, open: '', close: '' },
+    Sunday: { isOpen: false, open: '', close: '' }
   })
 
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
@@ -110,6 +120,7 @@ export default function CreateBusiness(): React.ReactNode {
         const payload: ICreateBusiness = { ...data }
         payload.province = getProvinceName(data.province)
         payload.district = getDistrictName(data.district)
+        payload.dayOfWeek = convertOpenTimesToDayOfWeek(openTimes)
 
         createBusiness(payload)
       }
@@ -173,6 +184,24 @@ export default function CreateBusiness(): React.ReactNode {
     }
     return ''
   }
+
+  const convertOpenTimesToDayOfWeek = (openTimes: {
+    [key: string]: { isOpen: boolean; open: string; close: string }
+  }): IDayOfWeek[] => {
+    const dayOfWeek: IDayOfWeek[] = []
+
+    for (const [day, times] of Object.entries(openTimes)) {
+      if (times.isOpen) {
+        dayOfWeek.push({
+          day: day.toLowerCase(),
+          openTime: times.open,
+          closeTime: times.close
+        })
+      }
+    }
+
+    return dayOfWeek
+  }
   return (
     <div className='h-100 w-100 create-business-container'>
       <div className=' mt-2 process-bar-container'>
@@ -204,7 +233,7 @@ export default function CreateBusiness(): React.ReactNode {
             listService={getServiceResponse && getServiceResponse.items.length > 0 ? getServiceResponse.items : []}
           />
         ) : currentStep === 3 ? (
-          <OpenTimeForm handleOnChangeData={handleOnChangeData} data={data} handleOnChangeStep={handleOnChangeStep} />
+          <OpenTimeForm openTimes={openTimes} setOpenTimes={setOpenTimes} handleOnChangeStep={handleOnChangeStep} />
         ) : currentStep === 4 ? (
           <AddressForm
             listProvince={getProvinceResponse && getProvinceResponse.items.length > 0 ? getProvinceResponse.items : []}

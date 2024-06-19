@@ -1,53 +1,27 @@
 'use client'
 import React, { useState } from 'react'
 import { Button, Switch } from 'antd'
-import { ICreateBusiness } from '@/types/business'
 import './open-time-form.scss'
 
 export default function OpenTimeForm({
   handleOnChangeStep,
-  data,
-  handleOnChangeData
+
+  openTimes,
+  setOpenTimes
 }: {
+  openTimes: { [key: string]: { isOpen: boolean; open: string; close: string } }
+  setOpenTimes: React.Dispatch<
+    React.SetStateAction<{ [key: string]: { isOpen: boolean; open: string; close: string } }>
+  >
   handleOnChangeStep: (type: string) => void
-  data: ICreateBusiness
-  handleOnChangeData: (type: string, value: string | number | boolean | string[] | number[] | boolean[]) => void
 }): React.ReactNode {
-  const [daysOpen, setDaysOpen] = useState<{
-    Monday: boolean
-    Tuesday: boolean
-    Wednesday: boolean
-    Thursday: boolean
-    Friday: boolean
-    Saturday: boolean
-    Sunday: boolean
-  }>({
-    Monday: false,
-    Tuesday: false,
-    Wednesday: false,
-    Thursday: false,
-    Friday: false,
-    Saturday: false,
-    Sunday: false
-  })
-
-  const [openTimes, setOpenTimes] = useState<{ [key: string]: { open: string; close: string } }>({
-    Monday: { open: '', close: '' },
-    Tuesday: { open: '', close: '' },
-    Wednesday: { open: '', close: '' },
-    Thursday: { open: '', close: '' },
-    Friday: { open: '', close: '' },
-    Saturday: { open: '', close: '' },
-    Sunday: { open: '', close: '' }
-  })
-
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
   const handleDayChange = (day: string, checked: boolean): void => {
-    setDaysOpen((prevDaysOpen) => ({
-      ...prevDaysOpen,
-      [day]: checked
+    setOpenTimes((prevOpenTimes) => ({
+      ...prevOpenTimes,
+      [day]: { ...prevOpenTimes[day], isOpen: checked }
     }))
   }
 
@@ -65,7 +39,7 @@ export default function OpenTimeForm({
     const newErrors: { [key: string]: string } = {}
 
     daysOfWeek.forEach((day) => {
-      if (daysOpen[day as keyof typeof daysOpen]) {
+      if (openTimes[day].isOpen) {
         const openTime = openTimes[day].open
         const closeTime = openTimes[day].close
 
@@ -117,13 +91,13 @@ export default function OpenTimeForm({
                   <div className='d-flex align-items-center justify-content-between time-status'>
                     <Switch
                       size='small'
-                      checked={daysOpen[day as keyof typeof daysOpen]}
+                      checked={openTimes[day].isOpen}
                       onChange={(checked) => handleDayChange(day, checked)}
                     />
-                    <div className='ms-2'>{daysOpen[day as keyof typeof daysOpen] ? 'Open' : 'Closed'}</div>
+                    <div className='ms-2'>{openTimes[day].isOpen ? 'Open' : 'Closed'}</div>
                   </div>
                 </div>
-                {daysOpen[day as keyof typeof daysOpen] ? (
+                {openTimes[day].isOpen ? (
                   <div className='mt-1'>
                     <input
                       className='hour-input'
