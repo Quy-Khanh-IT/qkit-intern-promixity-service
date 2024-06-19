@@ -206,8 +206,13 @@ function MapPage(): React.ReactNode {
       key: '2',
       label: <span className='p-2'>My business</span>,
       onClick: (): void => {
-        setRouteValue(ROUTE.MY_BUSINESS)
-        router.push(ROUTE.MY_BUSINESS)
+        if (userInformation?.role === (RoleEnum._BUSINESS as string)) {
+          setRouteValue(ROUTE.MY_BUSINESS)
+          router.push(ROUTE.MY_BUSINESS)
+        } else {
+          setRouteValue(ROUTE.MY_BUSINESS_CREATE)
+          router.push(ROUTE.MY_BUSINESS_CREATE)
+        }
       }
     },
     {
@@ -221,7 +226,9 @@ function MapPage(): React.ReactNode {
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>
         <div className='demo-logo'>
-          <Image src='/logo_light.png' preview={false} height={40} alt='logo' />
+          <Link href={ROUTE.MAP}>
+            <Image src='/logo_light.png' preview={false} height={40} alt='logo' />
+          </Link>
         </div>
         <div className='search-wrapper d-flex justify-content-center align-items-center'>
           <Search

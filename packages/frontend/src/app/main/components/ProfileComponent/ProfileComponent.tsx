@@ -17,7 +17,6 @@ import { EditOutlined } from '@ant-design/icons'
 import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { UploadChangeParam } from 'antd/es/upload'
 import { RcFile, UploadProps } from 'antd/lib/upload'
-import { IUpdateImageResponse } from '../../../../types/user'
 
 interface SubmitButtonProps extends ProfileProps {
   form: FormInstance

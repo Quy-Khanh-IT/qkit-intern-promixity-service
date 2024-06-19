@@ -9,7 +9,7 @@ import { getPresentUrl } from '@/utils/helpers.util'
 import { Col, Grid, MenuProps, Row, theme } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 import { useAnimationControls } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import MainHeader from './layouts/MainHeader'
@@ -32,6 +32,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>): React.ReactNode {
+  const router = useRouter()
   const currentPathName = usePathname()
   const { userInformation } = useAuth()
   const [collapsed, setCollapsed] = useState<boolean>(false)
@@ -103,10 +104,9 @@ export default function RootLayout({
   const onMenuClick: MenuProps['onClick'] = (e) => {
     const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
-    dispatch(setSidebarTab())
     window.location.href = LOCAL_ENDPOINT + routeValueTemp
     setRouteValue(routeValueTemp)
-    console.log('da emit', routeValueTemp)
+    dispatch(setSidebarTab())
   }
 
   const overlayStyle: React.CSSProperties = {
