@@ -3,7 +3,7 @@ import { Button, Steps } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 import './create-business.scss'
 
-import { ICreateBusiness } from '@/types/business'
+import { ICreateBusiness, IDayOfWeek } from '@/types/business'
 
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
 
@@ -19,6 +19,7 @@ import { ToastService } from '@/services/toast.service'
 import { ErrorResponse } from '@/types/error'
 import { useRouter } from 'next/navigation'
 import { ROUTE } from '@/constants'
+import OpenTimeForm from './components/OpenTimeForm'
 
 export default function CreateBusiness(): React.ReactNode {
   const [currentStep, setCurrentStep] = useState<number>(0)
@@ -39,6 +40,16 @@ export default function CreateBusiness(): React.ReactNode {
     location: {
       coordinates: [0, 0]
     }
+  })
+
+  const [openTimes, setOpenTimes] = useState<{ [key: string]: { isOpen: boolean; open: string; close: string } }>({
+    Monday: { isOpen: false, open: '', close: '' },
+    Tuesday: { isOpen: false, open: '', close: '' },
+    Wednesday: { isOpen: false, open: '', close: '' },
+    Thursday: { isOpen: false, open: '', close: '' },
+    Friday: { isOpen: false, open: '', close: '' },
+    Saturday: { isOpen: false, open: '', close: '' },
+    Sunday: { isOpen: false, open: '', close: '' }
   })
 
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
@@ -104,10 +115,12 @@ export default function CreateBusiness(): React.ReactNode {
 
       setStepList(currentStepList)
       setCurrentStep(nextStep)
-      if (nextStep === 5) {
+
+      if (currentStep + 1 === 6) {
         const payload: ICreateBusiness = { ...data }
         payload.province = getProvinceName(data.province)
         payload.district = getDistrictName(data.district)
+        payload.dayOfWeek = convertOpenTimesToDayOfWeek(openTimes)
 
         createBusiness(payload)
       }
@@ -172,17 +185,33 @@ export default function CreateBusiness(): React.ReactNode {
     return ''
   }
 
-  console.log('data bth', data)
+  const convertOpenTimesToDayOfWeek = (openTimes: {
+    [key: string]: { isOpen: boolean; open: string; close: string }
+  }): IDayOfWeek[] => {
+    const dayOfWeek: IDayOfWeek[] = []
+
+    for (const [day, times] of Object.entries(openTimes)) {
+      if (times.isOpen) {
+        dayOfWeek.push({
+          day: day.toLowerCase(),
+          openTime: times.open,
+          closeTime: times.close
+        })
+      }
+    }
+
+    return dayOfWeek
+  }
   return (
     <div className='h-100 w-100 create-business-container'>
-      <div className=' mt-3 process-bar-container'>
+      <div className=' mt-2 process-bar-container'>
         <div className='create-business-title d-flex justify-content-center mb-2'>
           <h2>Create Business</h2>
         </div>
         <Steps progressDot current={currentStep} size='small' items={stepList} />
         {currentStep > 0 ? (
           <Button onClick={() => handleOnChangeStep('back')} className='ms-5 mt-5'>
-            Back <i className='fa-solid fa-chevron-left ms-2'></i>
+            Back <i className='fa-solid fa-chevron-left ms-1'></i>
           </Button>
         ) : (
           ''
@@ -204,6 +233,8 @@ export default function CreateBusiness(): React.ReactNode {
             listService={getServiceResponse && getServiceResponse.items.length > 0 ? getServiceResponse.items : []}
           />
         ) : currentStep === 3 ? (
+          <OpenTimeForm openTimes={openTimes} setOpenTimes={setOpenTimes} handleOnChangeStep={handleOnChangeStep} />
+        ) : currentStep === 4 ? (
           <AddressForm
             listProvince={getProvinceResponse && getProvinceResponse.items.length > 0 ? getProvinceResponse.items : []}
             listDistrict={getDistrictResponse && getDistrictResponse.items.length > 0 ? getDistrictResponse.items : []}
@@ -211,7 +242,7 @@ export default function CreateBusiness(): React.ReactNode {
             data={data}
             handleOnChangeStep={handleOnChangeStep}
           />
-        ) : currentStep === 4 ? (
+        ) : currentStep === 5 ? (
           <AddressLineForm
             handleOnChangeData={handleOnChangeData}
             data={data}

@@ -1,12 +1,13 @@
 'use client'
 import { Button, Input, List, Typography } from 'antd'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import './address-line-form.scss'
 import { ICreateBusiness } from '@/types/business'
 import { IAddressLinePayload } from '@/types/address'
 import AddressLineMap from './address-line-map'
 import { useGetAddressLineQuery } from '@/services/address-line.service'
 import { SearchProps } from 'antd/es/input'
+import { ToastService } from '@/services/toast.service'
 
 export default function AddressLineForm({
   handleOnChangeStep,
@@ -32,6 +33,7 @@ export default function AddressLineForm({
     format: 'jsonv2'
   }
 
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
   const [isSearch, setIsSearch] = useState<boolean>(false)
   const [searchPosition, setSearchPosition] = useState<[number, number]>([10.878599, 106.807282])
 
@@ -43,15 +45,20 @@ export default function AddressLineForm({
   } = useGetAddressLineQuery(addressLinePayload, { skip: !isSearch })
 
   const onSearch: SearchProps['onSearch'] = () => {
+    console.log('onSearch')
     setIsSearch(true)
   }
 
   useEffect(() => {
-    setIsSearch(false)
     if (getAddressLineResponse) {
-      setSearchPosition([parseFloat(getAddressLineResponse[0].lat), parseFloat(getAddressLineResponse[0].lon)])
-      handleOnChangeData('addressLine', getAddressLineResponse[0].address.road)
+      try {
+        setSearchPosition([parseFloat(getAddressLineResponse[0].lat), parseFloat(getAddressLineResponse[0].lon)])
+        handleOnChangeData('addressLine', getAddressLineResponse[0].address.road)
+      } catch (error) {
+        toastService.error("This address doesn't exist! Please try another address.")
+      }
     }
+    setIsSearch(false)
   }, [isGetAddressLineSuccess, isGetAddressLineError])
 
   return (
@@ -101,7 +108,7 @@ export default function AddressLineForm({
             className='mt-4 btn-continue '
             type='primary'
           >
-            Continue
+            Finish
           </Button>
         </div>
         <div className='content-right w-50  d-flex justify-content-center  container'>
