@@ -2,6 +2,7 @@ import React from 'react'
 import './review.scss'
 import StarProgressBar from './components/StarProgressBar'
 import { IBusiness } from '@/types/business'
+import ReviewList from './components/ReviewList'
 
 export default function Review({ business }: { business: IBusiness }): React.ReactNode {
   const rating = business.overallRating
@@ -14,7 +15,7 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
   console.log(business)
   return (
     <div className='review-wrapper'>
-      <div className='container '>
+      <div className='container review-container pb-2'>
         <div className='mt-4 d-flex'>
           <div className='star-progress-bar-wrapper'>
             <StarProgressBar stars={business.stars} />
@@ -35,6 +36,16 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
             </div>
           </div>
         </div>
+        <div className='p-3 d-flex align-items-center justify-content-center'>
+          <div className='send-review-btn p-1 d-flex align-items-center justify-content-center'>
+            <i className='fa-regular fa-comment-dots me-2'></i>
+            Write a review
+          </div>
+        </div>
+      </div>
+
+      <div className='review-list-container p-3'>
+        <ReviewList />
       </div>
     </div>
   )
