@@ -98,14 +98,12 @@ export class ReviewService {
           const reviewId = reps.data[i].review_id;
           const id = reps.data[i].id;
 
-          const reply = await this.getComments({
+          const replies = await this.getComments({
             reviewId: reviewId,
             parentCommentId: id,
           } as CommentQuery);
 
-          reps.data[i].replies = {
-            ...reply,
-          };
+          reps.data[i].replies = [...replies];
         }
       }
 
@@ -147,8 +145,6 @@ export class ReviewService {
       };
     }
 
-    console.log('matchStage', matchStage);
-
     const result = PaginationHelper.configureBaseQueryFilter(
       matchStage,
       sortStage,
@@ -179,20 +175,6 @@ export class ReviewService {
     if (query.content) {
       matchStage['content'] = { $regex: query.content, $options: 'i' };
     }
-
-    // if (query.type) {
-    //   let arr = [];
-
-    //   if (!Array.isArray(query.type)) {
-    //     arr.push(query.type);
-    //   } else {
-    //     arr = query.type;
-    //   }
-
-    //   matchStage['type'] = {
-    //     $in: arr,
-    //   };
-    // }
 
     if (query.starsRating && query.starsRating.length > 0) {
       let arr = [];
@@ -376,7 +358,7 @@ export class ReviewService {
     return reply;
   }
 
-  async getComments(query: CommentQuery): Promise<Comment> {
+  async getComments(query: CommentQuery): Promise<Comment[]> {
     const reviewId = query.reviewId;
 
     const review = await this.reviewRepository.findOneById(reviewId);
@@ -390,7 +372,7 @@ export class ReviewService {
       query.parentCommentId,
     );
 
-    return this.buildNestedComments(comments)[0];
+    return this.buildNestedComments(comments);
   }
 
   buildNestedComments(comments: Array<Comment>) {
