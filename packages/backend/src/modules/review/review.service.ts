@@ -91,11 +91,7 @@ export class ReviewService {
         } as CommentFilter,
       );
 
-      console.log('reps', reps);
-
-      reps.data = reps.data[0].replies;
-
-      console.log('reps', reps);
+      reps.data = reps?.data[0]?.replies;
 
       if (Array.isArray(reps.data)) {
         for (const i in reps.data) {
@@ -112,31 +108,6 @@ export class ReviewService {
           };
         }
       }
-
-      // let newReps = {
-      //   currentPage: 1,
-      //   replies: [
-      //     {
-      //       page: 1,
-      //       data: [],
-      //     },
-      //   ],
-      //   links: {
-      //     first:
-      //       'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=1&limit=1',
-      //     previous: null,
-      //     next: 'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=2&limit=1',
-      //     last: 'http://localhost:8080/reviews/6667e86e33c10381ee69412f/comments?offset=2&limit=1',
-      //   },
-      //   pageSize: 1,
-      //   totalPages: 2,
-      //   totalRecords: 2,
-      // };
-
-      // const replies = await this.getComments({
-      //   reviewId: reps.review_id,
-      //   parentCommentId: reps.id,
-      // } as CommentQuery);
 
       return {
         ...plainToClass(Review, review),
@@ -158,20 +129,6 @@ export class ReviewService {
     let sortStage: Record<string, any> = {};
     const finalPipeline: PipelineStage[] = [];
 
-    if (query.starsRating && query.starsRating.length > 0) {
-      let arr = [];
-
-      if (!Array.isArray(query.starsRating)) {
-        arr.push(query.starsRating);
-      } else {
-        arr = query.starsRating;
-      }
-
-      matchStage['star'] = {
-        $in: arr,
-      };
-    }
-
     if (query.businessId) {
       matchStage['businessId'] = transStringToObjectId(query.businessId);
     }
@@ -186,9 +143,11 @@ export class ReviewService {
       }
 
       matchStage['star'] = {
-        $in: arr,
+        $in: arr.map((star) => parseInt(star)),
       };
     }
+
+    console.log('matchStage', matchStage);
 
     const result = PaginationHelper.configureBaseQueryFilter(
       matchStage,

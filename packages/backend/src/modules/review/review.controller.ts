@@ -50,35 +50,35 @@ export class ReviewController {
     return await this.reviewService.findAll(transferData);
   }
 
-  @Get(':reviewId/commentssss')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: '[ALL]: get comments of a review',
-  })
-  async getCommentsByReview(
-    @Param('reviewId') id: string,
-    @Query() query: CommentFilter,
-  ) {
-    const transferData = plainToClass(CommentFilter, query);
+  // @Get(':reviewId/comments')
+  // @HttpCode(200)
+  // @ApiOperation({
+  //   summary: '[ALL]: get comments of a review',
+  // })
+  // async getCommentsByReview(
+  //   @Param('reviewId') id: string,
+  //   @Query() query: CommentFilter,
+  // ) {
+  //   const transferData = plainToClass(CommentFilter, query);
 
-    const comments = await this.reviewService.getCommentsByReview(
-      id,
-      transferData,
-    );
+  //   const comments = await this.reviewService.getCommentsByReview(
+  //     id,
+  //     transferData,
+  //   );
 
-    return comments;
-  }
+  //   return comments;
+  // }
 
-  @Get('comments')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: '[ALL]',
-  })
-  async getComments(@Query() query: CommentQuery) {
-    const comments = await this.reviewService.getComments(query);
+  // @Get('comments')
+  // @HttpCode(200)
+  // @ApiOperation({
+  //   summary: '[ALL]',
+  // })
+  // async getComments(@Query() query: CommentQuery) {
+  //   const comments = await this.reviewService.getComments(query);
 
-    return comments;
-  }
+  //   return comments;
+  // }
 
   @Get(':businessId/filter')
   @HttpCode(200)
@@ -94,16 +94,16 @@ export class ReviewController {
     return await this.reviewService.findReviewBusiness(id, transferData);
   }
 
-  @Get(':reviewId')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: '[ADMIN]',
-  })
-  async findById(@Param('reviewId') id: string) {
-    const review: Review = await this.reviewService.findById(id);
+  // @Get(':reviewId')
+  // @HttpCode(200)
+  // @ApiOperation({
+  //   summary: '[ADMIN]',
+  // })
+  // async findById(@Param('reviewId') id: string) {
+  //   const review: Review = await this.reviewService.findById(id);
 
-    return review;
-  }
+  //   return review;
+  // }
 
   @Post()
   @HttpCode(201)

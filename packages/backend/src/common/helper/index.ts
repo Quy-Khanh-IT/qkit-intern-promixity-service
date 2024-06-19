@@ -137,7 +137,6 @@ export class PaginationHelper {
     repository: BaseRepositoryAbstract<T>,
     createOptionalPipeline?: (queryData: V) => Promise<PipelineStage[]>,
   ): Promise<PaginationResult<T>> {
-    console.log('queryData', queryData);
     let basePipeline: PipelineStage[] = [
       {
         $sort: { page: 1 },
