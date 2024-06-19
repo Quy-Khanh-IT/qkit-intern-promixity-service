@@ -47,7 +47,7 @@ export default function SearchItemDetail(): React.ReactNode {
                 />
               </>
             ) : (
-              <div className='navigation-bar-business d-flex align-items-center ps-3 pe-3 justify-content-between'>
+              <div className='navigation-bar-business d-flex align-items-center ps-2 pe-2 justify-content-between mb-2'>
                 <i onClick={() => handleOnChangeMenu('Overview')} className='fa-solid fa-arrow-left'></i>
                 <div className='business-nav-title'>{business.name}</div>
                 <i onClick={handleOnClose} className='fa-solid fa-xmark'></i>
