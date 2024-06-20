@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { NotificationTypeEnum } from 'src/common/enums/notification.enum';
+import {
+  NotificationResourceEnum,
+  NotificationTypeEnum,
+} from 'src/common/enums/notification.enum';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 @Schema({
@@ -18,8 +21,12 @@ export class Notification extends BaseEntity {
 
   @Prop({
     enum: NotificationTypeEnum,
+    required: true,
   })
   type: NotificationTypeEnum;
+
+  @Prop({ enum: NotificationResourceEnum, required: true })
+  resource: NotificationResourceEnum;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   senderId: Types.ObjectId;

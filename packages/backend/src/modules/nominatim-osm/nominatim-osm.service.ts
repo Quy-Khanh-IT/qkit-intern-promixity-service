@@ -62,7 +62,7 @@ export class NominatimOsmService {
     // const data = await this.axiosService.processRetry(url);
     const data = await this.axiosService.testGet(url);
 
-    console.log('data', data);
+    // console.log('data', data);
 
     return data;
   }

@@ -15,7 +15,10 @@ import {
   StatusActionsEnum,
   UserRole,
 } from 'src/common/enums';
-import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
+import {
+  EventDispatcherEnum,
+  NotificationResourceEnum,
+} from 'src/common/enums/notification.enum';
 import {
   BusinessInvalidAddressException,
   BusinessNotBelongException,
@@ -338,6 +341,7 @@ export class BusinessService {
           content: `User '${user.firstName} ${user.lastName}' has registered a new business '${business.name}' (id: ${business._id}). Please check and approve it.`,
           senderId: user.id,
           receiverId: null, // "null" to send to admin
+          // resource: NotificationResourceEnum.BUSINESS,
         }),
       );
     }
@@ -537,14 +541,14 @@ export class BusinessService {
       throw new BusinessStatusException();
     }
 
-    this.eventEmitter.emit(
-      EventDispatcherEnum.CLOSE_BUSINESS,
-      new CloseBusinessEvent({
-        content: `User has requested to delete business '${business.name}' (id: ${business.id}). Please check and approve it.`,
-        senderId: user.id,
-        receiverId: null,
-      }),
-    );
+    // this.eventEmitter.emit(
+    //   EventDispatcherEnum.CLOSE_BUSINESS,
+    //   new CloseBusinessEvent({
+    //     content: `User has requested to delete business '${business.name}' (id: ${business.id}). Please check and approve it.`,
+    //     senderId: user.id,
+    //     receiverId: null,
+    //   }),
+    // );
 
     return true;
   }
@@ -581,14 +585,14 @@ export class BusinessService {
       throw new BusinessStatusException('Business is not deleted');
     }
 
-    this.eventEmitter.emit(
-      EventDispatcherEnum.RESTORE_BUSINESS,
-      new RestoreBusinessEvent({
-        content: `User has requested to restore business '${business.name}' (id: ${business.id}). Please check and approve it.`,
-        senderId: business.userId.toString(),
-        receiverId: null,
-      }),
-    );
+    // this.eventEmitter.emit(
+    //   EventDispatcherEnum.RESTORE_BUSINESS,
+    //   new RestoreBusinessEvent({
+    //     content: `User has requested to restore business '${business.name}' (id: ${business.id}). Please check and approve it.`,
+    //     senderId: business.userId.toString(),
+    //     receiverId: null,
+    //   }),
+    // );
 
     return true;
   }
@@ -612,15 +616,15 @@ export class BusinessService {
         status: BusinessStatusEnum.APPROVED,
       }));
 
-      this.eventEmitter.emit(
-        EventDispatcherEnum.CREATE_BUSINESS,
-        new CreateBusinessEvent({
-          title: 'Business Approved',
-          content: `Your business '${business.name}' has been approved. Congratulations!`,
-          senderId: null,
-          receiverId: business.userId.toString(),
-        }),
-      );
+      // this.eventEmitter.emit(
+      //   EventDispatcherEnum.CREATE_BUSINESS,
+      //   new CreateBusinessEvent({
+      //     title: 'Business Approved',
+      //     content: `Your business '${business.name}' has been approved. Congratulations!`,
+      //     senderId: null,
+      //     receiverId: business.userId.toString(),
+      //   }),
+      // );
 
       return result;
     }
@@ -635,14 +639,14 @@ export class BusinessService {
         status: BusinessStatusEnum.REJECTED,
       }));
 
-      this.eventEmitter.emit(
-        EventDispatcherEnum.REJECT_BUSINESS,
-        new RejectBusinessEvent({
-          content: `Your business '${business.name}' has been rejected. Please update your business again.`,
-          senderId: null,
-          receiverId: business.userId.toString(),
-        }),
-      );
+      // this.eventEmitter.emit(
+      //   EventDispatcherEnum.REJECT_BUSINESS,
+      //   new RejectBusinessEvent({
+      //     content: `Your business '${business.name}' has been rejected. Please update your business again.`,
+      //     senderId: null,
+      //     receiverId: business.userId.toString(),
+      //   }),
+      // );
 
       return result;
     }
@@ -654,14 +658,14 @@ export class BusinessService {
         status: BusinessStatusEnum.BANNED,
       }));
 
-      this.eventEmitter.emit(
-        EventDispatcherEnum.BANNED_BUSINESS,
-        new BannedBusinessEvent({
-          content: `Your business '${business.name}' has been banned. Please contact admin for more information.`,
-          senderId: null,
-          receiverId: business.id,
-        }),
-      );
+      // this.eventEmitter.emit(
+      //   EventDispatcherEnum.BANNED_BUSINESS,
+      //   new BannedBusinessEvent({
+      //     content: `Your business '${business.name}' has been banned. Please contact admin for more information.`,
+      //     senderId: null,
+      //     receiverId: business.id,
+      //   }),
+      // );
 
       return result;
     }
@@ -678,14 +682,14 @@ export class BusinessService {
         status: BusinessStatusEnum.CLOSED,
       }));
 
-      this.eventEmitter.emit(
-        EventDispatcherEnum.CLOSE_BUSINESS,
-        new CloseBusinessEvent({
-          content: `Your business "${business.name}" has been closed. If you want to restore, please contact admin.`,
-          senderId: null,
-          receiverId: business.id,
-        }),
-      );
+      // this.eventEmitter.emit(
+      //   EventDispatcherEnum.CLOSE_BUSINESS,
+      //   new CloseBusinessEvent({
+      //     content: `Your business "${business.name}" has been closed. If you want to restore, please contact admin.`,
+      //     senderId: null,
+      //     receiverId: business.id,
+      //   }),
+      // );
 
       return result;
     }
@@ -782,15 +786,6 @@ export class BusinessService {
   getBusinessRepository(): BusinessRepository {
     return this.businessRepository;
   }
-
-  // async getReviews(businessId: string) {
-  //   const business = await this.businessRepository.findOneById(businessId);
-
-  //   if (!business) {
-  //     throw new BusinessNotFoundException();
-  //   }
-
-  // }
 
   async getUserBusinesses(
     userId: string,
@@ -941,7 +936,7 @@ export class BusinessService {
       longitude: longitude.toString(),
     });
 
-    console.log('reverseData', reverseData);
+    // console.log('reverseData', reverseData);
 
     // if (reverseData?.state === validateAddressDto.province) {
     //   // is a province (example: tỉnh Bình Dương)

@@ -148,6 +148,8 @@ export class NotificationService {
 
   @OnEvent(EventDispatcherEnum.CREATE_BUSINESS)
   async handleCreateBusinessEvent(createBusinessEvent: CreateBusinessEvent) {
+    console.log('createBusinessEvent.payload: ', createBusinessEvent.payload);
+
     return this.create(createBusinessEvent.payload);
   }
 

@@ -11,12 +11,19 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { Request } from 'express';
 import { Roles } from 'src/common/decorators/role.decorator';
-import { UserRole } from 'src/common/enums';
+import { DeleteActionEnum, EmotionEnum, UserRole } from 'src/common/enums';
 import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
 import { RoleGuard } from 'src/cores/guard/role.guard';
 import { StarSerializeInterceptor } from 'src/cores/interceptors/star.interceptor';
@@ -48,6 +55,18 @@ export class ReviewController {
     const transferData = plainToClass(FindAllReviewQuery, data);
 
     return await this.reviewService.findAll(transferData);
+  }
+
+  @Patch(':reviewId/report')
+  @HttpCode(200)
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.USER, UserRole.BUSINESS, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '[USER, BUSINESS, ADMIN]: report a review',
+  })
+  async reportReview(@Param('reviewId') id: string, @Req() req: Request) {
+    return await this.reviewService.reportReview(id, req.user);
   }
 
   // @Get(':reviewId/comments')
@@ -94,16 +113,30 @@ export class ReviewController {
     return await this.reviewService.findReviewBusiness(id, transferData);
   }
 
-  // @Get(':reviewId')
-  // @HttpCode(200)
-  // @ApiOperation({
-  //   summary: '[ADMIN]',
-  // })
-  // async findById(@Param('reviewId') id: string) {
-  //   const review: Review = await this.reviewService.findById(id);
+  @Get('emotions')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: '[ALL]: get all emotions',
+  })
+  async getEmotions() {
+    return EmotionEnum;
+  }
 
-  //   return review;
-  // }
+  @Get(':reviewId')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiQuery({ type: CommentFilter })
+  @ApiOperation({
+    summary:
+      '[ADMIN]: Get details of a review by id (include business information)',
+  })
+  async findById(@Param('reviewId') id: string, @Query() query: CommentFilter) {
+    const review: Review = await this.reviewService.findById(id, query);
+
+    return review;
+  }
 
   @Post()
   @HttpCode(201)
@@ -206,41 +239,42 @@ export class ReviewController {
   //   return this.reviewService.editComment(id, editResponseDto, req.user.id);
   // }
 
-  // @Delete(':reviewId')
-  // @HttpCode(200)
-  // @ApiBearerAuth()
-  // @ApiOperation({
-  //   summary:
-  //     '[ADMIN, USER, BUSINESS]: USER, BUSINESS can delete their own review, ADMIN can delete any review.',
-  // })
-  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  // @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
-  // @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
-  // async delete(
-  //   @Param('reviewId') id: string,
-  //   @Query('type') type: DeleteActionEnum,
-  //   @Req() req: Request,
-  // ) {
-  //   if (type === DeleteActionEnum.SOFT) {
-  //     return this.reviewService.softDelete(id, req.user);
-  //   }
+  @Delete(':reviewId')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '[ADMIN, USER, BUSINESS]: USER, BUSINESS can delete their own review, ADMIN can delete any review.',
+  })
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.BUSINESS)
+  @ApiQuery({ name: 'type', enum: DeleteActionEnum, required: true })
+  async delete(
+    @Param('reviewId') id: string,
+    @Query('type') type: DeleteActionEnum,
+    @Req() req: Request,
+  ) {
+    if (type === DeleteActionEnum.SOFT) {
+      return this.reviewService.softDelete(id, req.user);
+    }
 
-  //   if (type === DeleteActionEnum.HARD) {
-  //     return this.reviewService.hardDelete(id, req.user);
-  //   }
-  // }
+    if (type === DeleteActionEnum.HARD) {
+      return false;
+      // return this.reviewService.hardDelete(id, req.user);
+    }
+  }
 
-  // @Patch(':id/restore')
-  // @HttpCode(200)
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAccessTokenGuard, RoleGuard)
-  // @Roles(UserRole.ADMIN)
-  // @ApiOperation({
-  //   summary: '[ADMIN]: Restore a preview that was previously deleted',
-  // })
-  // async restore(@Param('id') id: string, @Req() req: Request) {
-  //   return this.reviewService.restoreReview(id);
-  // }
+  @Patch(':id/restore')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: '[ADMIN]: Restore a preview that was previously deleted',
+  })
+  async restore(@Param('id') id: string, @Req() req: Request) {
+    return this.reviewService.restoreReview(id);
+  }
 
   @Delete(':commentId/comments')
   @ApiBearerAuth()

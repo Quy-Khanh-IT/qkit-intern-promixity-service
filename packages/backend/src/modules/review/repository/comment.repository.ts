@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToClass } from 'class-transformer';
-import { Model } from 'mongoose';
+import { Model, Schema } from 'mongoose';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
 import { User } from 'src/modules/user/entities/user.entity';
@@ -8,8 +8,17 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { BaseRepositoryAbstract } from '../../../cores/repository/base/repositoryAbstract.base';
 import { CommentDto } from '../dto/create-comment.dto';
 import { Comment } from '../entities/comment.entity';
-import { UserSchema } from '../entities/review.entity';
+import { Review, UserSchema } from '../entities/review.entity';
 import { CommentRepositoryInterface } from '../interfaces/comment-repo.interface';
+
+interface Business {
+  name: string;
+  description: string;
+  phoneNumber: string;
+  website: string;
+  userId: Schema.Types.ObjectId;
+  // Include other fields as needed
+}
 
 export class CommentRepository
   extends BaseRepositoryAbstract<Comment>
@@ -17,8 +26,17 @@ export class CommentRepository
 {
   constructor(
     @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
+    @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
   ) {
     super(commentModel);
+  }
+
+  async findReviewWithBusiness(reviewId: string): Promise<Review> {
+    const review = await this.reviewModel
+      .findOne({ _id: transStringToObjectId(reviewId) })
+      .populate('businessId');
+
+    return review;
   }
 
   async createReply(parentCommentId: string, dto: CommentDto, user: User) {
@@ -27,9 +45,15 @@ export class CommentRepository
       page: null,
     });
 
+    const review = await this.reviewModel.findOne({
+      _id: parent.reviewId,
+    });
+
     if (!parent) {
       throw new Error('Parent comment not found');
     }
+
+    const business = review.businessId as unknown as Business;
 
     const right = parent.right;
 
@@ -54,14 +78,18 @@ export class CommentRepository
       parentId: parent._id,
       page: null,
       type: ReviewTypeEnum.COMMENT,
+      depth: parent.depth + 1,
       postBy: {
         userId: user._id,
+        lastName: user.lastName,
         firstName: user.firstName,
-        avatarUrl: '',
+        avatarUrl: user.image,
         user_id: user._id.toString(),
       },
       left: right,
       right: right + 1,
+      isBusinessOwner: business.userId === user._id ? true : false,
+      isAdmin: user.role === 'admin' ? true : false,
     });
 
     newReply.id = transObjectIdToString(newReply._id);
@@ -88,8 +116,8 @@ export class CommentRepository
           content: 1,
           postBy: 1,
           reviewId: 1,
-          createdAt: 1,
-          updatedAt: 1,
+          created_at: 1,
+          updated_at: 1,
           parentId: 1,
           left: 1,
           right: 1,
@@ -99,6 +127,7 @@ export class CommentRepository
 
       return comments.map((comment) => {
         comment.postBy = plainToClass(UserSchema, comment.postBy);
+
         return {
           ...plainToClass(Comment, comment),
           postBy: comment.postBy,

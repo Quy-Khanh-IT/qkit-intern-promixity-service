@@ -37,7 +37,7 @@ export class AxiosService {
       ),
     );
 
-    console.log('result', result);
+    // console.log('result', result);
 
     return result?.data ?? null;
   }
