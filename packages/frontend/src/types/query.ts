@@ -45,7 +45,7 @@ export interface IBusinessUserStatisticQuery {
   statusUser: UserOptionEnum | 'all'
 }
 
-export interface IGetReviewOfAdminQuery {
+export interface IGetAllReviewOfAdminQuery extends IGelAllQuery {
   content?: string
   starsRating?: string[]
   userId?: string

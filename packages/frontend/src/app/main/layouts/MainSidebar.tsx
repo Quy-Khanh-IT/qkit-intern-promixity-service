@@ -44,6 +44,14 @@ const _MainSidebar: React.FC<IMainSidebarProps> = ({ userInformation, selectedMe
                 <i className='fa-light fa-building'></i>
               </Flex>
             )
+          },
+          {
+            ...ADMIN_SIDEBAR_OPTIONS.MANAGE_REVIEW,
+            icon: (
+              <Flex style={{ width: 14, height: 16 }} justify='center'>
+                <i className='fa-sharp fa-light fa-comments'></i>
+              </Flex>
+            )
           }
         ]
       } else if (userInformation.role === (RoleEnum._BUSINESS as string)) {

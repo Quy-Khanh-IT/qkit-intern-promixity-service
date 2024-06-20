@@ -1,8 +1,9 @@
 import { API_ENDPOINT } from '@/constants'
-import { IGetReviewOfAdminQuery } from '@/types/query'
+import { IGetAllReviewOfAdminQuery } from '@/types/query'
 import { IGetReviewOfBusinessPayload, IGetReviewOfBusinessResponse } from '@/types/review'
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import qs from 'qs'
 
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
@@ -17,12 +18,14 @@ export const reviewApi = createApi({
       }),
       providesTags: ['ReviewList']
     }),
-    getReviewsForAdmin: builder.query<IGetReviewOfBusinessResponse, IGetReviewOfAdminQuery>({
-      query: (params) => ({
-        url: `/reviews`,
-        method: 'GET',
-        params
-      }),
+    getReviewsForAdmin: builder.query<IGetReviewOfBusinessResponse, IGetAllReviewOfAdminQuery>({
+      query: (payload) => {
+        const queryString = qs.stringify(payload, { arrayFormat: 'repeat' })
+        return {
+          url: `/reviews?${queryString}`,
+          method: 'GET'
+        }
+      },
       providesTags: ['ReviewList']
     })
   })
