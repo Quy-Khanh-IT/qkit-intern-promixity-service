@@ -48,7 +48,8 @@ export class ReviewRepository
   async findReviewWithBusiness(reviewId: string): Promise<Review> {
     const review = await this.reviewModel
       .findOne({ _id: transStringToObjectId(reviewId) })
-      .populate('businessId');
+      .populate('businessId')
+      .lean();
 
     return review;
   }

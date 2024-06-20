@@ -38,6 +38,8 @@ import { Review, UserSchema } from './entities/review.entity';
 import { CommentRepository } from './repository/comment.repository';
 import { ReviewRepository } from './repository/review.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ReviewWithCommentsAndBusinessInterface } from './interfaces/review.interface';
+import { Business } from '../business/entities/business.entity';
 
 @Injectable()
 export class ReviewService {
@@ -152,22 +154,6 @@ export class ReviewService {
       finalPipeline.push({ $match: matchStage });
     }
 
-    // finalPipeline.push({
-    //   $lookup: {
-    //     from: 'businesses', // The collection name for businesses
-    //     localField: 'businessId',
-    //     foreignField: '_id',
-    //     as: 'business',
-    //   },
-    // });
-
-    // finalPipeline.push({ $unwind: '$business' });
-    // finalPipeline.push({
-    //   $match: { 'business.name': { $regex: 'QKIT', $options: 'i' } },
-    // });
-
-    // console.log('finalPipeline', finalPipeline);
-
     if (Object.keys(sortStage).length > 0) {
       finalPipeline.push({ $sort: sortStage });
     }
@@ -275,23 +261,28 @@ export class ReviewService {
     return finalPipeline;
   }
 
-  async findById(id: string, filter?: CommentFilter): Promise<Review> {
-    const review = await this.reviewRepository.findOneById(id);
+  async findById(
+    id: string,
+    filter?: CommentFilter,
+  ): Promise<ReviewWithCommentsAndBusinessInterface> {
+    const review = await this.reviewRepository.findReviewWithBusiness(id);
 
     if (!review) {
       throw new ReviewNotFoundException();
     }
 
+    const business = review.businessId as unknown as Business;
+
     review.postBy = plainToClass(UserSchema, review.postBy);
 
-    const reps = await this.getCommentsByReview(review.id, {
+    const reps = await this.getCommentsByReview(id, {
       offset: filter.offset,
       limit: 1,
     } as CommentFilter);
 
-    console.log('reps', reps);
-
     reps.data = reps?.data[0]?.replies;
+
+    console.log('reps', reps);
 
     if (Array.isArray(reps.data)) {
       for (const i in reps.data) {
@@ -307,7 +298,14 @@ export class ReviewService {
       }
     }
 
-    return reps;
+    return {
+      ...plainToClass(Review, review),
+      business_id: business.id,
+      business: plainToClass(Business, business),
+      reply: {
+        ...reps,
+      },
+    };
   }
 
   async getCommentsByReview(
