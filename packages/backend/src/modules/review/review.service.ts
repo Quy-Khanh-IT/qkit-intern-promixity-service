@@ -38,7 +38,8 @@ import { Review, UserSchema } from './entities/review.entity';
 import { CommentRepository } from './repository/comment.repository';
 import { ReviewRepository } from './repository/review.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ReviewWithCommentsInterface } from './interfaces/review.inteface';
+import { ReviewWithCommentsAndBusinessInterface } from './interfaces/review.interface';
+import { Business } from '../business/entities/business.entity';
 
 @Injectable()
 export class ReviewService {
@@ -263,21 +264,25 @@ export class ReviewService {
   async findById(
     id: string,
     filter?: CommentFilter,
-  ): Promise<ReviewWithCommentsInterface> {
-    const review = await this.reviewRepository.findOneById(id);
+  ): Promise<ReviewWithCommentsAndBusinessInterface> {
+    const review = await this.reviewRepository.findReviewWithBusiness(id);
 
     if (!review) {
       throw new ReviewNotFoundException();
     }
 
+    const business = review.businessId as unknown as Business;
+
     review.postBy = plainToClass(UserSchema, review.postBy);
 
-    const reps = await this.getCommentsByReview(review.id, {
+    const reps = await this.getCommentsByReview(id, {
       offset: filter.offset,
       limit: 1,
     } as CommentFilter);
 
     reps.data = reps?.data[0]?.replies;
+
+    console.log('reps', reps);
 
     if (Array.isArray(reps.data)) {
       for (const i in reps.data) {
@@ -293,10 +298,10 @@ export class ReviewService {
       }
     }
 
-    console.log('reps', reps);
-
     return {
       ...plainToClass(Review, review),
+      business_id: business.id,
+      business: plainToClass(Business, business),
       reply: {
         ...reps,
       },
