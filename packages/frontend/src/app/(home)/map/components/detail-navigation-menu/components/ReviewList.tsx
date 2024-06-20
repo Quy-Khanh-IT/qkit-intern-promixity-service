@@ -4,6 +4,7 @@ import './review-list.scss'
 import { useGetReviewsForBusinessQuery } from '@/services/review.service'
 import { Dropdown, MenuProps, Skeleton, Space } from 'antd'
 import ReviewItem from './ReviewItem'
+import { useAuth } from '@/context/AuthContext'
 
 export default function ReviewList({ businessId }: { businessId: string }): React.ReactNode {
   const [sortBy, setSortBy] = useState<string>('desc')
@@ -24,7 +25,11 @@ export default function ReviewList({ businessId }: { businessId: string }): Reac
 
   if (isLoading || !showReviews) {
     return (
-      <div className='review-list'>
+      <div className='review-list p-3'>
+        <Skeleton active avatar />
+        <Skeleton active avatar />
+        <Skeleton active avatar />
+        <Skeleton active avatar />
         <Skeleton active avatar />
       </div>
     )

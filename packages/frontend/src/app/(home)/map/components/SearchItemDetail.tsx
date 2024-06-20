@@ -55,7 +55,7 @@ export default function SearchItemDetail(): React.ReactNode {
             )}
             <div className='detail-content-wrapper w-100'>
               {menuActive === 'Overview' ? (
-                <div className='p-3'>
+                <div className='p-3 navigation-menu-wrapper'>
                   <h5 className='detail-title'>{business.name}</h5>
                   <StarRating rating={business.overallRating} totalReview={business.totalReview} />
                   <div className='business-category'>{business.category.name}</div>

@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import './review.scss'
 import StarProgressBar from './components/StarProgressBar'
 import { IBusiness } from '@/types/business'
 import ReviewList from './components/ReviewList'
+import { Image, Modal, Rate } from 'antd'
+import { useAuth } from '@/context/AuthContext'
+import { ToastService } from '@/services/toast.service'
+import { useCreateReviewMutation } from '@/services/review.service'
+import { ICreateReviewPayload } from '@/types/review'
 
 export default function Review({ business }: { business: IBusiness }): React.ReactNode {
   const rating = business.overallRating
@@ -11,6 +16,54 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
   const fullStars = Math.floor(rating)
   const hasHalfStar = rating % 1 >= 0.5
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+  const toastService = useMemo<ToastService>(() => new ToastService(), [])
+
+  const { userInformation } = useAuth()
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [reviewText, setReviewText] = useState<string>('')
+  const [ratingValue, setRatingValue] = useState<number>(0)
+
+  const [createReview, { isSuccess: isCreatedSuccess, isError: isCreatedError }] = useCreateReviewMutation()
+
+  const showModal = (): void => {
+    if (!(userInformation && userInformation.isVerified)) {
+      toastService.error('You must login to review this business')
+    } else {
+      setIsModalOpen(true)
+    }
+  }
+
+  const handleOk = (): void => {
+    if (ratingValue < 1) {
+      toastService.error('Please rate this business')
+    } else {
+      if (reviewText) {
+        const payload: ICreateReviewPayload = {
+          businessId: business.id,
+          content: reviewText,
+          star: ratingValue.toString()
+        }
+        createReview(payload)
+      } else {
+        toastService.error('Please enter a review')
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (isCreatedSuccess) {
+      toastService.success('Review created successfully')
+      setIsModalOpen(false)
+      setReviewText('')
+      setRatingValue(0)
+    } else if (isCreatedError) {
+      toastService.error('Review failed to create')
+    }
+  }, [isCreatedSuccess, isCreatedError])
+
+  const handleCancel = (): void => {
+    setIsModalOpen(false)
+  }
 
   return (
     <div className='review-wrapper'>
@@ -36,7 +89,7 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
           </div>
         </div>
         <div className='p-3 d-flex align-items-center justify-content-center'>
-          <div className='send-review-btn p-1 d-flex align-items-center justify-content-center'>
+          <div onClick={showModal} className='send-review-btn p-1 d-flex align-items-center justify-content-center'>
             <i className='fa-regular fa-comment-dots me-2'></i>
             Write a review
           </div>
@@ -46,6 +99,33 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
       <div className='review-list-container'>
         <ReviewList businessId={business.id} />
       </div>
+
+      {/* Modal write a review */}
+      <Modal okText='Post' open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <div className='review-business-name text-center mb-3'>{business.name}</div>
+        <div className='user-info d-flex align-items-center '>
+          <div className='user-avatar mb-2'>
+            <Image
+              preview={false}
+              height={40}
+              width={40}
+              alt='user-avatar'
+              src='https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
+            />
+          </div>
+          <div className='user-name ms-2'>Trương Nguyễn Công Chính</div>
+        </div>
+
+        <div className='d-flex align-items-center justify-content-center mt-2 mb-1'>
+          <Rate value={ratingValue} onChange={(value) => setRatingValue(value)} />
+        </div>
+        <textarea
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
+          className='p-3 review-text-area w-100 mt-3'
+          placeholder='Share details of your own experience at this place'
+        ></textarea>
+      </Modal>
     </div>
   )
 }

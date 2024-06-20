@@ -4,6 +4,7 @@
 
 .review-wrapper {
   border-bottom: 1px solid $gray-border;
+  text-align: justify;
 }
 
 .review-owner-avatar {
@@ -23,4 +24,18 @@
 
 .review-content {
   color: black;
+}
+
+.btn-reply {
+  color: $link-color;
+  text-align: right;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+.review-business-name {
+  font-weight: 700;
 }
