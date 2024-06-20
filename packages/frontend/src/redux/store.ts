@@ -15,6 +15,7 @@ import { serviceApi } from '@/services/service.service'
 import { statisticApi } from '@/services/statistic.service'
 import { addressLineApi } from '@/services/address-line.service'
 import { sidebarPropsSlice } from './slices/sidebar.slice'
+import { reviewApi } from '@/services/review.service'
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +31,7 @@ export const store = configureStore({
     [notificationApi.reducerPath]: notificationApi.reducer,
     selectedBusiness: selectedBusinessSlice.reducer,
     [serviceApi.reducerPath]: serviceApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer,
     [statisticApi.reducerPath]: statisticApi.reducer,
     [addressLineApi.reducerPath]: addressLineApi.reducer
   },
@@ -45,6 +47,7 @@ export const store = configureStore({
       categoryApi.middleware,
       notificationApi.middleware,
       serviceApi.middleware,
+      reviewApi.middleware,
       statisticApi.middleware,
       addressLineApi.middleware,
       rtkQueryErrorLogger

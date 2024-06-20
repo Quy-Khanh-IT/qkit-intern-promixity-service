@@ -18,6 +18,10 @@ export const ADMIN_SIDEBAR_OPTIONS: SidebarOptions = {
   MANAGE_BUSINESS: {
     key: '3',
     label: 'Manage business'
+  },
+  MANAGE_REVIEW: {
+    key: '4',
+    label: 'Manage review'
   }
 }
 
