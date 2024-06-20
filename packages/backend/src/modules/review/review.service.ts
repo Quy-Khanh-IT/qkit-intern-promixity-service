@@ -52,17 +52,97 @@ export class ReviewService {
       this.configGetAllReviewPipeLine,
     );
 
-    const reviews = aggregateResult.data.map((review) => {
+    const reviews = aggregateResult.data.map(async (review) => {
       review.postBy = plainToClass(UserSchema, review.postBy);
+
+      let reps = await this.getCommentsByReview(
+        transObjectIdToString(review._id),
+        {
+          offset: 1,
+          limit: 1,
+        } as CommentFilter,
+      );
+
+      reps.data = reps?.data[0]?.replies;
+
+      if (Array.isArray(reps.data)) {
+        for (const i in reps.data) {
+          const reviewId = reps.data[i].review_id;
+          const id = reps.data[i].id;
+
+          const replies = await this.getComments({
+            reviewId: reviewId,
+            parentCommentId: id,
+          } as CommentQuery);
+
+          reps.data[i].replies = [...replies];
+        }
+      }
 
       return {
         ...plainToClass(Review, review),
+        reply: {
+          ...reps,
+        },
       };
     });
 
-    aggregateResult.data = reviews;
+    aggregateResult.data = await Promise.all(reviews);
 
     return aggregateResult;
+  }
+
+  async configGetAllReviewPipeLine(
+    query: FindAllReviewQuery,
+  ): Promise<PipelineStage[]> {
+    let matchStage: Record<string, any> = {};
+    let sortStage: Record<string, any> = {};
+    const finalPipeline: PipelineStage[] = [];
+
+    if (query.userId) {
+      matchStage['userId'] = transStringToObjectId(query.userId);
+    }
+
+    if (query.businessId) {
+      matchStage['businessId'] = transStringToObjectId(query.businessId);
+    }
+
+    if (query.starsRating && query.starsRating.length > 0) {
+      let arr = [];
+
+      if (!Array.isArray(query.starsRating)) {
+        arr.push(query.starsRating);
+      } else {
+        arr = query.starsRating;
+      }
+
+      matchStage['star'] = {
+        $in: arr.map((star) => parseInt(star)),
+      };
+    }
+
+    if (query.content) {
+      matchStage['content'] = { $regex: query.content, $options: 'i' };
+    }
+
+    const result = PaginationHelper.configureBaseQueryFilter(
+      matchStage,
+      sortStage,
+      query,
+    );
+
+    matchStage = result.matchStage;
+    sortStage = result.sortStage;
+
+    if (Object.keys(matchStage).length > 0) {
+      finalPipeline.push({ $match: matchStage });
+    }
+
+    if (Object.keys(sortStage).length > 0) {
+      finalPipeline.push({ $sort: sortStage });
+    }
+
+    return finalPipeline;
   }
 
   async findReviewBusiness(
@@ -149,59 +229,6 @@ export class ReviewService {
       matchStage,
       sortStage,
       query as FindAllReviewQuery,
-    );
-
-    matchStage = result.matchStage;
-    sortStage = result.sortStage;
-
-    if (Object.keys(matchStage).length > 0) {
-      finalPipeline.push({ $match: matchStage });
-    }
-
-    if (Object.keys(sortStage).length > 0) {
-      finalPipeline.push({ $sort: sortStage });
-    }
-
-    return finalPipeline;
-  }
-
-  async configGetAllReviewPipeLine(
-    query: FindAllReviewQuery,
-  ): Promise<PipelineStage[]> {
-    let matchStage: Record<string, any> = {};
-    let sortStage: Record<string, any> = {};
-    const finalPipeline: PipelineStage[] = [];
-
-    if (query.content) {
-      matchStage['content'] = { $regex: query.content, $options: 'i' };
-    }
-
-    if (query.starsRating && query.starsRating.length > 0) {
-      let arr = [];
-
-      if (!Array.isArray(query.starsRating)) {
-        arr.push(query.starsRating);
-      } else {
-        arr = query.starsRating;
-      }
-
-      matchStage['star'] = {
-        $in: arr,
-      };
-    }
-
-    if (query.userId) {
-      matchStage['userId'] = transStringToObjectId(query.userId);
-    }
-
-    if (query.businessId) {
-      matchStage['businessId'] = transStringToObjectId(query.businessId);
-    }
-
-    const result = PaginationHelper.configureBaseQueryFilter(
-      matchStage,
-      sortStage,
-      query,
     );
 
     matchStage = result.matchStage;
