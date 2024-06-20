@@ -8,6 +8,7 @@ import {
   BusinessStatusEnum,
   ReviewActionEnum,
   ReviewTypeEnum,
+  TypeSort,
   UserRole,
 } from 'src/common/enums';
 import {
@@ -37,9 +38,6 @@ import { Review, UserSchema } from './entities/review.entity';
 import { CommentRepository } from './repository/comment.repository';
 import { ReviewRepository } from './repository/review.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventDispatcherEnum } from 'src/common/enums/notification.enum';
-import { CreateBusinessEvent } from '../business/events/create-business.event';
-import { ReportReviewEvent } from './events/report-review.event';
 
 @Injectable()
 export class ReviewService {
@@ -134,6 +132,11 @@ export class ReviewService {
 
     if (query.content) {
       matchStage['content'] = { $regex: query.content, $options: 'i' };
+    }
+
+    if (query.sortReportedCountBy) {
+      sortStage['reportedCount'] =
+        query.sortReportedCountBy === TypeSort.ASC ? 1 : -1;
     }
 
     const result = PaginationHelper.configureBaseQueryFilter(
