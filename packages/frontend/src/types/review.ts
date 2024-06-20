@@ -40,6 +40,7 @@ export interface IReply {
   id: string
   review_id: string
   replies: IReplyReply[]
+  created_at: string
 }
 
 export interface IReplyReply {
@@ -49,6 +50,7 @@ export interface IReplyReply {
   review_id: string
   parent_id: string
   replies: IReplyReply[]
+  created_at: string
 }
 
 export interface IReviewOwner {
