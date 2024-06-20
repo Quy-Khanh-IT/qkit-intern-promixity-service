@@ -5,14 +5,14 @@ import {
 } from 'src/common/enums/notification.enum';
 import { BaseEvent } from 'src/modules/notification/event/event.base';
 
-export class CloseBusinessEvent extends BaseEvent {
+export class ReportReviewEvent extends BaseEvent {
   getNotificationContent(): NotificationEnum {
-    throw NotificationEnum.BANNED_BUSINESS;
-  }
-  getResourceType(): NotificationResourceEnum {
-    throw NotificationResourceEnum.BUSINESS;
+    return NotificationEnum.REPORT_REVIEW;
   }
   getEventType(): NotificationTypeEnum {
-    return NotificationTypeEnum.CLOSE;
+    return NotificationTypeEnum.REPORT;
+  }
+  getResourceType(): NotificationResourceEnum {
+    return NotificationResourceEnum.REVIEW;
   }
 }

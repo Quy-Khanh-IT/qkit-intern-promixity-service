@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
-import { ReviewTypeEnum } from 'src/common/enums';
+import { EmotionEnum, ReviewTypeEnum } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 // Implement bucket model
@@ -50,8 +50,14 @@ export class Review extends BaseEntity {
   @Prop({ enum: ReviewTypeEnum, required: true })
   type: string;
 
+  @Prop({ enum: EmotionEnum, required: true })
+  emotion: string;
+
   @Prop({ enum: [1, 2, 3, 4, 5], default: null })
   star: number | null;
+
+  @Prop({ default: 0, required: false })
+  reportedCount: number;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

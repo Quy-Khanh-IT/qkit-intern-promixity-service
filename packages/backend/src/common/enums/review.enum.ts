@@ -17,3 +17,10 @@ export enum ReviewTypeEnum {
   REVIEW = 'review',
   COMMENT = 'comment',
 }
+
+export enum EmotionEnum {
+  EXCELLENT = 'excellent',
+  GOOD = 'good',
+  NORMAL = 'normal',
+  BAD = 'bad',
+}

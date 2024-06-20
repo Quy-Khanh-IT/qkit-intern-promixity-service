@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { plainToClass } from 'class-transformer';
-import { Model } from 'mongoose';
+import { Model, Schema } from 'mongoose';
 import { ReviewTypeEnum } from 'src/common/enums';
 import { ReviewNotFoundException } from 'src/common/exceptions/review.exception';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
@@ -12,6 +12,15 @@ import { CreateReviewDto } from '../dto/create-review.dto';
 import { Comment } from '../entities/comment.entity';
 import { Review } from '../entities/review.entity';
 import { ReviewRepositoryInterface } from '../interfaces/review-repo.interface';
+
+interface Business {
+  name: string;
+  description: string;
+  phoneNumber: string;
+  website: string;
+  userId: Schema.Types.ObjectId;
+  // Include other fields as needed
+}
 
 export class ReviewRepository
   extends BaseRepositoryAbstract<Review>
@@ -36,6 +45,14 @@ export class ReviewRepository
     return;
   }
 
+  async findReviewWithBusiness(reviewId: string): Promise<Review> {
+    const review = await this.reviewModel
+      .findOne({ _id: transStringToObjectId(reviewId) })
+      .populate('businessId');
+
+    return review;
+  }
+
   async createReview(dto: CreateReviewDto, poster: User): Promise<Review> {
     const review = await this.reviewModel.create({
       businessId: transStringToObjectId(dto.businessId),
@@ -48,6 +65,7 @@ export class ReviewRepository
       content: dto.content,
       type: ReviewTypeEnum.REVIEW,
       star: dto.star,
+      emotion: dto.emotion,
     });
 
     review.id = transObjectIdToString(review._id);
@@ -56,11 +74,13 @@ export class ReviewRepository
   }
 
   async createComment(dto: CommentDto, reviewId: string, user: User) {
-    const review = await this.reviewModel.findById(reviewId);
+    const review = await this.findReviewWithBusiness(reviewId);
 
     if (!review) {
       throw new ReviewNotFoundException();
     }
+
+    const business = review.businessId as unknown as Business;
 
     let right: number;
 
@@ -87,6 +107,7 @@ export class ReviewRepository
       reviewId: review._id,
       postBy: {
         userId: user._id,
+        lastName: user.lastName,
         firstName: user.firstName,
         avatarUrl: '',
         user_id: user._id.toString(),
@@ -96,6 +117,9 @@ export class ReviewRepository
       page: null,
       left: right,
       right: right + 1,
+      depth: 0,
+      isBusinessOwner: business.userId === user._id ? true : false,
+      isAdmin: user.role === 'admin' ? true : false,
       _page: review.page ? review.page : 1,
       replies: [],
     });

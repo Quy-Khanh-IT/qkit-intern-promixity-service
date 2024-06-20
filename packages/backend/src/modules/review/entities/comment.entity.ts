@@ -67,6 +67,12 @@ export class Comment extends BaseEntity {
   @Prop({ default: null })
   right: number | null;
 
+  @Prop({ default: false })
+  isBusinessOwner: boolean;
+
+  @Prop({ default: false })
+  isAdmin: boolean;
+
   @Prop({ required: true, trim: true, maxlength: 255 })
   content: string;
 
