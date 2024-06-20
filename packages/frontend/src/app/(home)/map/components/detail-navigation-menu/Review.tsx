@@ -12,7 +12,6 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
   const hasHalfStar = rating % 1 >= 0.5
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
 
-  console.log(business)
   return (
     <div className='review-wrapper'>
       <div className='container review-container pb-2'>
@@ -44,8 +43,8 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
         </div>
       </div>
 
-      <div className='review-list-container p-3'>
-        <ReviewList />
+      <div className='review-list-container'>
+        <ReviewList businessId={business.id} />
       </div>
     </div>
   )

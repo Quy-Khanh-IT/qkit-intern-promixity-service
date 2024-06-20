@@ -1,0 +1,78 @@
+'use client'
+import { IReview } from '@/types/review'
+import { Image } from 'antd'
+import moment from 'moment'
+import './review-item.scss'
+export default function ReviewItem({ review }: { review: IReview }): React.ReactNode {
+  const formatTimeDifference = (createdAt: string): string => {
+    const now = moment()
+    const createdAtMoment = moment(createdAt)
+    const duration = moment.duration(now.diff(createdAtMoment))
+
+    const minutes = duration.asMinutes()
+    if (minutes < 60) {
+      return `${Math.floor(minutes)} minutes ago`
+    }
+
+    const hours = duration.asHours()
+    if (hours < 24) {
+      return `${Math.floor(hours)} hours ago`
+    }
+
+    const days = duration.asDays()
+    if (days < 30) {
+      return `${Math.floor(days)} days ago`
+    }
+
+    const months = duration.asMonths()
+    if (months < 12) {
+      return `${Math.floor(months)} months ago`
+    }
+
+    const years = duration.asYears()
+    return `${Math.floor(years)} years ago`
+  }
+
+  const rating = review.star
+  const fullStars = Math.floor(rating)
+  const hasHalfStar = rating % 1 >= 0.5
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0)
+  return (
+    <div className='review-wrapper p-3'>
+      <div className='review-owner-info '>
+        <div className='review-owner-avatar d-flex mb-2'>
+          <Image
+            src={
+              review.postBy.avatarUrl
+                ? review.postBy.avatarUrl
+                : 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
+            }
+            alt='owner-avatar'
+            width={32}
+            height={32}
+          />
+          <div className='ms-2'>
+            <div className='owner-name'>{review.postBy.firstName} </div>
+            <div className='review-time'>{formatTimeDifference(review.created_at)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className='business-rating d-flex  mt-3'>
+        <div className='rating-star d-flex align-items-center'>
+          {Array.from({ length: fullStars }, (_, index) => (
+            <i key={`full-${index}`} className='fa-solid fa-star star-fill'></i>
+          ))}
+          {hasHalfStar && <i className='fa-solid fa-star-half star-fill'></i>}
+          {Array.from({ length: emptyStars }, (_, index) => (
+            <i key={`empty-${index}`} className='fa-solid fa-star'></i>
+          ))}
+        </div>
+      </div>
+      <div className='review-content mt-2'>{review.content}</div>
+      <div className='review-reply-wrapper mt-2 ps-3'>
+        {review.reply && review.reply.data && review.reply.data.length > 0 ? <div>reply</div> : ''}
+      </div>
+    </div>
+  )
+}
