@@ -44,3 +44,10 @@ export interface IBusinessUserStatisticQuery {
   statusBusiness: StatusEnum | 'all'
   statusUser: UserOptionEnum | 'all'
 }
+
+export interface IGetReviewOfAdminQuery {
+  content?: string
+  starsRating?: string[]
+  userId?: string
+  businessId?: string
+}

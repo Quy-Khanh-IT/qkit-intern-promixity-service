@@ -104,9 +104,12 @@ export default function RootLayout({
   const onMenuClick: MenuProps['onClick'] = (e) => {
     const routeValueTemp = findRouteMenuBasedKey(userInformation?.role, e.key)
     setSelectedMenuKey(e.key)
-    window.location.href = LOCAL_ENDPOINT + routeValueTemp
+    console.log('e.key', e.key)
+    // window.location.href = LOCAL_ENDPOINT + routeValueTemp
+    router.push(routeValueTemp)
+    // window.location.reload()
     setRouteValue(routeValueTemp)
-    dispatch(setSidebarTab())
+    // dispatch(setSidebarTab())
   }
 
   const overlayStyle: React.CSSProperties = {
