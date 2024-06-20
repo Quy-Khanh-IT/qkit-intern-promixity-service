@@ -17,7 +17,7 @@ export default function ReviewList({ businessId }: { businessId: string }): Reac
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowReviews(true)
-    }, 500)
+    }, 1000)
 
     return (): void => clearTimeout(timer)
   }, [])
