@@ -50,3 +50,29 @@
 .review-container {
   border-bottom: 1px solid $gray-border;
 }
+
+.user-avatar {
+  img {
+    border-radius: 50%;
+    border: 1px solid $gray-border;
+  }
+}
+
+.ant-modal-content {
+  color: black !important;
+}
+
+.user-name {
+  font-weight: 700;
+}
+
+.review-business-name {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.review-text-area {
+  min-height: 120px;
+}

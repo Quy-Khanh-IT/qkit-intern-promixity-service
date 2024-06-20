@@ -60,3 +60,9 @@ export interface IReviewOwner {
   avatarUrl: string
   user_id: string
 }
+
+export interface ICreateReviewPayload {
+  content: string
+  star: string
+  businessId: string
+}

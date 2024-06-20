@@ -8,7 +8,6 @@ import { setSearchPosition } from '@/redux/slices/map-props.slice'
 import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
-import { IUserInformation } from '@/types/user'
 import { getPresentUrl } from '@/utils/helpers.util'
 import { Button, Dropdown, Image, Input, Layout, MenuProps, Space, Typography } from 'antd'
 import dynamic from 'next/dynamic'
@@ -24,8 +23,6 @@ import './map.scss'
 import { RoleEnum } from '@/types/enum'
 import { ITimeOption } from '@/types/business'
 
-const { Text } = Typography
-
 function MapPage(): React.ReactNode {
   const router = useRouter()
   const { onLogout, userInformation } = useAuth()
@@ -37,7 +34,7 @@ function MapPage(): React.ReactNode {
 
   const position = useSelector((state: RootState) => state.mapProps.position)
   const zoom = useSelector((state: RootState) => state.mapProps.zoom)
-  const { selectedBusinessId, selectedBusinessData } = useSelector((state: RootState) => state.selectedBusiness)
+  const { selectedBusinessId } = useSelector((state: RootState) => state.selectedBusiness)
   const { Header, Content } = Layout
   const { Search } = Input
   const [collapsed, setCollapsed] = useState<boolean>(true)
@@ -78,7 +75,8 @@ function MapPage(): React.ReactNode {
   const {
     data: searchResponse,
     isLoading,
-    isFetching
+    isFetching,
+    refetch
   } = useFindNearByQuery(queryData, {
     skip: !shouldFetch
   })
@@ -221,7 +219,11 @@ function MapPage(): React.ReactNode {
       onClick: handleLogout
     }
   ]
-
+  useEffect(() => {
+    if (shouldFetch) {
+      refetch()
+    }
+  }, [refetch, shouldFetch, queryData])
   return (
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>

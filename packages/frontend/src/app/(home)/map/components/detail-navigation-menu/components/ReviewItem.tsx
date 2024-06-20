@@ -55,6 +55,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
               alt='owner-avatar'
               width={32}
               height={32}
+              fallback={'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'}
             />
             <div className='ms-2'>
               <div className='owner-name'>{reply.postBy.firstName}</div>
@@ -63,6 +64,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
           </div>
         </div>
         <div className='review-content mt-2'>{reply.content}</div>
+        <div className='mb-1 mt-2 btn-reply'>Reply</div>
         {reply.replies && reply.replies.length > 0 && (
           <div>{reply.replies.map((childReply: IReplyReply) => renderReplyRecursive(childReply, level + 1))}</div>
         )}
@@ -71,6 +73,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
   }
   return (
     <div className='review-wrapper p-3'>
+      {/* Start Review */}
       <div className='review-owner-info '>
         <div className='review-owner-avatar d-flex mb-2'>
           <Image
@@ -82,6 +85,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
             alt='owner-avatar'
             width={32}
             height={32}
+            fallback={'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'}
           />
           <div className='ms-2'>
             <div className='owner-name'>{review.postBy.firstName} </div>
@@ -102,6 +106,10 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
         </div>
       </div>
       <div className='review-content mt-2'>{review.content}</div>
+      <div className='mb-3 mt-2 btn-reply'>Reply</div>
+      {/* End review */}
+
+      {/* Reply */}
       <div className='review-reply-wrapper mt-2 ps-3'>
         {review.reply && review.reply.data && review.reply.data.length > 0
           ? review.reply.data.map((reply) => renderReplyRecursive(reply))
