@@ -38,6 +38,7 @@ import { Review, UserSchema } from './entities/review.entity';
 import { CommentRepository } from './repository/comment.repository';
 import { ReviewRepository } from './repository/review.repository';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ReviewWithCommentsInterface } from './interfaces/review.inteface';
 
 @Injectable()
 export class ReviewService {
@@ -152,22 +153,6 @@ export class ReviewService {
       finalPipeline.push({ $match: matchStage });
     }
 
-    // finalPipeline.push({
-    //   $lookup: {
-    //     from: 'businesses', // The collection name for businesses
-    //     localField: 'businessId',
-    //     foreignField: '_id',
-    //     as: 'business',
-    //   },
-    // });
-
-    // finalPipeline.push({ $unwind: '$business' });
-    // finalPipeline.push({
-    //   $match: { 'business.name': { $regex: 'QKIT', $options: 'i' } },
-    // });
-
-    // console.log('finalPipeline', finalPipeline);
-
     if (Object.keys(sortStage).length > 0) {
       finalPipeline.push({ $sort: sortStage });
     }
@@ -275,7 +260,10 @@ export class ReviewService {
     return finalPipeline;
   }
 
-  async findById(id: string, filter?: CommentFilter): Promise<Review> {
+  async findById(
+    id: string,
+    filter?: CommentFilter,
+  ): Promise<ReviewWithCommentsInterface> {
     const review = await this.reviewRepository.findOneById(id);
 
     if (!review) {
@@ -288,8 +276,6 @@ export class ReviewService {
       offset: filter.offset,
       limit: 1,
     } as CommentFilter);
-
-    console.log('reps', reps);
 
     reps.data = reps?.data[0]?.replies;
 
@@ -307,7 +293,14 @@ export class ReviewService {
       }
     }
 
-    return reps;
+    console.log('reps', reps);
+
+    return {
+      ...plainToClass(Review, review),
+      reply: {
+        ...reps,
+      },
+    };
   }
 
   async getCommentsByReview(
