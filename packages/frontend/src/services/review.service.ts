@@ -1,8 +1,12 @@
 import { baseQueryWithAuth } from '@/constants/baseQuery'
 import {
+  ICreateCommentPayload,
+  ICreateResponseCommentPayload,
   ICreateReviewPayload,
   IGetReviewOfBusinessPayload,
   IGetReviewOfBusinessResponse,
+  IReply,
+  IReplyReply,
   IReview
 } from '@/types/review'
 
@@ -28,8 +32,29 @@ export const reviewApi = createApi({
         body: params
       }),
       invalidatesTags: ['Review', 'NearBy']
+    }),
+    createComment: builder.mutation<IReply, ICreateCommentPayload>({
+      query: (params) => ({
+        url: `/reviews/${params.reviewId}/comment`,
+        method: 'POST',
+        body: params
+      }),
+      invalidatesTags: ['Review']
+    }),
+    createResponseComment: builder.mutation<IReplyReply, ICreateResponseCommentPayload>({
+      query: (params) => ({
+        url: `/reviews/${params.commentId}/response`,
+        method: 'POST',
+        body: params
+      }),
+      invalidatesTags: ['Review']
     })
   })
 })
 
-export const { useGetReviewsForBusinessQuery, useCreateReviewMutation } = reviewApi
+export const {
+  useGetReviewsForBusinessQuery,
+  useCreateReviewMutation,
+  useCreateCommentMutation,
+  useCreateResponseCommentMutation
+} = reviewApi

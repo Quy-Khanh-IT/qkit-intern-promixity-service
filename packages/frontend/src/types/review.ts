@@ -64,3 +64,13 @@ export interface ICreateReviewPayload {
   star: string
   businessId: string
 }
+
+export interface ICreateCommentPayload {
+  reviewId: string
+  content: string
+}
+
+export interface ICreateResponseCommentPayload {
+  commentId: string
+  content: string
+}
