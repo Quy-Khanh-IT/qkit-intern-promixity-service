@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 interface IFilterPopupProps<K> {
   dataIndex: K
-  optionsData: IOptionsPipe
+  optionsData?: IOptionsPipe
   filterCustom?: FilterOptions[]
   selectCustom?: SelectionOptions[]
   defaultValue?: string[]
@@ -24,6 +24,8 @@ const FilterPopupProps = <T, K extends keyof T>({
   selectCustom,
   _handleFilter
 }: IFilterPopupProps<K>): ColumnType<T> => {
+  const [selectCoreCustom, setSelectCoreCustom] = useState<SelectionOptions[]>()
+  const [filterCoreCustom, setFilterCoreCustom] = useState<FilterOptions[]>()
   const [optionsDataValue, setOptionsDataValue] = useState<string[]>([])
   const checkedList = useRef<string[]>([])
 
@@ -31,19 +33,24 @@ const FilterPopupProps = <T, K extends keyof T>({
   const indeterminate = useRef<boolean>(false)
 
   useEffect(() => {
-    checkedList.current = defaultValue || []
-
-    checkAll.current = optionsData?.selectionOpts.length === checkedList.current.length
-
-    indeterminate.current =
-      checkedList.current.length > 0 && checkedList.current.length < optionsData?.selectionOpts.length
-  }, [defaultValue, optionsData?.selectionOpts.length])
+    setSelectCoreCustom(selectCustom || optionsData?.selectionOpts)
+    setFilterCoreCustom(filterCustom || optionsData?.filterOpts)
+  }, [selectCustom, filterCustom, optionsData])
 
   useEffect(() => {
-    if (optionsData) {
-      setOptionsDataValue(optionsData.selectionOpts.map((option) => option.value))
+    checkedList.current = defaultValue || []
+
+    checkAll.current = selectCoreCustom?.length === checkedList.current.length
+
+    indeterminate.current =
+      checkedList.current.length > 0 && checkedList.current.length < (selectCoreCustom?.length || 5)
+  }, [defaultValue, selectCoreCustom?.length])
+
+  useEffect(() => {
+    if (selectCoreCustom) {
+      setOptionsDataValue(selectCoreCustom.map((option) => option.value))
     }
-  }, [optionsData])
+  }, [selectCoreCustom])
 
   const onCheckAllChange = (e: CheckboxChangeEvent, setSelectedKeys: (_keys: React.Key[]) => void): void => {
     const checkedTempList = e.target.checked ? optionsDataValue : []
@@ -66,7 +73,7 @@ const FilterPopupProps = <T, K extends keyof T>({
   }
 
   return {
-    filters: filterCustom ?? optionsData?.filterOpts,
+    filters: filterCoreCustom,
     filterDropdown: ({ setSelectedKeys, confirm, clearFilters, close }): React.ReactNode => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()} className='d-flex flex-column gap-2'>
         <Checkbox
@@ -77,7 +84,7 @@ const FilterPopupProps = <T, K extends keyof T>({
           Check all
         </Checkbox>
         <CheckboxGroup
-          options={selectCustom ?? optionsData?.selectionOpts}
+          options={selectCoreCustom}
           value={checkedList.current}
           onChange={(list: string[]) => {
             checkedList.current = list

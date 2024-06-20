@@ -23,13 +23,7 @@ import { ColumnsType, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { IModalMethods } from '@/types/modal'
 import { IGetAllBusinessQuery } from '@/types/query'
-import {
-  compareDates,
-  convertSortOrder,
-  // encodeUrIValues,
-  formatDate,
-  parseSearchParamsToObject
-} from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
 import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
@@ -419,7 +413,6 @@ const ManageBusiness = (): React.ReactNode => {
       },
       ...FilterPopupProps<IBusiness, DataIndex>({
         dataIndex: 'overallRating',
-        optionsData: statusData as IOptionsPipe,
         defaultValue: queryData?.starsRating || [],
         filterCustom: RATING_OPTIONS_FILTERS,
         selectCustom: RATING_SELECT_FILTERS,

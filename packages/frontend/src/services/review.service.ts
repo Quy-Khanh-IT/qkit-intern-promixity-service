@@ -1,13 +1,12 @@
-import { API_ENDPOINT } from '@/constants'
+import { baseQueryWithAuth } from '@/constants/baseQuery'
 import { IGetAllReviewOfAdminQuery } from '@/types/query'
 import { IGetReviewOfBusinessPayload, IGetReviewOfBusinessResponse } from '@/types/review'
-
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 import qs from 'qs'
 
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
-  baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
+  baseQuery: baseQueryWithAuth,
   tagTypes: ['ReviewList'],
   endpoints: (builder) => ({
     getReviewsForBusiness: builder.query<IGetReviewOfBusinessResponse, IGetReviewOfBusinessPayload>({
