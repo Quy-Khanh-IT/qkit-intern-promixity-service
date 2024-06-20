@@ -1,18 +1,20 @@
 import { API_ENDPOINT } from '@/constants'
-import { District, Province } from '@/types/address'
+import { IGetReviewOfBusinessPayload, IGetReviewOfBusinessResponse } from '@/types/review'
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
   baseQuery: fetchBaseQuery({ baseUrl: API_ENDPOINT }),
   endpoints: (builder) => ({
-    getProvinces: builder.query<{ count: number; items: Province[] }, void>({
-      query: () => '/address/provinces'
-    }),
-    getDistrictByProvinceCode: builder.query<{ count: number; items: District[] }, string>({
-      query: (provinceCode: string) => `/address/districts/${provinceCode}`
+    getReviewsForBusiness: builder.query<IGetReviewOfBusinessResponse, IGetReviewOfBusinessPayload>({
+      query: (params) => ({
+        url: `/reviews/${params.businessId}/filter`,
+        method: 'GET',
+        params
+      })
     })
   })
 })
 
-export const { useGetProvincesQuery, useGetDistrictByProvinceCodeQuery } = reviewApi
+export const { useGetReviewsForBusinessQuery } = reviewApi

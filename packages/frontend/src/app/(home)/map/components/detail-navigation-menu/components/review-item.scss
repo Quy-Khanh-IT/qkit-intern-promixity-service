@@ -1,0 +1,26 @@
+@import '@/sass/common/common.scss';
+.review-owner-info {
+}
+
+.review-wrapper {
+  border-bottom: 1px solid $gray-border;
+}
+
+.review-owner-avatar {
+  img {
+    border-radius: 50%;
+  }
+}
+
+.owner-name {
+  color: black;
+  font-size: 12px;
+}
+
+.review-time {
+  font-size: 12px;
+}
+
+.review-content {
+  color: black;
+}
