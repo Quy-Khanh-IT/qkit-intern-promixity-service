@@ -1,6 +1,8 @@
 import { LOCAL_ENDPOINT } from '@/constants'
 import { NotificationEnum, SortEnum, SortEnumAlias } from '@/types/enum'
 import qs from 'qs'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 export function formatDate(inputDate: string): string {
   const dateObj = new Date(inputDate)
@@ -35,30 +37,9 @@ export const getPresentUrl = (): string => {
 }
 
 export const getTimeHistory = (expiryTime: string): string => {
-  const currentDate = new Date()
-  const expiryDate = new Date(expiryTime)
-  const diffTime = Math.abs(currentDate.getTime() - expiryDate.getTime())
-
-  const diffSeconds = Math.floor((diffTime / 1000) % 60)
-  const diffMinutes = Math.floor((diffTime / 1000 / 60) % 60)
-  const diffHours = Math.floor((diffTime / (1000 * 60 * 60)) % 24)
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  const diffMonths = Math.floor(diffDays / 30)
-  const diffYears = Math.floor(diffDays / 365)
-
-  if (diffYears > 0) {
-    return `${diffYears} năm trước`
-  } else if (diffMonths > 0) {
-    return `${diffMonths} tháng trước`
-  } else if (diffDays > 0) {
-    return `${diffDays} ngày trước`
-  } else if (diffHours > 0) {
-    return `${diffHours} giờ trước`
-  } else if (diffMinutes > 0) {
-    return `${diffMinutes} phút trước`
-  } else {
-    return `${diffSeconds} giây trước`
-  }
+  if (expiryTime === '') return ''
+  dayjs.extend(relativeTime)
+  return dayjs(new Date(expiryTime)).fromNow()
 }
 
 export const convertNotificationType = (type: string): string => {

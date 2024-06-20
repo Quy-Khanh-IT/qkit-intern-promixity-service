@@ -34,12 +34,14 @@ export interface IReview {
 }
 
 export interface IReply {
-  _page: number
   postBy: IReviewOwner
+  _page: number
   content: string
   id: string
   review_id: string
   replies: IReplyReply[]
+  created_at?: string
+  updated_at?: string
 }
 
 export interface IReplyReply {
@@ -49,6 +51,8 @@ export interface IReplyReply {
   review_id: string
   parent_id: string
   replies: IReplyReply[]
+  created_at?: string
+  updated_at?: string
 }
 
 export interface IReviewOwner {

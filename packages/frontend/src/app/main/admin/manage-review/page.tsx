@@ -1,31 +1,19 @@
 'use client'
-import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
-import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
-import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
+import { DEFAULT_DATE_FORMAT, ROUTE, StorageKey } from '@/constants'
 import { RootState } from '@/redux/store'
-import { ColumnsType, IOptionsPipe } from '@/types/common'
-import { IModalMethods } from '@/types/modal'
+import variables from '@/sass/common/_variables.module.scss'
+import { useGetReviewsForAdminQuery } from '@/services/review.service'
+import { ColumnsType } from '@/types/common'
+import { TableActionEnum } from '@/types/enum'
+import { IGetAllReviewOfAdminQuery } from '@/types/query'
+import { IReview } from '@/types/review'
 import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
 import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
-import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
-import {
-  Col,
-  DatePicker,
-  DescriptionsProps,
-  Dropdown,
-  Flex,
-  MenuProps,
-  PaginationProps,
-  Row,
-  Select,
-  TableProps,
-  Tag,
-  Typography
-} from 'antd'
+import { EllipsisOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { Col, DatePicker, Dropdown, Flex, MenuProps, PaginationProps, Row, Select, TableProps, Typography } from 'antd'
 import { RangePickerProps } from 'antd/es/date-picker'
 import {
   FilterDropdownProps,
@@ -36,17 +24,11 @@ import {
 } from 'antd/es/table/interface'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import qs from 'qs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
-import { generateRoleColor } from '../../utils/main.util'
+import { RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { MANAGE_REVIEW_FIELDS } from './manage-review.const'
 import './manage-review.scss'
-import { IReview } from '@/types/review'
-import { IGetAllReviewOfAdminQuery } from '@/types/query'
-import { useGetReviewsForAdminQuery } from '@/services/review.service'
-import { TableActionEnum } from '@/types/enum'
-import variables from '@/sass/common/_variables.module.scss'
 
 const { starColor } = variables
 
@@ -60,9 +42,6 @@ const ACTIVE_FETCH = '1'
 const DELETED_FETCH = '2'
 
 const VIEW_DETAILS_OPTION = 1
-const DECENTRALIZE_OPTION = 2
-const RESTORE_OPTION = 2
-const DELETE_OPTION = 3
 
 type DataIndex = keyof IReview
 // For search
@@ -94,12 +73,6 @@ const ManageReview = (): React.ReactNode => {
     parseSearchParamsToObject(searchParams.toString()) as IGetAllReviewOfAdminQuery
   )
   const [selectedUser, setSelectedUser] = useState<IReview | null>(null)
-
-  // Modal
-  const refViewDetailsModal = useRef<IModalMethods | null>(null)
-  const refDecentralizeModal = useRef<IModalMethods | null>(null)
-  const refRestoreModal = useRef<IModalMethods | null>(null)
-  const refDeleteUserModal = useRef<IModalMethods | null>(null)
 
   // Redux
   const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
@@ -156,13 +129,7 @@ const ManageReview = (): React.ReactNode => {
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
-      refViewDetailsModal.current?.showModal()
-    } else if (selectedOpt === DECENTRALIZE_OPTION && userOptionBoolean === false) {
-      refDecentralizeModal.current?.showModal()
-    } else if (selectedOpt === RESTORE_OPTION && userOptionBoolean === true) {
-      refRestoreModal.current?.showModal()
-    } else if (selectedOpt === DELETE_OPTION) {
-      refDeleteUserModal.current?.showModal()
+      router.push(`${ROUTE.MANAGE_REVIEW}/${selectedUser?.id}`)
     }
   }
 
@@ -291,34 +258,6 @@ const ManageReview = (): React.ReactNode => {
             label: <span>View Details</span>,
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
-          },
-          ...(userOption === ACTIVE_FETCH
-            ? [
-                {
-                  key: 'Decentralize',
-                  label: <span>Decentralize</span>,
-                  icon: <UserAddOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: () => handleModal(2)
-                }
-              ]
-            : [
-                {
-                  key: 'Restore',
-                  label: <span>Restore</span>,
-                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
-                  onClick: (): void => handleModal(2)
-                }
-              ]),
-          {
-            key: 'Delete ',
-            label: <span className={userOptionBoolean ? 'error-modal-title' : ''}>Delete</span>,
-            icon: (
-              <i
-                className={`fa-regular fa-trash ${userOptionBoolean ? 'error-modal-title' : 'delete-icon'}`}
-                style={{ fontSize: 15, cursor: 'pointer' }}
-              ></i>
-            ),
-            onClick: (): void => handleModal(3)
           }
         ]
         return (
@@ -334,7 +273,7 @@ const ManageReview = (): React.ReactNode => {
       title: MANAGE_REVIEW_FIELDS.firstName,
       dataIndex: 'firstName',
       key: 'firstName',
-      width: 160,
+      width: 160
       // ...SearchPopupProps<IReview, DataIndex>({
       //   dataIndex: 'firstName',
       //   placeholder: MANAGE_REVIEW_FIELDS.firstName,
@@ -346,7 +285,7 @@ const ManageReview = (): React.ReactNode => {
       title: MANAGE_REVIEW_FIELDS.lastName,
       dataIndex: 'lastName',
       key: 'lastName',
-      width: 160,
+      width: 160
       // ...SearchPopupProps<IReview, DataIndex>({
       //   dataIndex: 'lastName',
       //   placeholder: MANAGE_REVIEW_FIELDS.lastName,
@@ -369,7 +308,7 @@ const ManageReview = (): React.ReactNode => {
       title: MANAGE_REVIEW_FIELDS.businessName,
       dataIndex: 'businessName',
       key: 'businessName',
-      width: 200,
+      width: 200
       // ...SearchPopupProps<IReview, DataIndex>({
       //   dataIndex: 'businessName',
       //   placeholder: MANAGE_REVIEW_FIELDS.businessName,
@@ -457,11 +396,11 @@ const ManageReview = (): React.ReactNode => {
   const options = [
     {
       value: ACTIVE_FETCH,
-      label: 'Active users'
+      label: 'Active reviews'
     },
     {
       value: DELETED_FETCH,
-      label: 'Deleted users'
+      label: 'Deleted reviews'
     }
   ]
 
