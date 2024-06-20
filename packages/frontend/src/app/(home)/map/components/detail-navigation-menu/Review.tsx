@@ -103,18 +103,21 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
       {/* Modal write a review */}
       <Modal okText='Post' open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
         <div className='review-business-name text-center mb-3'>{business.name}</div>
-        <div className='user-info d-flex align-items-center '>
-          <div className='user-avatar mb-2'>
-            <Image
-              preview={false}
-              height={40}
-              width={40}
-              alt='user-avatar'
-              src='https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
-            />
+        {userInformation && userInformation.isVerified && (
+          <div className='user-info d-flex align-items-center '>
+            <div className='user-avatar mb-2'>
+              <Image
+                preview={false}
+                height={40}
+                width={40}
+                alt='user-avatar'
+                src={userInformation.image}
+                fallback='https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
+              />
+            </div>
+            <div className='user-name ms-2'>{`${userInformation.lastName} ${userInformation.firstName}`}</div>
           </div>
-          <div className='user-name ms-2'>Trương Nguyễn Công Chính</div>
-        </div>
+        )}
 
         <div className='d-flex align-items-center justify-content-center mt-2 mb-1'>
           <Rate value={ratingValue} onChange={(value) => setRatingValue(value)} />
