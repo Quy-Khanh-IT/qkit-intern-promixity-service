@@ -51,7 +51,7 @@ export const findKeyMenuBasedRoute = (role: string, routeValue: string): string 
   const findKey = (options: SidebarOptions): string | undefined => {
     const foundOption = Object.entries(options).find(([routeAlias, _objectValue]: [string, SidebarOption]) => {
       const routeTemp: string = ROUTE[routeAlias as keyof typeof ROUTE]
-      return routeTemp.includes(routeValue)
+      return routeValue.includes(routeTemp)
     })
     return foundOption ? foundOption[1].key : undefined
   }

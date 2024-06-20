@@ -8,16 +8,18 @@ const { Text, Title } = Typography
 
 interface IAdminReviewProps {
   data: IReply[] | IReplyReply[]
+  offsetNumber: number
 }
 
-const AdminReview: React.FC<IAdminReviewProps> = ({ data }) => {
+const AdminReview: React.FC<IAdminReviewProps> = ({ data, offsetNumber }) => {
+  const _offsetCoreNumber = offsetNumber > 6 ? 6 : offsetNumber
+
   return (
     <>
       {data.map((item: IReply | IReplyReply) => {
-        const offsetNumber = 2
         return (
           <>
-            <Col span={24 - offsetNumber} push={offsetNumber} key={item.id}>
+            <Col span={24 - _offsetCoreNumber} push={_offsetCoreNumber} key={item.id}>
               <Card className='shadow-3-down'>
                 <Flex>
                   <div>
@@ -41,7 +43,9 @@ const AdminReview: React.FC<IAdminReviewProps> = ({ data }) => {
               </Card>
             </Col>
 
-            {item?.replies && item.replies.length > 0 && <AdminReview data={item.replies} />}
+            {item?.replies && item.replies.length > 0 && (
+              <AdminReview data={item.replies} offsetNumber={offsetNumber + 2} />
+            )}
           </>
         )
       })}

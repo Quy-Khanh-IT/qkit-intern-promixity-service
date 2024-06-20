@@ -27,7 +27,7 @@ const ImageCustom: React.FC<ImageCustomProps> = ({ width, height, src, className
             src={PLACEHOLDER.LOADING_IMAGE}
             width={width}
             height={height}
-            alt={PLACEHOLDER.ERROR_IMAGE}
+            alt={PLACEHOLDER.ERROR_IMAGE_2}
           />
         }
         fallback={PLACEHOLDER.ERROR_IMAGE}
