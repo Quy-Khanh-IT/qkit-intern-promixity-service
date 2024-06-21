@@ -1,23 +1,22 @@
 'use client'
 import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
+import AdminReview from '@/app/components/Review/AdminReview'
+import { useGetReviewsByIdQuery } from '@/services/review.service'
+import { getTimeHistory } from '@/utils/helpers.util'
 import { Button, Card, Col, Flex, Row, Space, Typography } from 'antd'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 import './review-details.scss'
-import jsonData from './test.json'
-import { IReview } from '@/types/review'
-import { getTimeHistory } from '@/utils/helpers.util'
-import AdminReview from '@/app/components/Review/AdminReview'
 
 const { Text, Title } = Typography
 
 const ReviewDetails = (): React.ReactNode => {
   const router = useRouter()
-  const reviewsData: IReview = jsonData
   const params = useParams<{ slug: string }>()
+  const { data: reviewData } = useGetReviewsByIdQuery(params.slug)
 
   useEffect(() => {
-    console.log('reviewsData', reviewsData)
+    console.log('reviewData', reviewData)
   })
 
   return (
@@ -37,25 +36,25 @@ const ReviewDetails = (): React.ReactNode => {
                     <ImageCustom
                       width={65}
                       height={65}
-                      src={reviewsData.postBy.avatarUrl}
+                      src={reviewData?.postBy.avatarUrl}
                       className='d-flex align-self-center'
                     />
                   </div>
                   <Flex className='ms-3' vertical>
                     <Space className='w-100'>
                       <Title level={5} className='mb-0'>
-                        {reviewsData.postBy.firstName}
+                        {reviewData?.postBy.firstName} {reviewData?.postBy?.lastName}
                       </Title>
-                      <Text>{getTimeHistory(reviewsData.created_at)}</Text>
+                      <Text>{getTimeHistory(reviewData?.created_at || '')}</Text>
                     </Space>
-                    <Text>{reviewsData.content}</Text>
+                    <Text>{reviewData?.content}</Text>
                   </Flex>
                 </Flex>
               </Card>
             </Col>
 
-            {reviewsData?.reply && reviewsData.reply?.data && reviewsData.reply.data.length > 0 && (
-              <AdminReview data={reviewsData.reply.data} offsetNumber={2} />
+            {reviewData?.reply && reviewData.reply?.data && reviewData.reply.data.length > 0 && (
+              <AdminReview data={reviewData.reply.data} offsetNumber={2} />
             )}
           </div>
         </Col>

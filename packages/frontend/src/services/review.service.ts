@@ -12,7 +12,7 @@ import {
   IReview
 } from '@/types/review'
 
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
 
 export const reviewApi = createApi({
   reducerPath: 'reviewApi',
@@ -60,14 +60,18 @@ export const reviewApi = createApi({
         body: params
       }),
       invalidatesTags: ['ReviewList']
+    }),
+    getReviewsById: builder.query<IReview, string>({
+      query: (reviewId) => `/reviews/${reviewId}?offset=1`,
+      providesTags: ['ReviewList']
     })
   })
 })
-
 export const {
   useGetReviewsForBusinessQuery,
   useCreateReviewMutation,
   useCreateCommentMutation,
   useCreateResponseCommentMutation,
-  useGetReviewsForAdminQuery
+  useGetReviewsForAdminQuery,
+  useGetReviewsByIdQuery
 } = reviewApi
