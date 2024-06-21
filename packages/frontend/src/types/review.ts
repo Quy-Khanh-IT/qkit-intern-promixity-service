@@ -76,3 +76,7 @@ export interface ICreateResponseCommentPayload {
   commentId: string
   content: string
 }
+
+export interface IEmotions {
+  [key: string]: string
+}
