@@ -13,7 +13,11 @@ import Overview from './detail-navigation-menu/Overview'
 import About from './detail-navigation-menu/About'
 import Review from './detail-navigation-menu/Review'
 
-export default function SearchItemDetail(): React.ReactNode {
+export default function SearchItemDetail({
+  handleChangeFetch
+}: {
+  handleChangeFetch: (value: boolean) => void
+}): React.ReactNode {
   const dispatch = useDispatch()
   const business: IBusiness | null = useSelector((state: RootState) => state.selectedBusiness.selectedBusinessData)
 
@@ -91,7 +95,7 @@ export default function SearchItemDetail(): React.ReactNode {
                 {menuActive === 'Overview' ? (
                   <Overview handleOnChangeMenu={handleOnChangeMenu} business={business} />
                 ) : menuActive === 'Reviews' ? (
-                  <Review business={business} />
+                  <Review handleChangeFetch={handleChangeFetch} business={business} />
                 ) : (
                   <About business={business} />
                 )}

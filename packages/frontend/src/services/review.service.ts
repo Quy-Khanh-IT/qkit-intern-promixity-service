@@ -5,6 +5,7 @@ import {
   ICreateCommentPayload,
   ICreateResponseCommentPayload,
   ICreateReviewPayload,
+  IEmotions,
   IGetReviewOfBusinessPayload,
   IGetReviewOfBusinessResponse,
   IReply,
@@ -61,6 +62,12 @@ export const reviewApi = createApi({
       }),
       invalidatesTags: ['ReviewList']
     }),
+    getEmotions: builder.query<IEmotions, void>({
+      query: () => ({
+        url: `/reviews/emotions`,
+        method: 'GET'
+      })
+    }),
     getReviewsById: builder.query<IReview, string>({
       query: (reviewId) => `/reviews/${reviewId}?offset=1`,
       providesTags: ['ReviewList']
@@ -73,5 +80,6 @@ export const {
   useCreateCommentMutation,
   useCreateResponseCommentMutation,
   useGetReviewsForAdminQuery,
+  useGetEmotionsQuery,
   useGetReviewsByIdQuery
 } = reviewApi

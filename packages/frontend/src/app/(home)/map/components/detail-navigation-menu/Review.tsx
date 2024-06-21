@@ -3,13 +3,19 @@ import './review.scss'
 import StarProgressBar from './components/StarProgressBar'
 import { IBusiness } from '@/types/business'
 import ReviewList from './components/ReviewList'
-import { Image, Modal, Rate } from 'antd'
+import { Image, Modal, Rate, Select } from 'antd'
 import { useAuth } from '@/context/AuthContext'
 import { ToastService } from '@/services/toast.service'
-import { useCreateReviewMutation } from '@/services/review.service'
+import { useCreateReviewMutation, useGetEmotionsQuery } from '@/services/review.service'
 import { ICreateReviewPayload } from '@/types/review'
 
-export default function Review({ business }: { business: IBusiness }): React.ReactNode {
+export default function Review({
+  business,
+  handleChangeFetch
+}: {
+  business: IBusiness
+  handleChangeFetch: (value: boolean) => void
+}): React.ReactNode {
   const rating = business.overallRating
   const totalReview = business.totalReview
 
@@ -22,6 +28,7 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [reviewText, setReviewText] = useState<string>('')
   const [ratingValue, setRatingValue] = useState<number>(0)
+  const [emotionValue, setEmotionValue] = useState<string>('')
 
   const [createReview, { isSuccess: isCreatedSuccess, isError: isCreatedError }] = useCreateReviewMutation()
 
@@ -33,16 +40,20 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
     }
   }
 
+  const { data: emotions } = useGetEmotionsQuery()
+
   const handleOk = (): void => {
-    if (ratingValue < 1) {
+    if (ratingValue < 1 && emotionValue === '') {
       toastService.error('Please rate this business')
     } else {
       if (reviewText) {
         const payload: ICreateReviewPayload = {
           businessId: business.id,
           content: reviewText,
-          star: ratingValue.toString()
+          star: ratingValue.toString(),
+          emotion: emotionValue
         }
+
         createReview(payload)
       } else {
         toastService.error('Please enter a review')
@@ -56,6 +67,8 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
       setIsModalOpen(false)
       setReviewText('')
       setRatingValue(0)
+      setEmotionValue('')
+      handleChangeFetch(true)
     } else if (isCreatedError) {
       toastService.error('Review failed to create')
     }
@@ -65,6 +78,33 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
     setIsModalOpen(false)
   }
 
+  const emotionOptions = Object.entries(emotions || {}).map(([label, value]) => {
+    let color
+    switch (value) {
+      case 'EXCELLENT':
+        color = '#28a745'
+        break
+      case 'GOOD':
+        color = '#17a2b8'
+        break
+      case 'NORMAL':
+        color = '#ffc107'
+        break
+      case 'BAD':
+        color = '#dc3545'
+        break
+      default:
+        color = '#000000'
+    }
+
+    return { value, label, color }
+  })
+
+  const handleChangeEmotion = (value: string): void => {
+    setEmotionValue(value)
+  }
+
+  console.log(emotionValue)
   return (
     <div className='review-wrapper'>
       <div className='container review-container pb-2'>
@@ -122,6 +162,19 @@ export default function Review({ business }: { business: IBusiness }): React.Rea
         <div className='d-flex align-items-center justify-content-center mt-2 mb-1'>
           <Rate value={ratingValue} onChange={(value) => setRatingValue(value)} />
         </div>
+        {emotions && emotionOptions.length > 0 ? (
+          <div className='d-flex align-items-center mt-3 mb-1'>
+            <div>Your experience here:</div>
+            <Select
+              onChange={handleChangeEmotion}
+              className='ms-2'
+              style={{ width: 140 }}
+              options={emotionOptions}
+            ></Select>
+          </div>
+        ) : (
+          ''
+        )}
         <textarea
           value={reviewText}
           onChange={(e) => setReviewText(e.target.value)}

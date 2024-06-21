@@ -66,6 +66,7 @@ export interface ICreateReviewPayload {
   content: string
   star: string
   businessId: string
+  emotion: string
 }
 
 export interface ICreateCommentPayload {
@@ -76,4 +77,8 @@ export interface ICreateCommentPayload {
 export interface ICreateResponseCommentPayload {
   commentId: string
   content: string
+}
+
+export interface IEmotions {
+  [key: string]: string
 }
