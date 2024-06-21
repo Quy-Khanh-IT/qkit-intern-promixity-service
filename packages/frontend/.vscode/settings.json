@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "addressdetails",
+    "antd",
     "btns",
     "canvasjs",
     "countrycodes",
@@ -10,9 +11,11 @@
     "NOMINATIM",
     "otps",
     "phash",
+    "reduxjs",
     "Sider",
     "signin",
     "Việt",
+    "xmark",
     "zoomend"
   ]
 }

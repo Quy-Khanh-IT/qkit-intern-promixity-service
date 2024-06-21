@@ -1,0 +1,78 @@
+@import '@/sass/common/common.scss';
+.star-progress-bar-wrapper {
+  width: 70%;
+}
+
+.rating-detail-wrapper {
+  width: 30%;
+}
+
+.star-progress-bar {
+  width: 208px !important;
+}
+
+.star-number {
+  width: 40px;
+  text-align: center;
+}
+
+.rating-detail {
+  font-size: 44px;
+  color: black;
+  line-height: 1.1;
+}
+
+.business-rating {
+  font-size: 10px !important;
+  i {
+    margin-right: 1px;
+  }
+}
+
+.send-review-btn {
+  border: 1px solid $gray-border;
+  width: 145px;
+  height: 36px;
+  border-radius: 16px;
+  color: black;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  i {
+    color: $link-color;
+  }
+
+  &:hover {
+    background-color: $gray-hover;
+  }
+}
+
+.review-container {
+  border-bottom: 1px solid $gray-border;
+}
+
+.user-avatar {
+  img {
+    border-radius: 50%;
+    border: 1px solid $gray-border;
+  }
+}
+
+.ant-modal-content {
+  color: black !important;
+}
+
+.user-name {
+  font-weight: 700;
+}
+
+.review-business-name {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.review-text-area {
+  min-height: 120px;
+}

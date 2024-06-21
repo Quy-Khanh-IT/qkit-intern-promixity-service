@@ -102,14 +102,20 @@ const findNextOpenTime = (
     return parseInt(dayA || '0', 10) - parseInt(dayB || '0', 10)
   })
 
-  for (const schedule of sortedDayOfWeek) {
-    const openTime: Dayjs = dayjs()
-      .startOf('day')
-      .add(dayjs(`${schedule.openTime}`, 'HH:mm').hour(), 'hour')
-      .add(dayjs(`${schedule.openTime}`, 'HH:mm').minute(), 'minute')
+  const currentDayIndex = sortedDayOfWeek.findIndex((schedule) => schedule.day === dayOfWeekMap[currentTime.day()])
 
-    if (openTime.isAfter(currentTime)) {
-      return openTime
+  for (let i = 1; i <= sortedDayOfWeek.length; i++) {
+    const nextDayIndex = (currentDayIndex + i) % sortedDayOfWeek.length
+    const schedule = sortedDayOfWeek[nextDayIndex]
+
+    const nextOpenTime = dayjs()
+      .day((currentTime.day() + i) % 7)
+      .startOf('day')
+      .hour(parseInt(schedule.openTime.split(':')[0], 10))
+      .minute(parseInt(schedule.openTime.split(':')[1], 10))
+
+    if (nextOpenTime.isAfter(currentTime)) {
+      return nextOpenTime
     }
   }
 

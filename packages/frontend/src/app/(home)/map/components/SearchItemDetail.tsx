@@ -11,6 +11,7 @@ import { RootState } from '@/redux/store'
 
 import Overview from './detail-navigation-menu/Overview'
 import About from './detail-navigation-menu/About'
+import Review from './detail-navigation-menu/Review'
 
 export default function SearchItemDetail(): React.ReactNode {
   const dispatch = useDispatch()
@@ -31,23 +32,37 @@ export default function SearchItemDetail(): React.ReactNode {
       {business ? (
         <div className='detail-container'>
           <div className='detail-container-wrapper h-100 v-100 scroll-bar-2'>
-            <div onClick={handleOnClose} className='close-btn d-flex align-items-center justify-content-center'>
-              <i className='fa-solid fa-xmark'></i>
-            </div>
-            <Image
-              src={business.images?.[0]?.url ? business.images?.[0]?.url : './images/default_business.png'}
-              width={360}
-              height={240}
-              alt='business-image'
-              className='detail-thumb'
-              fallback='./images/default_business.png'
-            />
-            <div className='detail-content-wrapper w-100'>
-              <div className='p-3'>
-                <h5 className='detail-title'>{business.name}</h5>
-                <StarRating rating={business.overallRating} totalReview={business.totalReview} />
-                <div className='business-category'>{business.category.name}</div>
+            {menuActive === 'Overview' ? (
+              <>
+                <div onClick={handleOnClose} className='close-btn d-flex align-items-center justify-content-center'>
+                  <i className='fa-solid fa-xmark'></i>
+                </div>
+                <Image
+                  src={business.images?.[0]?.url ? business.images?.[0]?.url : './images/default_business.png'}
+                  width={360}
+                  height={240}
+                  alt='business-image'
+                  className='detail-thumb'
+                  fallback='./images/default_business.png'
+                />
+              </>
+            ) : (
+              <div className='navigation-bar-business d-flex align-items-center ps-2 pe-2 justify-content-between mb-2'>
+                <i onClick={() => handleOnChangeMenu('Overview')} className='fa-solid fa-arrow-left'></i>
+                <div className='business-nav-title'>{business.name}</div>
+                <i onClick={handleOnClose} className='fa-solid fa-xmark'></i>
               </div>
+            )}
+            <div className='detail-content-wrapper w-100'>
+              {menuActive === 'Overview' ? (
+                <div className='p-3 navigation-menu-wrapper'>
+                  <h5 className='detail-title'>{business.name}</h5>
+                  <StarRating rating={business.overallRating} totalReview={business.totalReview} />
+                  <div className='business-category'>{business.category.name}</div>
+                </div>
+              ) : (
+                ''
+              )}
 
               <div className='navigation-menu container '>
                 <div className='menu-tab-list row'>
@@ -74,9 +89,9 @@ export default function SearchItemDetail(): React.ReactNode {
 
               <>
                 {menuActive === 'Overview' ? (
-                  <Overview business={business} />
+                  <Overview handleOnChangeMenu={handleOnChangeMenu} business={business} />
                 ) : menuActive === 'Reviews' ? (
-                  <div>Reviews</div>
+                  <Review business={business} />
                 ) : (
                   <About business={business} />
                 )}

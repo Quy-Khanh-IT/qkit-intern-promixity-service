@@ -33,7 +33,8 @@ export const store = configureStore({
     [serviceApi.reducerPath]: serviceApi.reducer,
     [reviewApi.reducerPath]: reviewApi.reducer,
     [statisticApi.reducerPath]: statisticApi.reducer,
-    [addressLineApi.reducerPath]: addressLineApi.reducer
+    [addressLineApi.reducerPath]: addressLineApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -50,7 +51,8 @@ export const store = configureStore({
       reviewApi.middleware,
       statisticApi.middleware,
       addressLineApi.middleware,
-      rtkQueryErrorLogger
+      rtkQueryErrorLogger,
+      reviewApi.middleware
     )
 })
 

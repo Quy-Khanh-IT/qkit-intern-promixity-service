@@ -4,10 +4,19 @@ import ItemStatus from '../search-item/ItemStatus'
 import { Carousel, Image } from 'antd'
 import './overview.scss'
 
-export default function Overview({ business }: { business: IBusiness }): React.ReactNode {
+export default function Overview({
+  business,
+  handleOnChangeMenu
+}: {
+  business: IBusiness
+  handleOnChangeMenu(menu: string): void
+}): React.ReactNode {
   return (
     <div>
-      <div className='service-wrapper p-3 pt-4 pb-4 d-flex align-items-center justify-content-between'>
+      <div
+        onClick={() => handleOnChangeMenu('About')}
+        className='service-wrapper p-3 pt-4 pb-4 d-flex align-items-center justify-content-between'
+      >
         <div className='service-list d-flex  align-items-center '>
           <ItemService isDetail={true} services={business.services} />
         </div>

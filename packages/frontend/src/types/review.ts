@@ -60,3 +60,19 @@ export interface IReviewOwner {
   avatarUrl: string
   user_id: string
 }
+
+export interface ICreateReviewPayload {
+  content: string
+  star: string
+  businessId: string
+}
+
+export interface ICreateCommentPayload {
+  reviewId: string
+  content: string
+}
+
+export interface ICreateResponseCommentPayload {
+  commentId: string
+  content: string
+}
