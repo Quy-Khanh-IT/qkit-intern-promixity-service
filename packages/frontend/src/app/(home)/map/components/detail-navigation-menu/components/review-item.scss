@@ -7,6 +7,10 @@
   text-align: justify;
 }
 
+.review-reply-wrapper {
+  border-left: 1px solid $gray-border;
+}
+
 .review-owner-avatar {
   img {
     border-radius: 50%;
