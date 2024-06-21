@@ -22,6 +22,7 @@ export interface IReview {
   content: string
   type: string
   star: number
+  reportedCount: number
   id: string
   reply: {
     currentPage: number

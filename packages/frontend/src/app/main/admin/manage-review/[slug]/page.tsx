@@ -5,7 +5,7 @@ import { useGetReviewsByIdQuery } from '@/services/review.service'
 import { getTimeHistory } from '@/utils/helpers.util'
 import { Button, Card, Col, Flex, Row, Space, Typography } from 'antd'
 import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect } from 'react'
+import React from 'react'
 import './review-details.scss'
 
 const { Text, Title } = Typography
@@ -14,10 +14,6 @@ const ReviewDetails = (): React.ReactNode => {
   const router = useRouter()
   const params = useParams<{ slug: string }>()
   const { data: reviewData } = useGetReviewsByIdQuery(params.slug)
-
-  useEffect(() => {
-    console.log('reviewData', reviewData)
-  })
 
   return (
     <div>
@@ -54,7 +50,15 @@ const ReviewDetails = (): React.ReactNode => {
             </Col>
 
             {reviewData?.reply && reviewData.reply?.data && reviewData.reply.data.length > 0 && (
-              <AdminReview data={reviewData.reply.data} offsetNumber={2} />
+              <div className='pb-3'>
+                {reviewData.reply.data.length === 1 ? (
+                  <div className='split-review-section'>
+                    <AdminReview data={reviewData.reply.data} offsetNumber={2} />
+                  </div>
+                ) : (
+                  <AdminReview data={reviewData.reply.data} offsetNumber={2} />
+                )}
+              </div>
             )}
           </div>
         </Col>

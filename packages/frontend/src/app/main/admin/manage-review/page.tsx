@@ -1,11 +1,16 @@
 'use client'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
+import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import TableComponent from '@/app/components/admin/Table/Table'
-import { DEFAULT_DATE_FORMAT, ROUTE, StorageKey } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, ROUTE, StorageKey } from '@/constants'
 import { RootState } from '@/redux/store'
 import variables from '@/sass/common/_variables.module.scss'
-import { useGetReviewsForAdminQuery } from '@/services/review.service'
+import {
+  useDeleteReviewByIdMutation,
+  useGetReviewsForAdminQuery,
+  useRestoreReviewByIdMutation
+} from '@/services/review.service'
 import { ColumnsType } from '@/types/common'
 import { TableActionEnum } from '@/types/enum'
 import { IGetAllReviewOfAdminQuery } from '@/types/query'
@@ -24,11 +29,13 @@ import {
 } from 'antd/es/table/interface'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import qs from 'qs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
+import { DELETE_OPTIONS, RATING_OPTIONS_FILTERS, RATING_SELECT_FILTERS } from '../../admin.constant'
 import { MANAGE_REVIEW_FIELDS } from './manage-review.const'
+import { UndoOutlined } from '@ant-design/icons'
 import './manage-review.scss'
+import { IModalMethods } from '@/types/modal'
 
 const { starColor } = variables
 
@@ -42,6 +49,8 @@ const ACTIVE_FETCH = '1'
 const DELETED_FETCH = '2'
 
 const VIEW_DETAILS_OPTION = 1
+const RESTORE_OPTION = 2
+const DELETE_OPTION = 3
 
 type DataIndex = keyof IReview
 // For search
@@ -77,17 +86,13 @@ const ManageReview = (): React.ReactNode => {
   // Redux
   const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
 
+  // Modal
+  const refRestoreModal = useRef<IModalMethods | null>(null)
+  const refDeleteReviewModal = useRef<IModalMethods | null>(null)
+
   // Other
-  // const [deleteUserMutation] = useDeleteUserMutation()
-  // const [updateUserRoleMutation] = useUpdateUserRoleMutation()
-  // const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
-  // const { data: privateProfileData } = useGetPrivateUserProfileQuery(
-  //   {
-  //     userId: selectedReview?.id || '',
-  //     userStatus: reviewOptionBoolean ? reviewOptionEnum._DELETED : reviewOptionEnum._ACTIVE
-  //   },
-  //   { skip: !selectedReview }
-  // )
+  const [deleteReviewMutation] = useDeleteReviewByIdMutation()
+  const [restoreDeletedReviewMutation] = useRestoreReviewByIdMutation()
 
   useEffect(() => {
     setQueryData(
@@ -130,6 +135,10 @@ const ManageReview = (): React.ReactNode => {
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
       router.push(`${ROUTE.MANAGE_REVIEW}/${selectedReview?.id}`)
+    } else if (selectedOpt === RESTORE_OPTION && reviewOptionBoolean === true) {
+      refRestoreModal.current?.showModal()
+    } else if (selectedOpt === DELETE_OPTION) {
+      refDeleteReviewModal.current?.showModal()
     }
   }
 
@@ -258,6 +267,27 @@ const ManageReview = (): React.ReactNode => {
             label: <span>View Details</span>,
             icon: <FolderViewOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
             onClick: () => handleModal(1)
+          },
+          ...(reviewOption === ACTIVE_FETCH
+            ? []
+            : [
+                {
+                  key: 'Restore',
+                  label: <span>Restore</span>,
+                  icon: <UndoOutlined style={{ fontSize: 15, cursor: 'pointer' }} />,
+                  onClick: (): void => handleModal(2)
+                }
+              ]),
+          {
+            key: 'Delete ',
+            label: <span className={reviewOptionBoolean ? 'error-modal-title' : ''}>Delete</span>,
+            icon: (
+              <i
+                className={`fa-regular fa-trash ${reviewOptionBoolean ? 'error-modal-title' : 'delete-icon'}`}
+                style={{ fontSize: 15, cursor: 'pointer' }}
+              ></i>
+            ),
+            onClick: (): void => handleModal(3)
           }
         ]
         return (
@@ -305,18 +335,6 @@ const ManageReview = (): React.ReactNode => {
       })
     },
     {
-      title: MANAGE_REVIEW_FIELDS.businessName,
-      dataIndex: 'businessName',
-      key: 'businessName',
-      width: 200
-      // ...SearchPopupProps<IReview, DataIndex>({
-      //   dataIndex: 'businessName',
-      //   placeholder: MANAGE_REVIEW_FIELDS.businessName,
-      //   defaultValue: queryData?.businessName ? [queryData?.businessName] : [],
-      //   _handleSearch: handleSearch
-      // })
-    },
-    {
       title: 'Rating',
       dataIndex: 'star',
       align: 'center',
@@ -353,6 +371,13 @@ const ManageReview = (): React.ReactNode => {
       sorter: {
         compare: (itemA: IReview, itemB: IReview) => compareDates(itemA.created_at, itemB.created_at)
       }
+    },
+    {
+      title: MANAGE_REVIEW_FIELDS.reportedCount,
+      dataIndex: 'reportedCount',
+      align: 'center',
+      key: 'reportedCount',
+      width: 150
     }
   ]
 
@@ -384,6 +409,19 @@ const ManageReview = (): React.ReactNode => {
         (prev) => ({ ...prev, startDate: dateStrings[0], endDate: dateStrings[1] }) as IGetAllReviewOfAdminQuery
       )
     }
+  }
+
+  const handleDeleteReview = (): void => {
+    deleteReviewMutation({
+      deleteType: reviewOptionBoolean ? DELETE_OPTIONS.HARD : DELETE_OPTIONS.SOFT,
+      reviewId: selectedReview?.id ?? ''
+    })
+    refDeleteReviewModal.current?.hideModal()
+  }
+
+  const handleRestoreReview = (): void => {
+    restoreDeletedReviewMutation(selectedReview?.id ?? '')
+    refRestoreModal.current?.hideModal()
   }
 
   return (
@@ -425,6 +463,32 @@ const ManageReview = (): React.ReactNode => {
         }}
         _onChange={onChangeSorter}
         className='--manage-review-table'
+      />
+
+      <RestoreModal
+        title={MODAL_TEXT.RESTORE_REVIEW_TITLE}
+        content={
+          <>
+            <Text strong>{MODAL_TEXT.RESTORE_REVIEW}</Text>
+            <Text>Content: {selectedReview?.content}</Text>
+          </>
+        }
+        handleConfirm={handleRestoreReview}
+        ref={refRestoreModal}
+      />
+
+      <DeleteModal
+        title={MODAL_TEXT.DELETE_REVIEW_TITLE}
+        content={
+          <>
+            <Text strong type={reviewOptionBoolean ? 'danger' : undefined}>
+              {reviewOptionBoolean ? MODAL_TEXT.DELETE_REVIEW_PERMANENT : MODAL_TEXT.DELETE_REVIEW_TEMPORARY}
+            </Text>
+            <Text>Content: {selectedReview?.content}</Text>
+          </>
+        }
+        handleConfirm={handleDeleteReview}
+        ref={refDeleteReviewModal}
       />
     </div>
   )
