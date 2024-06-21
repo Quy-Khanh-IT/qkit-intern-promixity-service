@@ -12,6 +12,7 @@ import { CreateReviewDto } from '../dto/create-review.dto';
 import { Comment } from '../entities/comment.entity';
 import { Review } from '../entities/review.entity';
 import { ReviewRepositoryInterface } from '../interfaces/review-repo.interface';
+import { use } from 'passport';
 
 interface Business {
   name: string;
@@ -67,7 +68,7 @@ export class ReviewRepository
       content: dto.content,
       type: ReviewTypeEnum.REVIEW,
       star: dto.star,
-      emotion: dto.emotion,
+      emotion: dto.emotion ? dto.emotion : 'NORMAL',
     });
 
     review.id = transObjectIdToString(review._id);
@@ -115,7 +116,7 @@ export class ReviewRepository
         userId: user._id,
         lastName: user.lastName,
         firstName: user.firstName,
-        avatarUrl: '',
+        avatarUrl: user.lastName,
         user_id: user._id.toString(),
       },
       content: dto.content,
@@ -123,7 +124,7 @@ export class ReviewRepository
       page: null,
       left: right,
       right: right + 1,
-      depth: 0,
+      depth: 1,
       isBusinessOwner: business.userId === user._id ? true : false,
       isAdmin: user.role === 'admin' ? true : false,
       _page: review.page ? review.page : 1,
