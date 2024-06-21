@@ -59,6 +59,7 @@ export class ReviewRepository
       businessId: transStringToObjectId(dto.businessId),
       postBy: {
         userId: poster._id,
+        lastName: poster.lastName,
         firstName: poster.firstName,
         avatarUrl: poster.image,
         user_id: poster._id.toString(),
@@ -74,7 +75,11 @@ export class ReviewRepository
     return review.toObject();
   }
 
-  async createComment(dto: CommentDto, reviewId: string, user: User) {
+  async createComment(
+    dto: CommentDto,
+    reviewId: string,
+    user: User,
+  ): Promise<Comment> {
     const review = await this.findReviewWithBusiness(reviewId);
 
     if (!review) {
@@ -104,7 +109,7 @@ export class ReviewRepository
       right = 1;
     }
 
-    const newComment = await this.commentModel.create({
+    let newComment = await this.commentModel.create({
       reviewId: review._id,
       postBy: {
         userId: user._id,
@@ -124,6 +129,8 @@ export class ReviewRepository
       _page: review.page ? review.page : 1,
       replies: [],
     });
+
+    newComment = newComment.toObject();
 
     const updateComment = await this.commentModel.updateOne(
       {
@@ -170,7 +177,7 @@ export class ReviewRepository
       }
     }
 
-    return plainToClass(Comment, newComment.toObject() as Comment);
+    return plainToClass(Comment, newComment);
   }
 
   async deleteComment(commentId: string) {

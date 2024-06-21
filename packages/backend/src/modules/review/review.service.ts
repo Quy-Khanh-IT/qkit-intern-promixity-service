@@ -425,7 +425,7 @@ export class ReviewService {
 
     comment.postBy = plainToInstance(UserSchema, comment.postBy);
 
-    return plainToClass(Review, comment);
+    return comment;
   }
 
   async createReply(

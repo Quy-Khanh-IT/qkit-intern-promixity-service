@@ -15,6 +15,9 @@ export class UserSchema {
   user_id?: string;
 
   @Prop({ trim: true })
+  lastName: string;
+
+  @Prop({ trim: true })
   firstName: string;
 
   @Prop({ trim: true, default: '' })
