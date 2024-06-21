@@ -6,10 +6,13 @@ import './review-item.scss'
 import { useEffect, useState } from 'react'
 import { useCreateCommentMutation, useCreateResponseCommentMutation } from '@/services/review.service'
 import { toast } from 'react-toastify'
-import { set } from 'lodash-es'
+
 export default function ReviewItem({ review }: { review: IReview }): React.ReactNode {
   const [replyInputValue, setReplyInputValue] = useState<{ [key: string]: string }>({})
   const [showReplyInput, setShowReplyInput] = useState<{ [key: string]: boolean }>({})
+  const [showReadMoreReplyInput, setShowReadMoreReplyInput] = useState<{ [key: string]: boolean }>({})
+
+  const [isReadMoreComment, setIsReadMoreComment] = useState<boolean>(false)
   const [createResponseComment, { isSuccess: isCreateResponseSuccess, isError: isCreateResponseError }] =
     useCreateResponseCommentMutation()
 
@@ -24,6 +27,12 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
     }
   }
 
+  const handleOpenReadmoreReply = (replyId: string): void => {
+    setShowReadMoreReplyInput({ ...showReadMoreReplyInput, [replyId]: true })
+  }
+  const handleCancelReadmoreReply = (replyId: string): void => {
+    setShowReadMoreReplyInput({ ...showReadMoreReplyInput, [replyId]: false })
+  }
   const handleCancelReply = (replyId: string): void => {
     setShowReplyInput({ ...showReplyInput, [replyId]: false })
     setReplyInputValue({ ...replyInputValue, [replyId]: '' })
@@ -157,11 +166,26 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
             </div>
           </div>
         ) : (
-          <div className='mb-1 mt-2 btn-reply' onClick={() => handleReplyClick(reply.id)}>
-            Reply
+          <div className='d-flex align-items-center justify-content-between mt-2'>
+            <div></div>
+            <div className='mb-1 mt-2 btn-reply' onClick={() => handleReplyClick(reply.id)}>
+              Reply
+            </div>
           </div>
         )}
-        {reply.replies && reply.replies.length > 0 && (
+        {reply.replies &&
+          reply.replies.length > 0 &&
+          (!showReadMoreReplyInput[reply.id] ? (
+            <div onClick={() => handleOpenReadmoreReply(reply.id)} className=' mb-3 read-more-btn'>
+              Read More replies
+            </div>
+          ) : (
+            <div onClick={() => handleCancelReadmoreReply(reply.id)} className=' mb-3 read-more-btn'>
+              Read Less
+            </div>
+          ))}
+
+        {showReadMoreReplyInput[reply.id] && reply.replies && reply.replies.length > 0 && (
           <div>{reply.replies.map((childReply: IReplyReply) => renderReplyRecursive(childReply, level + 1))}</div>
         )}
       </div>
@@ -223,18 +247,30 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
           </div>
         </div>
       ) : (
-        <div className='mb-1 mt-2 btn-reply' onClick={() => setShowCommentInput(true)}>
-          Reply
+        <div className='d-flex align-items-center justify-content-between mt-2'>
+          <div></div>
+          <div className='mb-1 mt-2 btn-reply' onClick={() => setShowCommentInput(true)}>
+            Reply
+          </div>
         </div>
       )}
       {/* End review */}
 
       {/* Reply */}
-      <div className='review-reply-wrapper  mt-2 ps-1'>
-        {review.reply && review.reply.data && review.reply.data.length > 0
-          ? review.reply.data.map((reply) => renderReplyRecursive(reply))
-          : ''}
-      </div>
+      {review.reply && review.reply.data && review.reply.data.length > 0 && (
+        <div onClick={() => setIsReadMoreComment(!isReadMoreComment)} className=' mb-2 read-more-btn'>
+          {isReadMoreComment ? 'Read Less' : 'Read More replies'}
+        </div>
+      )}
+      {isReadMoreComment ? (
+        <div className='review-reply-wrapper  mt-2 ps-1'>
+          {review.reply && review.reply.data && review.reply.data.length > 0
+            ? review.reply.data.map((reply) => renderReplyRecursive(reply))
+            : ''}
+        </div>
+      ) : (
+        ''
+      )}
     </div>
   )
 }
