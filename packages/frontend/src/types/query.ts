@@ -46,6 +46,8 @@ export interface IBusinessUserStatisticQuery {
 }
 
 export interface IGetAllReviewOfAdminQuery extends IGelAllQuery {
+  firstName?: string
+  lastName?: string
   content?: string
   starsRating?: string[]
   userId?: string

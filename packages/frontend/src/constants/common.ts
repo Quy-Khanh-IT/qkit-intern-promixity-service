@@ -45,6 +45,12 @@ export const MODAL_TEXT = {
   RESTORE_BUSINESS_TITLE: 'Restore Business',
   RESTORE_BUSINESS: 'Do you want to restore this business?',
 
+  DELETE_REVIEW_TITLE: 'Delete Review',
+  DELETE_REVIEW_TEMPORARY: 'Do you want to delete this review?',
+  DELETE_REVIEW_PERMANENT: 'Do you want to delete this review permanently?',
+  RESTORE_REVIEW_TITLE: 'Restore Review',
+  RESTORE_REVIEW: 'Do you want to restore this review?',
+
   CHANGE_PASSWORD_TITLE: 'Change Password'
 }
 

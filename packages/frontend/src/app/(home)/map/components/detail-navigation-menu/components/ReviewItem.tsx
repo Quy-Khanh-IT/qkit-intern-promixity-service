@@ -139,7 +139,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
             />
             <div className='ms-2'>
               <div className='owner-name'>{reply.postBy.firstName}</div>
-              <div className='review-time'>{formatTimeDifference(reply.created_at)}</div>
+              <div className='review-time'>{formatTimeDifference(reply.created_at || '')}</div>
             </div>
           </div>
         </div>

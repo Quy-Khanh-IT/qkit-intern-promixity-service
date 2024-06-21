@@ -4,5 +4,6 @@ export const MANAGE_REVIEW_FIELDS = {
   businessName: 'Business Name',
   content: 'Content',
   rating: 'Rating',
-  created_at: 'Created At'
+  created_at: 'Created At',
+  reportedCount: 'Reported Count'
 }
