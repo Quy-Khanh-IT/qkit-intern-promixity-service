@@ -57,6 +57,7 @@ export interface IReplyReply {
 
 export interface IReviewOwner {
   firstName: string
+  lastName?: string
   avatarUrl: string
   user_id: string
 }

@@ -61,7 +61,7 @@ const ManageReview = (): React.ReactNode => {
   const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
   // Review data
-  const [reviewOption, setreviewOption] = useState<string>(ACTIVE_FETCH)
+  const [reviewOption, setReviewOption] = useState<string>(ACTIVE_FETCH)
   const reviewOptionBoolean: boolean = useMemo<boolean>(() => reviewOption === DELETED_FETCH, [reviewOption])
   const [queryData, setQueryData] = useState<IGetAllReviewOfAdminQuery>({
     offset: currentPage,
@@ -134,7 +134,7 @@ const ManageReview = (): React.ReactNode => {
   }
 
   const onChangeSelection = (value: string): void => {
-    setreviewOption(value)
+    setReviewOption(value)
     setQueryData(
       (_prev) =>
         ({
@@ -271,7 +271,7 @@ const ManageReview = (): React.ReactNode => {
     },
     {
       title: MANAGE_REVIEW_FIELDS.firstName,
-      dataIndex: 'firstName',
+      dataIndex: ['postBy', 'firstName'],
       key: 'firstName',
       width: 160
       // ...SearchPopupProps<IReview, DataIndex>({
@@ -283,7 +283,7 @@ const ManageReview = (): React.ReactNode => {
     },
     {
       title: MANAGE_REVIEW_FIELDS.lastName,
-      dataIndex: 'lastName',
+      dataIndex: ['postBy', 'lastName'],
       key: 'lastName',
       width: 160
       // ...SearchPopupProps<IReview, DataIndex>({
@@ -355,43 +355,6 @@ const ManageReview = (): React.ReactNode => {
       }
     }
   ]
-
-  // const detailedItems: DescriptionsProps['items'] = [
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.firstName,
-  //     span: 2,
-  //     children: privateProfileData?.firstName || PLACEHOLDER.EMPTY_TEXT
-  //   },
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.lastName,
-  //     span: 2,
-  //     children: privateProfileData?.lastName || PLACEHOLDER.EMPTY_TEXT
-  //   },
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.email,
-  //     span: 4,
-  //     children: privateProfileData?.email || PLACEHOLDER.EMPTY_TEXT
-  //   },
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.phoneNumber,
-  //     span: 4,
-  //     children: privateProfileData?.phoneNumber || PLACEHOLDER.EMPTY_TEXT
-  //   },
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.role,
-  //     span: 2,
-  //     children: (
-  //       <Tag color={generateRoleColor(privateProfileData?.role || '')} key={privateProfileData?.role} className='me-0'>
-  //         {privateProfileData?.role && privateProfileData?.role.toUpperCase()}
-  //       </Tag>
-  //     )
-  //   },
-  //   {
-  //     label: MANAGE_REVIEW_FIELDS.created_at,
-  //     span: 2,
-  //     children: formatDate(privateProfileData?.created_at || '')
-  //   }
-  // ]
 
   const options = [
     {
