@@ -69,7 +69,7 @@ export class Comment extends BaseEntity {
   @Prop({ default: 0, max: 5 })
   count: number;
 
-  @Prop({ default: 0, max: 3 })
+  @Prop({ default: 0 })
   depth: number;
 
   @Prop({ default: null })
