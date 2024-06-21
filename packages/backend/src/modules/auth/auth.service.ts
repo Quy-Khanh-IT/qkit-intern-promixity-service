@@ -265,7 +265,7 @@ export class AuthService {
       userId: user._id,
     });
 
-    const newResetLink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}/reset-password?token=${newJWTToken}`;
+    const newResetLink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}${AuthConstant.FORGOT_STRING_PATH}?token=${newJWTToken}`;
     return newResetLink;
   }
 
