@@ -24,6 +24,11 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
     }
   }
 
+  const handleCancelReply = (replyId: string): void => {
+    setShowReplyInput({ ...showReplyInput, [replyId]: false })
+    setReplyInputValue({ ...replyInputValue, [replyId]: '' })
+  }
+
   const handleInputChange = (replyId: string, value: string): void => {
     setReplyInputValue({ ...replyInputValue, [replyId]: value })
   }
@@ -143,7 +148,9 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
               />
             </div>
             <div className='d-flex'>
-              <div className='mb-1 mt-2 btn-reply me-2 cancel-btn'>Cancel</div>
+              <div onClick={() => handleCancelReply(reply.id)} className='mb-1 mt-2 btn-reply me-2 cancel-btn'>
+                Cancel
+              </div>
               <div onClick={() => handlePostReply(reply.id)} className='mb-1 mt-2 btn-reply'>
                 Post
               </div>
@@ -207,7 +214,9 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
             />
           </div>
           <div className='d-flex'>
-            <div className='mb-1 mt-2 btn-reply me-2 cancel-btn'>Cancel</div>
+            <div onClick={() => setShowCommentInput(false)} className='mb-1 mt-2 btn-reply me-2 cancel-btn'>
+              Cancel
+            </div>
             <div onClick={handlePostComment} className='mb-1 mt-2 btn-reply'>
               Post
             </div>
