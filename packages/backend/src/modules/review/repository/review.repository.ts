@@ -116,7 +116,7 @@ export class ReviewRepository
         userId: user._id,
         lastName: user.lastName,
         firstName: user.firstName,
-        avatarUrl: user.lastName,
+        avatarUrl: user.image,
         user_id: user._id.toString(),
       },
       content: dto.content,
