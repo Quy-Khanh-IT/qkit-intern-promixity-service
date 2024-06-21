@@ -102,7 +102,6 @@ export const {
   useCreateResponseCommentMutation,
   useGetReviewsForAdminQuery,
   useGetEmotionsQuery,
-  useGetReviewsByIdQuery
   useGetReviewsByIdQuery,
   useDeleteReviewByIdMutation,
   useDeleteCommentByIdMutation,
