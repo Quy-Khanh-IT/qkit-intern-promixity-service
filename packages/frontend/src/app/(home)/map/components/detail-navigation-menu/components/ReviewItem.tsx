@@ -114,7 +114,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
     return (
       <div
         key={reply.id}
-        className={`review-reply-wrapper mt-2 ${level === 0 ? 'first-reply ps-3' : level === 1 ? 'ps-4' : ''}`}
+        className={`review-reply-wrapper mt-2 ${level === 0 ? 'first-reply ps-4' : level === 1 ? 'ps-4 review-reply-container' : ''}`}
       >
         <div className='review-owner-info'>
           <div className='review-owner-avatar d-flex mb-2'>
@@ -230,7 +230,7 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
       {/* End review */}
 
       {/* Reply */}
-      <div className='review-reply-wrapper mt-2 ps-3'>
+      <div className='review-reply-wrapper  mt-2 ps-1'>
         {review.reply && review.reply.data && review.reply.data.length > 0
           ? review.reply.data.map((reply) => renderReplyRecursive(reply))
           : ''}
