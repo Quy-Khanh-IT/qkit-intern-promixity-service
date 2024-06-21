@@ -53,7 +53,7 @@ export class Review extends BaseEntity {
   @Prop({ enum: ReviewTypeEnum, required: true })
   type: string;
 
-  @Prop({ enum: EmotionEnum, required: true })
+  @Prop({ enum: EmotionEnum, required: false, default: EmotionEnum.NORMAL })
   emotion: string;
 
   @Prop({ enum: [1, 2, 3, 4, 5], default: null })
