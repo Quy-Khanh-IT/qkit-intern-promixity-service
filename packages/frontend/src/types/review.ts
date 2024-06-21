@@ -66,6 +66,7 @@ export interface ICreateReviewPayload {
   content: string
   star: string
   businessId: string
+  emotion: string
 }
 
 export interface ICreateCommentPayload {

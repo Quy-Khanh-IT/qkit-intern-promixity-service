@@ -27,6 +27,7 @@ export interface ISearchSider {
   handleOnChangeTimeOption: (_type: string, _value: string) => void
   timeOption: ITimeOption
   handleOnApplyTimeFilter: () => void
+  handleChangeFetch: (value: boolean) => void
 }
 
 export interface ITimeFilterProps {

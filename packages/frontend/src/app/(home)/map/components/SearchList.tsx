@@ -4,10 +4,12 @@ import SearchItem from './SearchItem'
 
 export function SearchList({
   businesses,
-  handleItemClick
+  handleItemClick,
+  handleChangeFetch
 }: {
   businesses: IBusiness[] | [] | undefined
   handleItemClick: () => void
+  handleChangeFetch: (value: boolean) => void
 }): React.ReactNode {
   return (
     <div className='search-list-wrapper'>
@@ -15,7 +17,7 @@ export function SearchList({
         businesses.map((business) => {
           return (
             <div key={business.id}>
-              <SearchItem handleItemClick={handleItemClick} business={business} />
+              <SearchItem handleChangeFetch={handleChangeFetch} handleItemClick={handleItemClick} business={business} />
             </div>
           )
         })

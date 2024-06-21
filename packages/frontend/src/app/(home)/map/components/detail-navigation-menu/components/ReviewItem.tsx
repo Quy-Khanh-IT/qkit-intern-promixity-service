@@ -4,7 +4,7 @@ import { Image } from 'antd'
 import moment from 'moment'
 import './review-item.scss'
 export default function ReviewItem({ review }: { review: IReview }): React.ReactNode {
-  const formatTimeDifference = (createdAt: string): string => {
+  const formatTimeDifference = (createdAt: string | undefined): string => {
     const now = moment()
     const createdAtMoment = moment(createdAt)
     const duration = moment.duration(now.diff(createdAtMoment))
@@ -48,9 +48,8 @@ export default function ReviewItem({ review }: { review: IReview }): React.React
           <div className='review-owner-avatar d-flex mb-2'>
             <Image
               src={
-                reply.postBy.avatarUrl
-                  ? reply.postBy.avatarUrl
-                  : 'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
+                reply.postBy.avatarUrl ||
+                'https://raw.githubusercontent.com/ninehcobra/free-host-image/main/News/logo.png'
               }
               alt='owner-avatar'
               width={32}

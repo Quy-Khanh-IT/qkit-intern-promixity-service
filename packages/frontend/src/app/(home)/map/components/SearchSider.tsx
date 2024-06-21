@@ -106,7 +106,11 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
               </div>
             </div>
             <div className='search-result-content mt-3'>
-              <SearchList handleItemClick={props.handleItemClick} businesses={props.businesses} />
+              <SearchList
+                handleChangeFetch={props.handleChangeFetch}
+                handleItemClick={props.handleItemClick}
+                businesses={props.businesses}
+              />
             </div>
           </div>
         )}

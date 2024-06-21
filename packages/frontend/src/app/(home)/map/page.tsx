@@ -45,6 +45,7 @@ function MapPage(): React.ReactNode {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
   const [rating, setRating] = useState<number>(0)
+  const [createdReview, setCreatedReview] = useState<boolean>(false)
 
   const [timeOption, setTimeOption] = useState<ITimeOption>({
     timeOpenType: 'every_time',
@@ -154,9 +155,16 @@ function MapPage(): React.ReactNode {
 
   useEffect(() => {
     if (shouldFetch) {
+      console.log('vao duoc day ne')
       handleOnSearch()
+      setCreatedReview(false)
     }
-  }, [distanceRadius, rating, selectedCategoryId, isApplyTimeFilter])
+  }, [distanceRadius, rating, selectedCategoryId, isApplyTimeFilter, createdReview])
+
+  const handleChangeFetch = (value: boolean): void => {
+    setShouldFetch(value)
+    setCreatedReview(value)
+  }
 
   useEffect(() => {
     setCollapsed(true)
@@ -281,7 +289,7 @@ function MapPage(): React.ReactNode {
       </Header>
 
       <Layout>
-        {selectedBusinessId ? <SearchItemDetail /> : ''}
+        {selectedBusinessId ? <SearchItemDetail handleChangeFetch={handleChangeFetch} /> : ''}
         <SearchSider
           onClose={handleCloseSider}
           showSpinner={showSpinner}
@@ -296,6 +304,7 @@ function MapPage(): React.ReactNode {
           handleOnChangeTimeOption={handleOnChangeTimeOption}
           timeOption={timeOption}
           handleOnApplyTimeFilter={handleOnApplyTimeFilter}
+          handleChangeFetch={handleChangeFetch}
         />
 
         <Content style={{ margin: '0 16px' }}>
