@@ -10,6 +10,16 @@ export class FindAllReviewQuery extends QueryFilterBase {
   @ApiPropertyOptional({ example: 'hay' })
   content: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'Đặng' })
+  lastName: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'Giao Kiều' })
+  firstName: string;
+
   @IsOptional()
   @ApiPropertyOptional({ required: false, example: ['3', '5'] })
   starsRating: string[];

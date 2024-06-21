@@ -141,6 +141,17 @@ export class ReviewService {
         query.sortReportedCountBy === TypeSort.ASC ? 1 : -1;
     }
 
+    if (query.firstName) {
+      matchStage['postBy.firstName'] = {
+        $regex: query.firstName,
+        $options: 'i',
+      };
+    }
+
+    if (query.lastName) {
+      matchStage['postBy.lastName'] = { $regex: query.lastName, $options: 'i' };
+    }
+
     const result = PaginationHelper.configureBaseQueryFilter(
       matchStage,
       sortStage,
