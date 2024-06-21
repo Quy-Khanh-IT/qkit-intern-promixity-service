@@ -52,3 +52,11 @@
   border-radius: 32px;
   border-color: $gray-border;
 }
+
+.read-more-btn {
+  font-weight: 500;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.5;
+  }
+}
