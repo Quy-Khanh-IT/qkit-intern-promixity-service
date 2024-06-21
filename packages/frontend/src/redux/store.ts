@@ -33,8 +33,7 @@ export const store = configureStore({
     [serviceApi.reducerPath]: serviceApi.reducer,
     [reviewApi.reducerPath]: reviewApi.reducer,
     [statisticApi.reducerPath]: statisticApi.reducer,
-    [addressLineApi.reducerPath]: addressLineApi.reducer,
-    [reviewApi.reducerPath]: reviewApi.reducer
+    [addressLineApi.reducerPath]: addressLineApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
