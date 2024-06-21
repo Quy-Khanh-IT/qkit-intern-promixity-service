@@ -60,19 +60,19 @@ const ManageReview = (): React.ReactNode => {
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
-  // User data
-  const [userOption, setUserOption] = useState<string>(ACTIVE_FETCH)
-  const userOptionBoolean: boolean = useMemo<boolean>(() => userOption === DELETED_FETCH, [userOption])
+  // Review data
+  const [reviewOption, setreviewOption] = useState<string>(ACTIVE_FETCH)
+  const reviewOptionBoolean: boolean = useMemo<boolean>(() => reviewOption === DELETED_FETCH, [reviewOption])
   const [queryData, setQueryData] = useState<IGetAllReviewOfAdminQuery>({
     offset: currentPage,
     limit: PAGE_SIZE,
-    isDeleted: userOptionBoolean
+    isDeleted: reviewOptionBoolean
   } as IGetAllReviewOfAdminQuery)
 
-  const { data: usersData, isFetching: isLoadingUsers } = useGetReviewsForAdminQuery(
+  const { data: reviewsData, isFetching: isLoadingReviews } = useGetReviewsForAdminQuery(
     parseSearchParamsToObject(searchParams.toString()) as IGetAllReviewOfAdminQuery
   )
-  const [selectedUser, setSelectedUser] = useState<IReview | null>(null)
+  const [selectedReview, setSelectedReview] = useState<IReview | null>(null)
 
   // Redux
   const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
@@ -83,10 +83,10 @@ const ManageReview = (): React.ReactNode => {
   // const [restoreDeletedUserMutation] = useRestoreDeletedUserMutation()
   // const { data: privateProfileData } = useGetPrivateUserProfileQuery(
   //   {
-  //     userId: selectedUser?.id || '',
-  //     userStatus: userOptionBoolean ? UserOptionEnum._DELETED : UserOptionEnum._ACTIVE
+  //     userId: selectedReview?.id || '',
+  //     userStatus: reviewOptionBoolean ? reviewOptionEnum._DELETED : reviewOptionEnum._ACTIVE
   //   },
-  //   { skip: !selectedUser }
+  //   { skip: !selectedReview }
   // )
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const ManageReview = (): React.ReactNode => {
       (_prev) =>
         ({
           ...ORIGIN_DATA,
-          isDeleted: userOptionBoolean
+          isDeleted: reviewOptionBoolean
         }) as IGetAllReviewOfAdminQuery
     )
   }, [sidebarTabState])
@@ -122,19 +122,19 @@ const ManageReview = (): React.ReactNode => {
         ({
           ...prev,
           offset: currentPage,
-          isDeleted: userOptionBoolean
+          isDeleted: reviewOptionBoolean
         }) as IGetAllReviewOfAdminQuery
     )
   }, [currentPage])
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
-      router.push(`${ROUTE.MANAGE_REVIEW}/${selectedUser?.id}`)
+      router.push(`${ROUTE.MANAGE_REVIEW}/${selectedReview?.id}`)
     }
   }
 
   const onChangeSelection = (value: string): void => {
-    setUserOption(value)
+    setreviewOption(value)
     setQueryData(
       (_prev) =>
         ({
@@ -244,10 +244,10 @@ const ManageReview = (): React.ReactNode => {
     {
       align: 'center',
       width: 75,
-      onCell: (user: IReview): React.HTMLAttributes<HTMLElement> => {
+      onCell: (review: IReview): React.HTMLAttributes<HTMLElement> => {
         return {
           onClick: (): void => {
-            setSelectedUser(user)
+            setSelectedReview(review)
           }
         }
       },
@@ -351,7 +351,7 @@ const ManageReview = (): React.ReactNode => {
       },
       showSorterTooltip: false,
       sorter: {
-        compare: (userA: IReview, userB: IReview) => compareDates(userA.created_at, userB.created_at)
+        compare: (itemA: IReview, itemB: IReview) => compareDates(itemA.created_at, itemB.created_at)
       }
     }
   ]
@@ -424,7 +424,7 @@ const ManageReview = (): React.ReactNode => {
   }
 
   return (
-    <div className='--manage-user'>
+    <div className='--manage-review'>
       <Row className='mb-3' style={{ height: 36 }}>
         <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
@@ -433,7 +433,7 @@ const ManageReview = (): React.ReactNode => {
               optionFilterProp='children'
               filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input)}
               className='filter-select w-100'
-              value={userOption}
+              value={reviewOption}
               options={options}
             />
           </Col>
@@ -441,7 +441,7 @@ const ManageReview = (): React.ReactNode => {
 
         <Col span={6} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span>
-            Total: <strong>{usersData?.totalRecords}</strong>
+            Total: <strong>{reviewsData?.totalRecords}</strong>
           </span>
         </Col>
 
@@ -451,17 +451,17 @@ const ManageReview = (): React.ReactNode => {
       </Row>
 
       <TableComponent
-        isFetching={isLoadingUsers}
+        isFetching={isLoadingReviews}
         columns={listColumns}
-        dataSource={usersData?.data ?? []}
+        dataSource={reviewsData?.data ?? []}
         pagination={{
           current: currentPage,
           pageSize: PAGE_SIZE,
-          total: usersData?.totalRecords ?? 0,
+          total: reviewsData?.totalRecords ?? 0,
           onChange: onChangePagination
         }}
         _onChange={onChangeSorter}
-        className='--manage-user-table'
+        className='--manage-review-table'
       />
     </div>
   )

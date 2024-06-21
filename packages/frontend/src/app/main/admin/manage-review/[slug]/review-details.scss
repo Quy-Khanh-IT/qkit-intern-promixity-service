@@ -3,13 +3,17 @@
   max-height: calc(100vh - 80px - 48px - 40px - 36px - 16px) !important;
 
   .--content-details{
-    & > .ant-col:last-child{
-      padding-bottom: 16px;
+    & > .ant-col{
+      margin-top: 12px !important;
     }
+
+    & > .ant-col:last-child{
+      padding-bottom: 32px;
+    }
+
   }
 
   .ant-card{
-    margin: 12px 0 !important;
     .ant-card-body{
       padding: 16px !important;
     }
