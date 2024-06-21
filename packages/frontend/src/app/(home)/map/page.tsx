@@ -26,6 +26,7 @@ import { ITimeOption } from '@/types/business'
 function MapPage(): React.ReactNode {
   const router = useRouter()
   const { onLogout, userInformation } = useAuth()
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
   const [userAvatar, setUserAvatar] = useState<string>('')
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
@@ -70,6 +71,9 @@ function MapPage(): React.ReactNode {
   useEffect(() => {
     if (userInformation) {
       setUserAvatar(userInformation.image)
+      if (userInformation.role === (RoleEnum._ADMIN as string)) {
+        setIsAdmin(true)
+      }
     }
   }, [userInformation])
 
@@ -203,16 +207,31 @@ function MapPage(): React.ReactNode {
     {
       key: '1',
       label: (
-        <Link href={ROUTE.USER_PROFILE} className='p-2' onClick={() => setRouteValue(ROUTE.USER_PROFILE)}>
+        <Link
+          href={isAdmin ? ROUTE.ADMIN_PROFILE : ROUTE.USER_PROFILE}
+          className='p-2'
+          onClick={() => {
+            if (isAdmin) {
+              setRouteValue(ROUTE.ADMIN_PROFILE)
+              router.push(ROUTE.ADMIN_PROFILE)
+            } else {
+              setRouteValue(ROUTE.USER_PROFILE)
+              router.push(ROUTE.USER_PROFILE)
+            }
+          }}
+        >
           Profile
         </Link>
       )
     },
     {
       key: '2',
-      label: <span className='p-2'>My business</span>,
+      label: <span className='p-2'>{isAdmin ? 'Dashboard' : 'My business'}</span>,
       onClick: (): void => {
-        if (userInformation?.role === (RoleEnum._BUSINESS as string)) {
+        if (userInformation?.role === (RoleEnum._ADMIN as string)) {
+          setRouteValue(ROUTE.DASHBOARD)
+          router.push(ROUTE.DASHBOARD)
+        } else if (userInformation?.role === (RoleEnum._BUSINESS as string)) {
           setRouteValue(ROUTE.MY_BUSINESS)
           router.push(ROUTE.MY_BUSINESS)
         } else {
