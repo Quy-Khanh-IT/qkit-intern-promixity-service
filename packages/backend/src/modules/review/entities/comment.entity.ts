@@ -15,6 +15,17 @@ import { UserSchema } from './review.entity';
   },
 })
 export class Comment extends BaseEntity {
+  @Transform(
+    (value) => {
+      return value.obj?._id?.toString();
+    },
+    {
+      toClassOnly: true,
+    },
+  )
+  @Expose()
+  id?: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Review' })
   @Exclude()
   reviewId: Types.ObjectId;
