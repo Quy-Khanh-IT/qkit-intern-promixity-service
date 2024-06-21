@@ -456,10 +456,16 @@ export class ReviewService {
   async getComments(query: CommentQuery): Promise<Comment[]> {
     const reviewId = query.reviewId;
 
-    const review = await this.reviewRepository.findOneById(reviewId);
+    let review = await this.reviewRepository.findOneById(reviewId);
 
     if (!review) {
-      throw new ReviewNotFoundException();
+      review = await this.reviewRepository.findOneByConditionWithDeleted({
+        _id: transStringToObjectId(reviewId),
+      });
+
+      if (!review) {
+        throw new ReviewNotFoundException();
+      }
     }
 
     const comments = await this.commentRepository.getComments(
