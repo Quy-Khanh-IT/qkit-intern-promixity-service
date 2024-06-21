@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react'
 import '../main.scss'
 import { directRoutes } from '../utils/main.util'
 import { removeFromSessionStorage } from '@/utils/session-storage.util'
+import { useRouter } from 'next/navigation'
 
 const { Text } = Typography
 
@@ -27,9 +28,11 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
   const {
     token: { colorBgContainer }
   } = theme.useToken()
+  const router = useRouter()
   const { onLogout, userInformation } = useAuth()
   const [userRole, setUserRole] = useState<string>('')
   const [userAvatar, setUserAvatar] = useState<string>('')
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
 
   const handleLogout = (): void => {
     removeFromSessionStorage(StorageKey._ROUTE_VALUE)
@@ -40,37 +43,43 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
     if (userInformation) {
       setUserAvatar(userInformation.image)
       setUserRole(userInformation.role)
+      if (userInformation.role === (RoleEnum._ADMIN as string)) {
+        setIsAdmin(true)
+      }
     }
   }, [userInformation])
 
   const items: MenuProps['items'] = [
-    ...(userInformation?.role === (RoleEnum._ADMIN as string)
-      ? [
-          {
-            key: '1',
-            label: (
-              <Link
-                href={ROUTE.ADMIN_PROFILE}
-                onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}
-                className='link-underline-none'
-              >
-                <Text className='p-2'>Profile</Text>
-              </Link>
-            )
-          }
-        ]
-      : [
-          {
-            key: '1',
-            label: (
-              <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)} className='link-underline-none'>
-                <Text className='p-2'>Back to map</Text>
-              </Link>
-            )
-          }
-        ]),
+    {
+      key: '1',
+      label: (
+        <Link
+          href={userInformation?.role === (RoleEnum._ADMIN as string) ? ROUTE.ADMIN_PROFILE : ROUTE.USER_PROFILE}
+          onClick={() => {
+            if (isAdmin) {
+              setRouteValue(ROUTE.ADMIN_PROFILE)
+              router.push(ROUTE.ADMIN_PROFILE)
+            } else {
+              setRouteValue(ROUTE.USER_PROFILE)
+              router.push(ROUTE.USER_PROFILE)
+            }
+          }}
+          className='link-underline-none'
+        >
+          <Text className='p-2'>Profile</Text>
+        </Link>
+      )
+    },
     {
       key: '2',
+      label: (
+        <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)} className='link-underline-none'>
+          <Text className='p-2'>Back to map</Text>
+        </Link>
+      )
+    },
+    {
+      key: '3',
       label: (
         <Text onClick={handleLogout} className='p-2  '>
           Log out
