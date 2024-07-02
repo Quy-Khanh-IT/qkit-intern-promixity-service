@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useGetPrivateUserProfileQuery, useUpdatePrivateUserProfileMutation } from '@/services/user.service'
 import type { FormInstance, UploadFile } from 'antd'
 import { Button, Flex, Form, Input, Space, Tag, Typography, Upload } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import './profile-component.scss'
 import { IUpdateProfilePayload } from '@/types/user'
 import { toast } from 'react-toastify'
@@ -160,6 +160,13 @@ const ProfileComponent: React.FC = () => {
     changePasswordModalRef.current?.hideModal()
   }
 
+  const handleInputChange = (e: ChangeEvent): void => {
+    const { value, name } = e.target as HTMLInputElement
+    form.setFieldsValue({
+      [name]: value.trim()
+    })
+  }
+
   return (
     <>
       <Flex align='center' vertical className='--profile-wrapper scroll-bar-2'>
@@ -190,7 +197,7 @@ const ProfileComponent: React.FC = () => {
                 rules={[{ required: true, message: 'Please enter your first name' }]}
                 validateTrigger={['onBlur']}
               >
-                <Input autoComplete='true' />
+                <Input autoComplete='true' onChange={handleInputChange} />
               </Form.Item>
 
               <Form.Item
@@ -199,7 +206,7 @@ const ProfileComponent: React.FC = () => {
                 rules={[{ required: true, message: 'Please enter your last name' }]}
                 validateTrigger={['onBlur']}
               >
-                <Input value={userProfile?.lastName} />
+                <Input value={userProfile?.lastName} onChange={handleInputChange} />
               </Form.Item>
 
               <Form.Item name='email' label='Email' rules={VALIDATION.EMAIL} validateTrigger={['onBlur']}>
@@ -211,7 +218,7 @@ const ProfileComponent: React.FC = () => {
                 rules={[{ required: true, message: 'Please enter your phone number' }]}
                 validateTrigger={['onBlur']}
               >
-                <Input />
+                <Input onChange={handleInputChange} />
               </Form.Item>
 
               <Form.Item>
@@ -244,7 +251,7 @@ const ProfileComponent: React.FC = () => {
             <Typography.Text style={{ margin: '8px 0', display: 'block' }}>
               <span style={{ color: 'red' }}>*</span> Password
             </Typography.Text>
-            <Input defaultValue='Hello, ant design!' type='password' disabled={true} />
+            <Input defaultValue='Hello, ant design!' type='password' disabled={true} onChange={handleInputChange} />
 
             <Flex justify='end' style={{ margin: '16px 0', flexGrow: 1 }}>
               <Button type='default' htmlType='reset' className={`btn-primary`} onClick={openChangePasswordModal}>
