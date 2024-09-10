@@ -5,3 +5,22 @@ export enum StarEnum {
   FOUR = '4',
   FIVE = '5',
 }
+
+export enum ReviewActionEnum {
+  CREATE = 'create',
+  DELETE = 'delete',
+  EDIT = 'edit',
+  RESTORE = 'restore',
+}
+
+export enum ReviewTypeEnum {
+  REVIEW = 'review',
+  COMMENT = 'comment',
+}
+
+export enum EmotionEnum {
+  EXCELLENT = 'excellent',
+  GOOD = 'good',
+  NORMAL = 'normal',
+  BAD = 'bad',
+}

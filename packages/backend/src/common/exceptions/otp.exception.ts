@@ -1,7 +1,7 @@
 import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { BaseBusinessException } from './base/base-message.exception';
 
-export class OTPExceedLimitException extends BaseException {
+export class OTPExceedLimitException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.OTP_EXCEEDED_LIMIT,

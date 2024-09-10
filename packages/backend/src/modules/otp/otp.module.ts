@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailModule } from '../mail/mail.module';
 import { UserModule } from '../user/user.module';
@@ -16,7 +16,7 @@ import { OtpRepository } from './repository/otp.repository';
       },
     ]),
     MailModule,
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [OtpController],
   providers: [OtpService, OtpRepository],

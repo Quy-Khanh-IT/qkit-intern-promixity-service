@@ -24,7 +24,7 @@ export class JwtResetPasswordStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayload): Promise<User> {
-    const user = await this.userService.findOneById(payload.user_id);
+    const user = await this.userService.findVerifiedOneWithId(payload.user_id);
     if (!user) {
       throw new NotFoundException({
         message: ERRORS_DICTIONARY.AUTH_EMAIL_NOT_EXISTED,

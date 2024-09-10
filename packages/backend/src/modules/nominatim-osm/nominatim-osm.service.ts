@@ -51,13 +51,18 @@ export class NominatimOsmService {
       lon: reverseDto.longitude,
       lat: reverseDto.latitude,
     };
+
     const params = { ...constructor, ...this.optsParam };
 
     const queryParams = buildQueryParams(params);
 
     const url = this.osmReverseApi + queryParams;
 
-    const data = await this.axiosService.processRetry(url);
+    console.log('testGet');
+    // const data = await this.axiosService.processRetry(url);
+    const data = await this.axiosService.testGet(url);
+
+    // console.log('data', data);
 
     return data;
   }

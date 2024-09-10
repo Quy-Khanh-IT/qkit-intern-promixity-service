@@ -1,17 +1,27 @@
 import { ERRORS_DICTIONARY, ERROR_MESSAGES } from '../constants';
-import { BaseException } from './base/base-message.exception';
+import { BaseBusinessException } from './base/base-message.exception';
 
-export class NewPassNotMatchOldException extends BaseException {
+export class NewPassNotMatchOldException extends BaseBusinessException {
   constructor() {
     super(
-      ERRORS_DICTIONARY.USER_NEW_PASSWORD_NOT_MATCH_OLD,
-      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NEW_PASSWORD_NOT_MATCH_OLD],
+      ERRORS_DICTIONARY.USER_PASSWORD_NOT_MATCH_OLD,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_PASSWORD_NOT_MATCH_OLD],
       403,
     );
   }
 }
 
-export class ConfirmPassNotMatchException extends BaseException {
+export class ExceedResetEmailRequestException extends BaseBusinessException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_EXCEED_RESET_EMAIL_REQUEST,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_EXCEED_RESET_EMAIL_REQUEST],
+      403,
+    );
+  }
+}
+
+export class ConfirmPassNotMatchException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_CONFIRM_PASSWORD_NOT_MATCH,
@@ -21,7 +31,7 @@ export class ConfirmPassNotMatchException extends BaseException {
   }
 }
 
-export class UserNotAcceptRoleException extends BaseException {
+export class UserNotAcceptRoleException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_NOT_ACCEPTED_ROLE,
@@ -31,7 +41,7 @@ export class UserNotAcceptRoleException extends BaseException {
   }
 }
 
-export class UserConflictAdminException extends BaseException {
+export class UserConflictAdminException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_CONFLICT_ADMIN,
@@ -41,7 +51,7 @@ export class UserConflictAdminException extends BaseException {
   }
 }
 
-export class UserNotFoundException extends BaseException {
+export class UserNotFoundException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_NOT_FOUND,
@@ -51,7 +61,17 @@ export class UserNotFoundException extends BaseException {
   }
 }
 
-export class UserAlreadyExistException extends BaseException {
+export class UserUnVerifiedException extends BaseBusinessException {
+  constructor() {
+    super(
+      ERRORS_DICTIONARY.USER_UNVERIFIED,
+      ERROR_MESSAGES[ERRORS_DICTIONARY.USER_NOT_FOUND],
+      404,
+    );
+  }
+}
+
+export class UserAlreadyExistException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_ALREADY_EXIST,
@@ -61,7 +81,7 @@ export class UserAlreadyExistException extends BaseException {
   }
 }
 
-export class UserDisabledException extends BaseException {
+export class UserDisabledException extends BaseBusinessException {
   constructor() {
     super(
       ERRORS_DICTIONARY.USER_DISABLED,

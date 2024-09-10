@@ -1,9 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseEntity } from 'src/cores/entity/base/entity.base';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { HydratedDocument, Types } from 'mongoose';
 import { BusinessStatusEnum, StarEnum } from 'src/common/enums';
-import { CloundinaryImage } from '../../upload-file/entities/cloundinary.entity';
+import { BaseEntity } from 'src/cores/entity/base/entity.base';
+
+import { CategorySchema } from './category.entity';
 import { DayOpenCloseTimeSchema } from './dayOpenCloseTime.entity';
+import { Image } from './image.entity';
+import { ServiceSchema } from './service.entity';
 import { StarSchema } from './star.entity';
 
 const defaultStars: StarSchema[] = [
@@ -48,14 +52,16 @@ export class Business extends BaseEntity {
   @Prop({ default: '', trim: true })
   website: string;
 
-  @Prop([CloundinaryImage])
-  images: CloundinaryImage[];
+  @Prop({ type: [Image], default: [] })
+  images: Image[];
 
-  @Prop({ required: true, trim: true })
-  category: string;
+  @Prop({ type: CategorySchema, required: true })
+  @Type(() => CategorySchema)
+  category: CategorySchema;
 
-  @Prop({ type: [String], default: [] })
-  services: string[];
+  @Prop({ type: [ServiceSchema] })
+  @Type(() => ServiceSchema)
+  services: ServiceSchema[];
 
   @Prop({ default: 0 })
   overallRating: number;
@@ -70,38 +76,57 @@ export class Business extends BaseEntity {
   addressLine: string;
 
   @Prop({ trim: true })
-  addressLineFull: string;
+  fullAddress: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   province: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   district: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   country: string;
 
   @Prop([DayOpenCloseTimeSchema])
   dayOfWeek: DayOpenCloseTimeSchema[];
 
-  @Prop({ type: [CloundinaryImage], default: [] })
-  imgs: CloundinaryImage[];
-
-  @Prop({ trim: true })
-  longitude: string;
-
-  @Prop({ trim: true })
-  latitude: string;
+  @Prop({
+    type: {
+      type: String,
+      required: true,
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
+  })
+  location: {
+    coordinates: number[];
+  };
 
   @Prop({
     enum: BusinessStatusEnum,
     default: BusinessStatusEnum.PENDING,
   })
-  status: string;
+  status: BusinessStatusEnum;
 
-  @Prop({ default: null })
-  deleted_at: MongooseSchema.Types.Date;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Exclude()
+  userId: Types.ObjectId;
+
+  @Transform((value) => value.obj?.userId?.toString(), { toClassOnly: true })
+  @Expose()
+  user_id?: string;
+
+  @Prop({ default: 0 })
+  _page: number;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);
+
+BusinessSchema.index({ location: '2dsphere' });
+BusinessSchema.index({ name: 'text', description: 'text' });
+BusinessSchema.index({ userId: 1 });
+
 export type BusinessDocument = HydratedDocument<Business>;

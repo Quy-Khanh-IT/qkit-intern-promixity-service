@@ -2,8 +2,8 @@ import * as dayjs from 'dayjs';
 import { FilterQuery, Model, PipelineStage, QueryOptions } from 'mongoose';
 import { FindAllResponse } from 'src/common/types/findAllResponse.type';
 import { transObjectIdToString, transStringToObjectId } from 'src/common/utils';
-import { BaseRepositoryInterface } from './repositoryInterface.base';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
+import { BaseRepositoryInterface } from './repositoryInterface.base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>
@@ -13,7 +13,6 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   }
 
   async restore(id: string): Promise<T> {
-    this.model.aggregate();
     const result = await this.model.findOneAndUpdate(
       {
         _id: transStringToObjectId(id),
@@ -68,13 +67,13 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     return await this.model.aggregate(pipeline).exec();
   }
 
-  async findOneById(id: string): Promise<T> {
-    const result = (await this.model.findById(id).lean().exec()) as T;
-    if (result) {
-      result.id = transObjectIdToString(result._id);
+  async findOneById(id: string): Promise<T | null> {
+    const result = (await this.model.findById(id).lean().exec()) as T | null;
+    if (!result) {
+      return null;
     }
-
-    return result.deletedAt ? null : result;
+    result.id = transObjectIdToString(result._id);
+    return result.deleted_at ? null : result;
   }
 
   async findOneByCondition(condition = {}): Promise<T | null> {
@@ -85,9 +84,10 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
       })
       .lean()
       .exec()) as T;
-    if (result) {
-      result.id = transObjectIdToString(result._id);
+    if (!result) {
+      return null;
     }
+    result.id = transObjectIdToString(result._id);
     return result;
   }
 
@@ -126,5 +126,21 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
   async hardDelete(id: string): Promise<boolean> {
     return !!(await this.model.findByIdAndDelete(id));
+  }
+
+  async findOneByConditionWithDeleted(condition = {}): Promise<T | null> {
+    const result = (await this.model
+      .findOne({
+        ...condition,
+        deleted_at: {
+          $ne: null,
+        },
+      })
+      .lean()
+      .exec()) as T;
+    if (result) {
+      result.id = transObjectIdToString(result._id);
+    }
+    return result;
   }
 }

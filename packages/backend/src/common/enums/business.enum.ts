@@ -14,17 +14,18 @@ export enum DeleteActionEnum {
 }
 
 export enum BusinessStatusEnum {
-  PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
   BANNED = 'banned',
-  DELETED = 'deleted',
+  CLOSED = 'closed',
+  PENDING = 'pending',
 }
 
 export enum StatusActionsEnum {
   APPROVED = 'approved',
   REJECTED = 'rejected',
   BANNED = 'banned',
+  CLOSED = 'closed',
 }
 
 export const OrderNumberDay = {
@@ -35,6 +36,6 @@ export const OrderNumberDay = {
   [DayEnum.FRIDAY]: 5,
   [DayEnum.SATURDAY]: 6,
   [DayEnum.SUNDAY]: 7,
-};
+} as const;
 
 export const AvailableActions = {};

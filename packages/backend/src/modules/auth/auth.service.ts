@@ -10,21 +10,25 @@ import {
   ConfigKey,
   ERRORS_DICTIONARY,
   ERROR_MESSAGES,
+  OTPConstant,
 } from 'src/common/constants';
 import { AuthConstant } from 'src/common/constants/auth.constant';
-import { TypeRequests } from 'src/common/enums';
+import { TypeRequests, UserRole } from 'src/common/enums';
 import {
   EmailExistedException,
   EmailNotExistedException,
   OTPNotMatchException,
+  PhoneExistedException,
   TokenExpiredException,
   TokenResetExceededLimitException,
+  UnVerifiedUser,
   UserNotFoundException,
   WrongCredentialsException,
 } from 'src/common/exceptions';
-import { verifyHash } from 'src/common/utils';
+import { transObjectIdToString, verifyHash } from 'src/common/utils';
 import { MailService } from '../mail/mail.service';
 import { OtpService } from '../otp/otp.service';
+import { Requests } from '../request/entities/request.entity';
 import { RequestService } from '../request/request.service';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
@@ -48,7 +52,23 @@ export class AuthService {
     private readonly requestService: RequestService,
   ) {}
 
-  public async signUp(registrationData: SignUpDto): Promise<User> {
+  public async verifyUser(user: User, otp: string): Promise<boolean> {
+    const otps = await this.otpService.findManyByEmail(user.email, 5);
+
+    if (!otps.count || otps.items[0].otp !== otp) {
+      throw new OTPNotMatchException();
+    }
+
+    await this.userService.updateVerifiedStatusByEmail(user.id, true);
+
+    this.mailService.sendWelcomeMail(
+      user.email,
+      'Welcome to our Proximity Service',
+    );
+    return true;
+  }
+
+  public async signUp(registrationData: SignUpDto): Promise<string> {
     const isExistingEmail = await this.userService.checkEmailExist(
       registrationData.email,
     );
@@ -56,34 +76,43 @@ export class AuthService {
       throw new EmailExistedException();
     }
 
-    const otps = await this.otpService.findManyByEmail(
-      registrationData.email,
-      5,
+    const isExistingPhone = await this.userService.checkPhoneExist(
+      registrationData.phoneNumber,
     );
 
-    if (!otps.count || otps.items[0].otp !== registrationData.otp) {
-      throw new OTPNotMatchException();
+    if (isExistingPhone) {
+      throw new PhoneExistedException();
     }
 
     const hashedPassword: string = await argon2.hash(registrationData.password);
 
-    return await this.userService.create({
+    const result = await this.userService.create({
       firstName: registrationData.firstName,
       lastName: registrationData.lastName,
       email: registrationData.email,
       password: hashedPassword,
-      address: {
-        city: registrationData.city,
-        country: registrationData.country,
-        province: registrationData.province,
-      },
       phoneNumber: registrationData.phoneNumber,
-      roles: ['user'],
+      role: UserRole.USER,
       image: null,
+      isVerified: false,
     });
+
+    const [jwtToken, otpResult] = await Promise.all([
+      this.JWTTokenService.generateVerifyToken({
+        action: 'verify',
+        user_id: transObjectIdToString(result._id),
+      }),
+      this.otpService.createForRegister(registrationData.email),
+    ]);
+    this.mailService.sendOTPMail(
+      registrationData.email,
+      'OTP Code for registration',
+      otpResult.otp,
+    );
+    return jwtToken;
   }
 
-  public async login(loginData: LoginDto): Promise<LoginResponseDto> {
+  public async login(loginData: LoginDto): Promise<LoginResponseDto | void> {
     const user = await this.userService.findOneByEmail(loginData.email);
     if (!user) {
       throw new EmailNotExistedException();
@@ -95,13 +124,104 @@ export class AuthService {
     if (!isMatchingPassword) {
       throw new WrongCredentialsException();
     }
+
+    if (!user.isVerified) {
+      return this.processLoginWithUnVerifiedUser(user);
+    }
+
     const pairToken = await this.JWTTokenService.genNewPairToken({
       user_id: user._id.toString(),
       action: 'login',
     });
+
+    const newRefreshToken: Requests = {
+      token: pairToken[1],
+      expiredAt: Dayjs()
+        .add(
+          this.configService.get<number>(
+            ConfigKey.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+          ),
+          'seconds',
+        )
+        .toDate(),
+      used: false,
+      metaData: {},
+      type: TypeRequests.REFRESH_TOKEN,
+      userId: user._id,
+    };
+
+    const isSavedRefreshToken =
+      await this.requestService.findOneAndReplaceWithUserId(
+        user._id.toString(),
+        newRefreshToken,
+      );
+
+    if (!isSavedRefreshToken) {
+      throw new InternalServerErrorException('Save refresh token failed');
+    }
+
     return {
       accessToken: pairToken[0],
       refreshToken: pairToken[1],
+      userId: user.id,
+      expiredAt: newRefreshToken.expiredAt,
+    };
+  }
+
+  async processLoginWithUnVerifiedUser(user: User): Promise<void> {
+    const jwt = await this.JWTTokenService.generateVerifyToken({
+      action: 'verify',
+      user_id: user.id,
+    });
+    const otpCodes = await this.otpService.findManyByEmail(user.email, 5);
+    if (otpCodes.count < OTPConstant.OTP_MAX_VERIFY_EMAIL) {
+      const newOtpCode = await this.otpService.createForRegister(user.email);
+      this.mailService.sendOTPMail(
+        user.email,
+        'OTP Code for registration',
+        newOtpCode.otp,
+      );
+    }
+    throw new UnVerifiedUser(jwt);
+  }
+
+  async refreshToken(user: User): Promise<LoginResponseDto> {
+    const userIdString = user.id ? user.id : user._id.toString();
+    const pairToken = await this.JWTTokenService.genNewPairToken({
+      user_id: userIdString,
+      action: 'login',
+    });
+    const newRefreshToken: Requests = {
+      token: pairToken[1],
+      expiredAt: Dayjs()
+        .add(
+          this.configService.get<number>(
+            ConfigKey.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+          ),
+          'seconds',
+        )
+        .toDate(),
+      used: false,
+      metaData: {},
+      type: TypeRequests.REFRESH_TOKEN,
+      userId: user._id,
+    };
+
+    const isSavingRefreshToken =
+      await this.requestService.findOneAndReplaceWithUserId(
+        userIdString,
+        newRefreshToken,
+      );
+
+    if (!isSavingRefreshToken) {
+      throw new InternalServerErrorException('Save refresh token failed');
+    }
+
+    return {
+      accessToken: pairToken[0],
+      refreshToken: pairToken[1],
+      userId: userIdString,
+      expiredAt: newRefreshToken.expiredAt,
     };
   }
 
@@ -145,7 +265,7 @@ export class AuthService {
       userId: user._id,
     });
 
-    const newResetLink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}/reset-password?token=${newJWTToken}`;
+    const newResetLink = `${this.configService.get<string>(ConfigKey.FRONT_END_URL)}${AuthConstant.FORGOT_STRING_PATH}?token=${newJWTToken}`;
     return newResetLink;
   }
 

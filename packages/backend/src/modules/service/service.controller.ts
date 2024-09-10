@@ -1,30 +1,37 @@
 import {
+  Body,
   Controller,
   Get,
+  HttpCode,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  UseGuards,
 } from '@nestjs/common';
-import { ServiceService } from './service.service';
-import { CreateServiceDto } from './dto/create-service.dto';
-import { UpdateServiceDto } from './dto/update-service.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { UserRole } from 'src/common/enums';
+import { JwtAccessTokenGuard } from 'src/cores/guard/jwt-access-token.guard';
+import { RoleGuard } from 'src/cores/guard/role.guard';
+
+import { CreateServiceDto } from './dto/create-service.dto';
+import { ServiceService } from './service.service';
 
 @Controller('services')
 @ApiTags('services')
-@ApiBearerAuth()
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
-  @Post()
-  create(@Body() createServiceDto: CreateServiceDto) {
-    return this.serviceService.create(createServiceDto);
+  @Get()
+  @HttpCode(200)
+  async getAll() {
+    return this.serviceService.getAll();
   }
 
-  @Get()
-  findAll() {
-    return this.serviceService.findAll();
+  @Post()
+  @HttpCode(201)
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  create(@Body() createServiceDto: CreateServiceDto) {
+    return this.serviceService.create(createServiceDto);
   }
 }

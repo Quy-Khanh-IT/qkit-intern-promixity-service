@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { OTPConstant } from 'src/common/constants';
 import { EmailRegrex } from 'src/common/utils';
 
 export class RequesUpdateEmail {
@@ -16,5 +17,11 @@ export class RequesUpdateEmail {
     description: 'Email',
     example: 'example123@gmail.com',
   })
-  email: string;
+  newEmail: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '1H34as' })
+  @Length(OTPConstant.OTP_LENGTH)
+  otp: string;
 }

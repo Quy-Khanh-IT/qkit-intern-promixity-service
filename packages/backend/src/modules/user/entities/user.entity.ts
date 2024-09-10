@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Exclude } from 'class-transformer';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
+import { UserRole } from 'src/common/enums';
 import { BaseEntity } from 'src/cores/entity/base/entity.base';
 
 export type UserDocument = HydratedDocument<User>;
@@ -31,27 +32,19 @@ export class User extends BaseEntity {
   @Prop({ required: true, minlength: 2, maxlength: 50 })
   lastName: string;
 
-  @Prop([String])
-  @Exclude()
-  roles: string[]; //Partial index
+  @Prop({ required: true, enum: UserRole, default: UserRole.USER })
+  role: UserRole; //Partial index
 
   @Prop()
   image: string;
 
-  @Prop()
+  @Prop({ unique: true })
   phoneNumber: string;
 
-  @Prop({
-    type: AddressUser,
-    _id: false,
-    required: true,
-  })
-  address: Object;
-
-  @Prop([Types.ObjectId])
-  @Exclude()
-  businesses: Types.ObjectId[];
+  @Prop({ default: false })
+  isVerified: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ firstName: 'text', lastName: 'text' });
 //path: packages/backend/src/modules/user/dto/create-user.dto.ts

@@ -17,6 +17,26 @@ export class RequestService {
     });
   }
 
+  async findOneAndReplaceWithUserId(userId: string, newRequest: Requests) {
+    return await this.requestRepository.findOneWithConditionAndUpsert(
+      { userId: transStringToObjectId(userId) },
+      newRequest,
+    );
+  }
+
+  async populateWithUserId(
+    userId: string,
+    type: TypeRequests,
+  ): Promise<Requests> {
+    const condition = { userId: transStringToObjectId(userId), type: type };
+    const result = await this.requestRepository.populateWithCondition(
+      condition,
+      'userId',
+    );
+    console.log('🚀 ~ RequestService ~ result:', result);
+    return result;
+  }
+
   async findManyByUserId(
     userId: string,
     limit: number = 5,

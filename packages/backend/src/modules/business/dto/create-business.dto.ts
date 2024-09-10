@@ -1,24 +1,98 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsString,
+  IsArray,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPhoneNumber,
-  IsArray,
-  IsNumber,
-  Min,
-  Max,
-  ValidateNested,
-  IsEnum,
+  IsString,
   Matches,
-  isArray,
+  Max,
+  Min,
+  ValidateNested,
 } from 'class-validator';
 import { BusinessConstant } from 'src/common/constants/business.constant';
 import { DayEnum } from 'src/common/enums';
 
+export class CreateBusinessDto {
+  @ApiProperty({ example: 'QKIT Coffee làng đại học' })
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'This is coffee shop' })
+  description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: '6654531573a483ab7bf58949' })
+  categoryId: string;
+
+  @IsArray()
+  @IsOptional()
+  @ApiPropertyOptional({
+    example: ['665459a2a6b9b5c51c63efa9', '665459e2a6b9b5c51c63efab'],
+  })
+  serviceIds: string[];
+
+  @IsPhoneNumber('VN')
+  @IsOptional()
+  @ApiPropertyOptional({ example: '0816429333' })
+  phoneNumber: string;
+
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'https://qkit.vn/company-profile' })
+  website: string;
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => DayOpenCloseTime)
+  @ApiPropertyOptional({
+    example: [{ day: 'monday', openTime: '08:00', closeTime: '12:00' }],
+  })
+  dayOfWeek: DayOpenCloseTime[];
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: 'Việt Nam', default: 'Việt Nam' })
+  country: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: ' Thành phố Hồ Chí Minh' })
+  province: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: 'Quận 1' })
+  district: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: 'Lý Tự Trọng' })
+  addressLine: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: '612/A Lý Tự Trọng' })
+  fullAddress: string;
+
+  @IsNotEmpty()
+  @ApiProperty({
+    example: {
+      coordinates: [106.698387, 10.775114],
+    },
+  })
+  location: {
+    coordinates: number[];
+  };
+}
+
 export class DayOpenCloseTime {
-  @IsEnum(DayEnum) // Validate against the DayEnum enum
+  @IsEnum(DayEnum)
   @ApiProperty({ enum: DayEnum })
   day: string;
 
@@ -40,83 +114,6 @@ export class DayOpenCloseTime {
   @IsNumber()
   @Min(1)
   @Max(7)
-  @ApiProperty({ example: 1 })
+  @ApiPropertyOptional()
   order: number;
-}
-
-export class CreateBusinessDto {
-  @ApiProperty({ example: 'QKIT Coffee làng đại học' })
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ example: 'This is coffee shop' })
-  description: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({ example: '66446d345c9bc4899106d4a6' })
-  category: string;
-
-  @IsOptional()
-  @IsArray()
-  @ApiProperty({ example: ['66446c971b53183d5e868de4'] })
-  services: string[];
-
-  @IsOptional()
-  @IsPhoneNumber('VN')
-  @ApiProperty({ example: '0816429333' })
-  phoneNumber: string;
-
-  @IsOptional()
-  @ApiProperty({ example: 'https://qkit.vn/company-profile' })
-  website: string;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => DayOpenCloseTime)
-  @ApiProperty({
-    example: [{ day: 'monday', openTime: '08:00', closeTime: '12:00' }],
-  })
-  dayOfWeek: DayOpenCloseTime[];
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({ example: 'Việt Nam', default: 'Việt Nam' })
-  country: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({ example: 'Hồ Chí Minh' })
-  province: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty({ example: 'Quận 1' })
-  district: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Lý Tự Trọng' })
-  addressLine: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: '612/A Lý Tự Trọng' })
-  addressLineFull: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
-  @ApiProperty({ example: '106.698387' })
-  longitude: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
-  @ApiProperty({ example: '10.775114' })
-  latitude: string;
 }

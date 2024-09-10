@@ -1,35 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Length,
-  Matches,
-} from 'class-validator';
-import { EmailErrorValidationMessage, EmailRegrex } from 'src/common/utils';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsArray, IsOptional, IsString } from 'class-validator';
+import { UserRole } from 'src/common/enums';
 import { QueryFilterBase } from 'src/cores/pagination/base/query-filter.base';
 
 export class FindAllUserQuery extends QueryFilterBase {
-  @ApiProperty({ required: false, example: 'example123@gmail.com' })
+  @ApiPropertyOptional({ required: false, example: 'example123@gmail.com' })
   @IsOptional()
-  @Matches(EmailRegrex, { message: EmailErrorValidationMessage })
   email: string;
 
   @IsString()
-  @ApiProperty({ required: false, example: 'Tuan' })
+  @ApiPropertyOptional({ required: false, example: 'Tuan' })
   @IsOptional()
-  @Length(2, 50)
-  name: string;
+  firstName: string;
 
   @IsString()
-  @ApiProperty({ required: false, example: '038xxxxxxx' })
+  @ApiPropertyOptional({ required: false, example: 'Tuan' })
   @IsOptional()
-  @IsPhoneNumber('VN')
+  lastName: string;
+
+  @IsString()
+  @ApiPropertyOptional({ required: false })
+  @IsOptional()
   phone: string;
 
-  @IsString()
-  @ApiProperty({ required: false, example: '5883d387971bb840b7399130' })
-  @Length(24, 24)
+  @ApiPropertyOptional({
+    isArray: true,
+    example: [UserRole.ADMIN, UserRole.USER],
+  })
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   @IsOptional()
-  businessId: string;
+  @IsArray()
+  role: string[];
 }
