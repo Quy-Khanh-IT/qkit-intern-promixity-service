@@ -9,23 +9,23 @@ services:
       - .env
     ports:
       - '${PORT}:${PORT}'
-    depends_on:
-      - mongodb
+    # depends_on:
+    #   - mongodb
     networks:
       - my-network
 
-  mongodb:
-    image: mongo:latest
-    volumes:
-      - mongodb_data:/data/db
-    hostname: mongodb
-    ports:
-      - '27019:27017'
-    networks:
-      - my-network
+  # mongodb:
+  #   image: mongo:latest
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   hostname: mongodb
+  #   ports:
+  #     - '27019:27017'
+  #   networks:
+  #     - my-network
 
 networks:
   my-network:
     driver: bridge
-volumes:
-  mongodb_data:
+# volumes:
+#   mongodb_data:
