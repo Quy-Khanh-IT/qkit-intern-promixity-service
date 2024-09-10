@@ -1,0 +1,31 @@
+# Not done yet
+version: "3.8"
+
+services:
+  qkit-map-be:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    container_name: qkit-map-be-container
+    env_file:
+      - ./packages/backend/.env
+    ports:
+      - "3011:3000"
+    networks:
+      - my-network
+
+  qkit-map-fe:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    container_name: qkit-map-fe-container
+    env_file:
+      - ./packages/frontend/.env.local
+    ports:
+      - "3012:3000"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
