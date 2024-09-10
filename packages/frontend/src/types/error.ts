@@ -1,10 +1,14 @@
 export interface ErrorResponse {
   data?: {
-    errors?: {
-      [key: string]: string[]
-    }
+    errors?: ErrorDataResponse
     message?: string
+    statusCode?: number
   }
+  status?: number
+}
+
+export interface ErrorDataResponse {
+  [key: string]: string[]
 }
 
 export interface RegisterDataErrors {

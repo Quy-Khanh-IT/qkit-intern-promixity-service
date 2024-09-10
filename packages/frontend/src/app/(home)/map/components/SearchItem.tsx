@@ -12,10 +12,12 @@ import ItemStatus from './search-item/ItemStatus'
 
 export default function SearchItem({
   business,
-  handleItemClick
+  handleItemClick,
+  handleChangeFetch
 }: {
   business: IBusiness
   handleItemClick: () => void
+  handleChangeFetch: (value: boolean) => void
 }): React.ReactNode {
   const [lastClickTime, setLastClickTime] = useState<number | null>(null)
   const dispatch = useDispatch()

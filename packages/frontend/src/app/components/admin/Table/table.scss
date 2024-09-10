@@ -16,11 +16,15 @@
   overflow: hidden;
 
   @include xs{
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+    max-height: calc(100vh - 80px - 48px - 40px - 104px - 104px) !important;
   }
 
   @media screen and (min-width: 468px) {
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+    max-height: calc(100vh - 80px - 48px - 40px - 52px - 52px) !important;
+  }
+
+  .ant-skeleton-paragraph{
+    margin-top: 0 !important;
   }
 }
 
@@ -31,15 +35,13 @@
   border-right: 1px solid $gray-border;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  // 80 header, 48 external padding, 40 internal padding, 50 filter content, 50px for pagination
-  // style={{ maxHeight: 'calc(100vh - 80px - 48px - 40px - 50px - 50px)' }}
 
   @include xs{
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 86px);
+    max-height: calc(100vh - 80px - 48px - 40px - 104px - 104px) !important;
   }
 
   @media screen and (min-width: 468px) {
-    max-height: calc(100vh - 80px - 48px - 40px - 50px - 56px);
+    max-height: calc(100vh - 80px - 48px - 40px - 52px - 52px) !important;
   }
 
   .ant-table-filter-trigger{
@@ -80,6 +82,7 @@
 }
 
 .row-pagination{
+  height: 36px;
   margin-top: 16px;
 
   .table-pagination {

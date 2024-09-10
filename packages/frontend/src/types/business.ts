@@ -33,6 +33,24 @@ export interface IBusiness {
   _distance: number
 }
 
+export interface ICreateBusiness {
+  name: string
+  description: string
+  categoryId: string
+  serviceIds: string[]
+  phoneNumber: string
+  website: string
+  dayOfWeek: IDayOfWeek[]
+  country: string
+  province: string
+  district: string
+  addressLine: string
+  fullAddress: string
+  location: {
+    coordinates: [number, number]
+  }
+}
+
 export interface IStar {
   star: string
   count: number
@@ -41,6 +59,7 @@ export interface IStar {
 export interface ICategory {
   name: string
   id: string
+  linkURL: string
 }
 
 export interface IBusinessImage {
@@ -76,4 +95,10 @@ export interface IService {
 export interface ISelectedBusiness {
   selectedBusinessId: string | null
   selectedBusinessData: IBusiness | null
+}
+
+export interface ITimeOption {
+  timeOpenType: string
+  day: string
+  openTime: string
 }

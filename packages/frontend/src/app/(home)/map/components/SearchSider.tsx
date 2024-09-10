@@ -1,11 +1,12 @@
 'use client'
 import Sider from 'antd/es/layout/Sider'
 import './search-sider.scss'
-import { Button, Dropdown, MenuProps, Space, Spin, Tooltip } from 'antd'
+import { Select, Spin, Tooltip } from 'antd'
 import { SearchList } from './SearchList'
 import { ISearchSider } from '@/types/map'
 import { RatingMenu } from '@/constants/map'
 import { useGetAllBusinessCategoriesQuery } from '@/services/category.service'
+import TimeFilter from './TimeFilter'
 
 export default function SearchSider(props: ISearchSider): React.ReactNode {
   const { data: getCategoryResponse } = useGetAllBusinessCategoriesQuery()
@@ -22,34 +23,9 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
       </div>
     )
   }
-  const handleRatingMenuClick: MenuProps['onClick'] = (e) => {
-    props.handleOnChangeRating(e.key)
-  }
-  const starItems: MenuProps['items'] = RatingMenu
-  const menuProps = {
-    starItems,
-    onClick: handleRatingMenuClick
-  }
 
-  const categoryItems: MenuProps['items'] =
-    getCategoryResponse && getCategoryResponse.filterOpts.length > 0
-      ? [
-          { label: 'ALL category', key: 'all' },
-          ...getCategoryResponse.filterOpts.map((item, index) => ({
-            key: item.value,
-            label: item.text
-          }))
-        ]
-      : []
-
-  const handleCategoryMenuClick: MenuProps['onClick'] = (e) => {
-    props.handleOnChangeCategory(e.key)
-  }
-  const categoryProps = {
-    items: categoryItems,
-    onClick: handleCategoryMenuClick
-  }
-
+  const filterOption = (input: string, option?: { label: string; value: string }): boolean =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
   return (
     <div>
       <Sider
@@ -66,40 +42,75 @@ export default function SearchSider(props: ISearchSider): React.ReactNode {
           </div>
         ) : (
           <div className='search-result-wrapper w-100 h-100 search-result-wrapper scroll-bar-2 pt-2'>
-            <div className='search-result-title mt-2 d-flex justify-content-between align-items-center'>
+            <div className='search-result-title mt-2 d-flex  justify-content-between align-items-center'>
               <div className='ms-2'>
-                Results{' '}
-                <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
-                  <i className='fa-light fa-circle-info'></i>{' '}
-                </Tooltip>
-                <span className='total-results ms-1'>{props.totalResult ? `(${props.totalResult} results)` : ''}</span>
-                <Dropdown className='ms-2' menu={menuProps}>
-                  <Button className='btn-dropdown'>
-                    <Space>
-                      {props.rating ? `${props.rating} +⭐` : 'Any ⭐'}
-                      <i className='fa-solid fa-angle-down'></i>
-                    </Space>
-                  </Button>
-                </Dropdown>
-                <Dropdown className='ms-2' menu={categoryProps}>
-                  <Button className='btn-dropdown'>
-                    <Space className='category-meu-wrapper'>
-                      {props.categoryId && props.categoryId !== 'all'
-                        ? getCategoryResponse && getCategoryResponse.filterOpts.length > 0
-                          ? getCategoryResponse.filterOpts.find((item) => item.value === props.categoryId)?.text
-                          : 'ALL category'
-                        : 'ALL category'}
-                      <i className='fa-solid fa-angle-down'></i>
-                    </Space>
-                  </Button>
-                </Dropdown>
+                <div className='mb-2 d-flex align-items-center'>
+                  <Select
+                    className=''
+                    showSearch
+                    placeholder='Select a star'
+                    optionFilterProp='children'
+                    filterOption={filterOption}
+                    options={RatingMenu}
+                    onChange={(value: string) => props.handleOnChangeRating(value)}
+                    value={props.rating.toString()}
+                  />
+                  <Select
+                    className=' ms-2'
+                    showSearch
+                    placeholder='Select a category'
+                    optionFilterProp='children'
+                    filterOption={filterOption}
+                    options={[
+                      ...(getCategoryResponse && getCategoryResponse.filterOpts.length > 0
+                        ? [
+                            {
+                              label: 'All category',
+                              value: 'all'
+                            },
+                            ...getCategoryResponse.filterOpts.map((item) => ({
+                              value: item.value,
+                              label: item.text
+                            }))
+                          ]
+                        : [
+                            {
+                              label: 'All category',
+                              value: 'all'
+                            }
+                          ])
+                    ]}
+                    onChange={(value: string) => props.handleOnChangeCategory(value)}
+                    value={props.categoryId ? props.categoryId : 'all'}
+                  />
+                  <div className='ms-2'>
+                    <TimeFilter
+                      handleOnChangeTimeOption={props.handleOnChangeTimeOption}
+                      timeOption={props.timeOption}
+                      handleOnApplyTimeFilter={props.handleOnApplyTimeFilter}
+                    />
+                  </div>
+                </div>
+                <div>
+                  Results{' '}
+                  <Tooltip color='#fff' placement='bottomLeft' title={searchResultTooltip}>
+                    <i className='fa-light fa-circle-info'></i>{' '}
+                  </Tooltip>
+                  <span className='total-results ms-1'>
+                    {props.totalResult ? `(${props.totalResult} results)` : ''}
+                  </span>
+                </div>
               </div>
               <div onClick={props.onClose} className='close-btn me-2'>
                 <i className='fa-solid fa-x'></i>
               </div>
             </div>
             <div className='search-result-content mt-3'>
-              <SearchList handleItemClick={props.handleItemClick} businesses={props.businesses} />
+              <SearchList
+                handleChangeFetch={props.handleChangeFetch}
+                handleItemClick={props.handleItemClick}
+                businesses={props.businesses}
+              />
             </div>
           </div>
         )}

@@ -154,7 +154,7 @@ $header-height: 48px;
                 outline: none;
                 line-height: 1.9;
                 width: 100%;
-                color: black;
+                color: black !important;
 
                 &::placeholder {
                   font-weight: 400;
@@ -166,10 +166,10 @@ $header-height: 48px;
                 &:-moz-autofill,
                 &:-ms-autofill {
                   background-color: transparent !important;
-                  color: black !important; // Đảm bảo màu chữ autofill là đen
-                  box-shadow: 0 0 0 1000px #e8f0fe inset !important; // Điều chỉnh màu nền của autofill
-                  -webkit-text-fill-color: black !important; // Đảm bảo màu chữ autofill là đen
-                  transition: background-color 5000s ease-in-out 0s !important; // Tránh việc nền bị thay đổi
+                  color: black !important;
+                  box-shadow: 0 0 0 1000px #e8f0fe inset !important;
+                  -webkit-text-fill-color: black !important;
+                  transition: background-color 5000s ease-in-out 0s !important;
                 }
               }
 
@@ -218,7 +218,7 @@ $header-height: 48px;
             margin-top: 48px;
 
             input {
-              color: black;
+              color: black !important;
               margin-bottom: 20px;
               border-radius: 20px;
               border: none;

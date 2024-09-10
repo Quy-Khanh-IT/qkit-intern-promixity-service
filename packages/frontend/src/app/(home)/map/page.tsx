@@ -3,12 +3,16 @@ import ImageCustom from '@/app/components/ImageCustom/ImageCustom'
 import { ROUTE, StorageKey } from '@/constants'
 import { DistanceMenu, LIMIT_BASE_ON_RADIUS, MAP_LIMIT_BUSINESS, MAP_RADIUS } from '@/constants/map'
 import { useAuth } from '@/context/AuthContext'
+import { useSessionStorage } from '@/hooks/useSessionStorage'
 import { setSearchPosition } from '@/redux/slices/map-props.slice'
 import { setSelectedBusiness } from '@/redux/slices/selected-business.slice'
 import { useFindNearByQuery } from '@/services/near-by.service'
 import { IFindNearByPayLoad } from '@/types/near-by'
+import { getPresentUrl } from '@/utils/helpers.util'
 import { Button, Dropdown, Image, Input, Layout, MenuProps, Space, Typography } from 'antd'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
@@ -16,17 +20,14 @@ import Map from './components'
 import SearchItemDetail from './components/SearchItemDetail'
 import SearchSider from './components/SearchSider'
 import './map.scss'
-import { getFromLocalStorage } from '@/utils/local-storage.util'
-import { IUserInformation } from '@/types/user'
-import { useSessionStorage } from '@/hooks/useSessionStorage'
-import { getPresentUrl } from '@/utils/helpers.util'
+import { RoleEnum } from '@/types/enum'
+import { ITimeOption } from '@/types/business'
 
-const { Text } = Typography
-
-export default function MapPage(): React.ReactNode {
-  const { onLogout } = useAuth()
-  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
-  const [userImage, setUserImage] = useState<string>('')
+function MapPage(): React.ReactNode {
+  const router = useRouter()
+  const { onLogout, userInformation } = useAuth()
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
+  const [userAvatar, setUserAvatar] = useState<string>('')
   const [_routeValue, setRouteValue, _removeRouteValue] = useSessionStorage(
     StorageKey._ROUTE_VALUE,
     getPresentUrl() || ROUTE.MAP
@@ -34,7 +35,7 @@ export default function MapPage(): React.ReactNode {
 
   const position = useSelector((state: RootState) => state.mapProps.position)
   const zoom = useSelector((state: RootState) => state.mapProps.zoom)
-  const { selectedBusinessId, selectedBusinessData } = useSelector((state: RootState) => state.selectedBusiness)
+  const { selectedBusinessId } = useSelector((state: RootState) => state.selectedBusiness)
   const { Header, Content } = Layout
   const { Search } = Input
   const [collapsed, setCollapsed] = useState<boolean>(true)
@@ -45,6 +46,15 @@ export default function MapPage(): React.ReactNode {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false)
   const [clickPosition, setClickPosition] = useState<[number, number] | null>(null)
   const [rating, setRating] = useState<number>(0)
+  const [createdReview, setCreatedReview] = useState<boolean>(false)
+
+  const [timeOption, setTimeOption] = useState<ITimeOption>({
+    timeOpenType: 'every_time',
+    day: 'monday',
+    openTime: '01:00'
+  })
+  const [isApplyTimeFilter, setIsApplyTimeFilter] = useState<number>(1)
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
   const [queryData, setQueryData] = useState<IFindNearByPayLoad>({
@@ -54,23 +64,24 @@ export default function MapPage(): React.ReactNode {
     q: '',
     limit: MAP_LIMIT_BUSINESS.LEVEL_DEFAULT,
     ...(rating !== 0 ? { star: rating } : {}),
-    ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
+    ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {}),
+    ...timeOption
   })
 
-  // useEffect(() => {
-  //   console.log('userInformation', userInformation);
-  // }, [])
-
   useEffect(() => {
-    if (storedUser) {
-      setUserImage(storedUser.image)
+    if (userInformation) {
+      setUserAvatar(userInformation.image)
+      if (userInformation.role === (RoleEnum._ADMIN as string)) {
+        setIsAdmin(true)
+      }
     }
-  }, [storedUser])
+  }, [userInformation])
 
   const {
     data: searchResponse,
     isLoading,
-    isFetching
+    isFetching,
+    refetch
   } = useFindNearByQuery(queryData, {
     skip: !shouldFetch
   })
@@ -91,7 +102,8 @@ export default function MapPage(): React.ReactNode {
       q: searchText,
       limit: maxLimit,
       ...(rating !== 0 ? { star: rating } : {}),
-      ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {})
+      ...(selectedCategoryId !== null && selectedCategoryId !== 'all' ? { categoryId: selectedCategoryId } : {}),
+      ...timeOption
     }
     dispatch(setSearchPosition(clickPosition ? clickPosition : position))
     setQueryData(data)
@@ -140,16 +152,23 @@ export default function MapPage(): React.ReactNode {
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     setDistanceRadius(parseInt(e.key))
   }
-  const menuProps = {
-    distanceItems,
+  const distanceMenuProps = {
+    items: distanceItems,
     onClick: handleMenuClick
   }
 
   useEffect(() => {
     if (shouldFetch) {
+      console.log('vao duoc day ne')
       handleOnSearch()
+      setCreatedReview(false)
     }
-  }, [distanceRadius, rating, selectedCategoryId])
+  }, [distanceRadius, rating, selectedCategoryId, isApplyTimeFilter, createdReview])
+
+  const handleChangeFetch = (value: boolean): void => {
+    setShouldFetch(value)
+    setCreatedReview(value)
+  }
 
   useEffect(() => {
     setCollapsed(true)
@@ -169,42 +188,76 @@ export default function MapPage(): React.ReactNode {
     setSelectedCategoryId(value)
   }
 
-  const handleLogout = (): void => {
-    onLogout()
+  const handleOnChangeTimeOption = (type: string, value: string): void => {
+    setTimeOption({
+      ...timeOption,
+      [type]: value
+    })
   }
 
-  const items: MenuProps['items'] = [
+  const handleOnApplyTimeFilter = (): void => {
+    setIsApplyTimeFilter(isApplyTimeFilter + 1)
+  }
+
+  const handleLogout = (): void => {
+    onLogout(userInformation?.role as RoleEnum)
+  }
+
+  const avatarMenuItems: MenuProps['items'] = [
     {
       key: '1',
       label: (
-        <Link href={ROUTE.USER_PROFILE} onClick={() => setRouteValue(ROUTE.USER_PROFILE)}>
-          <Text className='p-2'>Profile</Text>
+        <Link
+          href={isAdmin ? ROUTE.ADMIN_PROFILE : ROUTE.USER_PROFILE}
+          className='p-2'
+          onClick={() => {
+            if (isAdmin) {
+              setRouteValue(ROUTE.ADMIN_PROFILE)
+              router.push(ROUTE.ADMIN_PROFILE)
+            } else {
+              setRouteValue(ROUTE.USER_PROFILE)
+              router.push(ROUTE.USER_PROFILE)
+            }
+          }}
+        >
+          Profile
         </Link>
       )
     },
     {
       key: '2',
-      label: (
-        <Link href={ROUTE.MY_BUSINESS} onClick={() => setRouteValue(ROUTE.MY_BUSINESS)}>
-          <Text className='p-2'>My business</Text>
-        </Link>
-      )
+      label: <span className='p-2'>{isAdmin ? 'Dashboard' : 'My business'}</span>,
+      onClick: (): void => {
+        if (userInformation?.role === (RoleEnum._ADMIN as string)) {
+          setRouteValue(ROUTE.DASHBOARD)
+          router.push(ROUTE.DASHBOARD)
+        } else if (userInformation?.role === (RoleEnum._BUSINESS as string)) {
+          setRouteValue(ROUTE.MY_BUSINESS)
+          router.push(ROUTE.MY_BUSINESS)
+        } else {
+          setRouteValue(ROUTE.MY_BUSINESS_CREATE)
+          router.push(ROUTE.MY_BUSINESS_CREATE)
+        }
+      }
     },
     {
       key: '3',
-      label: (
-        <Text onClick={handleLogout} className='p-2  '>
-          Log out
-        </Text>
-      )
+      label: <span className='p-2'>Log out</span>,
+      onClick: handleLogout
     }
   ]
-
+  useEffect(() => {
+    if (shouldFetch) {
+      refetch()
+    }
+  }, [refetch, shouldFetch, queryData])
   return (
     <Layout className='vh-100'>
       <Header className='d-flex align-items-center w-100 search-header justify-content-between'>
         <div className='demo-logo'>
-          <Image src='/logo_light.png' preview={false} height={40} alt='logo' />
+          <Link href={ROUTE.ROOT}>
+            <Image src='/logo_light.png' preview={false} height={40} alt='logo' />
+          </Link>
         </div>
         <div className='search-wrapper d-flex justify-content-center align-items-center'>
           <Search
@@ -220,7 +273,7 @@ export default function MapPage(): React.ReactNode {
             onSearch={handleOnSearch}
             width={1000}
           />
-          <Dropdown className='ms-1' menu={menuProps}>
+          <Dropdown className='ms-1' menu={distanceMenuProps}>
             <Button className='btn-dropdown'>
               <Space>
                 {`Distance: ${distanceRadius === 0 ? `500m` : `${distanceRadius}km`}`}
@@ -230,14 +283,14 @@ export default function MapPage(): React.ReactNode {
           </Dropdown>
         </div>
         <div style={{ width: 100 }} className='d-flex justify-content-end'>
-          {userImage ? (
+          {userInformation && userInformation.isVerified ? (
             <>
-              <Dropdown menu={{ items }} placement='bottomRight' arrow>
+              <Dropdown menu={{ items: avatarMenuItems }} placement='bottomRight' arrow>
                 <div>
                   <ImageCustom
                     width={40}
                     height={40}
-                    src={userImage || ''}
+                    src={userAvatar}
                     preview={false}
                     className='--avatar-custom d-cursor'
                   />
@@ -255,7 +308,7 @@ export default function MapPage(): React.ReactNode {
       </Header>
 
       <Layout>
-        {selectedBusinessId ? <SearchItemDetail /> : ''}
+        {selectedBusinessId ? <SearchItemDetail handleChangeFetch={handleChangeFetch} /> : ''}
         <SearchSider
           onClose={handleCloseSider}
           showSpinner={showSpinner}
@@ -267,6 +320,10 @@ export default function MapPage(): React.ReactNode {
           handleOnChangeCategory={handleOnChangeCategory}
           rating={rating}
           categoryId={selectedCategoryId}
+          handleOnChangeTimeOption={handleOnChangeTimeOption}
+          timeOption={timeOption}
+          handleOnApplyTimeFilter={handleOnApplyTimeFilter}
+          handleChangeFetch={handleChangeFetch}
         />
 
         <Content style={{ margin: '0 16px' }}>
@@ -287,3 +344,11 @@ export default function MapPage(): React.ReactNode {
     </Layout>
   )
 }
+
+const DynamicMapPage = dynamic(() => Promise.resolve(MapPage), { ssr: false })
+
+const MapPageDynamic = (): React.ReactNode => {
+  return <DynamicMapPage />
+}
+
+export default MapPageDynamic

@@ -1,3 +1,4 @@
+import { TOAST_MSG } from '@/constants'
 import { ErrorResponse } from '@/types/error'
 import type { Middleware, MiddlewareAPI } from '@reduxjs/toolkit'
 import { isRejected, isRejectedWithValue } from '@reduxjs/toolkit'
@@ -9,13 +10,13 @@ import { toast } from 'react-toastify'
 
 const clarifyError = (error: ErrorResponse): string => {
   const prefixes = ['ATH', 'OTP', 'USR', 'BUS', 'CVL']
-  let errorMessage: string | undefined = error?.data?.message || 'Something wrong on server!'
+  let errorMessage: string | undefined = error?.data?.message || TOAST_MSG.SERVER_NOT_RESPONDING
 
   const startsWithAny = prefixes.find((prefix) => errorMessage?.startsWith(prefix))
 
   if (startsWithAny) {
     if (startsWithAny === 'ATH') {
-      errorMessage = 'Incorrect username or password.'
+      errorMessage = TOAST_MSG.LOGIN_FAILED
     } else {
       errorMessage = Array.isArray(error?.data?.errors?.detail)
         ? error?.data?.errors?.detail.join(', ')
@@ -28,9 +29,14 @@ const clarifyError = (error: ErrorResponse): string => {
 export const rtkQueryErrorLogger: Middleware = (_api: MiddlewareAPI) => (next) => (action) => {
   if (isRejectedWithValue(action)) {
     const errorData = action.payload as ErrorResponse
-    toast.error(clarifyError(errorData))
+
+    if (errorData.data && errorData.data?.errors && 'message' in errorData.data.errors) {
+      toast.error(clarifyError(errorData))
+    }
   } else if (isRejected(action)) {
-    toast.error('Serve is not responding', { toastId: 'default-error' })
+    if (action?.error?.name !== 'ConditionError') {
+      toast.error(TOAST_MSG.SERVER_NOT_RESPONDING, { toastId: 'default-error' })
+    }
   }
 
   return next(action)

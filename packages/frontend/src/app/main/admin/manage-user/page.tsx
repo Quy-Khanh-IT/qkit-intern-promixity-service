@@ -1,12 +1,12 @@
 'use client'
 import { default as DeleteModal, default as RestoreModal } from '@/app/components/admin/ConfirmModal/ConfirmModal'
 import DecentralizeModal from '@/app/components/admin/DecentralizeModal/DecentralizeModal'
-import { IModalMethods } from '@/app/components/admin/modal'
 import FilterPopupProps from '@/app/components/admin/Table/components/FilterPopup'
 import SearchPopupProps from '@/app/components/admin/Table/components/SearchPopup'
 import TableComponent from '@/app/components/admin/Table/Table'
 import ViewRowDetailsModal from '@/app/components/admin/ViewRowDetails/ViewRowDetailsModal'
-import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER } from '@/constants'
+import { DEFAULT_DATE_FORMAT, MODAL_TEXT, PLACEHOLDER, ROUTE, StorageKey } from '@/constants'
+import { RootState } from '@/redux/store'
 import {
   useDeleteUserMutation,
   useGetAllRolesQuery,
@@ -17,9 +17,11 @@ import {
 } from '@/services/user.service'
 import { ColumnsType, IOptionsPipe } from '@/types/common'
 import { TableActionEnum, UserOptionEnum } from '@/types/enum'
+import { IModalMethods } from '@/types/modal'
 import { IGetAllUsersQuery } from '@/types/query'
 import { IUserInformation } from '@/types/user'
-import { compareDates, convertSortOrder, formatDate } from '@/utils/helpers.util'
+import { compareDates, convertSortOrder, formatDate, parseSearchParamsToObject } from '@/utils/helpers.util'
+import { getFromSessionStorage, saveToSessionStorage } from '@/utils/session-storage.util'
 import { EllipsisOutlined, FolderViewOutlined, UndoOutlined, UserAddOutlined } from '@ant-design/icons'
 import {
   Col,
@@ -42,10 +44,12 @@ import {
   TableCurrentDataSource,
   TablePaginationConfig
 } from 'antd/es/table/interface'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import qs from 'qs'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { DELETE_OPTIONS } from '../../admin.constant'
 import { generateRoleColor } from '../../utils/main.util'
-import { MANAGE_BUSINESS_SORT_FIELDS } from '../manage-business/manage-business.const'
 import { MANAGE_USER_FIELDS } from './manage-user.const'
 import './manage-user.scss'
 
@@ -67,7 +71,16 @@ type DataIndex = keyof IUserInformation
 // For search
 type SearchIndex = keyof IGetAllUsersQuery
 
+const ORIGIN_DATA = {
+  offset: ORIGIN_PAGE,
+  limit: PAGE_SIZE
+} as IGetAllUsersQuery
+
 const ManageUser = (): React.ReactNode => {
+  const router = useRouter()
+  const currentPathName = usePathname()
+  // Search
+  const searchParams = useSearchParams()
   // Pagination
   const [currentPage, setCurrentPage] = useState<number>(ORIGIN_PAGE)
 
@@ -79,7 +92,10 @@ const ManageUser = (): React.ReactNode => {
     limit: PAGE_SIZE,
     isDeleted: userOptionBoolean
   } as IGetAllUsersQuery)
-  const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(queryData)
+
+  const { data: usersData, isFetching: isLoadingUsers } = useGetAllUsersQuery(
+    parseSearchParamsToObject(searchParams.toString()) as IGetAllUsersQuery
+  )
   const [selectedUser, setSelectedUser] = useState<IUserInformation | null>(null)
 
   // Modal
@@ -87,6 +103,9 @@ const ManageUser = (): React.ReactNode => {
   const refDecentralizeModal = useRef<IModalMethods | null>(null)
   const refRestoreModal = useRef<IModalMethods | null>(null)
   const refDeleteUserModal = useRef<IModalMethods | null>(null)
+
+  // Redux
+  const sidebarTabState = useSelector((state: RootState) => state.selectedSidebarTab.sidebarTabState)
 
   // Other
   const [deleteUserMutation] = useDeleteUserMutation()
@@ -103,6 +122,33 @@ const ManageUser = (): React.ReactNode => {
 
   useEffect(() => {
     setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: userOptionBoolean
+        }) as IGetAllUsersQuery
+    )
+  }, [sidebarTabState])
+
+  useEffect(() => {
+    const routeTemp = getFromSessionStorage(StorageKey._ROUTE_VALUE)
+    const storedPathName: string = routeTemp ? (routeTemp as string) : ROUTE.MANAGE_USER
+    const storedQueryValue: IGetAllUsersQuery = parseSearchParamsToObject(storedPathName.split('?')[1])
+    storedQueryValue.limit = PAGE_SIZE
+    setQueryData(storedQueryValue)
+  }, [])
+
+  useEffect(() => {
+    const queryString = qs.stringify(queryData, { arrayFormat: 'repeat' })
+    const params = new URLSearchParams(queryString).toString()
+
+    const newPathname = `${currentPathName}?${params}`
+    router.push(newPathname)
+    saveToSessionStorage(StorageKey._ROUTE_VALUE, newPathname)
+  }, [queryData])
+
+  useEffect(() => {
+    setQueryData(
       (prev) =>
         ({
           ...prev,
@@ -110,7 +156,7 @@ const ManageUser = (): React.ReactNode => {
           isDeleted: userOptionBoolean
         }) as IGetAllUsersQuery
     )
-  }, [currentPage, userOptionBoolean])
+  }, [currentPage])
 
   const handleModal = (selectedOpt: number): void => {
     if (selectedOpt === VIEW_DETAILS_OPTION) {
@@ -126,6 +172,13 @@ const ManageUser = (): React.ReactNode => {
 
   const onChangeSelection = (value: string): void => {
     setUserOption(value)
+    setQueryData(
+      (_prev) =>
+        ({
+          ...ORIGIN_DATA,
+          isDeleted: value === DELETED_FETCH
+        }) as IGetAllUsersQuery
+    )
     setCurrentPage(ORIGIN_PAGE)
   }
 
@@ -146,6 +199,18 @@ const ManageUser = (): React.ReactNode => {
     return queryDataTemp
   }
 
+  const deleteUnSelectedField = (_queryData: IGetAllUsersQuery, dataIndex: DataIndex): IGetAllUsersQuery => {
+    const queryDataTemp = { ..._queryData } as IGetAllUsersQuery
+    if ((dataIndex as string) === 'phoneNumber') {
+      delete queryDataTemp.phone
+    } else if ((dataIndex as string) === 'created_at') {
+      delete queryDataTemp.sortBy
+    } else {
+      delete queryDataTemp[dataIndex as SearchIndex]
+    }
+    return queryDataTemp
+  }
+
   const handleSearch = (
     selectedKeys: string[],
     _confirm: FilterDropdownProps['confirm'],
@@ -153,8 +218,7 @@ const ManageUser = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllUsersQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
@@ -169,8 +233,7 @@ const ManageUser = (): React.ReactNode => {
   ): void => {
     if (selectedKeys.length === 0) {
       setQueryData((prev) => {
-        const queryTemp: IGetAllUsersQuery = { ...prev }
-        delete queryTemp[dataIndex as SearchIndex]
+        const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, dataIndex)
         return { ...queryTemp } as IGetAllUsersQuery
       })
     } else {
@@ -185,23 +248,21 @@ const ManageUser = (): React.ReactNode => {
     extra: TableCurrentDataSource<IUserInformation>
   ) => {
     if (extra?.action === (TableActionEnum._SORT as string)) {
-      const _queryDataTemp: IGetAllUsersQuery = { ...queryData }
-      Object.keys(_queryDataTemp).forEach((key: string) => {
-        if (Object.values(MANAGE_BUSINESS_SORT_FIELDS).includes(key)) {
-          delete _queryDataTemp[key as keyof IGetAllUsersQuery]
-        }
-      })
-
       const updateQueryData = (sorterItem: SorterResult<IUserInformation>): void => {
         if (sorterItem?.order) {
-          setQueryData((_prev) =>
+          setQueryData((prev) =>
             mapQueryData(
-              _queryDataTemp,
+              prev,
               sorterItem?.columnKey as DataIndex,
               convertSortOrder(sorterItem?.order as string),
               extra?.action
             )
           )
+        } else {
+          setQueryData((prev) => {
+            const queryTemp: IGetAllUsersQuery = deleteUnSelectedField(prev, sorterItem?.columnKey as DataIndex)
+            return { ...queryTemp } as IGetAllUsersQuery
+          })
         }
       }
 
@@ -275,9 +336,10 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'firstName',
       key: 'firstName',
       width: 160,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'firstName',
         placeholder: MANAGE_USER_FIELDS.firstName,
+        defaultValue: queryData?.firstName ? [queryData?.firstName] : [],
         _handleSearch: handleSearch
       })
     },
@@ -286,9 +348,10 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'lastName',
       key: 'lastName',
       width: 160,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'lastName',
         placeholder: MANAGE_USER_FIELDS.lastName,
+        defaultValue: queryData?.lastName ? [queryData?.lastName] : [],
         _handleSearch: handleSearch
       })
     },
@@ -296,9 +359,10 @@ const ManageUser = (): React.ReactNode => {
       title: MANAGE_USER_FIELDS.email,
       dataIndex: 'email',
       key: 'email',
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'email',
         placeholder: MANAGE_USER_FIELDS.email,
+        defaultValue: queryData?.email ? [queryData?.email] : [],
         _handleSearch: handleSearch
       })
     },
@@ -307,9 +371,10 @@ const ManageUser = (): React.ReactNode => {
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       width: 200,
-      ...SearchPopupProps<IUserInformation, keyof IUserInformation>({
+      ...SearchPopupProps<IUserInformation, DataIndex>({
         dataIndex: 'phoneNumber',
         placeholder: MANAGE_USER_FIELDS.phoneNumber,
+        defaultValue: queryData?.phone ? [queryData?.phone] : [],
         _handleSearch: handleSearch
       })
     },
@@ -337,7 +402,8 @@ const ManageUser = (): React.ReactNode => {
           {role?.toUpperCase()}
         </Tag>
       ),
-      ...FilterPopupProps<IUserInformation, keyof IUserInformation>({
+      ...FilterPopupProps<IUserInformation, DataIndex>({
+        defaultValue: queryData?.role || [],
         dataIndex: 'role',
         optionsData: rolesData as IOptionsPipe,
         _handleFilter: handleFilter
@@ -430,7 +496,7 @@ const ManageUser = (): React.ReactNode => {
 
   return (
     <div className='--manage-user'>
-      <Row className='pb-3'>
+      <Row className='mb-3' style={{ height: 36 }}>
         <Col span={12} style={{ display: 'flex', flexWrap: 'wrap' }}>
           <Col xs={20} sm={16} md={14} lg={10} xl={6}>
             <Select

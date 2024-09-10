@@ -6,7 +6,7 @@ export default function StarRating({ rating, totalReview }: { rating: number; to
 
   return (
     <div className='business-rating d-flex align-items-center mb-1 mt-1'>
-      <div className='rating-count'>{rating}</div>
+      <div className='rating-count'>{rating.toFixed(1)}</div>
       <div className='rating-star '>
         {Array.from({ length: fullStars }, (_, index) => (
           <i key={`full-${index}`} className='fa-solid fa-star star-fill'></i>

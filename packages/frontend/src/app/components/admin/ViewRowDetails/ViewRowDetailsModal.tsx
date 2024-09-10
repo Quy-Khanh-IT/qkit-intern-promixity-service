@@ -3,7 +3,7 @@ import { Button, Carousel, Descriptions, DescriptionsProps, Modal } from 'antd'
 import { CarouselRef } from 'antd/es/carousel'
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import ImageCustom from '../../ImageCustom/ImageCustom'
-import { IModalMethods } from '../modal'
+import { IModalMethods } from '@/types/modal'
 import '../modal.scss'
 import './view-row-details.scss'
 

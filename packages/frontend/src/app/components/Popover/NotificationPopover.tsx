@@ -1,15 +1,22 @@
-import { Badge, Flex, Popover, Space, Tabs, TabsProps, Tooltip } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
-import StickyBox from 'react-sticky-box'
-
 import { UI_TEXT } from '@/constants'
-import { useLazyGetAllNotificationsQuery, useUpdateAllReadNotificationMutation } from '@/services/notification.service'
-import { BooleanEnum } from '@/types/enum'
+import { fetchVersionOptions } from '@/constants/rtk-query'
+import variables from '@/sass/common/_variables.module.scss'
+import {
+  useGetNotificationsQuantityQuery,
+  useLazyGetAllNotificationsQuery,
+  useUpdateAllReadNotificationMutation
+} from '@/services/notification.service'
+import { BooleanEnum, SortEnum } from '@/types/enum'
 import { INotification } from '@/types/notification'
 import { IGetAllNotificationQuery } from '@/types/query'
 import { BellOutlined } from '@ant-design/icons'
+import { Badge, Flex, Popover, Space, Tabs, TabsProps, Tooltip } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import StickyBox from 'react-sticky-box'
 import NotificationList from '../Notifications/NotificationList'
 import './notification-popover.scss'
+
+const { black } = variables
 
 const ORIGIN_PAGE = 1
 const PAGE_SIZE = 4
@@ -19,6 +26,7 @@ const TAB_STEPS = {
   UNREAD: '1',
   READ: '2'
 }
+const INTERVAL_FETCH_DATA = 20000
 
 const tabTitle = [
   <span key='all' className='tab-hover'>
@@ -42,7 +50,8 @@ const NotificationPopover = (): React.ReactNode => {
   const [cacheData, setCacheData] = useState<INotification[]>([])
   const [notificationsData, setNotificationsData] = useState<INotification[]>([])
   const [itemCount, setItemCount] = useState<number>(0)
-  const [getAllNotifications] = useLazyGetAllNotificationsQuery()
+  const [getAllNotifications] = useLazyGetAllNotificationsQuery(fetchVersionOptions)
+  const { data: notificationsQuantity } = useGetNotificationsQuantityQuery('object', fetchVersionOptions)
   const [updateAllReadNotification] = useUpdateAllReadNotificationMutation()
 
   const fetchAllRead = async (): Promise<void> => {
@@ -51,6 +60,8 @@ const NotificationPopover = (): React.ReactNode => {
 
   const clickAllRead = (e: React.MouseEvent<HTMLSpanElement>): void => {
     fetchAllRead()
+    setItemCount(0)
+    loadFirstNotifications(getTabPayload())
     const allReadBtn = document.querySelectorAll('.ant-list-item-action .read-btn')
     allReadBtn.forEach((item: Element) => {
       item.classList.add('d-none')
@@ -67,10 +78,15 @@ const NotificationPopover = (): React.ReactNode => {
     </Flex>
   )
 
-  const getTabPayload = (offset: number = ORIGIN_PAGE, limit: number = perPage.current): IGetAllNotificationQuery => {
+  const getTabPayload = (
+    offset: number = ORIGIN_PAGE,
+    limit: number = perPage.current,
+    sortBy: SortEnum = SortEnum._DESC
+  ): IGetAllNotificationQuery => {
     const payload = {
       offset,
-      limit
+      limit,
+      sortBy
     } as IGetAllNotificationQuery
 
     if (tabKeyRef.current === TAB_STEPS.UNREAD) {
@@ -82,7 +98,7 @@ const NotificationPopover = (): React.ReactNode => {
     return payload
   }
 
-  // load first and change tab
+  // load first and change tab, fetch interval tab
   const loadFirstNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
     setLoading(true)
     await getAllNotifications(payload)
@@ -94,16 +110,8 @@ const NotificationPopover = (): React.ReactNode => {
         }
         setNotificationsData(res.data)
         setCacheData(res.data)
-        setItemCount(res.totalRecords)
         setLoading(false)
       })
-  }
-
-  const onLoadInterval = async (): Promise<void> => {
-    setLoading(true)
-    await loadFirstNotifications(getTabPayload())
-
-    window.dispatchEvent(new Event('resize'))
   }
 
   const fetchMoreNotifications = async (payload: IGetAllNotificationQuery): Promise<void> => {
@@ -143,7 +151,7 @@ const NotificationPopover = (): React.ReactNode => {
         />
       ),
       forceRender: true,
-      style: { minHeight: 700, textColor: '#228154' }
+      style: { minHeight: 700, textColor: black }
     }
   })
 
@@ -168,13 +176,20 @@ const NotificationPopover = (): React.ReactNode => {
   )
 
   useEffect(() => {
+    setItemCount(notificationsQuantity || 0)
+  }, [notificationsQuantity])
+
+  useEffect(() => {
     loadFirstNotifications(getTabPayload())
+  }, [])
+
+  useEffect(() => {
     const timer = setInterval(() => {
-      onLoadInterval()
-    }, 60000)
+      loadFirstNotifications(getTabPayload())
+    }, INTERVAL_FETCH_DATA)
 
     return (): void => {
-      clearInterval(timer)
+      clearTimeout(timer)
     }
   }, [])
 

@@ -5,6 +5,7 @@
     "es6": true,
     "node": true
   },
+  "ignorePatterns": ["next.config.mjs"],
   "settings": {
     "react": {
       "version": "detect"
@@ -70,7 +71,9 @@
         "useRef",
         "useMemo",
         "useCallback",
-        "useImperativeHandle"
+        "useImperativeHandle",
+        "useForm",
+        "useWatch"
         // useEffect and useLayoutEffect do not take generics, so they are not included
       ]
     ],

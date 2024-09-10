@@ -34,7 +34,7 @@ export class HttpClientModel implements HttpClientInterface {
           if (token) {
             config.headers.Authorization = `Bearer ${token}`
           } else {
-            window.location.href = '/login'
+            window.location.href = '/signin'
             throw new Error('Token is required')
           }
         }

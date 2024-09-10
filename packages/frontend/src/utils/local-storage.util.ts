@@ -1,4 +1,4 @@
-export const saveToLocalStorage = (key: string, data: unknown): void => {
+export const saveToLocalStorage = <T>(key: string, data: T): void => {
   if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
     try {
       localStorage.setItem(key, JSON.stringify(data))
@@ -10,12 +10,12 @@ export const saveToLocalStorage = (key: string, data: unknown): void => {
   }
 }
 
-export const getFromLocalStorage = (key: string): unknown => {
+export const getFromLocalStorage = <T>(key: string): T | null => {
   if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
     try {
       const dataString = localStorage.getItem(key)
       if (dataString) {
-        return JSON.parse(dataString)
+        return JSON.parse(dataString) as T
       } else {
         return null
       }

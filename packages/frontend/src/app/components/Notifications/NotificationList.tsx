@@ -35,7 +35,7 @@ const NotificationList: React.FC<INotificationListProps> = ({
         }}
       >
         <Button onClick={onLoadMore} style={{ outlineColor: 'red' }} className='btn-negative'>
-          Tải thêm
+          Load more
         </Button>
       </div>
     ) : null

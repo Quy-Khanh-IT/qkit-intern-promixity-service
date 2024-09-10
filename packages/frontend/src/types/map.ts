@@ -1,4 +1,4 @@
-import { IBusiness } from './business'
+import { IBusiness, ITimeOption } from './business'
 import { Icon } from 'leaflet'
 
 export interface IMapProps {
@@ -10,7 +10,7 @@ export interface IMapProps {
   businesses?: IBusiness[]
   radius?: number
   clickPosition?: [number, number] | null
-  handleSetClickPosition?: (value: [number, number] | null) => void
+  handleSetClickPosition?: (_value: [number, number] | null) => void
 }
 
 export interface ISearchSider {
@@ -21,9 +21,19 @@ export interface ISearchSider {
   totalResult: number | undefined
   handleItemClick: () => void
   rating: number
-  handleOnChangeRating: (value: string) => void
+  handleOnChangeRating: (_value: string) => void
   categoryId: string | null
-  handleOnChangeCategory: (value: string) => void
+  handleOnChangeCategory: (_value: string) => void
+  handleOnChangeTimeOption: (_type: string, _value: string) => void
+  timeOption: ITimeOption
+  handleOnApplyTimeFilter: () => void
+  handleChangeFetch: (value: boolean) => void
+}
+
+export interface ITimeFilterProps {
+  handleOnChangeTimeOption: (_type: string, _value: string) => void
+  timeOption: ITimeOption
+  handleOnApplyTimeFilter: () => void
 }
 
 export interface IMarkerProps {

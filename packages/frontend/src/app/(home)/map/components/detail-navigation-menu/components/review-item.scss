@@ -1,0 +1,62 @@
+@import '@/sass/common/common.scss';
+.review-owner-info {
+}
+
+.review-wrapper {
+  border-bottom: 1px solid $gray-border;
+  text-align: justify;
+}
+
+.review-reply-container {
+  border-left: 1px solid $gray-border;
+}
+
+.review-owner-avatar {
+  img {
+    border-radius: 50%;
+  }
+}
+
+.owner-name {
+  color: black;
+  font-size: 12px;
+}
+
+.review-time {
+  font-size: 12px;
+}
+
+.review-content {
+  color: black;
+}
+
+.btn-reply {
+  color: $link-color;
+  text-align: right;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+.review-business-name {
+  font-weight: 700;
+}
+
+.cancel-btn {
+  color: $gray;
+}
+
+.reply-input {
+  border-radius: 32px;
+  border-color: $gray-border;
+}
+
+.read-more-btn {
+  font-weight: 500;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.5;
+  }
+}

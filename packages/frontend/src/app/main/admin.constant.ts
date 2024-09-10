@@ -18,6 +18,21 @@ export const ADMIN_SIDEBAR_OPTIONS: SidebarOptions = {
   MANAGE_BUSINESS: {
     key: '3',
     label: 'Manage business'
+  },
+  MANAGE_REVIEW: {
+    key: '4',
+    label: 'Manage review'
+  }
+}
+
+export const BUSINESS_SIDEBAR_OPTIONS: SidebarOptions = {
+  USER_PROFILE: {
+    key: '1',
+    label: 'My profile'
+  },
+  MY_BUSINESS: {
+    key: '2',
+    label: 'My business'
   }
 }
 
@@ -26,9 +41,9 @@ export const USER_SIDEBAR_OPTIONS: SidebarOptions = {
     key: '1',
     label: 'My profile'
   },
-  MY_BUSINESS: {
+  MY_BUSINESS_CREATE: {
     key: '2',
-    label: 'My business'
+    label: 'Create business'
   }
 }
 

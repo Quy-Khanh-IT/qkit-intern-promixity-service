@@ -1,5 +1,5 @@
 import { baseQueryWithAuth } from '@/constants/baseQuery'
-import { IBusiness } from '@/types/business'
+import { IBusiness, ICreateBusiness } from '@/types/business'
 import { FilterOptions, IOptionsPipe, SelectionOptions } from '@/types/common'
 import { IPaginationResponse } from '@/types/pagination'
 import { IGetAllBusinessQuery } from '@/types/query'
@@ -20,6 +20,24 @@ export const businessApi = createApi({
       providesTags: ['BusinessInfo']
     }),
 
+    createBusiness: builder.mutation<IBusiness, ICreateBusiness>({
+      query: (data) => {
+        const { location, ...rest } = data
+        const [lat, lng] = location.coordinates
+        const body = {
+          ...rest,
+          location: {
+            coordinates: [lng, lat]
+          }
+        }
+        return {
+          url: `/businesses`,
+          method: 'POST',
+          body
+        }
+      },
+      invalidatesTags: ['BusinessList']
+    }),
     // business
     getAllPrivateBusinesses: builder.query<IPaginationResponse<IBusiness>, IGetAllBusinessQuery>({
       query: (params) => {
@@ -124,7 +142,7 @@ export const businessApi = createApi({
     }),
     updateBusinessStatus: builder.mutation<void, { type: string; id: string }>({
       query: (payload) => ({
-        url: `/businesses/${payload.id}/status?${payload.type}`,
+        url: `/businesses/${payload.id}/status?type=${payload.type}`,
         method: 'PATCH'
       }),
       invalidatesTags: ['BusinessList']
@@ -148,5 +166,6 @@ export const {
   useGetAllBusinessActionsQuery,
   useUpdateBusinessStatusMutation,
   useRestoreDeletedBusinessMutation,
-  useDeleteBusinessMutation
+  useDeleteBusinessMutation,
+  useCreateBusinessMutation
 } = businessApi

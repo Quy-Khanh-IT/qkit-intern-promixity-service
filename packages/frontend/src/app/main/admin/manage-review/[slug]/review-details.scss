@@ -1,0 +1,18 @@
+@import '@/sass/common/_common.scss';
+
+.--review-details-cover{
+  overflow: auto;
+  max-height: calc(100vh - 80px - 48px - 40px - 36px - 16px) !important;
+
+  .ant-card{
+    .ant-card-body{
+      padding: 16px !important;
+    }
+  }
+
+  .split-review-section{
+    margin-top: 16px !important;
+    padding-left: 16px !important;
+    border-left: 1px solid #92989e74 !important;
+  }
+}

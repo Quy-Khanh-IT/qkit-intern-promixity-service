@@ -5,8 +5,6 @@ import { ROUTE, StorageKey } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import '@/sass/common/_common.scss'
 import { RoleEnum } from '@/types/enum'
-import { IUserInformation } from '@/types/user'
-import { getFromLocalStorage } from '@/utils/local-storage.util'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 import { Button, Col, Dropdown, Flex, Image, MenuProps, Space, theme, Typography } from 'antd'
 import { Header } from 'antd/es/layout/layout'
@@ -14,6 +12,8 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import '../main.scss'
 import { directRoutes } from '../utils/main.util'
+import { removeFromSessionStorage } from '@/utils/session-storage.util'
+import { useRouter } from 'next/navigation'
 
 const { Text } = Typography
 
@@ -21,54 +21,65 @@ interface IMainHeaderProps {
   collapsed: boolean
   setCollapsed: (_collapsed: boolean) => void
   setRouteValue: (_value: string) => void
+  startSelectedMenu: () => void
 }
 
-const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRouteValue }) => {
+const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRouteValue, startSelectedMenu }) => {
   const {
     token: { colorBgContainer }
   } = theme.useToken()
-  const storedUser = getFromLocalStorage(StorageKey._USER) as IUserInformation
-  const [userImage, setUserImage] = useState<string>('')
+  const router = useRouter()
   const { onLogout, userInformation } = useAuth()
-
-  useEffect(() => {
-    if (storedUser) {
-      setUserImage(storedUser.image)
-    }
-  }, [storedUser])
+  const [userRole, setUserRole] = useState<string>('')
+  const [userAvatar, setUserAvatar] = useState<string>('')
+  const [isAdmin, setIsAdmin] = useState<boolean>(false)
 
   const handleLogout = (): void => {
-    onLogout()
+    removeFromSessionStorage(StorageKey._ROUTE_VALUE)
+    onLogout(userRole as RoleEnum)
   }
 
+  useEffect(() => {
+    if (userInformation) {
+      setUserAvatar(userInformation.image)
+      setUserRole(userInformation.role)
+      if (userInformation.role === (RoleEnum._ADMIN as string)) {
+        setIsAdmin(true)
+      }
+    }
+  }, [userInformation])
+
   const items: MenuProps['items'] = [
-    ...(userInformation?.role === (RoleEnum._ADMIN as string)
-      ? [
-          {
-            key: '1',
-            label: (
-              <Link
-                href={ROUTE.ADMIN_PROFILE}
-                onClick={() => setRouteValue(ROUTE.ADMIN_PROFILE)}
-                className='link-underline-none'
-              >
-                <Text className='p-2'>Profile</Text>
-              </Link>
-            )
-          }
-        ]
-      : [
-          {
-            key: '1',
-            label: (
-              <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)} className='link-underline-none'>
-                <Text className='p-2'>Back to map</Text>
-              </Link>
-            )
-          }
-        ]),
+    {
+      key: '1',
+      label: (
+        <Link
+          href={userInformation?.role === (RoleEnum._ADMIN as string) ? ROUTE.ADMIN_PROFILE : ROUTE.USER_PROFILE}
+          onClick={() => {
+            if (isAdmin) {
+              setRouteValue(ROUTE.ADMIN_PROFILE)
+              router.push(ROUTE.ADMIN_PROFILE)
+            } else {
+              setRouteValue(ROUTE.USER_PROFILE)
+              router.push(ROUTE.USER_PROFILE)
+            }
+          }}
+          className='link-underline-none'
+        >
+          <Text className='p-2'>Profile</Text>
+        </Link>
+      )
+    },
     {
       key: '2',
+      label: (
+        <Link href={ROUTE.MAP} onClick={() => setRouteValue(ROUTE.MAP)} className='link-underline-none'>
+          <Text className='p-2'>Back to map</Text>
+        </Link>
+      )
+    },
+    {
+      key: '3',
       label: (
         <Text onClick={handleLogout} className='p-2  '>
           Log out
@@ -94,7 +105,13 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
             }}
             className='h-100'
           >
-            <Link href={directRoutesObject.logo} onClick={() => setRouteValue(directRoutesObject.logo)}>
+            <Link
+              href={directRoutesObject.logo}
+              onClick={() => {
+                startSelectedMenu()
+                setRouteValue(directRoutesObject.logo)
+              }}
+            >
               <Image
                 src='/logo_light.png'
                 className='header-logo'
@@ -131,7 +148,7 @@ const MainHeader: React.FC<IMainHeaderProps> = ({ collapsed, setCollapsed, setRo
               <ImageCustom
                 width={40}
                 height={40}
-                src={userImage}
+                src={userAvatar}
                 preview={false}
                 className='--avatar-custom d-cursor'
               />

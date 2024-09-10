@@ -1,4 +1,4 @@
-import { TOAST_MSG, VALIDATION } from '@/constants'
+import { confirmPasswordValidator, newPasswordValidator, TOAST_MSG, VALIDATION } from '@/constants'
 import { useAuth } from '@/context/AuthContext'
 import { useUpdatePasswordProfileMutation } from '@/services/user.service'
 import { IUpdatePasswordPayload } from '@/types/user'
@@ -7,6 +7,7 @@ import { Button, Flex, Form, Input, Space } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import './change-password-modal.scss'
+import { ErrorDataResponse, ErrorResponse } from '@/types/error'
 
 interface SubmitButtonProps extends ChangePasswordFormProps {
   form: FormInstance
@@ -43,17 +44,34 @@ const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ cl
       newPassword: values.newPassword,
       confirmPassword: values.confirmPassword
     }
-    await updatePasswordMutation({ userId: userInformation.id, passwordPayload: passwordPayload })
-      .unwrap()
-      .then(() => {
-        clearForm()
+
+    try {
+      const { error } = await updatePasswordMutation({ userId: userInformation.id, passwordPayload })
+
+      if (error) {
+        const errorInstance = error as ErrorResponse
+        if (errorInstance?.data) {
+          const apiErrors: ErrorDataResponse = errorInstance?.data?.errors || ({} as ErrorDataResponse)
+          if (Object.keys(apiErrors).length > 0) {
+            form.setFields(
+              Object.entries(apiErrors).map(([key, value]: [string, string[]]) => ({
+                name: key,
+                errors: value
+              }))
+            )
+          }
+        }
+      } else {
         toast.success(TOAST_MSG.UPDATE_PASSWORD_SUCCESS)
-      })
+        clearForm()
+      }
+    } catch (_error: unknown) {
+      toast.error(TOAST_MSG.UNKNOWN_ERROR)
+    }
   }
 
   const onSubmitForm = (): void => {
     handleChangePassword()
-    clearForm()
   }
 
   return (
@@ -71,7 +89,7 @@ const SubmitButton: React.FC<React.PropsWithChildren<SubmitButtonProps>> = ({ cl
 }
 
 const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm<IUpdatePasswordPayload>()
 
   return (
     <>
@@ -83,56 +101,57 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ closeModal }) =
         className='change-password-modal pb-3 pt-3'
       >
         <Form.Item name='oldPassword' label='Password' rules={VALIDATION.PASSWORD} className='mb-0'>
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
         <Form.Item
           name='newPassword'
           label='New password'
           rules={[
-            {
-              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-              validator(_, value: string) {
-                if (!value) {
-                  return Promise.reject(new Error('Please enter password'))
-                }
-                if (value?.length < 6 || value?.length > 25) {
-                  return Promise.reject(new Error('Password must be 6-25 characters long'))
-                }
-                if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{6,25}$/.test(value)) {
-                  return Promise.reject(
-                    new Error(
-                      'Password must include at least one uppercase letter, one number, and one special character'
-                    )
-                  )
-                }
-                return Promise.resolve()
-              }
-            }
+            { required: true, message: 'Please enter new password' },
+            { validator: newPasswordValidator(form.getFieldValue, 'oldPassword') }
           ]}
           className='mb-0 mt-2'
         >
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
         <Form.Item
           name='confirmPassword'
-          label='Confirm password'
+          label='Confirm new password'
           className='mb-0 mt-2'
           rules={[
-            { required: true, message: 'Please confirm your password' },
-            // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-            ({ getFieldValue }) => ({
-              // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-              validator(_, value) {
-                if (!value || getFieldValue('newPassword') === value) {
-                  return Promise.resolve()
-                }
-                return Promise.reject(new Error('The confirmation password does not match!'))
-              }
-            })
+            { required: true, message: 'Please confirm your new password' },
+            { validator: confirmPasswordValidator(form.getFieldValue, 'newPassword') }
           ]}
           validateTrigger={['onBlur']}
         >
-          <Input.Password />
+          <Input.Password
+            onPaste={(e) => {
+              e.preventDefault()
+              return false
+            }}
+            onCopy={(e) => {
+              e.preventDefault()
+              return false
+            }}
+          />
         </Form.Item>
 
         <Form.Item className='mb-0 mt-3'>

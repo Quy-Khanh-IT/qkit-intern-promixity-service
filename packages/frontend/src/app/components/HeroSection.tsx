@@ -30,7 +30,7 @@ export default function HeroSection(): React.ReactNode {
               </span>
             </div>
             <div className='d-flex align-items-center w-100 hero-content-wrapper'>
-              <button onClick={() => router.push('/signin')} className='hero-btn'>
+              <button onClick={() => router.push('/map')} className='hero-btn'>
                 JOIN NOW
               </button>
             </div>

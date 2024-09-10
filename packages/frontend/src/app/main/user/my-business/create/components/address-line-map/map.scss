@@ -1,0 +1,37 @@
+.map-container {
+  font-family: '__Poppins_eb80d3', '__Poppins_Fallback_eb80d3' !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+
+.popup-thumb {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0 !important;
+}
+
+.popup-title {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.business-popup {
+  max-width: 240px;
+}
+
+.address-line-map {
+  height: 50vh !important;
+}

@@ -1,0 +1,38 @@
+@import '@/sass/common/common.scss';
+.time-wrapper {
+  width: 192px;
+}
+
+.day-title {
+  font-size: 14px;
+  color: black;
+  font-weight: 600;
+}
+
+.ant-switch-inner {
+  width: 35px;
+}
+
+.time-status {
+  width: 88px;
+}
+
+.hour-input {
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  width: 100px;
+  font-size: 16px;
+  border-color: $gray-border;
+  border-width: 1px;
+  outline: none !important;
+
+  &::placeholder {
+    color: $gray-border;
+  }
+}
+
+.error-message {
+  color: $error;
+  font-weight: 500;
+}

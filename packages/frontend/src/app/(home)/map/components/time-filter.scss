@@ -1,0 +1,110 @@
+@import '@/sass/common/common.scss';
+
+.time-filter-wrapper {
+  border: 1px solid $gray-border;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  min-height: 30px;
+  font-weight: 400;
+
+  &:hover {
+    background-color: $gray-hover;
+    border-color: $main-color;
+  }
+}
+
+.down-icon {
+  color: $gray-border;
+}
+
+.time-select-wrapper {
+  position: fixed;
+  top: 116px;
+  left: 216px;
+  padding-bottom: 12px;
+  width: 320px;
+  background-color: #fff;
+  border-radius: 8px;
+  z-index: 9;
+
+  box-shadow:
+    0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.time-select-bottom {
+  border-top: 1px solid $gray-border;
+}
+
+.radio-option {
+  font-size: 14px !important;
+}
+
+.time-detail-option {
+  border-bottom: 1px solid $gray-border;
+}
+
+.time-detail-day {
+  width: 35%;
+  border-right: 1px solid $gray-border;
+}
+
+.time-detail-hour {
+  width: 65%;
+}
+
+.btn-time-detail {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $gray-border;
+  border-radius: 8px;
+
+  margin-bottom: 8px;
+  font-size: 13px !important;
+  background-color: transparent;
+}
+
+.btn-day {
+  width: 88px;
+}
+
+.btn-hour {
+  width: 86px;
+}
+
+.btn-apply {
+  text-align: right;
+  color: $main-color;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.is-active {
+  border-color: $main-color;
+  color: $main-color;
+  background-color: $gray-hover;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.btn-clear {
+  font-size: 14px;
+  cursor: pointer;
+}

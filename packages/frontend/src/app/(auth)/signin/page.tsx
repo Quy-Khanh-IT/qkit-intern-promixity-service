@@ -11,12 +11,17 @@ import './signin.scss'
 import { useAuth } from '@/context/AuthContext'
 import { ILoginPayload } from '@/types/auth'
 
-export default function SignIn(): React.ReactNode {
+const SignIn = (): React.ReactNode => {
   const { onLogin } = useAuth()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
   const toastService = useMemo<ToastService>(() => new ToastService(), [])
+  const [loadingLogin, setLoadingLogin] = useState<boolean>(false)
+
+  const handleLoadingLogin = (): void => {
+    setLoadingLogin(false)
+  }
 
   const [inputError, setInputError] = useState<{
     email: string
@@ -35,6 +40,7 @@ export default function SignIn(): React.ReactNode {
     if (isLoginSuccess) {
       toastService.success('Login success')
       saveToLocalStorage('auth', { accessToken: dataLogin.accessToken, refreshToken: dataLogin.refreshToken })
+      router.push('/map')
     }
     if (isLoginError) {
       const errorResponse = loginError as ErrorResponse
@@ -61,10 +67,13 @@ export default function SignIn(): React.ReactNode {
   }
 
   const handleSignIn = (): void => {
-    onLogin({
-      email,
-      password
-    } as ILoginPayload)
+    onLogin(
+      {
+        email,
+        password
+      } as ILoginPayload,
+      handleLoadingLogin
+    )
   }
 
   const onChangeData = (value: string, type: string): void => {
@@ -173,3 +182,5 @@ export default function SignIn(): React.ReactNode {
     </div>
   )
 }
+
+export default SignIn

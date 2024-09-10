@@ -1,6 +1,4 @@
-@import "@/sass/utils/animate.scss";
-@import "@/sass/utils/scroll-bar.scss";
-@import "@/sass/utils/utils.scss";
+@import "@/sass/utils/index.scss";
 @import "@/sass/common/common.scss";
 
 :root {
@@ -186,4 +184,9 @@ body {
       display: none !important;
     }
   }
+}
+
+// CanvasJs
+.canvasjs-chart-credit{
+  display: none !important;
 }

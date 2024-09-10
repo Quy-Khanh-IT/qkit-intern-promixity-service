@@ -1,0 +1,28 @@
+@import '@/sass/common/common.scss';
+
+.sort-btn {
+  width: 84px;
+  height: 36px;
+  border: 1px solid $gray-border;
+  border-radius: 36px;
+  color: $link-color;
+
+  &:hover {
+    background-color: $gray-hover;
+  }
+}
+
+.btn-title {
+  color: black;
+  font-weight: 500;
+}
+
+.sort-wrapper {
+}
+
+.review-reply-wrapper {
+}
+
+.first-reply {
+  border-left: 1px solid $gray-border;
+}

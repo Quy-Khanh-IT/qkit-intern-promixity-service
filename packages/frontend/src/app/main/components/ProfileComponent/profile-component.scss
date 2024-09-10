@@ -11,31 +11,23 @@
   .profile-cover {
     position: relative;
   
-    // @include ssm {
-    //   width: 90%;
-    // }
-  
-    // @include md {
-    //   width: 60%;
-    // }
-  
-    // @include xl {
-    //   width: 40%;
-    // }
-  
     .avatar-cover {
       position: relative;
       .role {
         position: absolute;
-        right: -25%;
+        left: 70%;
         top: 10%;
+      }
+
+      .--edit-avatar-icon{
+        position: absolute;
+        bottom: 13%;
+        right: 0;
       }
     }
   
     .editable-btn {
       position: absolute;
-      // bottom: calc(4% + -1px);
-      // right: 28%;
       bottom: calc(0.5% - 2.5px);
       right: 110px;
       transition-duration: 0.4s;
@@ -45,20 +37,6 @@
       right: 130px !important;
       transition: all .3s ease-in-out;
     }
-  }
-  
-  .password-cover {
-    // @include ssm {
-    //   width: 90%;
-    // }
-  
-    // @include md {
-    //   width: 60%;
-    // }
-  
-    // @include xl {
-    //   width: 40%;
-    // }
   }
 }
 

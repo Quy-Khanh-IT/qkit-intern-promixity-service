@@ -6,3 +6,7 @@ export interface SidebarOption {
 export interface SidebarOptions {
   [routeAlias: string]: SidebarOption
 }
+
+export interface SidebarOptionsRender extends SidebarOption {
+  icon: React.ReactNode
+}

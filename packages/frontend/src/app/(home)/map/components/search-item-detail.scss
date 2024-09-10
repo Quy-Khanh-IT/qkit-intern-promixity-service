@@ -19,6 +19,7 @@
   left: 562px;
   background-color: $light;
   height: 90vh;
+  width: 360px;
 
   border-radius: 16px;
   z-index: 999;
@@ -80,4 +81,31 @@
 .active {
   color: $link-color;
   border-bottom: 3px solid $link-color;
+}
+
+.navigation-bar-business {
+  height: 56px;
+  font-size: 16px;
+  color: black;
+  i {
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: $gray-hover;
+    }
+  }
+}
+
+.business-nav-title {
+  max-width: 255px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
 }

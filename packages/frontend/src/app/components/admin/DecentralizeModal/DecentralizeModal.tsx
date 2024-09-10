@@ -1,7 +1,7 @@
 import { Button, Col, Modal, Row, Select, Space } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { SelectionOptions } from '@/types/common'
-import { IModalMethods } from '../modal'
+import { IModalMethods } from '@/types/modal'
 import '../modal.scss'
 import './decentralize-role-modal.scss'
 
@@ -58,13 +58,11 @@ const _DecentralizeModal: React.ForwardRefRenderFunction<IModalMethods, IDecentr
             Close
           </Button>,
           <Button
-            // className={isConfirm ? 'btn-primary' : ''}
             className='btn-primary'
             onClick={handleConfirmChild}
             type='primary'
             key='ok'
             disabled={confirmBoolean}
-            // loading={confirmLoading}
           >
             Confirm
           </Button>

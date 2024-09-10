@@ -1,4 +1,6 @@
 import { Rule } from 'antd/es/form'
+import { RuleObject } from 'antd/lib/form'
+import { StoreValue } from 'rc-field-form/lib/interface'
 
 export const VALIDATION = {
   EMAIL: [
@@ -8,17 +10,23 @@ export const VALIDATION = {
   PASSWORD: [
     { required: true, message: 'Please enter password' },
     { min: 6, message: 'Password has at least 6 letters' }
-  ] as Rule[],
-  UPDATE_PASSWORD: [
-    { required: true, message: 'Please enter password' },
-    {
-      min: 6,
-      max: 25,
-      message: 'Password must be 6-25 characters long'
-    },
-    {
-      pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{6,25}$/,
-      message: 'Password must include at least one uppercase letter, one number, and one special character'
-    }
   ] as Rule[]
 }
+
+export const newPasswordValidator =
+  (getFieldValue: (_name: string) => string, checkField: string) =>
+  async (_: RuleObject, value: string): Promise<void> => {
+    if (getFieldValue(checkField) === value) {
+      return Promise.reject(new Error('New password must be different from the old password'))
+    }
+    return Promise.resolve()
+  }
+
+export const confirmPasswordValidator =
+  (getFieldValue: (_name: string) => string, checkField: string) =>
+  async (_: RuleObject, value: StoreValue): Promise<void> => {
+    if (getFieldValue(checkField) !== value) {
+      return Promise.reject(new Error('The confirmation password does not match!'))
+    }
+    return Promise.resolve()
+  }
