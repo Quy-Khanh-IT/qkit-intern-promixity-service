@@ -6,6 +6,6 @@ services:
       dockerfile: Dockerfile
     container_name: lbs-fe-con
     env_file:
-      - .env.local
+      - .env.production
     ports:
       - '3011:3000'

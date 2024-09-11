@@ -27,10 +27,10 @@
 # CMD ["npm", "run", "start:prod"]
 
 # Use a lighter version of Node as a base
-FROM node:20.11.1-alpine3.19 as base
+FROM node:20.11.1-alpine3.19 AS base
 EXPOSE 8080
 # Build
-FROM node:20.11.1-alpine3.19 as build
+FROM node:20.11.1-alpine3.19 AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci -f
@@ -38,7 +38,7 @@ COPY . .
 RUN npm run build
 RUN npm ci -f --only=production && npm cache clean --force
 # Final stage from base
-FROM base as final
+FROM base AS final
 WORKDIR /app
 ENV NODE_ENV production
 COPY --from=build /app/dist ./dist

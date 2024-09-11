@@ -28,30 +28,30 @@ export function configSwagger(app: INestApplication) {
         return { name, pass };
       }
 
-      function unauthorizedResponse(): void {
-        if (http_adapter.getType() === 'fastify') {
-          res.statusCode = 401;
-          res.setHeader('WWW-Authenticate', 'Basic');
-        } else {
-          res.status(401);
-          res.set('WWW-Authenticate', 'Basic');
-        }
+      // function unauthorizedResponse(): void {
+      //   if (http_adapter.getType() === 'fastify') {
+      //     res.statusCode = 401;
+      //     res.setHeader('WWW-Authenticate', 'Basic');
+      //   } else {
+      //     res.status(401);
+      //     res.set('WWW-Authenticate', 'Basic');
+      //   }
 
-        next();
-      }
+      //   next();
+      // }
 
-      if (!req.headers.authorization) {
-        return unauthorizedResponse();
-      }
+      // if (!req.headers.authorization) {
+      //   return unauthorizedResponse();
+      // }
 
-      const credentials = parseAuthHeader(req.headers.authorization);
+      // const credentials = parseAuthHeader(req.headers.authorization);
 
-      if (
-        credentials?.name !== api_documentation_credentials.name ||
-        credentials?.pass !== api_documentation_credentials.pass
-      ) {
-        return unauthorizedResponse();
-      }
+      // if (
+      //   credentials?.name !== api_documentation_credentials.name ||
+      //   credentials?.pass !== api_documentation_credentials.pass
+      // ) {
+      //   return unauthorizedResponse();
+      // }
 
       next();
     },
