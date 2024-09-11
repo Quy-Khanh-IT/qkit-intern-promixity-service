@@ -1,0 +1,8 @@
+docker run -d -p 3015:3000 --name be-lbs-2-con be-lbs-2
+
+docker build -t lbs-main-be .
+docker run --name lbs-main-be-con --env-file .env -dp 3012:8080 lbs-main-be
+
+docker run -d --env-file .env --name lbs-main-be-container lbs-main-be
+
+docker run --name lbs-main-be-con --env-file .env -dp 3012:8080 backend-app
