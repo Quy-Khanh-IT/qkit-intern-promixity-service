@@ -4,11 +4,11 @@ services:
     build:
       context: .
       dockerfile: DockerFile
-    container_name: nest-docker-postgres
+    container_name: lbs-main-con
     env_file:
       - .env
     ports:
-      - '${PORT}:${PORT}'
+      - '3012:8080'
     # depends_on:
     #   - mongodb
     networks:
