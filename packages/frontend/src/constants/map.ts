@@ -5,7 +5,7 @@ export const MAP_RADIUS = {
   LEVEL_FOUR: 5000,
   LEVEL_FIVE: 10000,
   LEVEL_SIX: 20000,
-  LEVEL_DEFAULT: 2000
+  LEVEL_DEFAULT: 10000
 }
 
 export const MAP_ZOOM = {
