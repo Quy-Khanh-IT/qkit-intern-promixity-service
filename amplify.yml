@@ -5,7 +5,6 @@ applications:
       phases:
         preBuild:
           commands:
-            - ls
             - npm install
         build:
           commands:
