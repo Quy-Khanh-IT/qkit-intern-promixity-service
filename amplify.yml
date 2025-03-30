@@ -5,14 +5,15 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm install --prefix packages/frontend
+            - ls
+            - npm install
         build:
           commands:
-            - npm run build --prefix packages/frontend
+            - npm run build
       artifacts:
-        baseDirectory: packages/frontend/.next
+        baseDirectory: .next
         files:
           - '**/*'
       cache:
         paths:
-          - packages/frontend/node_modules/**/*
+          - node_modules/**/*
