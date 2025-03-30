@@ -1,18 +1,18 @@
 version: 1
 applications:
-  - appRoot: packages/frontend  # Specify the root directory of your frontend
+  - appRoot: packages/frontend
     frontend:
       phases:
         preBuild:
           commands:
-            - npm ci --prefix packages/frontend  # Install dependencies in the frontend folder
+            - npm install --prefix packages/frontend
         build:
           commands:
-            - npm run build --prefix packages/frontend  # Build the frontend application
+            - npm run build --prefix packages/frontend
       artifacts:
-        baseDirectory: packages/frontend/.next  # Adjust this if necessary (e.g., build output directory)
+        baseDirectory: packages/frontend/.next
         files:
-          - '**/*'  # Include all files in the build output directory
+          - '**/*'
       cache:
         paths:
-          - packages/frontend/node_modules/**/*  # Cache node modules in the frontend folder
+          - packages/frontend/node_modules/**/*
