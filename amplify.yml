@@ -1,17 +1,21 @@
 version: 1
 frontend:
-  phases:
-    preBuild:
-      commands:
-        - cd packages/frontend
-        - npm ci
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: packages/frontend/.next # Pointing to the .next folder in frontend
-    files:
-      - "**/*"
-  cache:
-    paths:
-      - node_modules/**/* # Caching node_modules for faster builds
+  applications:
+    - appRoot: packages/frontend   # Path to your frontend project
+      frontendFramework: Next.js
+      phases:
+        preBuild:
+          commands:
+            - cd packages/frontend
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: packages/frontend/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+
